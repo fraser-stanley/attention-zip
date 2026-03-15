@@ -12,7 +12,7 @@ const sections = [
     label: "Skills",
     href: "/skills",
     category: "skills",
-    description: `${skills.length} verified skills`,
+    description: `${skills.length} skills`,
     items: skills.map((s) => s.name),
   },
   {

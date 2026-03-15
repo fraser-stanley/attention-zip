@@ -57,8 +57,8 @@ export default function Home() {
           Discover Zora. Arm your agent.
         </h1>
         <p className="text-sm text-muted-foreground max-w-lg mx-auto leading-relaxed">
-          Verified skills, live market data, and public leaderboards for
-          Zora-native agents. One-click install. Read-only. Open source.
+          Open-source skills for Zora-native agents. Install in one command,
+          read-only by default, no keys required.
         </p>
         <div className="flex items-center justify-center gap-3">
           <Link href="/skills" className={buttonVariants({ size: "default" })}>
@@ -87,9 +87,9 @@ export default function Home() {
       <section className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-sm font-medium uppercase tracking-wider text-muted-foreground">Verified Skills</h2>
+            <h2 className="text-sm font-medium uppercase tracking-wider text-muted-foreground">Skills</h2>
             <p className="text-xs text-muted-foreground mt-1">
-              First-party, open-source, read-only. Install in one command.
+              We wrote these, reviewed them, and published the source. Install in one command.
             </p>
           </div>
           <Link
@@ -153,7 +153,7 @@ export default function Home() {
       <section className="text-center space-y-4 pb-16">
         <h2 className="text-sm font-medium uppercase tracking-wider text-muted-foreground">Stay in the loop</h2>
         <p className="text-xs text-muted-foreground max-w-md mx-auto">
-          Get notified when new skills launch, the leaderboard goes live, and execution-capable skills ship.
+          We'll email you when new skills drop or when buy/sell execution ships.
         </p>
         <form className="flex items-center gap-2 max-w-sm mx-auto">
           <Input

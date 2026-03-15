@@ -27,7 +27,7 @@ export const skills: Skill[] = [
     name: "Trend Scout",
     description: "Fast-moving opportunities: new launches, gainers, momentum.",
     longDescription:
-      "Monitors trending coins, new launches, and top gainers on Zora. Emits structured alerts to your agent with coin name, address, market cap, volume, and 24h change. Perfect for catching momentum early.",
+      "Watches trending coins, new launches, and top gainers on Zora. Your agent gets coin name, address, market cap, volume, and 24h change as structured data. Good for spotting momentum before it shows up on dashboards.",
     risk: "none",
     riskLabel: "Read-only \u2014 no wallet needed",
     monitors: [
@@ -70,7 +70,7 @@ export const skills: Skill[] = [
     description:
       "Watch specific creators, creator-coin ecosystems, and holdings.",
     longDescription:
-      "Tracks creator coin ecosystems and featured creators on Zora. Set up watchlists for specific creators and get alerts when their coin activity changes significantly. Monitors holdings, volume, and market movements.",
+      "Tracks creator coins and featured creators on Zora. Set up a watchlist and get alerts when activity spikes. Covers holdings, volume, and price movement for specific creators you care about.",
     risk: "none",
     riskLabel: "Read-only \u2014 no wallet needed",
     monitors: [
@@ -110,7 +110,7 @@ Watchlist alert:
     description:
       'Scheduled digest: "what changed on Zora since last check?"',
     longDescription:
-      "Synthesizes trending, volume, creator, and new-launch data into a structured morning or evening briefing. Instead of raw data, you get a summary of what matters. Perfect for staying informed without constant monitoring.",
+      "Pulls trending, volume, creator, and new-launch data into a morning or evening briefing. You get a short summary instead of raw numbers. Useful if you don't want to check dashboards yourself.",
     risk: "none",
     riskLabel: "Read-only \u2014 no wallet needed",
     monitors: [

@@ -1,6 +1,6 @@
 export const SITE_NAME = "Zora Agent Skills";
 export const SITE_DESCRIPTION =
-  "Verified skills, live market data, and public leaderboards for Zora-native agents.";
+  "Skills, live data, and leaderboards for Zora-native agents. Open source, read-only, no custody.";
 export const SITE_REPO_URL =
   "https://github.com/fraserstanley/zora-agent-skills";
 export const API_VERSION = "0.1.0";

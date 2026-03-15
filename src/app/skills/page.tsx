@@ -41,10 +41,10 @@ export default function SkillsPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(skillJsonLd) }}
       />
       <div>
-        <h1 className="text-2xl font-bold tracking-tight">Verified Skills</h1>
+        <h1 className="text-2xl font-bold tracking-tight">Skills</h1>
         <p className="text-sm text-muted-foreground">
-          First-party, open-source, read-only. Each skill is a reviewed
-          SKILL.md file you install into your OpenClaw agent.
+          Each skill is a SKILL.md file we wrote and reviewed. Install it
+          into your OpenClaw or Claude Code agent in one command.
         </p>
       </div>
 

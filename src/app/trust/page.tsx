@@ -8,7 +8,7 @@ export default function TrustPage() {
       <div>
         <h1 className="text-2xl font-bold tracking-tight">Trust & Safety</h1>
         <p className="text-sm text-muted-foreground">
-          How we think about security, verification, and your wallet.
+          What we do, what we don&apos;t, and how to keep your wallet safe.
         </p>
       </div>
 
@@ -18,9 +18,8 @@ export default function TrustPage() {
         </CardHeader>
         <CardContent className="space-y-4 text-sm">
           <p>
-            All skills are <strong>first-party, verified, and open-source</strong>.
-            We reviewed the published source code and confirmed it does what it
-            claims.
+            We wrote every skill in this repo and published the source. You can
+            read the code before you install anything.
           </p>
           <p>
             <strong>

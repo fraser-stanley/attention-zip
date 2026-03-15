@@ -1,13 +1,17 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Providers } from "@/lib/providers";
 import { Nav } from "@/components/nav";
+import { CommandMenuLoader } from "@/components/command-menu-loader";
+import {
+  getSiteUrl,
+  SITE_DESCRIPTION,
+  SITE_NAME,
+  SITE_REPO_URL,
+} from "@/lib/site";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
+const siteUrl = getSiteUrl();
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
@@ -15,9 +19,26 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Zora Agent Skills",
-  description:
-    "Verified skills, live market data, and public leaderboards for Zora-native agents.",
+  metadataBase: new URL(siteUrl),
+  title: SITE_NAME,
+  description: SITE_DESCRIPTION,
+};
+
+const webApplicationJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  name: SITE_NAME,
+  description: SITE_DESCRIPTION,
+  url: siteUrl,
+  applicationCategory: "DeveloperApplication",
+  operatingSystem: "Cross-platform",
+  isAccessibleForFree: true,
+  offers: {
+    "@type": "Offer",
+    price: "0",
+    priceCurrency: "USD",
+  },
+  sameAs: [SITE_REPO_URL],
 };
 
 export default function RootLayout({
@@ -26,13 +47,20 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark">
+    <html lang="en">
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(webApplicationJsonLd) }}
+        />
+      </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistMono.variable} antialiased`}
       >
         <Providers>
           <Nav />
-          <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
+          <CommandMenuLoader />
+          <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-14 pb-12">
             {children}
           </main>
         </Providers>

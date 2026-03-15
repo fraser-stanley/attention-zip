@@ -3,35 +3,47 @@
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import Link from "next/link";
-import type { CoinNode } from "@/lib/zora";
-import {
-  formatCompactCurrency,
-  formatChange,
-  truncateAddress,
+import type {
+  CoinNode,
+  ExploreApiResponse,
+  LeaderboardApiResponse,
+  TraderNode,
 } from "@/lib/zora";
+import { formatCompactCurrency, formatChange, truncateAddress } from "@/lib/zora";
+
+type HomeCardSort = "trending" | "gainers" | "volume";
 
 function CoinCard({
   title,
   sort,
+  initialCoins,
 }: {
   title: string;
-  sort: string;
+  sort: HomeCardSort;
+  initialCoins?: CoinNode[];
 }) {
   const { data, isLoading } = useQuery({
     queryKey: ["explore", sort, 3],
     queryFn: async () => {
       const res = await fetch(`/api/explore?sort=${sort}&count=3`);
       if (!res.ok) throw new Error("Failed to fetch");
-      return res.json() as Promise<{ coins: CoinNode[] }>;
+      return res.json() as Promise<ExploreApiResponse>;
     },
+    initialData: initialCoins
+      ? {
+          coins: initialCoins,
+          sort,
+          count: 3,
+        }
+      : undefined,
+    initialDataUpdatedAt: initialCoins ? Date.now() : undefined,
     refetchInterval: 30_000,
   });
 
   return (
     <Card>
       <CardHeader className="pb-2">
-        <CardTitle className="text-sm font-medium text-muted-foreground">
+        <CardTitle className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
           {title}
         </CardTitle>
       </CardHeader>
@@ -49,10 +61,9 @@ function CoinCard({
               coin.marketCapDelta24h
             );
             return (
-              <Link
+              <div
                 key={coin.address ?? i}
-                href={`/coin/${coin.address}`}
-                className="flex items-center justify-between text-sm hover:bg-accent/50 rounded px-1 -mx-1 py-0.5"
+                className="flex items-center justify-between text-sm px-1 -mx-1 py-0.5"
               >
                 <span className="truncate font-medium">
                   {coin.name ?? "Unknown"}
@@ -73,7 +84,7 @@ function CoinCard({
                     {change.value}
                   </span>
                 </span>
-              </Link>
+              </div>
             );
           })
         )}
@@ -82,22 +93,29 @@ function CoinCard({
   );
 }
 
-function LeaderboardCard() {
+function LeaderboardCard({ initialTraders }: { initialTraders?: TraderNode[] }) {
   const { data, isLoading } = useQuery({
     queryKey: ["leaderboard", 3],
     queryFn: async () => {
       const res = await fetch("/api/leaderboard?count=3");
       if (!res.ok) throw new Error("Failed to fetch");
-      return res.json() as Promise<{ traders: Record<string, unknown>[] }>;
+      return res.json() as Promise<LeaderboardApiResponse>;
     },
-    refetchInterval: 300_000,
+    initialData: initialTraders
+      ? {
+          traders: initialTraders,
+          count: 3,
+        }
+      : undefined,
+    initialDataUpdatedAt: initialTraders ? Date.now() : undefined,
+    refetchInterval: 30_000,
   });
 
   return (
     <Card>
       <CardHeader className="pb-2">
-        <CardTitle className="text-sm font-medium text-muted-foreground">
-          Top Traders This Week
+        <CardTitle className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+          Top Traders
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-2">
@@ -110,15 +128,14 @@ function LeaderboardCard() {
         ) : (
           (data?.traders ?? []).map((trader, i) => (
             <div
-              key={i}
-              className="flex items-center justify-between text-sm py-0.5"
+              key={trader.address ?? i}
+              className="flex items-center justify-between text-sm px-1 -mx-1 py-0.5"
             >
-              <span className="font-mono text-xs text-muted-foreground">
-                #{i + 1}{" "}
-                {truncateAddress((trader.address as string) ?? "")}
+              <span className="truncate font-mono text-xs">
+                {truncateAddress(trader.address ?? "")}
               </span>
-              <span className="text-muted-foreground">
-                {formatCompactCurrency(trader.volume as string)}
+              <span className="text-muted-foreground shrink-0">
+                {formatCompactCurrency(trader.volume)}
               </span>
             </div>
           ))
@@ -128,13 +145,31 @@ function LeaderboardCard() {
   );
 }
 
-export function HomeLiveCards() {
+export function HomeLiveCards({
+  initialCoins,
+  initialTraders,
+}: {
+  initialCoins?: Partial<Record<HomeCardSort, CoinNode[]>>;
+  initialTraders?: TraderNode[];
+}) {
   return (
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-      <CoinCard title="Trending Now" sort="trending" />
-      <CoinCard title="Top Gainers (24h)" sort="gainers" />
-      <CoinCard title="Volume Leaders" sort="volume" />
-      <LeaderboardCard />
+      <CoinCard
+        title="Trending Now"
+        sort="trending"
+        initialCoins={initialCoins?.trending}
+      />
+      <CoinCard
+        title="Top Gainers (24h)"
+        sort="gainers"
+        initialCoins={initialCoins?.gainers}
+      />
+      <CoinCard
+        title="Volume Leaders"
+        sort="volume"
+        initialCoins={initialCoins?.volume}
+      />
+      <LeaderboardCard initialTraders={initialTraders} />
     </div>
   );
 }

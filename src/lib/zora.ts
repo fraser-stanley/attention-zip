@@ -6,13 +6,8 @@ import {
   getCoinsTopVolume24h,
   getCreatorCoins,
   getFeaturedCreators,
-  getTraderLeaderboard,
-  getCoin,
-  getCoinSwaps,
-  getCoinHolders,
   getTrendingAll,
-  getProfileBalances,
-  getProfileCoins,
+  getTraderLeaderboard,
 } from "@zoralabs/coins-sdk";
 
 const apiKey = process.env.ZORA_API_KEY;
@@ -45,6 +40,22 @@ export interface CoinNode {
   };
   uniqueHolders?: number;
   totalSupply?: string;
+}
+
+export interface TraderNode {
+  address?: string;
+  volume?: string;
+}
+
+export interface ExploreApiResponse {
+  coins: CoinNode[];
+  sort: SortOption;
+  count: number;
+}
+
+export interface LeaderboardApiResponse {
+  traders: TraderNode[];
+  count: number;
 }
 
 interface ExploreEdge {
@@ -86,37 +97,17 @@ export async function fetchCoins(
   );
 }
 
-export async function fetchLeaderboard(count: number = 20) {
+
+export async function fetchLeaderboard(
+  count: number = 20
+): Promise<TraderNode[]> {
   const response = await getTraderLeaderboard({ first: count });
   if ((response as { error?: unknown }).error) return [];
   const data = response.data as Record<string, unknown> | undefined;
-  const leaderboard = data?.traderLeaderboard as { edges?: Array<{ node: Record<string, unknown> }> } | undefined;
+  const leaderboard = data?.traderLeaderboard as
+    | { edges?: Array<{ node: TraderNode }> }
+    | undefined;
   return leaderboard?.edges?.map((e) => e.node) ?? [];
-}
-
-export async function fetchCoinDetail(address: string) {
-  const response = await getCoin({ address, chain: 8453 });
-  if ((response as { error?: unknown }).error) return null;
-  const data = response.data as Record<string, unknown> | undefined;
-  return (data?.zora20Token as Record<string, unknown>) ?? null;
-}
-
-export async function fetchCoinSwapsData(address: string, count: number = 20) {
-  const response = await getCoinSwaps({ address, chain: 8453, first: count });
-  if ((response as { error?: unknown }).error) return [];
-  const data = response.data as Record<string, unknown> | undefined;
-  const token = data?.zora20Token as Record<string, unknown> | undefined;
-  const edges = (token?.swaps as { edges?: Array<{ node: Record<string, unknown> }> })?.edges;
-  return edges?.map((e) => e.node) ?? [];
-}
-
-export async function fetchCoinHoldersData(address: string, count: number = 20) {
-  const response = await getCoinHolders({ chainId: 8453, address, count });
-  if ((response as { error?: unknown }).error) return [];
-  const data = response.data as Record<string, unknown> | undefined;
-  const token = data?.zora20Token as Record<string, unknown> | undefined;
-  const edges = (token?.holders as { edges?: Array<{ node: Record<string, unknown> }> })?.edges;
-  return edges?.map((e) => e.node) ?? [];
 }
 
 export function formatCompactCurrency(value: string | number | undefined): string {
@@ -162,22 +153,4 @@ export function coinTypeLabel(coinType: string | undefined): string {
     case "TREND": return "trend";
     default: return coinType?.toLowerCase() ?? "unknown";
   }
-}
-
-export async function fetchProfileBalances(identifier: string, count: number = 20) {
-  const response = await getProfileBalances({ identifier, count });
-  if ((response as { error?: unknown }).error) return [];
-  const data = response.data as Record<string, unknown> | undefined;
-  const profile = data?.profile as Record<string, unknown> | undefined;
-  const balances = profile?.coinBalances as { edges?: Array<{ node: Record<string, unknown> }> } | undefined;
-  return balances?.edges?.map((e) => e.node) ?? [];
-}
-
-export async function fetchProfileCoins(identifier: string, count: number = 20) {
-  const response = await getProfileCoins({ identifier, count });
-  if ((response as { error?: unknown }).error) return [];
-  const data = response.data as Record<string, unknown> | undefined;
-  const profile = data?.profile as Record<string, unknown> | undefined;
-  const coins = profile?.createdCoins as { edges?: Array<{ node: Record<string, unknown> }> } | undefined;
-  return coins?.edges?.map((e) => e.node) ?? [];
 }

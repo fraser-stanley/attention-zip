@@ -1,5 +1,26 @@
 # Changelog
 
+## Unreleased
+
+### Added
+
+- Agent discovery API index at `/api`
+- Skill catalog API at `/api/skills` with optional single-skill lookup via `?id=...`
+- `/.well-known/ai.json` discovery document for external agents
+- Cross-origin access for `/api/*` via `src/proxy.ts`
+- JSON-LD structured data for the app shell and skills gallery
+
+### Changed
+
+- Homepage, dashboard, leaderboard, and skills pages now render from server components first, then hydrate small client wrappers for live refresh or interaction
+- Shared cached server data layer added in `src/lib/data.ts` so SSR and API routes use the same fallback-aware fetch path
+- Command menu is now lazy-loaded through a client loader instead of shipping on first paint
+- Explore and leaderboard API routes now return explicit `Cache-Control` headers
+
+### Docs
+
+- Updated Claude-facing docs to describe the new agent-first API surface, server/client rendering split, and button variant import pattern
+
 ## v0.1.0
 
 Initial build of the Zora Agent Skills discovery surface.

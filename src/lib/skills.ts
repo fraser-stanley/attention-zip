@@ -12,6 +12,13 @@ export interface Skill {
   sampleOutput: string;
   badges: string[];
   githubUrl: string;
+  skillMdUrl: string;
+}
+
+export interface SkillInstallCommands {
+  claude: string;
+  openclaw: string;
+  manual: string;
 }
 
 export const skills: Skill[] = [
@@ -54,6 +61,8 @@ export const skills: Skill[] = [
     badges: ["Works with OpenClaw", "Zora CLI ready", "Read-only"],
     githubUrl:
       "https://github.com/fraserstanley/zora-agent-skills/tree/main/trend-scout",
+    skillMdUrl:
+      "https://raw.githubusercontent.com/fraserstanley/zora-agent-skills/main/trend-scout/SKILL.md",
   },
   {
     id: "creator-pulse",
@@ -92,6 +101,8 @@ Watchlist alert:
     badges: ["Works with OpenClaw", "Zora CLI ready", "Read-only"],
     githubUrl:
       "https://github.com/fraserstanley/zora-agent-skills/tree/main/creator-pulse",
+    skillMdUrl:
+      "https://raw.githubusercontent.com/fraserstanley/zora-agent-skills/main/creator-pulse/SKILL.md",
   },
   {
     id: "briefing-bot",
@@ -132,6 +143,8 @@ Nothing unusual detected. Market is moderately active.`,
     badges: ["Works with OpenClaw", "Zora CLI ready", "Read-only"],
     githubUrl:
       "https://github.com/fraserstanley/zora-agent-skills/tree/main/briefing-bot",
+    skillMdUrl:
+      "https://raw.githubusercontent.com/fraserstanley/zora-agent-skills/main/briefing-bot/SKILL.md",
   },
   {
     id: "portfolio-scout",
@@ -180,5 +193,19 @@ Coins held: 3`,
     ],
     githubUrl:
       "https://github.com/fraserstanley/zora-agent-skills/tree/main/portfolio-scout",
+    skillMdUrl:
+      "https://raw.githubusercontent.com/fraserstanley/zora-agent-skills/main/portfolio-scout/SKILL.md",
   },
 ];
+
+export function getSkillById(id: string) {
+  return skills.find((skill) => skill.id === id) ?? null;
+}
+
+export function getSkillInstallCommands(skill: Skill): SkillInstallCommands {
+  return {
+    claude: `claude skill add ${skill.githubUrl}`,
+    openclaw: skill.installCommand,
+    manual: `curl -O ${skill.skillMdUrl}`,
+  };
+}

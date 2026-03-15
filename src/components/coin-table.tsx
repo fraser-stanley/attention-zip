@@ -11,8 +11,7 @@ import {
 } from "@/components/ui/table";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
-import Link from "next/link";
-import type { CoinNode } from "@/lib/zora";
+import type { CoinNode, ExploreApiResponse, SortOption } from "@/lib/zora";
 import {
   formatCompactCurrency,
   formatChange,
@@ -21,19 +20,33 @@ import {
 } from "@/lib/zora";
 
 interface CoinTableProps {
-  sort: string;
+  sort: SortOption;
   count?: number;
   compact?: boolean;
+  initialCoins?: CoinNode[];
 }
 
-export function CoinTable({ sort, count = 10, compact = false }: CoinTableProps) {
+export function CoinTable({
+  sort,
+  count = 10,
+  compact = false,
+  initialCoins,
+}: CoinTableProps) {
   const { data, isLoading, error } = useQuery({
     queryKey: ["explore", sort, count],
     queryFn: async () => {
       const res = await fetch(`/api/explore?sort=${sort}&count=${count}`);
       if (!res.ok) throw new Error("Failed to fetch");
-      return res.json() as Promise<{ coins: CoinNode[] }>;
+      return res.json() as Promise<ExploreApiResponse>;
     },
+    initialData: initialCoins
+      ? {
+          coins: initialCoins,
+          sort,
+          count,
+        }
+      : undefined,
+    initialDataUpdatedAt: initialCoins ? Date.now() : undefined,
   });
 
   if (error) {
@@ -85,13 +98,8 @@ export function CoinTable({ sort, count = 10, compact = false }: CoinTableProps)
               <TableCell className="text-muted-foreground font-mono text-xs">
                 {i + 1}
               </TableCell>
-              <TableCell>
-                <Link
-                  href={`/coin/${coin.address}`}
-                  className="font-medium hover:underline"
-                >
-                  {coin.name ?? "Unknown"}
-                </Link>
+              <TableCell className="font-medium">
+                {coin.name ?? "Unknown"}
               </TableCell>
               {!compact && (
                 <TableCell className="font-mono text-xs text-muted-foreground">

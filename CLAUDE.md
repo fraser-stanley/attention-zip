@@ -1,6 +1,6 @@
 # Zora Agent Skills
 
-Discovery and install surface for Zora-native agent skills. Live market data, verified skill gallery, public leaderboards.
+Agent-first discovery and install surface for Zora-native skills. Live market data, verified skill gallery, public leaderboards, and machine-readable API docs.
 
 **Not** an execution platform, custody layer, or marketplace. Execution is local to the user's agent runtime. We don't hold keys, submit transactions, or enforce guardrails server-side.
 
@@ -39,35 +39,48 @@ The API key is **optional**. The SDK works without it (uses registered queries),
 src/
 ├── app/
 │   ├── page.tsx                    # Homepage (hero, live cards, skills preview, waitlist)
-│   ├── layout.tsx                  # Root layout (dark mode, Geist fonts, Providers, Nav)
+│   ├── layout.tsx                  # Root layout (metadata, JSON-LD, Providers, Nav)
 │   ├── globals.css                 # Tailwind imports + CSS variables
-│   ├── dashboard/page.tsx          # Tabbed explore (trending, mcap, new, volume, gainers, creators)
-│   ├── skills/page.tsx             # Skill gallery with install commands + sample output
-│   ├── leaderboard/page.tsx        # Weekly trader rankings
+│   ├── dashboard/page.tsx          # Server-rendered shell + streamed dashboard tabs
+│   ├── skills/page.tsx             # Server-rendered skill gallery + JSON-LD
+│   ├── leaderboard/page.tsx        # Weekly trader rankings with server-fetched initial data
 │   ├── trust/page.tsx              # Trust & Safety (wallet presets, scope disclaimers)
-│   ├── coin/[address]/page.tsx     # Coin detail (stats, swaps, holders)
 │   └── api/
-│       ├── explore/route.ts        # SDK explore queries (hides API key server-side)
-│       ├── coin/[address]/route.ts # Coin detail + swaps + holders
+│       ├── route.ts                # API discovery document
+│       ├── skills/route.ts         # Skill catalog for agents
+│       ├── explore/route.ts        # Explore queries + cache headers
 │       └── leaderboard/route.ts    # Trader leaderboard
 ├── components/
 │   ├── nav.tsx                     # Navigation bar
-│   ├── home-live-cards.tsx         # 4 live data cards (trending, gainers, volume, traders)
+│   ├── command-menu-loader.tsx     # Lazy client-only command menu mount
+│   ├── home-live-cards.tsx         # Hydrated live cards with server initial data
+│   ├── dashboard-tabs.tsx          # Client dashboard tabs + table refresh
+│   ├── leaderboard-table.tsx       # Client leaderboard refresh wrapper
+│   ├── skill-card-client.tsx       # Install block + output toggle
 │   ├── coin-table.tsx              # Reusable coin data table
 │   └── ui/                         # shadcn/ui components (button, card, badge, table, tabs, etc.)
+├── public/
+│   └── .well-known/ai.json         # Agent discovery metadata
 └── lib/
+    ├── data.ts                     # Cached server data helpers for pages and routes
+    ├── site.ts                     # Site metadata and URL helpers
     ├── zora.ts                     # SDK wrapper: all query functions + formatting helpers
     ├── skills.ts                   # Static skill definitions (4 skills)
     ├── providers.tsx               # React Query provider (30s staleTime)
     └── utils.ts                    # cn() helper for className merging
+├── proxy.ts                        # CORS headers for /api/*
 ```
 
 ## Key decisions
 
-- **All SDK calls go through API routes** (`/api/explore`, `/api/coin/[address]`, `/api/leaderboard`) so the API key stays server-side. Client pages fetch from these routes via React Query.
+- **Server components fetch initial data directly** through `src/lib/data.ts`, which wraps the SDK with `unstable_cache` and mock-data fallbacks. This keeps the first paint server-rendered without duplicating fetch logic.
+- **Client components still refresh through API routes** (`/api/explore`, `/api/leaderboard`) using React Query. The API remains the public integration surface for external agents and local tooling.
+- **Agent discovery is explicit** via `/api`, `/api/skills`, JSON-LD, and `/.well-known/ai.json`.
 - **Skills are static data** in `src/lib/skills.ts`. No database, no CMS. The homepage grid and skills gallery both render from this array — add a skill to the array and both pages update automatically.
+- **Install commands are shared** from `src/lib/skills.ts` so the UI and `/api/skills` stay in sync.
 - **No `config.schema.json`** for skills. Config is documented inline in SKILL.md files, following Bankr/OpenClaw conventions.
-- **React Query** with 30s `staleTime` and interval refresh. Dashboard tabs refetch on focus.
+- **Command menu is lazy-loaded** through `src/components/command-menu-loader.tsx` so it does not affect the initial page payload.
+- **React Query** handles live refresh after hydration. Initial render is server-owned for `/`, `/dashboard`, and `/leaderboard`.
 
 ## shadcn/ui v2 — critical gotcha
 
@@ -80,10 +93,12 @@ Wrong:
 
 Correct:
 ```tsx
+import { buttonVariants } from "@/components/ui/button-variants"
+
 <Link href="/foo" className={buttonVariants({ variant: "outline" })}>Go</Link>
 ```
 
-Always import `buttonVariants` from `@/components/ui/button` and apply it to `<Link>` directly.
+Import `buttonVariants` from `@/components/ui/button-variants` for server-safe usage with `<Link>`. The interactive `<Button>` component still lives in `@/components/ui/button`.
 
 ## SDK parameter inconsistencies
 
@@ -117,6 +132,15 @@ All SDK responses return `{ error, data }`. Always check `response.error` before
 4. **Portfolio Scout** — wallet balance + coin holdings (Bankr-ready bridge skill)
 
 All use OpenClaw SKILL.md format. All read-only — no wallet or private key needed.
+
+## Agent-facing endpoints
+
+- `/api` — discovery document listing public endpoints
+- `/api/skills` — full skill catalog JSON
+- `/api/skills?id=<skill-id>` — single skill lookup
+- `/api/explore` — live explore data with cache headers
+- `/api/leaderboard` — leaderboard data with cache headers
+- `/.well-known/ai.json` — simple discovery document for crawlers and agents
 
 ## Product boundaries
 

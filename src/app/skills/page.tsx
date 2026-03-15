@@ -1,35 +1,45 @@
-"use client";
-
-import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button, buttonVariants } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { skills } from "@/lib/skills";
-
-function CopyButton({ text }: { text: string }) {
-  const [copied, setCopied] = useState(false);
-
-  return (
-    <Button
-      variant="outline"
-      size="sm"
-      onClick={() => {
-        navigator.clipboard.writeText(text);
-        setCopied(true);
-        setTimeout(() => setCopied(false), 2000);
-      }}
-    >
-      {copied ? "Copied!" : "Copy install command"}
-    </Button>
-  );
-}
+import {
+  SkillInstallBlock,
+  SkillSampleOutput,
+} from "@/components/skill-card-client";
+import { getSkillInstallCommands, skills } from "@/lib/skills";
+import { toAbsoluteUrl } from "@/lib/site";
 
 export default function SkillsPage() {
-  const [expandedOutput, setExpandedOutput] = useState<string | null>(null);
+  const skillJsonLd = skills.map((skill) => {
+    const install = getSkillInstallCommands(skill);
+
+    return {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      name: skill.name,
+      description: skill.description,
+      applicationCategory: "DeveloperApplication",
+      operatingSystem: "Cross-platform",
+      isAccessibleForFree: true,
+      offers: {
+        "@type": "Offer",
+        price: "0",
+        priceCurrency: "USD",
+      },
+      featureList: [...skill.monitors, ...skill.wraps],
+      keywords: skill.badges.join(", "),
+      url: toAbsoluteUrl(`/skills#${skill.id}`),
+      downloadUrl: skill.skillMdUrl,
+      codeRepository: skill.githubUrl,
+      installUrl: install.claude,
+    };
+  });
 
   return (
     <div className="space-y-8">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(skillJsonLd) }}
+      />
       <div>
         <h1 className="text-2xl font-bold tracking-tight">Verified Skills</h1>
         <p className="text-sm text-muted-foreground">
@@ -58,6 +68,8 @@ export default function SkillsPage() {
               </div>
             </CardHeader>
             <CardContent className="space-y-6">
+              <SkillInstallBlock skill={skill} />
+
               {/* Monitors */}
               <div>
                 <h3 className="text-sm font-medium mb-2">What it monitors</h3>
@@ -80,7 +92,7 @@ export default function SkillsPage() {
                   {skill.wraps.map((cmd) => (
                     <code
                       key={cmd}
-                      className="block text-xs bg-muted px-3 py-1.5 rounded font-mono"
+                      className="block text-xs bg-muted px-3 py-1.5 font-mono"
                     >
                       {cmd}
                     </code>
@@ -103,61 +115,7 @@ export default function SkillsPage() {
 
               <Separator />
 
-              {/* Install */}
-              <div>
-                <h3 className="text-sm font-medium mb-2">Install</h3>
-                <div className="bg-muted rounded-lg p-4 font-mono text-sm">
-                  <code>{skill.installCommand}</code>
-                </div>
-                <div className="mt-2 flex items-center gap-2">
-                  <CopyButton text={skill.installCommand} />
-                  <a
-                    href={skill.githubUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className={buttonVariants({ variant: "ghost", size: "sm" })}
-                  >
-                    View source
-                  </a>
-                </div>
-              </div>
-
-              <Separator />
-
-              {/* What you'll get */}
-              <div>
-                <h3 className="text-sm font-medium mb-2">
-                  What you&apos;ll get after install
-                </h3>
-                <div className="space-y-3">
-                  <div>
-                    <p className="text-xs text-muted-foreground mb-1">
-                      Sample prompt:
-                    </p>
-                    <div className="bg-muted rounded-lg p-3 text-sm italic">
-                      &ldquo;{skill.samplePrompt}&rdquo;
-                    </div>
-                  </div>
-                  <div>
-                    <button
-                      className="text-xs text-muted-foreground hover:underline"
-                      onClick={() =>
-                        setExpandedOutput(
-                          expandedOutput === skill.id ? null : skill.id
-                        )
-                      }
-                    >
-                      {expandedOutput === skill.id ? "Hide" : "Show"} example
-                      output
-                    </button>
-                    {expandedOutput === skill.id && (
-                      <pre className="mt-2 bg-muted rounded-lg p-4 text-xs font-mono whitespace-pre-wrap">
-                        {skill.sampleOutput}
-                      </pre>
-                    )}
-                  </div>
-                </div>
-              </div>
+              <SkillSampleOutput skill={skill} />
             </CardContent>
           </Card>
         ))}

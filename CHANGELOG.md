@@ -16,6 +16,9 @@
 - Shared cached server data layer added in `src/lib/data.ts` so SSR and API routes use the same fallback-aware fetch path
 - Command menu is now lazy-loaded through a client loader instead of shipping on first paint
 - Explore and leaderboard API routes now return explicit `Cache-Control` headers
+- Removed global `refetchInterval` from React Query defaults — only pages that need polling opt in individually
+- Dashboard tabs now render only the active tab's CoinTable instead of all six at once
+- `unstable_cache` wrappers in `src/lib/data.ts` hoisted to module-scoped Maps so they're reused across requests
 
 ### Docs
 

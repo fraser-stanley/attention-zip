@@ -68,7 +68,8 @@ export function CommandMenu() {
     >
       <Command.Input
         placeholder="Type a command or search…"
-        className="w-full border-b border-border bg-transparent px-4 py-3 text-base md:text-sm font-mono placeholder:text-muted-foreground outline-none"
+        aria-label="Search commands and pages"
+        className="w-full border-b border-border bg-transparent px-4 py-3 text-base font-mono placeholder:text-muted-foreground outline-none"
       />
       <Command.List className="max-h-80 overflow-y-auto p-2">
         <Command.Empty className="px-4 py-6 text-center text-sm text-muted-foreground">

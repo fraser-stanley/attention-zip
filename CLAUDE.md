@@ -52,6 +52,9 @@ src/
 │       └── leaderboard/route.ts    # Trader leaderboard
 ├── components/
 │   ├── nav.tsx                     # Navigation bar
+│   ├── hero-section.tsx            # Hero layout with orb + CTA
+│   ├── hero-orb-glass.tsx          # Concrete dithered orb (R3F + spring click + velocity rotation)
+│   ├── hero-orb-glass-loader.tsx   # Dynamic import wrapper (ssr: false)
 │   ├── command-menu-loader.tsx     # Lazy client-only command menu mount
 │   ├── home-live-cards.tsx         # Hydrated live cards with server initial data
 │   ├── dashboard-tabs.tsx          # Client dashboard tabs + table refresh
@@ -61,13 +64,17 @@ src/
 │   └── ui/                         # shadcn/ui components (button, card, badge, table, tabs, etc.)
 ├── public/
 │   └── .well-known/ai.json         # Agent discovery metadata
+├── public/
+│   └── textures/                   # PBR texture maps (concrete diffuse/normal/roughness, env map)
 └── lib/
     ├── data.ts                     # Cached server data helpers for pages and routes
     ├── site.ts                     # Site metadata and URL helpers
     ├── zora.ts                     # SDK wrapper: all query functions + formatting helpers
     ├── skills.ts                   # Static skill definitions (4 skills)
     ├── providers.tsx               # React Query provider (30s staleTime)
-    └── utils.ts                    # cn() helper for className merging
+    ├── utils.ts                    # cn() helper for className merging
+    └── shaders/
+        └── dither-effect.ts        # 4x4 Bayer matrix dithering post-process (binary output)
 ├── proxy.ts                        # CORS headers for /api/*
 ```
 

@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import { HomeLiveCards } from "@/components/home-live-cards";
+import { HeroSection } from "@/components/hero-section";
 import { getExploreData, getLeaderboardData } from "@/lib/data";
 import { skills } from "@/lib/skills";
 
@@ -52,23 +53,7 @@ export default function Home() {
   return (
     <div className="space-y-16">
       {/* Hero */}
-      <section className="pt-16 pb-8 text-center space-y-8">
-        <h1 className="text-3xl sm:text-4xl font-medium tracking-tighter">
-          Discover Zora. Arm your agent.
-        </h1>
-        <p className="text-sm text-muted-foreground max-w-lg mx-auto leading-relaxed">
-          Open-source skills for Zora-native agents. Install in one command,
-          read-only by default, no keys required.
-        </p>
-        <div className="flex items-center justify-center gap-3">
-          <Link href="/skills" className={buttonVariants({ size: "default" })}>
-            Browse skills
-          </Link>
-          <Link href="/dashboard" className={buttonVariants({ variant: "outline", size: "default" })}>
-            Watch live
-          </Link>
-        </div>
-      </section>
+      <HeroSection />
 
       {/* Live data cards */}
       <section className="space-y-4">

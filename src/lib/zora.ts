@@ -8,6 +8,8 @@ import {
   getFeaturedCreators,
   getTrendingAll,
   getTraderLeaderboard,
+  getProfileBalances,
+  getProfileCoins,
 } from "@zoralabs/coins-sdk";
 
 const apiKey = process.env.ZORA_API_KEY;
@@ -153,4 +155,83 @@ export function coinTypeLabel(coinType: string | undefined): string {
     case "TREND": return "trend";
     default: return coinType?.toLowerCase() ?? "unknown";
   }
+}
+
+// --- Agent profile types and fetchers ---
+
+export interface BalanceNode {
+  balance: string;
+  coin?: {
+    name: string;
+    address: string;
+    symbol: string;
+    coinType: "CREATOR" | "CONTENT" | "TREND";
+    marketCap: string;
+    marketCapDelta24h: string;
+    volume24h: string;
+    totalSupply: string;
+    tokenPrice?: {
+      priceInUsdc?: string;
+    };
+  };
+}
+
+export interface ProfileData {
+  handle?: string;
+  avatar?: string;
+  balances: BalanceNode[];
+  balanceCount: number;
+  coins: CoinNode[];
+  coinCount: number;
+  totalValueUsd: number;
+}
+
+export interface AgentProfileApiResponse {
+  address: string;
+  volume?: string;
+  leaderboardRank?: number;
+  profile: ProfileData;
+}
+
+export async function fetchProfileBalanceNodes(
+  address: string,
+  count: number = 20
+): Promise<{ balances: BalanceNode[]; totalCount: number; handle?: string; avatar?: string }> {
+  const response = await getProfileBalances({ identifier: address, count });
+  if ((response as { error?: unknown }).error) return { balances: [], totalCount: 0 };
+
+  const data = response.data as Record<string, unknown> | undefined;
+  const profile = data?.profile as Record<string, unknown> | undefined;
+  if (!profile) return { balances: [], totalCount: 0 };
+
+  const handle = profile.handle as string | undefined;
+  const avatarObj = profile.avatar as { previewImage?: { small?: string } } | undefined;
+  const avatar = avatarObj?.previewImage?.small;
+
+  const coinBalances = profile.coinBalances as
+    | { count?: number; edges?: Array<{ node: BalanceNode }> }
+    | undefined;
+
+  return {
+    balances: coinBalances?.edges?.map((e) => e.node) ?? [],
+    totalCount: coinBalances?.count ?? 0,
+    handle,
+    avatar,
+  };
+}
+
+export async function fetchProfileCoinNodes(
+  address: string,
+  count: number = 20
+): Promise<CoinNode[]> {
+  const response = await getProfileCoins({ identifier: address, count });
+  if ((response as { error?: unknown }).error) return [];
+
+  const data = response.data as Record<string, unknown> | undefined;
+  const profile = data?.profile as Record<string, unknown> | undefined;
+  const createdCoins = profile?.createdCoins as
+    | { edges?: Array<{ node: CoinNode }> }
+    | undefined;
+
+  return createdCoins?.edges?.map((e) => e.node) ?? [];
 }

@@ -32,6 +32,14 @@ const sections = [
     items: ["Top traders", "Volume leaders", "Most active"],
   },
   {
+    id: "agents",
+    label: "Agents",
+    href: "/agents",
+    category: "data",
+    description: "Trader portfolios",
+    items: ["Portfolio view", "Holdings breakdown", "Created coins", "Volume rank"],
+  },
+  {
     id: "trust",
     label: "Trust & Safety",
     href: "/trust",

@@ -8,8 +8,41 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { HomeLiveCards } from "@/components/home-live-cards";
 import { HeroSection } from "@/components/hero-section";
+import { ActivityTicker, type ActivityItem } from "@/components/activity-ticker";
 import { getExploreData, getLeaderboardData } from "@/lib/data";
+import { formatCompactCurrency, formatChange, type CoinNode } from "@/lib/zora";
 import { skills } from "@/lib/skills";
+
+function coinToItem(coin: CoinNode, type: "trending" | "gainers" | "new"): ActivityItem {
+  const value = formatCompactCurrency(coin.marketCap);
+  if (type === "trending") {
+    return { name: coin.name ?? "Unknown", tag: "trending", value, positive: null };
+  }
+  if (type === "new") {
+    return { name: coin.name ?? "Unknown", tag: "new launch", value, positive: null };
+  }
+  const change = formatChange(coin.marketCap, coin.marketCapDelta24h);
+  return { name: coin.name ?? "Unknown", tag: change.value, value, positive: change.positive };
+}
+
+async function ActivityTickerSection() {
+  const [trending, gainers, newCoins] = await Promise.all([
+    getExploreData("trending", 5),
+    getExploreData("gainers", 5),
+    getExploreData("new", 5),
+  ]);
+
+  // Round-robin interleave
+  const maxLen = Math.max(trending.length, gainers.length, newCoins.length);
+  const items: ActivityItem[] = [];
+  for (let i = 0; i < maxLen; i++) {
+    if (i < trending.length) items.push(coinToItem(trending[i], "trending"));
+    if (i < gainers.length) items.push(coinToItem(gainers[i], "gainers"));
+    if (i < newCoins.length) items.push(coinToItem(newCoins[i], "new"));
+  }
+
+  return <ActivityTicker initialItems={items} />;
+}
 
 async function HomeLiveCardsSection() {
   const [trending, gainers, volume, traders] = await Promise.all([
@@ -54,10 +87,15 @@ export default function Home() {
       {/* Hero */}
       <HeroSection />
 
+      {/* Agent activity ticker */}
+      <Suspense fallback={null}>
+        <ActivityTickerSection />
+      </Suspense>
+
       {/* Live data cards */}
       <section className="space-y-4">
         <div className="flex items-center justify-between">
-          <h2 className="text-sm font-medium text-muted-foreground">Network activity</h2>
+          <h2 className="text-sm font-medium text-muted-foreground">Agent activity</h2>
           <span className="text-xs text-muted-foreground font-mono">Live</span>
         </div>
         <Suspense fallback={<HomeLiveCardsSkeleton />}>

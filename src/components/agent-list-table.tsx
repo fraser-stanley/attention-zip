@@ -18,24 +18,19 @@ import {
   type TraderNode,
 } from "@/lib/zora";
 
-export function LeaderboardTable({
+export function AgentListTable({
   initialTraders,
-  count = 20,
 }: {
   initialTraders: TraderNode[];
-  count?: number;
 }) {
   const { data, isLoading, error } = useQuery({
-    queryKey: ["leaderboard", count],
+    queryKey: ["leaderboard", 20],
     queryFn: async () => {
-      const res = await fetch(`/api/leaderboard?count=${count}`);
+      const res = await fetch("/api/leaderboard?count=20");
       if (!res.ok) throw new Error("Failed to fetch");
       return res.json() as Promise<LeaderboardApiResponse>;
     },
-    initialData: {
-      traders: initialTraders,
-      count,
-    },
+    initialData: { traders: initialTraders, count: 20 },
     initialDataUpdatedAt: Date.now(),
     refetchInterval: 300_000,
   });
@@ -43,7 +38,7 @@ export function LeaderboardTable({
   if (error) {
     return (
       <div className="py-8 text-center text-sm text-muted-foreground">
-        Failed to load leaderboard. Try refreshing.
+        Failed to load agents. Try refreshing.
       </div>
     );
   }

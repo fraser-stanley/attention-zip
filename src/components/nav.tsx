@@ -106,13 +106,21 @@ export function Nav() {
             >
               Zora
             </Link>
-            <button
-              onClick={() => setOpen(true)}
-              aria-label="Open navigation"
-              className="px-3 py-1.5 min-h-[44px] flex items-center text-sm transition-colors bg-foreground text-background hover:bg-background hover:text-foreground border border-transparent hover:border-border focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground"
-            >
-              Index
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                aria-label="Login"
+                className="px-3 py-1.5 min-h-[44px] flex items-center text-sm transition-colors border border-border text-foreground hover:bg-foreground hover:text-background focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground"
+              >
+                Login
+              </button>
+              <button
+                onClick={() => setOpen(true)}
+                aria-label="Open navigation"
+                className="px-3 py-1.5 min-h-[44px] flex items-center text-sm transition-colors bg-foreground text-background hover:bg-background hover:text-foreground border border-transparent hover:border-border focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground"
+              >
+                Index
+              </button>
+            </div>
           </div>
         </div>
       </header>

@@ -1,15 +1,9 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
-import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import {
   Table,
   TableBody,
@@ -18,6 +12,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { PnlSparkline } from "@/components/pnl-sparkline";
 import {
   formatCompactCurrency,
   formatChange,
@@ -25,6 +21,172 @@ import {
   coinTypeLabel,
   type AgentProfileApiResponse,
 } from "@/lib/zora";
+import { pnlColor, formatPnl, formatPct } from "@/lib/pnl-utils";
+import {
+  AGENT_MOCK_PNL,
+  AGENT_MOCK_POSITIONS,
+  AGENT_MOCK_TRADES,
+  AGENT_MOCK_SPARKLINE,
+} from "@/lib/agent-mock-data";
+import type { MockPosition } from "@/lib/portfolio-mock-data";
+
+type PositionFilter = "active" | "resolved" | "all";
+
+function StatsRow() {
+  const pnl = AGENT_MOCK_PNL;
+
+  const stats = [
+    { label: "Total PnL", value: formatPnl(pnl.totalPnl), sub: formatPct(pnl.totalPnlPct), color: pnlColor(pnl.totalPnl) },
+    { label: "Realized", value: formatPnl(pnl.realizedPnl), color: pnlColor(pnl.realizedPnl) },
+    { label: "Unrealized", value: formatPnl(pnl.unrealizedPnl), color: pnlColor(pnl.unrealizedPnl) },
+    { label: "Trades", value: String(pnl.totalTrades), color: "" },
+    { label: "Win rate", value: `${pnl.winRate}%`, color: "" },
+    { label: "W / L", value: `${pnl.wins} / ${pnl.losses}`, color: "" },
+  ];
+
+  return (
+    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
+      {stats.map((stat) => (
+        <div key={stat.label} className="border border-border p-3">
+          <p className="text-xs text-muted-foreground">{stat.label}</p>
+          <p className={`font-mono text-sm font-medium ${stat.color}`}>
+            {stat.value}
+            {stat.sub && (
+              <span className="ml-1 text-xs">{stat.sub}</span>
+            )}
+          </p>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function PositionsTable() {
+  const [filter, setFilter] = useState<PositionFilter>("active");
+
+  const positions = AGENT_MOCK_POSITIONS.filter((p) =>
+    filter === "all" ? true : p.status === filter
+  );
+
+  return (
+    <div className="space-y-3">
+      <div className="flex items-center justify-between">
+        <h2 className="text-lg font-semibold tracking-tight">Positions</h2>
+        <span className="text-xs font-mono text-muted-foreground">
+          {AGENT_MOCK_POSITIONS.filter((p) => p.status === "active").length} active
+          {" \u00b7 "}
+          {AGENT_MOCK_POSITIONS.filter((p) => p.status === "resolved").length} resolved
+        </span>
+      </div>
+
+      <Tabs value={filter} onValueChange={(v) => setFilter(v as PositionFilter)}>
+        <TabsList>
+          <TabsTrigger value="active">Active</TabsTrigger>
+          <TabsTrigger value="resolved">Resolved</TabsTrigger>
+          <TabsTrigger value="all">All</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value={filter}>
+          {positions.length === 0 ? (
+            <p className="py-6 text-center text-sm text-muted-foreground">
+              No {filter} positions.
+            </p>
+          ) : (
+            <PositionRows positions={positions} />
+          )}
+        </TabsContent>
+      </Tabs>
+    </div>
+  );
+}
+
+function PositionRows({ positions }: { positions: MockPosition[] }) {
+  return (
+    <Table>
+      <TableHeader>
+        <TableRow>
+          <TableHead>Coin</TableHead>
+          <TableHead className="hidden sm:table-cell">Type</TableHead>
+          <TableHead className="hidden sm:table-cell">Status</TableHead>
+          <TableHead className="text-right">Entry</TableHead>
+          <TableHead className="text-right">Current</TableHead>
+          <TableHead className="text-right">PnL</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {positions.map((pos) => (
+          <TableRow key={pos.address}>
+            <TableCell>
+              <span className="text-sm font-medium">{pos.coin}</span>
+              <span className="ml-2 text-xs text-muted-foreground font-mono">
+                ${pos.symbol}
+              </span>
+            </TableCell>
+            <TableCell className="hidden sm:table-cell">
+              <Badge variant="outline">{coinTypeLabel(pos.coinType)}</Badge>
+            </TableCell>
+            <TableCell className="hidden sm:table-cell">
+              <Badge variant={pos.status === "active" ? "default" : "outline"}>
+                {pos.status}
+              </Badge>
+            </TableCell>
+            <TableCell className="text-right font-mono text-sm">
+              {formatCompactCurrency(pos.entryPrice)}
+            </TableCell>
+            <TableCell className="text-right font-mono text-sm">
+              {formatCompactCurrency(pos.currentPrice)}
+            </TableCell>
+            <TableCell className={`text-right font-mono text-sm ${pnlColor(pos.pnl)}`}>
+              {formatPnl(pos.pnl)}
+              <span className="ml-1 text-xs">{formatPct(pos.pnlPct)}</span>
+            </TableCell>
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
+  );
+}
+
+function RecentTrades() {
+  return (
+    <div className="space-y-3">
+      <h2 className="text-lg font-semibold tracking-tight">Recent trades</h2>
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Coin</TableHead>
+            <TableHead>Side</TableHead>
+            <TableHead className="text-right">Amount</TableHead>
+            <TableHead className="text-right">PnL</TableHead>
+            <TableHead className="text-right hidden sm:table-cell">Date</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {AGENT_MOCK_TRADES.map((trade) => (
+            <TableRow key={`${trade.coin}-${trade.date}`}>
+              <TableCell className="font-mono text-sm">${trade.coin}</TableCell>
+              <TableCell>
+                <Badge variant={trade.side === "buy" ? "default" : "outline"}>
+                  {trade.side}
+                </Badge>
+              </TableCell>
+              <TableCell className="text-right font-mono text-sm">
+                ${trade.amount.toLocaleString()}
+              </TableCell>
+              <TableCell className={`text-right font-mono text-sm ${pnlColor(trade.pnl)}`}>
+                {formatPnl(trade.pnl)}
+                <span className="ml-1 text-xs">{formatPct(trade.pct)}</span>
+              </TableCell>
+              <TableCell className="text-right text-sm text-muted-foreground hidden sm:table-cell">
+                {trade.date}
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </div>
+  );
+}
 
 export function AgentProfileDetail({
   address,
@@ -65,74 +227,42 @@ export function AgentProfileDetail({
         &larr; Back to agents
       </Link>
 
-      {/* Summary card */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-3">
-            {profile.avatar && (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={profile.avatar}
-                alt=""
-                className="h-8 w-8 rounded-full"
-              />
-            )}
-            <span className="font-mono text-lg">
-              {profile.handle || truncateAddress(address)}
-            </span>
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-            <div>
-              <p className="text-xs text-muted-foreground uppercase tracking-wider">
-                Portfolio value
-              </p>
-              <p className="text-xl font-bold font-mono">
-                {formatCompactCurrency(profile.totalValueUsd)}
-              </p>
-            </div>
-            {data.volume && (
-              <div>
-                <p className="text-xs text-muted-foreground uppercase tracking-wider">
-                  Volume
-                </p>
-                <p className="text-xl font-bold font-mono">
-                  {formatCompactCurrency(data.volume)}
-                </p>
-              </div>
-            )}
-            {data.leaderboardRank && (
-              <div>
-                <p className="text-xs text-muted-foreground uppercase tracking-wider">
-                  Rank
-                </p>
-                <p className="text-xl font-bold font-mono">
-                  #{data.leaderboardRank}
-                </p>
-              </div>
-            )}
-            <div>
-              <p className="text-xs text-muted-foreground uppercase tracking-wider">
-                Holdings
-              </p>
-              <p className="text-xl font-bold font-mono">
-                {profile.balanceCount}
-              </p>
-            </div>
-          </div>
-          <div className="mt-4 border-t border-border pt-3">
-            <p className="text-xs text-muted-foreground">
-              PnL breakdown requires trade history indexing — coming soon
-            </p>
-          </div>
-          <p className="mt-2 text-xs font-mono text-muted-foreground break-all">
+      {/* Header */}
+      <div className="flex items-center gap-3">
+        {profile.avatar && (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={profile.avatar}
+            alt=""
+            className="h-10 w-10 rounded-full"
+          />
+        )}
+        <div>
+          <h1 className="font-mono text-lg font-medium">
+            {profile.handle || truncateAddress(address)}
+          </h1>
+          <p className="font-mono text-xs text-muted-foreground break-all">
             {address}
           </p>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
-      {/* Holdings table */}
+      {/* Stats + Sparkline */}
+      <div className="grid gap-4 lg:grid-cols-[1fr_320px]">
+        <StatsRow />
+        <div className="border border-border p-3 h-[140px]">
+          <p className="text-xs text-muted-foreground mb-1">Cumulative PnL</p>
+          <PnlSparkline data={AGENT_MOCK_SPARKLINE} height={100} />
+        </div>
+      </div>
+
+      {/* Positions */}
+      <PositionsTable />
+
+      {/* Recent trades */}
+      <RecentTrades />
+
+      {/* Holdings from API */}
       {profile.balances.length > 0 && (
         <div className="space-y-3">
           <h2 className="text-lg font-semibold tracking-tight">Holdings</h2>
@@ -233,13 +363,6 @@ export function AgentProfileDetail({
               ))}
             </TableBody>
           </Table>
-        </div>
-      )}
-
-      {/* Empty state */}
-      {profile.balances.length === 0 && profile.coins.length === 0 && (
-        <div className="py-8 text-center text-sm text-muted-foreground">
-          No holdings or created coins found for this address.
         </div>
       )}
     </div>

@@ -40,6 +40,14 @@ const sections = [
     items: ["Portfolio view", "Holdings breakdown", "Created coins", "Volume rank"],
   },
   {
+    id: "portfolio",
+    label: "Portfolio",
+    href: "/portfolio",
+    category: "data",
+    description: "Your positions & PnL",
+    items: ["PnL summary", "Active positions", "Trade history", "Installed skills"],
+  },
+  {
     id: "trust",
     label: "Trust & Safety",
     href: "/trust",
@@ -121,7 +129,7 @@ export function Nav() {
         )}
       >
         {/* Backdrop */}
-        <div className="absolute inset-0 bg-black/95" onClick={close} />
+        <div className="absolute inset-0 bg-black/80 backdrop-blur-md" onClick={close} />
 
         {/* Content */}
         <div

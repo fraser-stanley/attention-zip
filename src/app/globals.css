@@ -151,3 +151,13 @@
   0% { transform: translateX(0); }
   100% { transform: translateX(-50%); }
 }
+
+.highlight-block {
+  background-color: #3FFF00;
+  color: black;
+  padding: 0.1em 0.3em;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+  display: inline;
+  line-height: 1.4;
+}

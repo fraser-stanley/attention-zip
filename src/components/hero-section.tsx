@@ -10,9 +10,9 @@ export function HeroSection() {
     <section className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center pt-16 pb-8">
       <div className="space-y-6">
         <h1 className="text-3xl sm:text-4xl lg:text-5xl font-medium tracking-tighter">
-          Discover Zora.
+          <span className="highlight-block">Discover Zora.</span>
           <br />
-          Arm your agent.
+          <span className="highlight-block">Arm your agent.</span>
         </h1>
         <p className="text-sm text-muted-foreground max-w-md leading-relaxed">
           Open-source skills for Zora-native agents. Install in one command,

@@ -57,10 +57,16 @@ export default function RootLayout({
       <body
         className={`${geistMono.variable} antialiased`}
       >
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[200] focus:bg-background focus:px-4 focus:py-2 focus:text-sm focus:border focus:border-border"
+        >
+          Skip to main content
+        </a>
         <Providers>
           <Nav />
           <CommandMenuLoader />
-          <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-14 pb-12">
+          <main id="main-content" className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-14 pb-12">
             {children}
           </main>
         </Providers>

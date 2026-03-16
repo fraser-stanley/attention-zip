@@ -42,7 +42,7 @@ export const skills: Skill[] = [
       "zora explore --sort gainers -o json",
     ],
     installCommand:
-      'install skill from https://github.com/fraserstanley/zora-agent-skills/tree/main/trend-scout',
+      'install skill from https://github.com/fraser-stanley/zora-agent-skills/tree/main/trend-scout',
     samplePrompt:
       "Check Zora for trending coins with significant price movement in the last 24 hours.",
     sampleOutput: `Found 3 trending coins with notable movement:
@@ -60,9 +60,9 @@ export const skills: Skill[] = [
    Volume: $95.6K`,
     badges: ["Works with OpenClaw", "Zora CLI ready", "Read-only"],
     githubUrl:
-      "https://github.com/fraserstanley/zora-agent-skills/tree/main/trend-scout",
+      "https://github.com/fraser-stanley/zora-agent-skills/tree/main/trend-scout",
     skillMdUrl:
-      "https://raw.githubusercontent.com/fraserstanley/zora-agent-skills/main/trend-scout/SKILL.md",
+      "https://raw.githubusercontent.com/fraser-stanley/zora-agent-skills/main/trend-scout/SKILL.md",
   },
   {
     id: "creator-pulse",
@@ -85,7 +85,7 @@ export const skills: Skill[] = [
       "zora get <address> -o json",
     ],
     installCommand:
-      'install skill from https://github.com/fraserstanley/zora-agent-skills/tree/main/creator-pulse',
+      'install skill from https://github.com/fraser-stanley/zora-agent-skills/tree/main/creator-pulse',
     samplePrompt:
       "Show me the top featured creators on Zora and any recent activity on my watchlist.",
     sampleOutput: `Featured creators update:
@@ -100,9 +100,9 @@ Watchlist alert:
 \u26a0 jacob saw a 15% volume increase in the last hour.`,
     badges: ["Works with OpenClaw", "Zora CLI ready", "Read-only"],
     githubUrl:
-      "https://github.com/fraserstanley/zora-agent-skills/tree/main/creator-pulse",
+      "https://github.com/fraser-stanley/zora-agent-skills/tree/main/creator-pulse",
     skillMdUrl:
-      "https://raw.githubusercontent.com/fraserstanley/zora-agent-skills/main/creator-pulse/SKILL.md",
+      "https://raw.githubusercontent.com/fraser-stanley/zora-agent-skills/main/creator-pulse/SKILL.md",
   },
   {
     id: "briefing-bot",
@@ -127,7 +127,7 @@ Watchlist alert:
       "zora explore --type creator-coin -o json",
     ],
     installCommand:
-      'install skill from https://github.com/fraserstanley/zora-agent-skills/tree/main/briefing-bot',
+      'install skill from https://github.com/fraser-stanley/zora-agent-skills/tree/main/briefing-bot',
     samplePrompt: "Give me my morning Zora briefing.",
     sampleOutput: `Zora Morning Briefing \u2014 Mar 14, 2026
 
@@ -142,9 +142,9 @@ Leaderboard: 0xd8dA...6045 climbed to #3 with $42K weekly volume.
 Nothing unusual detected. Market is moderately active.`,
     badges: ["Works with OpenClaw", "Zora CLI ready", "Read-only"],
     githubUrl:
-      "https://github.com/fraserstanley/zora-agent-skills/tree/main/briefing-bot",
+      "https://github.com/fraser-stanley/zora-agent-skills/tree/main/briefing-bot",
     skillMdUrl:
-      "https://raw.githubusercontent.com/fraserstanley/zora-agent-skills/main/briefing-bot/SKILL.md",
+      "https://raw.githubusercontent.com/fraser-stanley/zora-agent-skills/main/briefing-bot/SKILL.md",
   },
   {
     id: "portfolio-scout",
@@ -166,7 +166,7 @@ Nothing unusual detected. Market is moderately active.`,
       "zora profile coins <address> -o json",
     ],
     installCommand:
-      'install skill from https://github.com/fraserstanley/zora-agent-skills/tree/main/portfolio-scout',
+      'install skill from https://github.com/fraser-stanley/zora-agent-skills/tree/main/portfolio-scout',
     samplePrompt:
       "Check my Zora portfolio at 0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045.",
     sampleOutput: `Portfolio for 0xd8dA...6045
@@ -192,9 +192,9 @@ Coins held: 3`,
       "Read-only",
     ],
     githubUrl:
-      "https://github.com/fraserstanley/zora-agent-skills/tree/main/portfolio-scout",
+      "https://github.com/fraser-stanley/zora-agent-skills/tree/main/portfolio-scout",
     skillMdUrl:
-      "https://raw.githubusercontent.com/fraserstanley/zora-agent-skills/main/portfolio-scout/SKILL.md",
+      "https://raw.githubusercontent.com/fraser-stanley/zora-agent-skills/main/portfolio-scout/SKILL.md",
   },
 ];
 

@@ -92,7 +92,8 @@ export function Nav() {
             </Link>
             <button
               onClick={() => setOpen(true)}
-              className="px-3 py-1.5 min-h-[44px] flex items-center text-sm transition-colors bg-foreground text-background hover:bg-background hover:text-foreground border border-transparent hover:border-border"
+              aria-label="Open navigation"
+              className="px-3 py-1.5 min-h-[44px] flex items-center text-sm transition-colors bg-foreground text-background hover:bg-background hover:text-foreground border border-transparent hover:border-border focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground"
             >
               Index
             </button>
@@ -127,7 +128,8 @@ export function Nav() {
               <span className="text-sm text-white/40 font-mono">Index</span>
               <button
                 onClick={close}
-                className="text-sm px-2 min-h-[44px] flex items-center text-white/40 hover:text-white transition-colors"
+                aria-label="Close navigation"
+                className="text-sm px-2 min-h-[44px] flex items-center text-white/40 hover:text-white transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
               >
                 Close
               </button>
@@ -144,11 +146,13 @@ export function Nav() {
                     href={section.href}
                     onMouseEnter={() => setHoveredSection(section.id)}
                     onMouseLeave={() => setHoveredSection(null)}
+                    onFocus={() => setHoveredSection(section.id)}
+                    onBlur={() => setHoveredSection(null)}
                     className={cn(
-                      "group bg-black p-6 flex flex-col gap-3 transition-colors duration-150",
+                      "group bg-black p-6 flex flex-col gap-3 transition-colors duration-150 outline-none",
                       hoveredSection === section.id
                         ? "bg-white text-black"
-                        : "hover:bg-white hover:text-black"
+                        : "hover:bg-white hover:text-black focus-visible:bg-white focus-visible:text-black"
                     )}
                   >
                     <div className="flex items-center justify-between">
@@ -266,7 +270,8 @@ export function Nav() {
             </span>
             <button
               onClick={() => setOpen(true)}
-              className="min-h-[44px] flex items-center hover:text-foreground transition-colors"
+              aria-label="Open navigation"
+              className="min-h-[44px] flex items-center hover:text-foreground transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground"
             >
               Index
             </button>

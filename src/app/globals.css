@@ -116,6 +116,8 @@
   --sidebar-ring: oklch(0.4 0 0);
 }
 
+/* Z-index scale: footer=40, header=50, overlay=100, command-menu=150, skip-link=200 */
+
 @layer base {
   * {
     @apply border-border outline-ring/50;

@@ -40,6 +40,7 @@ function CopyButton({ text }: { text: string }) {
       onClick={handleCopy}
       className="min-h-[44px] min-w-16 px-2 text-xs font-mono text-background/60 transition-colors hover:text-background"
       aria-label={copied ? "Copied command" : "Copy command"}
+      aria-live="polite"
     >
       {copied ? "Copied" : "Copy"}
     </button>

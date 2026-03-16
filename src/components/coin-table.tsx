@@ -120,9 +120,9 @@ export function CoinTable({
               <TableCell
                 className={`text-right font-mono text-sm ${
                   change.positive === true
-                    ? "text-green-600 dark:text-green-400"
+                    ? "text-green-600 dark:text-green-500"
                     : change.positive === false
-                    ? "text-red-600 dark:text-red-400"
+                    ? "text-red-600 dark:text-red-500"
                     : "text-muted-foreground"
                 }`}
               >

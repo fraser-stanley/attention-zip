@@ -1,10 +1,10 @@
 {
-  "name": "Zora Agent Skills",
+  "name": "Attention Index",
   "description": "Verified skills for Zora-native agents",
   "api": "/api",
   "skills_endpoint": "/api/skills",
   "explore_endpoint": "/api/explore",
   "leaderboard_endpoint": "/api/leaderboard",
-  "agent_endpoint": "/api/agents/:address",
+
   "documentation": "https://github.com/fraser-stanley/zora-agent-skills"
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useMemo, useRef, useCallback, useState, useSyncExternalStore } from "react";
+import { Suspense, useMemo, useRef, useCallback, useState } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { Environment, OrbitControls, useTexture } from "@react-three/drei";
 import { EffectComposer } from "@react-three/postprocessing";
@@ -12,23 +12,6 @@ const NORMAL_SCALE = new Vector2(0.6, 0.6);
 const WHITE = new Color("#ffffff");
 const BASE_SPEED = 1;
 const MAX_SPEED = 4;
-
-const reducedMotionQuery = "(prefers-reduced-motion: reduce)";
-function subscribeReducedMotion(cb: () => void) {
-  const mq = window.matchMedia(reducedMotionQuery);
-  mq.addEventListener("change", cb);
-  return () => mq.removeEventListener("change", cb);
-}
-function getReducedMotion() {
-  return window.matchMedia(reducedMotionQuery).matches;
-}
-function getReducedMotionServer() {
-  return false;
-}
-
-function usePrefersReducedMotion() {
-  return useSyncExternalStore(subscribeReducedMotion, getReducedMotion, getReducedMotionServer);
-}
 
 function Dither() {
   const effect = useMemo(
@@ -60,6 +43,7 @@ function ConcreteOrb({ pressed }: { pressed: boolean }) {
     "/textures/concrete-roughness.jpg",
   ]);
 
+  // eslint-disable-next-line react-hooks/immutability -- Three.js textures require mutable colorSpace assignment
   diffuseMap.colorSpace = SRGBColorSpace;
 
   const meshRef = useRef<THREE.Mesh>(null);
@@ -114,7 +98,6 @@ export function HeroOrbGlass() {
   const lastPos = useRef({ x: 0, y: 0 });
   const decayTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
   const [pressed, setPressed] = useState(false);
-  const prefersReducedMotion = usePrefersReducedMotion();
 
   const handlePointerMove = useCallback(
     (e: React.PointerEvent<HTMLDivElement>) => {
@@ -145,17 +128,16 @@ export function HeroOrbGlass() {
       camera={{ position: [0, 0, 2.8], fov: 45 }}
       style={{ width: "100%", height: "100%" }}
       scene={{ background: WHITE }}
-      onPointerMove={prefersReducedMotion ? undefined : handlePointerMove}
-      onPointerDown={prefersReducedMotion ? undefined : () => setPressed(true)}
-      onPointerUp={prefersReducedMotion ? undefined : () => setPressed(false)}
-      onPointerLeave={prefersReducedMotion ? undefined : handlePointerLeave}
-      aria-hidden="true"
+      onPointerMove={handlePointerMove}
+      onPointerDown={() => setPressed(true)}
+      onPointerUp={() => setPressed(false)}
+      onPointerLeave={handlePointerLeave}
     >
       <ambientLight intensity={0.7} />
       <directionalLight position={[5, 5, 5]} intensity={0.6} />
       <directionalLight position={[-3, -1, 2]} intensity={0.3} />
       <Suspense fallback={null}>
-        <ConcreteOrb pressed={prefersReducedMotion ? false : pressed} />
+        <ConcreteOrb pressed={pressed} />
         <Environment files="/textures/page-env.jpg" />
       </Suspense>
       <OrbitControls
@@ -165,12 +147,10 @@ export function HeroOrbGlass() {
         enablePan={false}
         enableDamping
         dampingFactor={0.05}
-        autoRotate={!prefersReducedMotion}
+        autoRotate
         autoRotateSpeed={1}
       />
-      {!prefersReducedMotion && (
-        <RotationController controlsRef={controlsRef} mouseVelocity={mouseVelocity} />
-      )}
+      <RotationController controlsRef={controlsRef} mouseVelocity={mouseVelocity} />
       <EffectComposer multisampling={0}>
         <Dither />
       </EffectComposer>

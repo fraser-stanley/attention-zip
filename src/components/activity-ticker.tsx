@@ -1,5 +1,7 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
+
 export interface ActivityItem {
   name: string;
   tag: string;
@@ -20,11 +22,11 @@ const PLACEHOLDER_ITEMS: ActivityItem[] = [
 
 function TickerItems({ items }: { items: ActivityItem[] }) {
   return (
-    <div className="flex items-center shrink-0">
+    <>
       {items.map((item, index) => (
-        <div
+        <span
           key={index}
-          className="flex items-center gap-1.5 px-4 font-mono text-xs"
+          className="inline-flex items-center gap-1.5 px-4 font-mono text-xs whitespace-nowrap"
         >
           <span className="text-foreground">{item.name}</span>
           <span
@@ -39,9 +41,9 @@ function TickerItems({ items }: { items: ActivityItem[] }) {
             {item.tag}
           </span>
           <span className="text-muted-foreground">{item.value}</span>
-        </div>
+        </span>
       ))}
-    </div>
+    </>
   );
 }
 
@@ -51,7 +53,18 @@ export function ActivityTicker({
   initialItems: ActivityItem[];
 }) {
   const items = initialItems.length > 0 ? initialItems : PLACEHOLDER_ITEMS;
-  const duration = Math.max(items.length * 3, 20);
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [scrollWidth, setScrollWidth] = useState(0);
+
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    // Measure the width of one set of items (half the total content)
+    setScrollWidth(el.scrollWidth / 2);
+  }, [items]);
+
+  // Speed: ~50px/s for smooth, visible movement
+  const duration = scrollWidth > 0 ? scrollWidth / 50 : 20;
 
   return (
     <div
@@ -66,10 +79,13 @@ export function ActivityTicker({
       </div>
 
       {/* Scrolling content */}
-      <div className="overflow-hidden flex-1">
+      <div className="overflow-hidden flex-1 relative">
         <div
-          className="flex whitespace-nowrap will-change-transform animate-marquee"
-          style={{ "--marquee-duration": `${duration}s` } as React.CSSProperties}
+          ref={scrollRef}
+          className="inline-flex whitespace-nowrap"
+          style={{
+            animation: scrollWidth > 0 ? `marquee ${duration}s linear infinite` : "none",
+          }}
         >
           <TickerItems items={items} />
           <TickerItems items={items} />

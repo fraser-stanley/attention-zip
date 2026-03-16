@@ -1,4 +1,4 @@
-import type { CoinNode, BalanceNode, ProfileData } from "./zora";
+import type { CoinNode } from "./zora";
 
 export const MOCK_COINS: CoinNode[] = [
   {
@@ -266,71 +266,3 @@ export const MOCK_TRADERS = [
   { address: "0xb0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9", volume: "48000" },
 ];
 
-const MOCK_BALANCES: BalanceNode[] = [
-  {
-    balance: "125000000000000000000",
-    coin: {
-      name: "Base Summer",
-      address: "0x1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b",
-      symbol: "BASESUMMER",
-      coinType: "TREND",
-      marketCap: "52400000",
-      marketCapDelta24h: "4200000",
-      volume24h: "8900000",
-      totalSupply: "1000000000",
-      tokenPrice: { priceInUsdc: "0.0524" },
-    },
-  },
-  {
-    balance: "50000000000000000000",
-    coin: {
-      name: "Zorb Genesis",
-      address: "0x2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c",
-      symbol: "ZORB",
-      coinType: "CREATOR",
-      marketCap: "31200000",
-      marketCapDelta24h: "2800000",
-      volume24h: "5100000",
-      totalSupply: "500000000",
-      tokenPrice: { priceInUsdc: "0.0624" },
-    },
-  },
-  {
-    balance: "200000000000000000000",
-    coin: {
-      name: "Higher",
-      address: "0x9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d",
-      symbol: "HIGHER",
-      coinType: "TREND",
-      marketCap: "1900000",
-      marketCapDelta24h: "450000",
-      volume24h: "670000",
-      totalSupply: "1000000000",
-      tokenPrice: { priceInUsdc: "0.0019" },
-    },
-  },
-  {
-    balance: "75000000000000000000",
-    coin: {
-      name: "Onchain Radio",
-      address: "0x3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d",
-      symbol: "RADIO",
-      coinType: "CONTENT",
-      marketCap: "14800000",
-      marketCapDelta24h: "-1100000",
-      volume24h: "2200000",
-      totalSupply: "750000000",
-      tokenPrice: { priceInUsdc: "0.0197" },
-    },
-  },
-];
-
-export const MOCK_DEFAULT_PROFILE: ProfileData = {
-  handle: undefined,
-  avatar: undefined,
-  balances: MOCK_BALANCES,
-  balanceCount: MOCK_BALANCES.length,
-  coins: MOCK_COINS.slice(0, 2),
-  coinCount: 2,
-  totalValueUsd: 12480,
-};

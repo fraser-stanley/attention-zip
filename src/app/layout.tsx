@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
-import { Geist_Mono } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 import { Providers } from "@/lib/providers";
 import { Nav } from "@/components/nav";
+import { Footer } from "@/components/footer";
 import { CommandMenuLoader } from "@/components/command-menu-loader";
-import { AgentationLoader } from "@/components/agentation-loader";
+
 import {
   getSiteUrl,
   SITE_DESCRIPTION,
@@ -14,9 +15,16 @@ import {
 
 const siteUrl = getSiteUrl();
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+const commitMono = localFont({
+  src: "../../public/fonts/CommitMono-VF.woff2",
+  variable: "--font-commit-mono",
+  display: "swap",
+});
+
+const helveticaHeavyCn = localFont({
+  src: "../../public/fonts/HelveticaNeueLTProHvCn.woff",
+  variable: "--font-helvetica-hv-cn",
+  weight: "800",
   display: "swap",
 });
 
@@ -55,13 +63,10 @@ export default function RootLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(webApplicationJsonLd) }}
         />
-        <link rel="preload" href="/textures/concrete-diffuse.jpg" as="image" />
-        <link rel="preload" href="/textures/concrete-normal.jpg" as="image" />
-        <link rel="preload" href="/textures/concrete-roughness.jpg" as="image" />
-        <link rel="preload" href="/textures/page-env.jpg" as="image" />
       </head>
       <body
-        className={`${geistMono.variable} antialiased`}
+        className={`${commitMono.variable} ${helveticaHeavyCn.variable} antialiased`}
+
       >
         <a
           href="#main-content"
@@ -72,10 +77,11 @@ export default function RootLayout({
         <Providers>
           <Nav />
           <CommandMenuLoader />
-          <AgentationLoader />
+
           <main id="main-content" className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-14 pb-12">
             {children}
           </main>
+          <Footer />
         </Providers>
       </body>
     </html>

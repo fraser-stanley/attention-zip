@@ -37,13 +37,6 @@ export async function GET() {
             count: "1-50",
           },
         },
-        agent: {
-          url: "/api/agents/:address",
-          description: "Agent profile with holdings, created coins, and leaderboard rank.",
-          params: {
-            address: "0x-prefixed wallet address",
-          },
-        },
       },
     },
     {

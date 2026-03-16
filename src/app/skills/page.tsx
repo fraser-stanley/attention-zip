@@ -61,7 +61,7 @@ export default function SkillsPage() {
                 </div>
                 <Badge
                   variant="secondary"
-                  className="text-xs font-normal text-green-600 dark:text-green-500 shrink-0 ml-4"
+                  className="text-xs font-normal text-[#3FFF00] shrink-0 ml-4"
                 >
                   {skill.riskLabel}
                 </Badge>

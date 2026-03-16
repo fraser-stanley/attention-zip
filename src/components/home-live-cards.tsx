@@ -75,9 +75,9 @@ function CoinCard({
                   <span
                     className={`font-mono text-xs ${
                       change.positive === true
-                        ? "text-green-600 dark:text-green-500"
+                        ? "text-[#3FFF00]"
                         : change.positive === false
-                        ? "text-red-600 dark:text-red-500"
+                        ? "text-[#FF00F0]"
                         : "text-muted-foreground"
                     }`}
                   >

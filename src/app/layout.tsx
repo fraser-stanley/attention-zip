@@ -4,6 +4,7 @@ import "./globals.css";
 import { Providers } from "@/lib/providers";
 import { Nav } from "@/components/nav";
 import { CommandMenuLoader } from "@/components/command-menu-loader";
+import { AgentationLoader } from "@/components/agentation-loader";
 import {
   getSiteUrl,
   SITE_DESCRIPTION,
@@ -66,6 +67,7 @@ export default function RootLayout({
         <Providers>
           <Nav />
           <CommandMenuLoader />
+          <AgentationLoader />
           <main id="main-content" className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-14 pb-12">
             {children}
           </main>

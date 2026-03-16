@@ -43,7 +43,7 @@ function CoinCard({
   return (
     <Card>
       <CardHeader className="pb-2">
-        <CardTitle className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+        <CardTitle className="text-xs font-medium text-muted-foreground">
           {title}
         </CardTitle>
       </CardHeader>
@@ -114,8 +114,8 @@ function LeaderboardCard({ initialTraders }: { initialTraders?: TraderNode[] }) 
   return (
     <Card>
       <CardHeader className="pb-2">
-        <CardTitle className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-          Top Traders
+        <CardTitle className="text-xs font-medium text-muted-foreground">
+          Top traders
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-2">
@@ -155,17 +155,17 @@ export function HomeLiveCards({
   return (
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
       <CoinCard
-        title="Trending Now"
+        title="Trending now"
         sort="trending"
         initialCoins={initialCoins?.trending}
       />
       <CoinCard
-        title="Top Gainers (24h)"
+        title="Top gainers (24h)"
         sort="gainers"
         initialCoins={initialCoins?.gainers}
       />
       <CoinCard
-        title="Volume Leaders"
+        title="Volume leaders"
         sort="volume"
         initialCoins={initialCoins?.volume}
       />

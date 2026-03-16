@@ -252,32 +252,6 @@ export function Nav() {
         </div>
       </div>
 
-      {/* Persistent footer bar */}
-      <div
-        inert={open ? true : undefined}
-        className={cn(
-          "fixed bottom-0 left-0 right-0 z-40 border-t border-border bg-background/80 backdrop-blur-sm transition-opacity duration-300",
-          open ? "opacity-0 pointer-events-none" : "opacity-100"
-        )}
-        style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
-      >
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="flex h-8 items-center justify-between text-xs text-muted-foreground font-mono">
-            <span className="capitalize">
-              {pathname === "/"
-                ? "Home"
-                : pathname.slice(1).replace(/\//g, " — ")}
-            </span>
-            <button
-              onClick={() => setOpen(true)}
-              aria-label="Open navigation"
-              className="min-h-[44px] flex items-center hover:text-foreground transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground"
-            >
-              Index
-            </button>
-          </div>
-        </div>
-      </div>
     </>
   );
 }

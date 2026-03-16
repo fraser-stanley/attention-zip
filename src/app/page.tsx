@@ -5,7 +5,6 @@ import { buttonVariants } from "@/components/ui/button-variants";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import { HomeLiveCards } from "@/components/home-live-cards";
 import { HeroSection } from "@/components/hero-section";
@@ -58,7 +57,7 @@ export default function Home() {
       {/* Live data cards */}
       <section className="space-y-4">
         <div className="flex items-center justify-between">
-          <h2 className="text-sm font-medium uppercase tracking-wider text-muted-foreground">Network Activity</h2>
+          <h2 className="text-sm font-medium text-muted-foreground">Network activity</h2>
           <span className="text-xs text-muted-foreground font-mono">Live</span>
         </div>
         <Suspense fallback={<HomeLiveCardsSkeleton />}>
@@ -66,13 +65,12 @@ export default function Home() {
         </Suspense>
       </section>
 
-      <Separator />
 
       {/* Skills preview */}
       <section className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-sm font-medium uppercase tracking-wider text-muted-foreground">Skills</h2>
+            <h2 className="text-sm font-medium text-muted-foreground">Skills</h2>
             <p className="text-xs text-muted-foreground mt-1">
               We wrote these, reviewed them, and published the source. Install in one command.
             </p>
@@ -91,15 +89,7 @@ export default function Home() {
               className="hover:border-foreground/30"
             >
               <CardHeader className="pb-2">
-                <div className="flex items-center justify-between">
-                  <CardTitle className="text-base">{skill.name}</CardTitle>
-                  <Badge
-                    variant="secondary"
-                    className="text-xs font-normal"
-                  >
-                    {skill.riskLabel}
-                  </Badge>
-                </div>
+                <CardTitle className="text-base">{skill.name}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
                 <p className="text-sm text-muted-foreground">
@@ -116,27 +106,16 @@ export default function Home() {
                     </Badge>
                   ))}
                 </div>
-                <Link
-                  href={`/skills#${skill.id}`}
-                  className={buttonVariants({
-                    variant: "outline",
-                    size: "sm",
-                    className: "w-full",
-                  })}
-                >
-                  Learn more
-                </Link>
               </CardContent>
             </Card>
           ))}
         </div>
       </section>
 
-      <Separator />
 
       {/* Waitlist */}
       <section className="text-center space-y-4 pb-16">
-        <h2 className="text-sm font-medium uppercase tracking-wider text-muted-foreground">Stay in the loop</h2>
+        <h2 className="text-sm font-medium text-muted-foreground">Stay in the loop</h2>
         <p className="text-xs text-muted-foreground max-w-md mx-auto">
           We'll email you when new skills drop or when buy/sell execution ships.
         </p>

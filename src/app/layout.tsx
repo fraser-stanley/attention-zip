@@ -17,6 +17,7 @@ const siteUrl = getSiteUrl();
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -54,6 +55,10 @@ export default function RootLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(webApplicationJsonLd) }}
         />
+        <link rel="preload" href="/textures/concrete-diffuse.jpg" as="image" />
+        <link rel="preload" href="/textures/concrete-normal.jpg" as="image" />
+        <link rel="preload" href="/textures/concrete-roughness.jpg" as="image" />
+        <link rel="preload" href="/textures/page-env.jpg" as="image" />
       </head>
       <body
         className={`${geistMono.variable} antialiased`}

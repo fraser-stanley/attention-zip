@@ -89,6 +89,7 @@ export function PnlSparkline({
         className="fill-foreground"
         fontSize={10}
         fontFamily="monospace"
+        style={{ fontVariantNumeric: "tabular-nums" }}
       >
         {formatPnl(lastValue)}
       </text>

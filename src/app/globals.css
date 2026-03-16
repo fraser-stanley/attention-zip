@@ -147,9 +147,24 @@
   }
 }
 
+/* Disable sticky hover states on touch-only devices */
+@media (hover: none) {
+  button:hover,
+  a:hover,
+  [role="button"]:hover {
+    color: inherit;
+    background-color: inherit;
+    border-color: inherit;
+  }
+}
+
 @keyframes marquee {
   0% { transform: translateX(0); }
   100% { transform: translateX(-50%); }
+}
+
+.animate-marquee {
+  animation: marquee var(--marquee-duration, 20s) linear infinite;
 }
 
 .highlight-block {

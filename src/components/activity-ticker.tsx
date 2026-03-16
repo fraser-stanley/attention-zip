@@ -68,8 +68,8 @@ export function ActivityTicker({
       {/* Scrolling content */}
       <div className="overflow-hidden flex-1">
         <div
-          className="flex whitespace-nowrap will-change-transform"
-          style={{ animation: `marquee ${duration}s linear infinite` }}
+          className="flex whitespace-nowrap will-change-transform animate-marquee"
+          style={{ "--marquee-duration": `${duration}s` } as React.CSSProperties}
         >
           <TickerItems items={items} />
           <TickerItems items={items} />

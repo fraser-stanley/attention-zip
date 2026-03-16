@@ -127,7 +127,7 @@ function PositionsContent() {
           <button
             key={f.value}
             onClick={() => setFilter(f.value)}
-            className={`px-3 py-1 text-xs font-mono border transition-colors ${
+            className={`px-3 py-1 min-h-[44px] text-xs font-mono border transition-colors ${
               filter === f.value
                 ? "bg-foreground text-background border-foreground"
                 : "bg-transparent text-muted-foreground border-border hover:text-foreground"

@@ -222,7 +222,7 @@ export function AgentProfileDetail({
       {/* Back link */}
       <Link
         href="/agents"
-        className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+        className="text-sm text-muted-foreground hover:text-foreground transition-colors min-h-[44px] inline-flex items-center"
       >
         &larr; Back to agents
       </Link>

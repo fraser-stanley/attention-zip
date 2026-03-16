@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { HomeLiveCards } from "@/components/home-live-cards";
 import { HeroSection } from "@/components/hero-section";
+import { ActivityTickerSection } from "@/components/activity-ticker-section";
 import { getExploreData, getLeaderboardData } from "@/lib/data";
 import { skills } from "@/lib/skills";
 
@@ -54,10 +55,15 @@ export default function Home() {
       {/* Hero */}
       <HeroSection />
 
+      {/* Activity marquee */}
+      <Suspense fallback={null}>
+        <ActivityTickerSection />
+      </Suspense>
+
       {/* Live data cards */}
       <section className="space-y-4">
         <div className="flex items-center justify-between">
-          <h2 className="text-sm font-medium text-muted-foreground">Network activity</h2>
+          <h2 className="text-sm font-medium text-muted-foreground">Agent activity</h2>
           <span className="text-xs text-muted-foreground font-mono">Live</span>
         </div>
         <Suspense fallback={<HomeLiveCardsSkeleton />}>

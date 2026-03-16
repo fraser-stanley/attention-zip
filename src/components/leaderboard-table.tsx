@@ -76,7 +76,7 @@ export function LeaderboardTable({
             <TableCell className="font-mono text-sm">
               <Link
                 href={`/agents/${trader.address}`}
-                className="hover:underline"
+                className="hover:underline min-h-[44px] inline-flex items-center"
               >
                 {truncateAddress(trader.address ?? "")}
               </Link>

@@ -56,7 +56,7 @@ export default function Home() {
       <HeroSection />
 
       {/* Activity marquee */}
-      <Suspense fallback={null}>
+      <Suspense fallback={<div className="border-y border-border h-8" />}>
         <ActivityTickerSection />
       </Suspense>
 

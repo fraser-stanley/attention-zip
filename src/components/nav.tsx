@@ -102,7 +102,7 @@ export function Nav() {
           <div className="flex h-11 items-center justify-between">
             <Link
               href="/"
-              className="font-mono text-sm font-medium tracking-wider uppercase"
+              className="font-mono text-sm font-medium tracking-wider uppercase min-h-[44px] flex items-center"
             >
               Zora
             </Link>
@@ -236,33 +236,38 @@ export function Nav() {
               </div>
 
               {/* Detail preview */}
-              {hoveredData && (
-                <div className="mt-8 border-t border-white/10 pt-6">
-                  <div className="flex items-center gap-3 mb-4">
-                    <span className="text-xs font-medium uppercase tracking-wider text-white/50">
-                      {hoveredData.label}
-                    </span>
-                    <span className="text-xs font-mono text-white/30">
-                      {hoveredData.items.length} items
-                    </span>
-                  </div>
-                  <div className="grid gap-0 border border-white/10">
-                    {hoveredData.items.map((item, i) => (
-                      <div
-                        key={item}
-                        className="flex items-center justify-between px-4 py-2 border-b border-white/5 last:border-b-0 text-sm"
-                      >
-                        <span className="text-white/70 font-mono text-xs">
-                          {String(i + 1).padStart(2, "0")}
-                        </span>
-                        <span className="text-white/90 text-sm flex-1 ml-4">
-                          {item}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
+              <div
+                aria-live="polite"
+                className={hoveredData ? "mt-8 border-t border-white/10 pt-6" : ""}
+              >
+                {hoveredData && (
+                  <>
+                    <div className="flex items-center gap-3 mb-4">
+                      <span className="text-xs font-medium uppercase tracking-wider text-white/50">
+                        {hoveredData.label}
+                      </span>
+                      <span className="text-xs font-mono text-white/30">
+                        {hoveredData.items.length} items
+                      </span>
+                    </div>
+                    <div className="grid gap-0 border border-white/10">
+                      {hoveredData.items.map((item, i) => (
+                        <div
+                          key={item}
+                          className="flex items-center justify-between px-4 py-2 border-b border-white/5 last:border-b-0 text-sm"
+                        >
+                          <span className="text-white/70 font-mono text-xs">
+                            {String(i + 1).padStart(2, "0")}
+                          </span>
+                          <span className="text-white/90 text-sm flex-1 ml-4">
+                            {item}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </>
+                )}
+              </div>
             </div>
           </div>
 

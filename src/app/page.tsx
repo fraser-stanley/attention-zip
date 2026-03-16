@@ -1,8 +1,6 @@
 import { Suspense } from "react";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
 import { buttonVariants } from "@/components/ui/button-variants";
-import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -56,7 +54,7 @@ export default function Home() {
       <HeroSection />
 
       {/* Activity marquee */}
-      <Suspense fallback={<div className="border-y border-border h-8" />}>
+      <Suspense fallback={null}>
         <ActivityTickerSection />
       </Suspense>
 
@@ -119,21 +117,6 @@ export default function Home() {
       </section>
 
 
-      {/* Waitlist */}
-      <section className="text-center space-y-4 pb-16">
-        <h2 className="text-sm font-medium text-muted-foreground">Stay in the loop</h2>
-        <p className="text-xs text-muted-foreground max-w-md mx-auto">
-          We'll email you when new skills drop or when buy/sell execution ships.
-        </p>
-        <form className="flex items-center gap-2 max-w-sm mx-auto">
-          <Input
-            type="email"
-            placeholder="you@example.com"
-            aria-label="Email address"
-          />
-          <Button type="submit">Notify me</Button>
-        </form>
-      </section>
     </div>
   );
 }

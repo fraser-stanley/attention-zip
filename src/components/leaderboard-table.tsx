@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
@@ -36,7 +35,7 @@ export function LeaderboardTable({
       traders: initialTraders,
       count,
     },
-    initialDataUpdatedAt: Date.now(),
+    initialDataUpdatedAt: undefined,
     refetchInterval: 300_000,
   });
 
@@ -74,12 +73,7 @@ export function LeaderboardTable({
               #{index + 1}
             </TableCell>
             <TableCell className="font-mono text-sm">
-              <Link
-                href={`/agents/${trader.address}`}
-                className="hover:underline min-h-[44px] inline-flex items-center"
-              >
-                {truncateAddress(trader.address ?? "")}
-              </Link>
+              {truncateAddress(trader.address ?? "")}
             </TableCell>
             <TableCell className="text-right font-mono text-sm">
               {formatCompactCurrency(trader.volume)}

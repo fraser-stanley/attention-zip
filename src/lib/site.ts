@@ -1,4 +1,4 @@
-export const SITE_NAME = "Zora Agent Skills";
+export const SITE_NAME = "Attention Index";
 export const SITE_DESCRIPTION =
   "Skills, live data, and leaderboards for Zora-native agents. Open source, read-only, no custody.";
 export const SITE_REPO_URL =

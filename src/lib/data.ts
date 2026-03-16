@@ -1,15 +1,11 @@
 import { unstable_cache } from "next/cache";
-import { MOCK_COINS, MOCK_TRADERS, MOCK_DEFAULT_PROFILE } from "@/lib/mock-data";
+import { MOCK_COINS, MOCK_TRADERS } from "@/lib/mock-data";
 import {
   fetchCoins,
   fetchLeaderboard,
-  fetchProfileBalanceNodes,
-  fetchProfileCoinNodes,
   type CoinNode,
   type SortOption,
   type TraderNode,
-  type ProfileData,
-  type AgentProfileApiResponse,
 } from "@/lib/zora";
 
 const EXPLORE_REVALIDATE_SECONDS: Record<SortOption, number> = {
@@ -82,70 +78,3 @@ export async function getLeaderboardData(
   return getLeaderboardFetcher(count)();
 }
 
-const AGENT_PROFILE_REVALIDATE_SECONDS = 120;
-
-const cachedAgentProfileFetchers = new Map<
-  string,
-  () => Promise<AgentProfileApiResponse>
->();
-
-function getAgentProfileFetcher(address: string) {
-  let fetcher = cachedAgentProfileFetchers.get(address);
-  if (!fetcher) {
-    fetcher = unstable_cache(
-      async (): Promise<AgentProfileApiResponse> => {
-        try {
-          const [balanceResult, coins, traders] = await Promise.all([
-            fetchProfileBalanceNodes(address, 20),
-            fetchProfileCoinNodes(address, 20),
-            fetchLeaderboard(50),
-          ]);
-
-          const balances = balanceResult.balances;
-          const totalValueUsd = balances.reduce((sum, b) => {
-            const price = parseFloat(b.coin?.tokenPrice?.priceInUsdc ?? "0");
-            const bal = parseFloat(b.balance ?? "0");
-            // balance is in wei (18 decimals)
-            return sum + (price * bal) / 1e18;
-          }, 0);
-
-          const traderIndex = traders.findIndex(
-            (t) => t.address?.toLowerCase() === address.toLowerCase()
-          );
-
-          const profile: ProfileData = {
-            handle: balanceResult.handle,
-            avatar: balanceResult.avatar,
-            balances,
-            balanceCount: balanceResult.totalCount,
-            coins,
-            coinCount: coins.length,
-            totalValueUsd,
-          };
-
-          return {
-            address,
-            volume: traderIndex >= 0 ? traders[traderIndex].volume : undefined,
-            leaderboardRank: traderIndex >= 0 ? traderIndex + 1 : undefined,
-            profile,
-          };
-        } catch {
-          return {
-            address,
-            profile: MOCK_DEFAULT_PROFILE,
-          };
-        }
-      },
-      ["agent-profile", address.toLowerCase()],
-      { revalidate: AGENT_PROFILE_REVALIDATE_SECONDS }
-    );
-    cachedAgentProfileFetchers.set(address, fetcher);
-  }
-  return fetcher;
-}
-
-export async function getAgentProfileData(
-  address: string
-): Promise<AgentProfileApiResponse> {
-  return getAgentProfileFetcher(address)();
-}

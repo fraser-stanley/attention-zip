@@ -46,7 +46,7 @@ export function CoinTable({
           count,
         }
       : undefined,
-    initialDataUpdatedAt: initialCoins ? Date.now() : undefined,
+    initialDataUpdatedAt: undefined,
   });
 
   if (error) {
@@ -98,7 +98,7 @@ export function CoinTable({
               <TableCell className="text-muted-foreground font-mono text-xs">
                 {i + 1}
               </TableCell>
-              <TableCell className="font-medium">
+              <TableCell>
                 {coin.name ?? "Unknown"}
               </TableCell>
               {!compact && (

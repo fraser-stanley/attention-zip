@@ -17,7 +17,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { PnlSparkline } from "@/components/pnl-sparkline";
+
 import { formatCompactCurrency } from "@/lib/zora";
 import { pnlColor, formatPnl, formatPct } from "@/lib/pnl-utils";
 import { skills } from "@/lib/skills";
@@ -34,15 +34,15 @@ function PnlStats() {
   const { pnl } = MOCK_PORTFOLIO;
 
   return (
-    <div className="grid grid-cols-2 gap-px border border-border">
+    <div className="grid grid-cols-2 gap-px">
       {/* Profit / Loss */}
       <div className="p-4">
-        <p className="text-xs font-mono uppercase tracking-wider text-muted-foreground">
+        <p className="text-xs font-mono uppercase tracking-wider text-muted-foreground mb-2">
           Profit / Loss
         </p>
-        <p className="text-2xl font-bold font-mono">
+        <p className="text-5xl font-bold font-display">
           <span className="highlight-block">{formatPnl(pnl.totalPnl)}</span>
-          <span className="ml-1.5 text-sm font-normal text-muted-foreground">USDC</span>
+          <span className="ml-1.5 text-sm font-normal font-mono text-muted-foreground">USDC</span>
         </p>
         <p className={`text-xs font-mono ${pnlColor(pnl.totalPnlPct)}`}>
           {formatPct(pnl.totalPnlPct)} ROI
@@ -51,53 +51,38 @@ function PnlStats() {
 
       {/* Trades */}
       <div className="p-4 border-l border-border">
-        <p className="text-xs font-mono uppercase tracking-wider text-muted-foreground">
+        <p className="text-xs font-mono uppercase tracking-wider text-muted-foreground mb-2">
           Trades
         </p>
-        <p className="text-2xl font-bold font-mono">
-          <span className="highlight-block">{pnl.totalTrades}</span>
+        <p className="text-5xl font-bold font-display">
+          {pnl.totalTrades}
         </p>
       </div>
 
       {/* Win Rate */}
       <div className="p-4 border-t border-border">
-        <p className="text-xs font-mono uppercase tracking-wider text-muted-foreground">
+        <p className="text-xs font-mono uppercase tracking-wider text-muted-foreground mb-2">
           Win Rate
         </p>
-        <p className="text-2xl font-bold font-mono">
-          <span className="highlight-block">{pnl.winRate}%</span>
+        <p className="text-5xl font-bold font-display">
+          {pnl.winRate}%
         </p>
       </div>
 
       {/* W / L */}
       <div className="p-4 border-t border-l border-border">
-        <p className="text-xs font-mono uppercase tracking-wider text-muted-foreground">
+        <p className="text-xs font-mono uppercase tracking-wider text-muted-foreground mb-2">
           W / L
         </p>
-        <p className="text-2xl font-bold font-mono">
-          <span className="highlight-block">{pnl.wins} / {pnl.losses}</span>
+        <p className="text-5xl font-bold font-display">
+          {pnl.wins} / {pnl.losses}
         </p>
       </div>
     </div>
   );
 }
 
-/* ─── Market section header (ZORA ≈ Simmer's POLYMARKET) ─── */
-function MarketHeader() {
-  return (
-    <div className="flex items-center justify-between py-3 border-b border-border">
-      <div className="flex items-center gap-2">
-        <div className="h-2 w-2 rounded-full bg-[#3FFF00]" />
-        <span className="text-sm font-bold font-mono uppercase tracking-wider">
-          Zora
-        </span>
-      </div>
-      <span className="text-xs font-mono text-muted-foreground">
-        {activeCount} active &middot; {resolvedCount} resolved
-      </span>
-    </div>
-  );
-}
+
 
 /* ─── Positions tab content ─── */
 function PositionsContent() {
@@ -110,15 +95,12 @@ function PositionsContent() {
   return (
     <div className="space-y-4">
       {/* Info banner */}
-      <div className="flex items-center gap-2 rounded-md bg-[#3FFF00]/5 border border-[#3FFF00]/15 px-4 py-2.5">
-        <div className="h-1.5 w-1.5 rounded-full bg-[#3FFF00]" />
-        <span className="text-xs font-mono text-[#3FFF00]">
-          {activeCount} positions open &middot; {formatCompactCurrency(MOCK_PORTFOLIO.totalValue)} total value
-        </span>
-      </div>
+      <p className="font-display text-5xl tracking-tight py-6">
+        {activeCount} positions open, {formatCompactCurrency(MOCK_PORTFOLIO.totalValue)} total value
+      </p>
 
       {/* Filter pills */}
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-1">
         {([
           { value: "active" as const, count: activeCount },
           { value: "resolved" as const, count: resolvedCount },
@@ -127,14 +109,14 @@ function PositionsContent() {
           <button
             key={f.value}
             onClick={() => setFilter(f.value)}
-            className={`px-3 py-1 min-h-[44px] text-xs font-mono border transition-colors ${
+            className={`px-3 py-1.5 text-sm transition-colors border border-transparent ${
               filter === f.value
-                ? "bg-foreground text-background border-foreground"
-                : "bg-transparent text-muted-foreground border-border hover:text-foreground"
+                ? "bg-foreground text-background"
+                : "bg-muted text-foreground/50 hover:text-foreground hover:bg-foreground/10"
             }`}
           >
             {f.value.charAt(0).toUpperCase() + f.value.slice(1)}{" "}
-            <span className="opacity-60">({f.count})</span>
+            <span className="opacity-50">({f.count})</span>
           </button>
         ))}
       </div>
@@ -254,8 +236,8 @@ function InstalledSkills() {
 
   return (
     <div className="space-y-3">
-      <h2 className="text-sm font-bold font-mono uppercase tracking-wider">
-        Trading Skills
+      <h2 className="text-sm font-bold font-sans uppercase tracking-wider">
+        Agent Loadout
       </h2>
 
       <div className="grid gap-3 sm:grid-cols-2">
@@ -264,13 +246,13 @@ function InstalledSkills() {
             <CardContent className="p-4">
               <div className="flex items-start justify-between gap-3">
                 <div>
-                  <p className="text-sm font-medium">{skill.name}</p>
+                  <p className="text-sm font-sans font-medium">{skill.name}</p>
                   <p className="text-xs text-muted-foreground mt-1">
                     {skill.description}
                   </p>
                 </div>
-                <Badge variant="outline" className="shrink-0 text-[#3FFF00] border-[#3FFF00]/30">
-                  Active
+                <Badge className="shrink-0 bg-[#3FFF00] text-black border-transparent">
+                  Equipped
                 </Badge>
               </div>
             </CardContent>
@@ -278,17 +260,17 @@ function InstalledSkills() {
         ))}
 
         {available.map((skill) => (
-          <Card key={skill.id} className="opacity-50">
+          <Card key={skill.id} className="border-dashed opacity-60 hover:opacity-100 transition-opacity">
             <CardContent className="p-4">
               <div className="flex items-start justify-between gap-3">
                 <div>
-                  <p className="text-sm font-medium">{skill.name}</p>
+                  <p className="text-sm font-sans font-medium">{skill.name}</p>
                   <p className="text-xs text-muted-foreground mt-1">
                     {skill.description}
                   </p>
                 </div>
                 <Badge variant="outline" className="shrink-0">
-                  Available
+                  Equip
                 </Badge>
               </div>
             </CardContent>
@@ -310,20 +292,12 @@ function InstalledSkills() {
 export function PortfolioView() {
   return (
     <div className="space-y-8">
-      {/* Stats + Sparkline */}
-      <div className="grid gap-4 lg:grid-cols-[1fr_320px]">
-        <PnlStats />
-        <div className="border border-border p-3 h-[180px]">
-          <p className="text-xs font-mono uppercase tracking-wider text-muted-foreground mb-1">
-            Cumulative PnL
-          </p>
-          <PnlSparkline data={MOCK_PORTFOLIO.sparkline} height={140} />
-        </div>
-      </div>
+      {/* Stats */}
+      <PnlStats />
 
       {/* Market section */}
       <div className="space-y-4">
-        <MarketHeader />
+
 
         <Tabs defaultValue="positions">
           <TabsList>

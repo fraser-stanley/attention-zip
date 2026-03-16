@@ -11,6 +11,14 @@ const fragmentShader = /* glsl */ `
   uniform float pixelSizeRatio;
   uniform float grayscaleOnly;
   uniform vec3 ditherColor;
+  uniform float time;
+  uniform float greenChance;
+  uniform vec3 greenColor;
+
+  // Simple hash for pseudo-random per-pixel
+  float hash(vec2 p) {
+    return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453123);
+  }
 
   bool getValue(float brightness, vec2 pos) {
     if (brightness > 16.0 / 17.0) return false;
@@ -59,6 +67,22 @@ const fragmentShader = /* glsl */ `
     // Strictly binary: every pixel is either dither color or pure white
     vec3 dc = dithered ? ditherColor : vec3(1.0);
 
+    // Rare green sparkle — smooth fade in/out per pixel
+    if (dithered && greenChance > 0.0) {
+      vec2 cell = floor(fragCoord / pixelSize);
+      // Each pixel gets a unique phase offset and cycle speed
+      float phase = hash(cell) * 6.2831; // 0–2π
+      float speed = 0.4 + hash(cell + 99.0) * 0.6; // 0.4–1.0 Hz
+      // Sine pulse: -1..1 → remap to 0..1, then sharpen so it's mostly off
+      float wave = sin(time * speed + phase);
+      float pulse = smoothstep(0.92, 1.0, wave); // only bright near peak
+      // Use hash to select which pixels can ever be green
+      float selection = hash(cell + 42.0);
+      if (selection < greenChance && pulse > 0.0) {
+        dc = mix(dc, greenColor, pulse);
+      }
+    }
+
     vec2 currentPixel = floor(fragCoord / pixelSize);
     vec2 originalPixel = floor(uv * resolution / pixelSize);
     baseColor = (currentPixel == originalPixel) ? dc : baseColor;
@@ -73,19 +97,27 @@ export class DitherEffect extends Effect {
     pixelSizeRatio = 1.0,
     grayscaleOnly = false,
     color = "#222222",
+    greenChance = 0.008,
+    greenHex = "#3FFF00",
   }: {
     gridSize?: number;
     pixelSizeRatio?: number;
     grayscaleOnly?: boolean;
     color?: string;
+    greenChance?: number;
+    greenHex?: string;
   } = {}) {
     const c = new Color(color);
+    const g = new Color(greenHex);
     const uniforms = new Map<string, Uniform>([
       ["resolution", new Uniform(new Vector2(1, 1))],
       ["gridSize", new Uniform(gridSize)],
       ["pixelSizeRatio", new Uniform(pixelSizeRatio)],
       ["grayscaleOnly", new Uniform(grayscaleOnly ? 1 : 0)],
       ["ditherColor", new Uniform(new Vector3(c.r, c.g, c.b))],
+      ["time", new Uniform(0)],
+      ["greenChance", new Uniform(greenChance)],
+      ["greenColor", new Uniform(new Vector3(g.r, g.g, g.b))],
     ]);
 
     super("DitherEffect", fragmentShader, { uniforms });
@@ -97,5 +129,6 @@ export class DitherEffect extends Effect {
   ) {
     const res = this.uniforms.get("resolution")!.value as Vector2;
     res.set(inputBuffer.width, inputBuffer.height);
+    this.uniforms.get("time")!.value = performance.now() / 1000;
   }
 }

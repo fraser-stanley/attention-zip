@@ -36,7 +36,7 @@ function CoinCard({
           count: 3,
         }
       : undefined,
-    initialDataUpdatedAt: initialCoins ? Date.now() : undefined,
+    initialDataUpdatedAt: undefined,
     refetchInterval: 30_000,
   });
 
@@ -107,7 +107,7 @@ function LeaderboardCard({ initialTraders }: { initialTraders?: TraderNode[] }) 
           count: 3,
         }
       : undefined,
-    initialDataUpdatedAt: initialTraders ? Date.now() : undefined,
+    initialDataUpdatedAt: undefined,
     refetchInterval: 30_000,
   });
 

@@ -8,11 +8,11 @@ import { HeroOrbGlassLoader } from "@/components/hero-orb-glass-loader";
 export function HeroSection() {
   return (
     <section className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center pt-16 pb-8">
-      <div className="space-y-6">
-        <h1 className="text-3xl sm:text-4xl lg:text-5xl font-medium tracking-tighter">
-          <span className="highlight-block">Discover Zora.</span>
+      <div className="space-y-4">
+        <h1 className="text-hero font-medium tracking-tighter leading-[1.1]">
+          Discover Zora.
           <br />
-          <span className="highlight-block">Arm your agent.</span>
+          Arm your agent.
         </h1>
         <p className="text-sm text-muted-foreground max-w-md leading-relaxed">
           Open-source skills for Zora-native agents. Install in one command,

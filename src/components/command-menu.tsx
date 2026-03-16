@@ -29,10 +29,9 @@ const itemClass =
   "px-3 py-2 text-sm cursor-pointer data-[selected=true]:bg-foreground data-[selected=true]:text-background";
 
 function useModKey() {
-  const [isMac, setIsMac] = useState(true);
-  useEffect(() => {
-    setIsMac(navigator.platform?.toUpperCase().includes("MAC") ?? true);
-  }, []);
+  const isMac = typeof navigator !== "undefined"
+    ? navigator.platform?.toUpperCase().includes("MAC") ?? true
+    : true;
   return isMac ? "⌘" : "Ctrl+";
 }
 

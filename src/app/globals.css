@@ -8,7 +8,8 @@
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: "Helvetica Neue", "Helvetica", "SF Pro Display", "SF Pro Text", ui-sans-serif, system-ui, sans-serif;
-  --font-mono: var(--font-geist-mono);
+  --font-mono: var(--font-commit-mono);
+  --font-display: var(--font-helvetica-hv-cn);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -48,6 +49,7 @@
 }
 
 :root {
+  --duration-base: 200ms;
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
@@ -121,6 +123,7 @@
 @layer base {
   * {
     @apply border-border outline-ring/50;
+    transition-duration: var(--duration-base);
   }
   body {
     @apply bg-background text-foreground;
@@ -134,9 +137,43 @@
   h1, h2, h3 {
     text-wrap: balance;
   }
+  h1 {
+    letter-spacing: -0.02em;
+  }
   button, a, input, [role="button"] {
     touch-action: manipulation;
   }
+}
+
+h1 {
+  font-family: var(--font-helvetica-hv-cn, "Helvetica Neue"), "Helvetica Neue", "Helvetica", sans-serif !important;
+}
+
+.text-hero {
+  font-size: clamp(1.875rem, 1.25rem + 2.5vw, 3rem);
+}
+
+.btn-base {
+  --btn-bg: var(--primary);
+  --btn-fg: var(--primary-foreground);
+  --btn-border: transparent;
+  background-color: var(--btn-bg);
+  color: var(--btn-fg);
+  border-color: var(--btn-border);
+}
+
+.btn-base:hover {
+  --btn-bg: var(--btn-hover-bg, var(--btn-bg));
+  --btn-fg: var(--btn-hover-fg, var(--btn-fg));
+  --btn-border: var(--btn-hover-border, var(--btn-border));
+  background-color: var(--btn-bg);
+  color: var(--btn-fg);
+  border-color: var(--btn-border);
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -147,24 +184,9 @@
   }
 }
 
-/* Disable sticky hover states on touch-only devices */
-@media (hover: none) {
-  button:hover,
-  a:hover,
-  [role="button"]:hover {
-    color: inherit;
-    background-color: inherit;
-    border-color: inherit;
-  }
-}
-
 @keyframes marquee {
   0% { transform: translateX(0); }
   100% { transform: translateX(-50%); }
-}
-
-.animate-marquee {
-  animation: marquee var(--marquee-duration, 20s) linear infinite;
 }
 
 .highlight-block {

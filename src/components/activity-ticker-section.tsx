@@ -35,7 +35,7 @@ async function TickerData() {
 
 export function ActivityTickerSection() {
   return (
-    <Suspense fallback={<div className="border-y border-border h-8" />}>
+    <Suspense fallback={<ActivityTicker initialItems={[]} />}>
       <TickerData />
     </Suspense>
   );

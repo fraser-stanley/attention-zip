@@ -44,15 +44,19 @@ src/
 │   ├── dashboard/page.tsx          # Server-rendered shell + streamed dashboard tabs
 │   ├── skills/page.tsx             # Server-rendered skill gallery + JSON-LD
 │   ├── leaderboard/page.tsx        # Weekly trader rankings with server-fetched initial data
+│   ├── portfolio/page.tsx          # Mock logged-in portfolio (Simmer-style PnL, positions, skills)
+│   ├── agents/page.tsx             # Agent list (trader leaderboard with portfolio links)
+│   ├── agents/[address]/page.tsx   # Agent profile (PnL, sparkline, positions, holdings)
 │   ├── trust/page.tsx              # Trust & Safety (wallet presets, scope disclaimers)
 │   └── api/
 │       ├── route.ts                # API discovery document
 │       ├── skills/route.ts         # Skill catalog for agents
 │       ├── explore/route.ts        # Explore queries + cache headers
-│       └── leaderboard/route.ts    # Trader leaderboard
+│       ├── leaderboard/route.ts    # Trader leaderboard
+│       └── agents/[address]/route.ts # Agent profile data
 ├── components/
-│   ├── nav.tsx                     # Navigation bar
-│   ├── hero-section.tsx            # Hero layout with orb + CTA
+│   ├── nav.tsx                     # Navigation bar (7 sections incl. Portfolio)
+│   ├── hero-section.tsx            # Hero layout with orb + CTA (highlight-block headings)
 │   ├── hero-orb-glass.tsx          # Concrete dithered orb (R3F + spring click + velocity rotation)
 │   ├── hero-orb-glass-loader.tsx   # Dynamic import wrapper (ssr: false)
 │   ├── command-menu-loader.tsx     # Lazy client-only command menu mount
@@ -61,6 +65,11 @@ src/
 │   ├── leaderboard-table.tsx       # Client leaderboard refresh wrapper
 │   ├── skill-card-client.tsx       # Install block + output toggle
 │   ├── coin-table.tsx              # Reusable coin data table
+│   ├── portfolio-view.tsx          # Simmer-style portfolio (stats, sparkline, positions, skills)
+│   ├── agent-profile-detail.tsx    # Agent profile with PnL, positions, sparkline, holdings
+│   ├── pnl-sparkline.tsx           # SVG sparkline for cumulative PnL charts
+│   ├── activity-ticker.tsx         # Live activity marquee ticker
+│   ├── activity-ticker-section.tsx # Activity ticker wrapper section
 │   └── ui/                         # shadcn/ui components (button, card, badge, table, tabs, etc.)
 ├── public/
 │   └── .well-known/ai.json         # Agent discovery metadata
@@ -73,6 +82,9 @@ src/
     ├── skills.ts                   # Static skill definitions (4 skills)
     ├── providers.tsx               # React Query provider (30s staleTime)
     ├── utils.ts                    # cn() helper for className merging
+    ├── pnl-utils.ts                # Shared PnL formatting (pnlColor, formatPnl, formatPct)
+    ├── portfolio-mock-data.ts      # Mock portfolio data (positions, trades, sparkline)
+    ├── agent-mock-data.ts          # Mock agent PnL data (positions, trades, sparkline)
     └── shaders/
         └── dither-effect.ts        # 4x4 Bayer matrix dithering post-process (binary output)
 ├── proxy.ts                        # CORS headers for /api/*
@@ -88,6 +100,10 @@ src/
 - **No `config.schema.json`** for skills. Config is documented inline in SKILL.md files, following Bankr/OpenClaw conventions.
 - **Command menu is lazy-loaded** through `src/components/command-menu-loader.tsx` so it does not affect the initial page payload.
 - **React Query** handles live refresh after hydration. Initial render is server-owned for `/`, `/dashboard`, and `/leaderboard`.
+- **Portfolio page is mock data only** — `src/lib/portfolio-mock-data.ts` provides all positions, trades, PnL stats, and sparkline data. No real wallet connection. Will be replaced with live data when trade history indexing ships.
+- **Agent profiles use mock PnL data** — `src/lib/agent-mock-data.ts` provides mock positions, trades, and sparkline for agent profile pages. Real profile data (holdings, created coins) comes from the SDK.
+- **PnL utilities are shared** — `src/lib/pnl-utils.ts` exports `pnlColor()`, `formatPnl()`, `formatPct()` used by both portfolio and agent profile pages. Gains = `#3FFF00`, losses = `#FF00F0`.
+- **Green highlight block treatment** — `.highlight-block` class in `globals.css` applies `#3FFF00` bg + black text with `box-decoration-break: clone` for per-line blocks. Used on hero heading and portfolio stat numbers. Primary button variant also uses `#3FFF00`.
 
 ## shadcn/ui v2 — critical gotcha
 
@@ -147,6 +163,7 @@ All use OpenClaw SKILL.md format. All read-only — no wallet or private key nee
 - `/api/skills?id=<skill-id>` — single skill lookup
 - `/api/explore` — live explore data with cache headers
 - `/api/leaderboard` — leaderboard data with cache headers
+- `/api/agents/<address>` — agent profile data (balances, coins, volume, rank)
 - `/.well-known/ai.json` — simple discovery document for crawlers and agents
 
 ## Product boundaries

@@ -24,7 +24,7 @@ export default function SkillsPage() {
       url: toAbsoluteUrl(`/skills#${skill.id}`),
       downloadUrl: skill.skillMdUrl,
       codeRepository: skill.githubUrl,
-      installUrl: install.claude,
+      installUrl: install.cli,
     };
   });
 

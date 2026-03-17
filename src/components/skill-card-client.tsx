@@ -13,7 +13,7 @@ import { buttonVariants } from "@/components/ui/button-variants";
 import { useInstalledSkills } from "@/lib/installed-skills-context";
 import { useToast } from "@/components/toast";
 
-type Method = "claude" | "openclaw" | "manual";
+type Method = "cli" | "openclaw" | "manual";
 
 function CopyButton({ text }: { text: string }) {
   const [copied, setCopied] = useState(false);
@@ -98,7 +98,11 @@ function SkillDetail({ skill }: { skill: Skill }) {
 
       <div className="flex flex-wrap gap-1.5">
         {skill.badges.map((badge) => (
-          <Badge key={badge} variant="outline" className="text-xs font-normal">
+          <Badge
+            key={badge}
+            variant={badge === "Execution" ? "default" : "outline"}
+            className={`text-xs font-normal ${badge === "Execution" ? "bg-amber-500/15 text-amber-500 border-amber-500/25" : ""}`}
+          >
             {badge}
           </Badge>
         ))}
@@ -292,7 +296,7 @@ function SkillRow({
 }
 
 export function SkillsInstallList({ skills }: { skills: Skill[] }) {
-  const [method, setMethod] = useState<Method>("claude");
+  const [method, setMethod] = useState<Method>("cli");
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
 
   function toggleExpanded(id: string) {
@@ -314,7 +318,7 @@ export function SkillsInstallList({ skills }: { skills: Skill[] }) {
         onValueChange={(v) => setMethod(v as Method)}
       >
         <TabsList className="mb-6">
-          <TabsTrigger value="claude">Claude Code</TabsTrigger>
+          <TabsTrigger value="cli">Zora CLI</TabsTrigger>
           <TabsTrigger value="openclaw">OpenClaw</TabsTrigger>
           <TabsTrigger value="manual">Manual</TabsTrigger>
         </TabsList>

@@ -16,7 +16,7 @@ export interface Skill {
 }
 
 export interface SkillInstallCommands {
-  claude: string;
+  cli: string;
   openclaw: string;
   manual: string;
 }
@@ -41,8 +41,7 @@ export const skills: Skill[] = [
       "zora explore --sort new -o json",
       "zora explore --sort gainers -o json",
     ],
-    installCommand:
-      'install skill from https://github.com/fraser-stanley/zora-agent-skills/tree/main/trend-scout',
+    installCommand: "npx zora-cli install",
     samplePrompt:
       "Check Zora for trending coins with significant price movement in the last 24 hours.",
     sampleOutput: `Found 3 trending coins with notable movement:
@@ -84,8 +83,7 @@ export const skills: Skill[] = [
       "zora explore --sort featured -o json",
       "zora get <address> -o json",
     ],
-    installCommand:
-      'install skill from https://github.com/fraser-stanley/zora-agent-skills/tree/main/creator-pulse',
+    installCommand: "npx zora-cli install",
     samplePrompt:
       "Show me the top featured creators on Zora and any recent activity on my watchlist.",
     sampleOutput: `Featured creators update:
@@ -126,8 +124,7 @@ Watchlist alert:
       "zora explore --sort new -o json",
       "zora explore --type creator-coin -o json",
     ],
-    installCommand:
-      'install skill from https://github.com/fraser-stanley/zora-agent-skills/tree/main/briefing-bot',
+    installCommand: "npx zora-cli install",
     samplePrompt: "Give me my morning Zora briefing.",
     sampleOutput: `Zora Morning Briefing \u2014 Mar 14, 2026
 
@@ -165,8 +162,7 @@ Nothing unusual detected. Market is moderately active.`,
       "zora profile balances <address> -o json",
       "zora profile coins <address> -o json",
     ],
-    installCommand:
-      'install skill from https://github.com/fraser-stanley/zora-agent-skills/tree/main/portfolio-scout',
+    installCommand: "npx zora-cli install",
     samplePrompt:
       "Check my Zora portfolio at 0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045.",
     sampleOutput: `Portfolio for 0xd8dA...6045
@@ -196,6 +192,59 @@ Coins held: 3`,
     skillMdUrl:
       "https://raw.githubusercontent.com/fraser-stanley/zora-agent-skills/main/portfolio-scout/SKILL.md",
   },
+  {
+    id: "momentum-trader",
+    name: "Momentum Trader",
+    description:
+      "Auto-buys trending Zora coins on momentum signals via Zora CLI.",
+    longDescription:
+      "Monitors Trend Scout signals for volume spikes, new launches, and top gainers — then executes buys through the Zora CLI on Base. Configurable max position size, trailing stops, and cooldown periods. Create a dedicated trader wallet with zora setup — never use your personal wallet. Pairs with Portfolio Scout to track P&L.",
+    risk: "medium",
+    riskLabel: "Execution-capable — dedicated wallet required",
+    monitors: [
+      "Trend Scout momentum signals",
+      "Volume spike detection",
+      "New launch sniping window",
+      "Position P&L and trailing stops",
+      "Cooldown and rate limits",
+    ],
+    wraps: [
+      "zora explore --sort gainers -o json",
+      "zora buy <address> --amount <eth> -o json",
+      "zora sell <address> --amount <tokens> -o json",
+      "zora get <address> -o json",
+    ],
+    installCommand: "npx zora-cli install",
+    samplePrompt:
+      "Watch Zora for coins with >20% gains and >$100K volume in the last hour. Auto-buy up to 0.05 ETH per position, max 3 positions. Set a 15% trailing stop.",
+    sampleOutput: `Momentum Trader active — scanning gainers...
+
+Signal detected:
+  hyperpop — +28.3% 1h, $210K vol, $950K mcap
+  Meets criteria: >20% gain, >$100K volume
+
+Executing buy via Zora CLI:
+  Bought 0.05 ETH of hyperpop at $0.00019/token
+  Position: 263 tokens | Entry: $0.00019
+  Trailing stop set: -15% from peak
+
+\u26a0 Buy skipped: frog market — slippage too high (4.2% > max 3%). Will retry in 30s.
+
+Active positions (2/3):
+  1. hyperpop — +4.2% since entry, stop at $0.000185
+  2. looksmaxxing — +11.8% since entry, stop at $0.000210
+
+Watching for next signal... (cooldown: 5 min)`,
+    badges: [
+      "Execution",
+      "Zora CLI native",
+      "Requires trader wallet",
+    ],
+    githubUrl:
+      "https://github.com/fraser-stanley/zora-agent-skills/tree/main/momentum-trader",
+    skillMdUrl:
+      "https://raw.githubusercontent.com/fraser-stanley/zora-agent-skills/main/momentum-trader/SKILL.md",
+  },
 ];
 
 export function getSkillById(id: string) {
@@ -204,8 +253,8 @@ export function getSkillById(id: string) {
 
 export function getSkillInstallCommands(skill: Skill): SkillInstallCommands {
   return {
-    claude: `claude skill add ${skill.githubUrl}`,
-    openclaw: skill.installCommand,
+    cli: "npx zora-cli install",
+    openclaw: "npx skills add zora-cli",
     manual: `curl -O ${skill.skillMdUrl}`,
   };
 }

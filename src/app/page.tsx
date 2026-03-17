@@ -99,8 +99,8 @@ export default function Home() {
                   {skill.badges.map((badge) => (
                     <Badge
                       key={badge}
-                      variant="outline"
-                      className="text-xs font-normal"
+                      variant={badge === "Execution" ? "default" : "outline"}
+                      className={`text-xs font-normal ${badge === "Execution" ? "bg-amber-500/15 text-amber-500 border-amber-500/25" : ""}`}
                     >
                       {badge}
                     </Badge>

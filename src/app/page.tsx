@@ -58,17 +58,6 @@ export default function Home() {
       {/* Hero */}
       <HeroSection />
 
-      {/* Live data cards */}
-      <section className="space-y-4">
-        <div className="flex items-center justify-between">
-          <h2 className="text-sm font-medium text-muted-foreground">Agent activity</h2>
-          <span className="text-xs text-muted-foreground font-mono">Live</span>
-        </div>
-        <Suspense fallback={<HomeLiveCardsSkeleton />}>
-          <HomeLiveCardsSection />
-        </Suspense>
-      </section>
-
       <HomeValuePropsSection />
 
       {/* Skills preview */}
@@ -112,6 +101,17 @@ export default function Home() {
             </Card>
           ))}
         </div>
+      </section>
+
+      {/* Live data cards */}
+      <section className="space-y-4">
+        <div className="flex items-center justify-between">
+          <h2 className="text-sm font-medium text-muted-foreground">Agent activity</h2>
+          <span className="text-xs text-muted-foreground font-mono">Live</span>
+        </div>
+        <Suspense fallback={<HomeLiveCardsSkeleton />}>
+          <HomeLiveCardsSection />
+        </Suspense>
       </section>
 
 

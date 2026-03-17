@@ -38,7 +38,7 @@ export default function SkillsPage() {
       />
       <section className="grid gap-10 lg:grid-cols-[minmax(0,1.35fr)_minmax(18rem,0.75fr)] lg:items-start">
           <div className="space-y-4">
-            <h1 className="max-w-4xl font-display text-[clamp(3rem,6vw,5rem)] font-bold leading-[0.94] tracking-tight">
+            <h1 className="max-w-4xl font-display text-[clamp(3rem,6vw,5rem)] font-bold leading-[0.94] tracking-tight pt-[0.06em]">
               Published skills for the runtime you already use.
             </h1>
             <p className="max-w-2xl text-base leading-7 text-muted-foreground">

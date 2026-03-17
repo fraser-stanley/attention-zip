@@ -4,6 +4,7 @@ import { Suspense } from "react";
 import Link from "next/link";
 import { buttonVariants } from "@/components/ui/button-variants";
 import { HeroOrbGlassLoader } from "@/components/hero-orb-glass-loader";
+import { cn } from "@/lib/utils";
 
 export function HeroSection() {
   return (
@@ -18,11 +19,12 @@ export function HeroSection() {
           Open-source skills for the Zora attention market. One command
           to install. Read-only by default, no keys needed.
         </p>
-        <div className="flex items-center">
-          <Link href="/skills" className={buttonVariants({ size: "default" })}>
-            Get started
-          </Link>
-        </div>
+        <Link
+          href="/skills"
+          className={cn(buttonVariants({ size: "default" }), "px-8")}
+        >
+          Get started
+        </Link>
       </div>
 
       <div className="flex justify-center lg:justify-end">

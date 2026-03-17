@@ -8,11 +8,9 @@ export const buttonVariants = cva(
         default:
           "[--btn-bg:var(--primary)] [--btn-fg:var(--primary-foreground)] [--btn-border:transparent] [--btn-hover-bg:color-mix(in_oklch,var(--primary)_80%,transparent)]",
         outline:
-          "[--btn-bg:var(--background)] [--btn-fg:var(--foreground)] [--btn-border:var(--foreground)] [--btn-hover-bg:var(--foreground)] [--btn-hover-fg:var(--background)] aria-expanded:bg-foreground aria-expanded:text-background",
-        secondary:
-          "[--btn-bg:var(--secondary)] [--btn-fg:var(--secondary-foreground)] [--btn-border:transparent] [--btn-hover-bg:color-mix(in_oklch,var(--secondary)_80%,transparent)] aria-expanded:bg-secondary aria-expanded:text-secondary-foreground",
+          "[--btn-bg:var(--background)] [--btn-fg:var(--foreground)] [--btn-border:var(--border)] [--btn-hover-bg:var(--foreground)] [--btn-hover-fg:var(--background)] aria-expanded:bg-foreground aria-expanded:text-background",
         ghost:
-          "[--btn-bg:transparent] [--btn-fg:var(--foreground)] [--btn-border:transparent] [--btn-hover-bg:var(--muted)] aria-expanded:bg-muted aria-expanded:text-foreground",
+          "[--btn-bg:color-mix(in_oklch,var(--foreground)_5%,transparent)] [--btn-fg:color-mix(in_oklch,var(--foreground)_50%,transparent)] [--btn-border:transparent] [--btn-hover-bg:color-mix(in_oklch,var(--foreground)_10%,transparent)] [--btn-hover-fg:var(--foreground)]",
         destructive:
           "[--btn-bg:color-mix(in_oklch,var(--destructive)_10%,transparent)] [--btn-fg:var(--destructive)] [--btn-border:transparent] [--btn-hover-bg:color-mix(in_oklch,var(--destructive)_20%,transparent)] focus-visible:border-destructive/40 focus-visible:ring-destructive/20",
         link: "[--btn-bg:transparent] [--btn-fg:var(--primary)] [--btn-border:transparent] underline-offset-4 hover:underline",

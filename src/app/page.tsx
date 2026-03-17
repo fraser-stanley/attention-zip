@@ -1,6 +1,4 @@
 import { Suspense } from "react";
-import Link from "next/link";
-import { buttonVariants } from "@/components/ui/button-variants";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -9,6 +7,7 @@ import { HeroSection } from "@/components/hero-section";
 import { ActivityTickerSection } from "@/components/activity-ticker-section";
 import { getExploreData, getLeaderboardData } from "@/lib/data";
 import { skills } from "@/lib/skills";
+import { AnimatedArrowLink } from "@/components/animated-arrow-link";
 
 async function HomeLiveCardsSection() {
   const [trending, gainers, volume, traders] = await Promise.all([
@@ -79,12 +78,9 @@ export default function Home() {
               We wrote these, reviewed them, and published the source. Install in one command.
             </p>
           </div>
-          <Link
-            href="/skills"
-            className={buttonVariants({ variant: "outline", size: "sm" })}
-          >
+          <AnimatedArrowLink href="/skills">
             View all
-          </Link>
+          </AnimatedArrowLink>
         </div>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {skills.map((skill) => (

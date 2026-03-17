@@ -1,5 +1,6 @@
 "use client";
 
+import type { ReactNode } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -10,8 +11,18 @@ import type {
   TraderNode,
 } from "@/lib/zora";
 import { formatCompactCurrency, formatChange, truncateAddress } from "@/lib/zora";
+import { FlameIcon } from "@/components/ui/flame";
+import { TrendingUpIcon } from "@/components/ui/trending-up";
+import { ChartBarIncreasingIcon } from "@/components/ui/chart-bar-increasing";
+import { ActivityIcon } from "@/components/ui/activity";
 
 type HomeCardSort = "trending" | "gainers" | "volume";
+
+const cardIcons: Record<HomeCardSort, ReactNode> = {
+  trending: <FlameIcon size={14} />,
+  gainers: <TrendingUpIcon size={14} />,
+  volume: <ChartBarIncreasingIcon size={14} />,
+};
 
 function CoinCard({
   title,
@@ -43,7 +54,8 @@ function CoinCard({
   return (
     <Card>
       <CardHeader className="pb-2">
-        <CardTitle className="text-xs font-medium text-muted-foreground">
+        <CardTitle className="text-xs font-medium text-muted-foreground flex items-center gap-1.5">
+          {cardIcons[sort]}
           {title}
         </CardTitle>
       </CardHeader>
@@ -114,7 +126,8 @@ function LeaderboardCard({ initialTraders }: { initialTraders?: TraderNode[] }) 
   return (
     <Card>
       <CardHeader className="pb-2">
-        <CardTitle className="text-xs font-medium text-muted-foreground">
+        <CardTitle className="text-xs font-medium text-muted-foreground flex items-center gap-1.5">
+          <ActivityIcon size={14} />
           Top traders
         </CardTitle>
       </CardHeader>

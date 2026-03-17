@@ -1,5 +1,8 @@
+"use client";
+
 import Link from "next/link";
 import { SITE_REPO_URL, API_VERSION } from "@/lib/site";
+import { ArrowUpRightIcon } from "@/components/ui/arrow-up-right";
 
 const columns = [
   {
@@ -54,9 +57,10 @@ export function Footer() {
                         href={link.href}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-xs font-mono text-background/70 transition-colors duration-200 hover:text-background"
+                        className="inline-flex items-center gap-1 text-xs font-mono text-background/70 transition-colors duration-200 hover:text-background"
                       >
                         {link.label}
+                        <ArrowUpRightIcon size={12} />
                       </a>
                     ) : (
                       <Link

@@ -2,6 +2,17 @@
 
 Decisions, trade-offs, and context that aren't obvious from the code.
 
+## 2026-03-17 — Wallet modal painting order
+
+### DOM order was misleading
+The wallet modal backdrop and panel sit next to each other in the same portal root. The backdrop is `absolute`, but the panel wrapper was initially non-positioned. In that setup, the backdrop painted above the panel even though the panel came later in the JSX.
+
+### The fix was `relative`, not more `z-index`
+Adding `relative` to the panel wrapper in `src/components/wallet-connect-modal.tsx` made it a positioned element in the same painting category as the backdrop. Since the panel wrapper comes after the backdrop in DOM order, it now paints on top. The bug was not the modal's portal or its `z-[150]` value.
+
+### Future rule for modal shells
+If a modal backdrop is `absolute` or `fixed`, make the panel container positioned as well. Do not rely on sibling order between positioned and non-positioned elements to control which layer appears on top.
+
 ## 2026-03-17 — Zora CLI integration + Momentum Trader
 
 ### Install commands are CLI-first now

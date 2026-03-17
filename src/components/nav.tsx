@@ -96,7 +96,7 @@ export function Nav() {
         inert={open ? true : undefined}
       >
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="flex h-11 items-center justify-between">
+          <div className="flex h-11 items-center justify-between py-[2px]">
             <Link href="/" aria-label="Attention Index home">
               <Image
                 src="/attention-index-logo.svg"

@@ -183,6 +183,10 @@ h1 {
   will-change: transform;
 }
 
+.ticker-track:hover {
+  animation-play-state: paused;
+}
+
 
 .highlight-block {
   background-color: #3FFF00;

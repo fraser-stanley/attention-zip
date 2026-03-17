@@ -101,7 +101,7 @@ function SkillDetail({ skill }: { skill: Skill }) {
           <Badge
             key={badge}
             variant={badge === "Execution" ? "default" : "outline"}
-            className={`text-xs font-normal ${badge === "Execution" ? "bg-amber-500/15 text-amber-500 border-amber-500/25" : ""}`}
+            className={`text-xs font-normal ${badge === "Execution" ? "bg-amber-500/20 text-amber-300 border-amber-500/30" : ""}`}
           >
             {badge}
           </Badge>
@@ -195,9 +195,12 @@ function InstallButton({
     return (
       <button
         type="button"
-        className="mt-4 min-h-[44px] inline-flex items-center gap-2 rounded-md px-4 py-2.5 text-sm font-medium transition-colors bg-[#3FFF00] text-black hover:bg-red-500/10 hover:text-red-500 border border-transparent hover:border-red-500/20"
+        className="mt-4 min-h-[44px] inline-flex items-center gap-2 rounded-md px-4 py-2.5 text-sm font-medium transition-colors bg-[#3FFF00] text-black hover:bg-red-500/10 hover:text-red-500 border border-transparent hover:border-red-500/20 focus-visible:bg-red-500/10 focus-visible:text-red-500 focus-visible:border-red-500/20"
+        aria-label={`Remove ${skill.name}`}
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
+        onFocus={() => setHovered(true)}
+        onBlur={() => setHovered(false)}
         onClick={handleUninstall}
       >
         {hovered ? (

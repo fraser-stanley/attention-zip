@@ -12,3 +12,9 @@
 - Skills JSON-LD `installUrl` now references the CLI install command.
 - CLAUDE.md updated: 5 skills, execution boundary notes, Zora CLI wallet references.
 - Button hover states now use explicit Tailwind variant classes instead of the global `.btn-base` CSS variable hover system, with scoped color transitions and press feedback.
+
+### Fixed (RAMS audit)
+- Install button accessibility: added `aria-label`, `onFocus`/`onBlur` handlers, and `focus-visible` styles so keyboard users can discover and trigger the "Remove" action.
+- Amber "Execution" badge contrast: changed from `text-amber-500` (~2.1:1) to `text-amber-300` on `bg-amber-500/20` for WCAG 4.5:1 compliance.
+- Homepage skills grid: capped to 4 cards (`skills.slice(0, 4)`) to prevent orphan 5th card on 4-column layout.
+- Trust page "What we don't do" list: added `aria-hidden` on color-only "x" markers + `sr-only` text for screen readers (WCAG 1.4.1).

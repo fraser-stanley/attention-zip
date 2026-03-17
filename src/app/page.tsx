@@ -83,7 +83,7 @@ export default function Home() {
           </AnimatedArrowLink>
         </div>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {skills.map((skill) => (
+          {skills.slice(0, 4).map((skill) => (
             <Card
               key={skill.id}
               className="hover:border-foreground/30"
@@ -100,7 +100,7 @@ export default function Home() {
                     <Badge
                       key={badge}
                       variant={badge === "Execution" ? "default" : "outline"}
-                      className={`text-xs font-normal ${badge === "Execution" ? "bg-amber-500/15 text-amber-500 border-amber-500/25" : ""}`}
+                      className={`text-xs font-normal ${badge === "Execution" ? "bg-amber-500/20 text-amber-300 border-amber-500/30" : ""}`}
                     >
                       {badge}
                     </Badge>

@@ -57,7 +57,7 @@ export function Footer() {
                         href={link.href}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1 text-xs font-mono text-background/70 transition-colors duration-200 hover:text-background"
+                        className="inline-flex items-center gap-1 text-xs font-mono text-background/70 transition-colors duration-150 hover:text-background"
                       >
                         {link.label}
                         <ArrowUpRightIcon size={12} />
@@ -65,7 +65,7 @@ export function Footer() {
                     ) : (
                       <Link
                         href={link.href}
-                        className="text-xs font-mono text-background/70 transition-colors duration-200 hover:text-background"
+                        className="text-xs font-mono text-background/70 transition-colors duration-150 hover:text-background"
                       >
                         {link.label}
                       </Link>

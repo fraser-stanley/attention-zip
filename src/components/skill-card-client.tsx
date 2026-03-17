@@ -102,12 +102,12 @@ function InstallMethodPicker({
     <div className="mb-12 border-y border-border/80 py-4">
       <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
         <div className="space-y-1">
-          <p className="text-[11px] font-mono uppercase tracking-[0.18em] text-muted-foreground">
+          <p className="text-[11px] font-mono uppercase tracking-widest text-muted-foreground">
             Install flow
           </p>
           <p className="max-w-xl text-sm leading-6 text-muted-foreground">
-            Pick a runtime once. Every command below updates instantly and the selection
-            stays pinned to this browser session.
+            Pick a runtime. Every command below updates to match, and the
+            choice sticks for this session.
           </p>
         </div>
 
@@ -154,7 +154,7 @@ function InstallCommandPanel({
         className={cn(
           "absolute right-2 top-2 z-10",
           hasHover
-            ? "opacity-0 transition-opacity duration-200 group-hover/install:opacity-100 focus-visible:opacity-100"
+            ? "opacity-0 transition-opacity duration-150 group-hover/install:opacity-100 focus-visible:opacity-100"
             : ""
         )}
       />
@@ -174,7 +174,7 @@ function SkillDetail({ skill }: { skill: Skill }) {
     <div className="mt-6 grid gap-6 border-t border-border/70 pt-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)]">
       <div className="grid gap-6 sm:grid-cols-2">
         <div>
-          <h3 className="mb-3 text-[11px] font-mono uppercase tracking-[0.18em] text-muted-foreground">
+          <h3 className="mb-3 text-[11px] font-mono uppercase tracking-widest text-muted-foreground">
             What it monitors
           </h3>
           <ul className="space-y-1.5 text-sm text-muted-foreground">
@@ -188,7 +188,7 @@ function SkillDetail({ skill }: { skill: Skill }) {
         </div>
 
         <div>
-          <h3 className="mb-3 text-[11px] font-mono uppercase tracking-[0.18em] text-muted-foreground">
+          <h3 className="mb-3 text-[11px] font-mono uppercase tracking-widest text-muted-foreground">
             Commands wrapped
           </h3>
           <div className="space-y-1.5">
@@ -206,7 +206,7 @@ function SkillDetail({ skill }: { skill: Skill }) {
 
       <div className="space-y-3">
         <div>
-          <p className="mb-2 text-[11px] font-mono uppercase tracking-[0.18em] text-muted-foreground">
+          <p className="mb-2 text-[11px] font-mono uppercase tracking-widest text-muted-foreground">
             Sample prompt
           </p>
           <div className="border border-border bg-muted/40 p-3 text-sm italic leading-6">
@@ -351,7 +351,7 @@ function SkillRow({
     <section className="scroll-mt-24 border-t border-border/80 py-10 sm:py-12" id={skill.id}>
       <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(19rem,23rem)] lg:gap-12">
         <div className="space-y-5">
-          <p className="text-[11px] font-mono uppercase tracking-[0.18em] text-muted-foreground">
+          <p className="text-[11px] font-mono uppercase tracking-widest text-muted-foreground">
             Skill {String(index + 1).padStart(2, "0")}
           </p>
 

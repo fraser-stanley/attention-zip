@@ -25,9 +25,9 @@ export const skills: Skill[] = [
   {
     id: "trend-scout",
     name: "Trend Scout",
-    description: "Fast-moving opportunities: new launches, gainers, momentum.",
+    description: "Trending coins, new launches, gainers, and momentum signals.",
     longDescription:
-      "Watches trending coins, new launches, and top gainers on Zora. Your agent gets coin name, address, market cap, volume, and 24h change as structured data. Good for spotting momentum before it shows up on dashboards.",
+      "Watches trending coins, new launches, and top gainers on Zora. Returns coin name, address, market cap, volume, and 24h change as structured data. Spots momentum before it shows up on dashboards.",
     risk: "none",
     riskLabel: "Read-only \u2014 no wallet needed",
     monitors: [
@@ -67,9 +67,9 @@ export const skills: Skill[] = [
     id: "creator-pulse",
     name: "Creator Pulse",
     description:
-      "Watch specific creators, creator-coin ecosystems, and holdings.",
+      "Track creators, their coins, and holdings.",
     longDescription:
-      "Tracks creator coins and featured creators on Zora. Set up a watchlist and get alerts when activity spikes. Covers holdings, volume, and price movement for specific creators you care about.",
+      "Tracks creator coins and featured creators on Zora. Set up a watchlist, get alerts when activity spikes. Covers holdings, volume, and price movement for creators you follow.",
     risk: "none",
     riskLabel: "Read-only \u2014 no wallet needed",
     monitors: [
@@ -107,7 +107,7 @@ Watchlist alert:
     description:
       'Scheduled digest: "what changed on Zora since last check?"',
     longDescription:
-      "Pulls trending, volume, creator, and new-launch data into a morning or evening briefing. You get a short summary instead of raw numbers. Useful if you don't want to check dashboards yourself.",
+      "Pulls trending, volume, creator, and new-launch data into a morning or evening briefing. Short summary instead of raw numbers.",
     risk: "none",
     riskLabel: "Read-only \u2014 no wallet needed",
     monitors: [
@@ -146,9 +146,9 @@ Nothing unusual detected. Market is moderately active.`,
     id: "portfolio-scout",
     name: "Portfolio Scout",
     description:
-      "Read-only wallet balance and coin holdings check. Bankr-ready.",
+      "Wallet balance and coin holdings. Read-only, Bankr-ready.",
     longDescription:
-      "Check any wallet's Zora coin holdings and ETH balance. Uses the same read-only wallet-check pattern Bankr agents already use. No private key needed — just a wallet address. Use this today with your Bankr wallet, add execution skills tomorrow.",
+      "Check any wallet's Zora coin holdings and ETH balance. Same read-only pattern as Bankr. No private key needed, just a wallet address.",
     risk: "none",
     riskLabel: "Read-only — wallet address only",
     monitors: [
@@ -197,7 +197,7 @@ Coins held: 3`,
     description:
       "Auto-buys trending Zora coins on momentum signals via Zora CLI.",
     longDescription:
-      "Monitors Trend Scout signals for volume spikes, new launches, and top gainers — then executes buys through the Zora CLI on Base. Configurable max position size, trailing stops, and cooldown periods. Create a dedicated trader wallet with zora setup — never use your personal wallet. Pairs with Portfolio Scout to track P&L.",
+      "Monitors Trend Scout signals for volume spikes, new launches, and top gainers, then executes buys through the Zora CLI on Base. Configurable position size, trailing stops, and cooldown. Create a dedicated trader wallet with zora setup. Never use your personal wallet.",
     risk: "medium",
     riskLabel: "Execution-capable — dedicated wallet required",
     monitors: [

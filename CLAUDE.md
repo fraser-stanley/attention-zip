@@ -1,6 +1,6 @@
 # Zora Agent Skills
 
-Agent-first discovery and install surface for Zora-native skills. Live market data, verified skill gallery, public leaderboards, and machine-readable API docs.
+Agent skills for the Zora attention market. Skill gallery, live market data, leaderboards, and machine-readable API docs.
 
 **Not** an execution platform, custody layer, or marketplace. Execution is local to the user's agent runtime. We don't hold keys, submit transactions, or enforce guardrails server-side.
 
@@ -108,6 +108,20 @@ src/
 - **Agent profiles use mock PnL data** — `src/lib/agent-mock-data.ts` provides mock positions, trades, and sparkline for agent profile pages. Real profile data (holdings, created coins) comes from the SDK.
 - **PnL utilities are shared** — `src/lib/pnl-utils.ts` exports `pnlColor()`, `formatPnl()`, `formatPct()` used by both portfolio and agent profile pages. Gains = `#3FFF00`, losses = `#FF00F0`.
 - **Green highlight block treatment** — `.highlight-block` class in `globals.css` applies `#3FFF00` bg + black text with `box-decoration-break: clone` for per-line blocks. Used on hero heading and portfolio stat numbers. Primary button variant also uses `#3FFF00`.
+
+## Tone of voice
+
+All user-facing copy follows the guidelines in `TONE.md`. Key rules:
+
+- Zora is an "attention market". Use this phrase as the definitive description.
+- Short, direct sentences. Lead with the fact, not the framing.
+- Trend-focused: trending coins, momentum, volume. Creator coins exist but are not the primary lens.
+- No promotional adjectives ("fast-moving", "powerful", "seamless").
+- No forced rule-of-three lists. Use the natural number of items.
+- No em dashes in marketing copy. Use commas or periods.
+- No developer jargon in user-facing text ("execution-capable flows", "install surface").
+- "Execution skills" not "execution-capable skills". "Points to" not "resolves to".
+- Speculation should be tasteful and optimistic, never overpromise.
 
 ## shadcn/ui v2 — critical gotcha
 

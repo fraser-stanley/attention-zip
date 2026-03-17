@@ -119,7 +119,7 @@
   --sidebar-ring: oklch(0.4 0 0);
 }
 
-/* Z-index scale: footer=40, header=50, overlay=100, command-menu=150, skip-link=200 */
+/* Z-index scale: footer=40, header=50, toast=100, overlay=100, command-menu=150, skip-link=200, wallet-modal=200 */
 
 @layer base {
   * {
@@ -127,9 +127,12 @@
   }
   body {
     @apply bg-background text-foreground;
-    font-variant-numeric: tabular-nums;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-variant-numeric: tabular-nums slashed-zero;
     letter-spacing: -0.01em;
     line-height: 1.3;
+    text-wrap: pretty;
   }
   html {
     @apply font-sans;

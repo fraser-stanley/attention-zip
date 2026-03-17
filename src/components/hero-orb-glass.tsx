@@ -47,7 +47,7 @@ function ConcreteOrb({ pressed }: { pressed: boolean }) {
   diffuseMap.colorSpace = SRGBColorSpace;
 
   const meshRef = useRef<THREE.Mesh>(null);
-  const scale = useSpring(pressed ? 0.88 : 1, 200, 10);
+  const scale = useSpring(pressed ? 0.88 : 1, 200, 16);
 
   useFrame(() => {
     if (!meshRef.current) return;

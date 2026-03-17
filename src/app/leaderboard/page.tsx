@@ -24,8 +24,7 @@ export default function LeaderboardPage() {
       <div>
         <h1 className="text-4xl tracking-tight">Leaderboard</h1>
         <p className="text-sm text-muted-foreground">
-          Top Zora traders this week. Data from Zora&apos;s weekly trader
-          leaderboard.
+          Top Zora traders this week.
         </p>
       </div>
       <Suspense fallback={<LeaderboardTableSkeleton />}>

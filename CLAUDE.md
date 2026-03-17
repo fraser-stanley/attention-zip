@@ -127,6 +127,18 @@ import { buttonVariants } from "@/components/ui/button-variants"
 
 Import `buttonVariants` from `@/components/ui/button-variants` for server-safe usage with `<Link>`. The interactive `<Button>` component still lives in `@/components/ui/button`.
 
+## Modal layering gotcha
+
+The wallet connect modal hit a subtle CSS painting-order bug. Inside `src/components/wallet-connect-modal.tsx`, the backdrop is `absolute`. When the panel wrapper was non-positioned, the backdrop painted above it even though the panel markup came later in the DOM.
+
+Fix: make the panel wrapper a positioned element with `relative`.
+
+```tsx
+<div className="relative flex h-full items-center justify-center pointer-events-none">
+```
+
+Do not assume DOM order alone will put modal content above an `absolute` sibling. If the backdrop and panel live in the same stacking context, make sure the panel container is positioned.
+
 ## SDK parameter inconsistencies
 
 The `@zoralabs/coins-sdk` functions use different parameter names. These are documented here because they caused build failures during initial development:

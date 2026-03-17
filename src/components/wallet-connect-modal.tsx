@@ -81,7 +81,7 @@ export function WalletConnectModal({ open, onClose }: WalletConnectModalProps) {
           />
 
           {/* Panel */}
-          <div className="flex items-center justify-center h-full pointer-events-none">
+          <div className="relative flex items-center justify-center h-full pointer-events-none">
             <motion.div
               role="dialog"
               aria-modal="true"

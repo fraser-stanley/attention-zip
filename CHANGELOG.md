@@ -19,6 +19,7 @@
 
 ### Fixed
 - Login button now opens wallet connect modal (was a dead button with no handler).
+- Wallet connect modal now reliably paints above its backdrop. Root cause was CSS painting order: the backdrop was `absolute`, while the panel wrapper was non-positioned, so the backdrop painted above it despite coming earlier in the DOM. Adding `relative` to the panel container fixed it.
 - Lint errors: ref access during render in nav, setState in effects in wallet modal.
 - Nav logo scaled to 17px. Portfolio loadout buttons standardized. Tab unselected state gets gray fill.
 

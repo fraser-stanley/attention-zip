@@ -117,7 +117,10 @@ export function Nav() {
                 </button>
               ) : (
                 <button
-                  onClick={() => setWalletModalOpen(true)}
+                  onClick={() => {
+                    setOpen(false);
+                    setWalletModalOpen(true);
+                  }}
                   className={buttonVariants({ variant: "outline" })}
                 >
                   Login

@@ -147,14 +147,15 @@ All SDK responses return `{ error, data }`. Always check `response.error` before
 
 ## Skills
 
-4 first-party, read-only, verified skills:
+5 first-party verified skills:
 
 1. **Trend Scout** — trending coins, new launches, gainers, momentum
 2. **Creator Pulse** — creator coin ecosystems, featured creators, watchlists
 3. **Briefing Bot** — structured morning/evening market digest
 4. **Portfolio Scout** — wallet balance + coin holdings (Bankr-ready bridge skill)
+5. **Momentum Trader** — auto-buys trending Zora coins on momentum signals via Zora CLI. Execution-capable — requires dedicated trader wallet created with `zora setup`.
 
-All use OpenClaw SKILL.md format. All read-only — no wallet or private key needed.
+Skills 1–4 are read-only (no wallet needed). Skill 5 is execution-capable via the Zora CLI's native wallet and buy/sell commands. All use OpenClaw SKILL.md format.
 
 ## Agent-facing endpoints
 
@@ -168,7 +169,7 @@ All use OpenClaw SKILL.md format. All read-only — no wallet or private key nee
 
 ## Product boundaries
 
-- No execution infrastructure (wait for CLI buy/sell to ship)
+- Execution skills (Momentum Trader) run locally via Zora CLI — we don't execute trades server-side
 - No custody or key management
 - No server-side enforcement or guardrails
 - No third-party skill submissions

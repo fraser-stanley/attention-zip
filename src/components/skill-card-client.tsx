@@ -1,21 +1,80 @@
 "use client";
 
 import { useEffect, useId, useRef, useState } from "react";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+
 import { Badge } from "@/components/ui/badge";
-import { getSkillInstallCommands, type Skill } from "@/lib/skills";
-import { CopyIcon } from "@/components/ui/copy";
+import { buttonVariants } from "@/components/ui/button-variants";
+import { ArrowUpRightIcon } from "@/components/ui/arrow-up-right";
 import { CheckIcon } from "@/components/ui/check";
 import { ChevronDownIcon } from "@/components/ui/chevron-down";
-import { ArrowUpRightIcon } from "@/components/ui/arrow-up-right";
+import { CopyIcon } from "@/components/ui/copy";
 import { PlusIcon } from "@/components/ui/plus";
-import { buttonVariants } from "@/components/ui/button-variants";
-import { useInstalledSkills } from "@/lib/installed-skills-context";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/components/toast";
+import { useExpandableMemory } from "@/hooks/use-expandable-memory";
+import { useHasHover } from "@/hooks/use-has-hover";
+import { useSessionStorageState } from "@/hooks/use-session-storage-state";
+import { useInstalledSkills } from "@/lib/installed-skills-context";
+import { getSkillInstallCommands, type Skill } from "@/lib/skills";
+import { cn } from "@/lib/utils";
 
 type Method = "claude" | "openclaw" | "manual";
 
-function CopyButton({ text }: { text: string }) {
+type InstallMethodMeta = {
+  value: Method;
+  label: string;
+  token: string;
+  description: string;
+};
+
+const INSTALL_METHOD_STORAGE_KEY = "zora:skills-install-method";
+
+const INSTALL_METHODS: InstallMethodMeta[] = [
+  {
+    value: "claude",
+    label: "Claude Code",
+    token: "CC",
+    description: "Install directly from the published GitHub path for Claude Code.",
+  },
+  {
+    value: "openclaw",
+    label: "OpenClaw",
+    token: "OC",
+    description: "Use the OpenClaw install syntax against the same reviewed source.",
+  },
+  {
+    value: "manual",
+    label: "Manual",
+    token: "CLI",
+    description: "Fetch the raw SKILL.md when you want to inspect and place it yourself.",
+  },
+];
+
+function isMethod(value: string | null): value is Method {
+  return value === "claude" || value === "openclaw" || value === "manual";
+}
+
+function getMethodMeta(method: Method) {
+  return INSTALL_METHODS.find((item) => item.value === method) ?? INSTALL_METHODS[0];
+}
+
+function MethodToken({ token }: { token: string }) {
+  return (
+    <span className="inline-flex min-h-6 min-w-6 items-center justify-center rounded-full border border-border bg-background px-1.5 text-[10px] font-mono uppercase tracking-[0.16em]">
+      {token}
+    </span>
+  );
+}
+
+function CopyButton({
+  text,
+  className,
+  label = "Copy command",
+}: {
+  text: string;
+  className?: string;
+  label?: string;
+}) {
   const [copied, setCopied] = useState(false);
   const timeoutRef = useRef<number | null>(null);
 
@@ -49,48 +108,136 @@ function CopyButton({ text }: { text: string }) {
     <button
       type="button"
       onClick={handleCopy}
-      className={buttonVariants({ variant: "ghost", size: "icon-sm" })}
-      aria-label={copied ? "Copied command" : "Copy command"}
+      className={cn(buttonVariants({ variant: "ghost", size: "icon" }), className)}
+      aria-label={copied ? "Copied command" : label}
       aria-live="polite"
     >
-      {copied ? (
-        <CheckIcon size={16} />
-      ) : (
-        <CopyIcon size={16} />
-      )}
+      {copied ? <CheckIcon size={16} /> : <CopyIcon size={16} />}
     </button>
   );
 }
 
-function SkillDetail({ skill }: { skill: Skill }) {
-  const [expandedOutput, setExpandedOutput] = useState(false);
-  const outputId = useId();
+function InstallMethodPicker({
+  method,
+  onChange,
+}: {
+  method: Method;
+  onChange: (method: Method) => void;
+}) {
+  const currentMethod = getMethodMeta(method);
 
   return (
-    <div className="mt-4 space-y-6 pt-4">
+    <div className="mb-8 overflow-hidden rounded-xl border border-border bg-card">
+      <div className="border-b border-border px-4 py-4">
+        <p className="text-[11px] font-mono uppercase tracking-[0.18em] text-muted-foreground">
+          Install method
+        </p>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Pick the command format once. The selection applies to every skill below.
+        </p>
+      </div>
+
+      <Tabs value={method} onValueChange={(value) => onChange(value as Method)} className="gap-0">
+        <TabsList
+          variant="line"
+          aria-label="Preferred install method"
+          className="w-full flex-wrap gap-2 border-b border-border bg-muted/30 px-2 py-2"
+        >
+          {INSTALL_METHODS.map((item) => (
+            <TabsTrigger
+              key={item.value}
+              value={item.value}
+              className="min-h-[44px] rounded-md px-3 py-2 text-foreground/70 data-active:border-border data-active:bg-background data-active:text-foreground"
+            >
+              <MethodToken token={item.token} />
+              <span>{item.label}</span>
+            </TabsTrigger>
+          ))}
+        </TabsList>
+      </Tabs>
+
+      <div className="px-4 py-3">
+        <div className="flex items-center gap-2">
+          <MethodToken token={currentMethod.token} />
+          <p className="text-sm font-medium">{currentMethod.label}</p>
+        </div>
+        <p className="mt-2 text-sm text-muted-foreground">{currentMethod.description}</p>
+      </div>
+    </div>
+  );
+}
+
+function InstallCommandPanel({
+  skillName,
+  method,
+  command,
+}: {
+  skillName: string;
+  method: Method;
+  command: string;
+}) {
+  const methodMeta = getMethodMeta(method);
+  const hasHover = useHasHover();
+
+  return (
+    <div className="group/install mt-4 overflow-hidden rounded-xl border border-border bg-card">
+      <div className="border-b border-border bg-muted/30 px-4 py-3">
+        <div className="flex items-center gap-2">
+          <MethodToken token={methodMeta.token} />
+          <p className="text-sm font-medium">{methodMeta.label}</p>
+        </div>
+        <p className="mt-1 text-xs text-muted-foreground">{methodMeta.description}</p>
+      </div>
+
+      <div className="relative p-4">
+        <CopyButton
+          text={command}
+          label={`Copy ${skillName} install command`}
+          className={cn(
+            "absolute right-6 top-6 z-10",
+            hasHover
+              ? "opacity-0 transition-opacity duration-200 group-hover/install:opacity-100 focus-visible:opacity-100"
+              : ""
+          )}
+        />
+        <pre className="overflow-x-auto rounded-lg border border-border bg-muted/50 p-4 pr-16 text-sm font-mono leading-relaxed whitespace-pre-wrap break-all">
+          <code>{command}</code>
+        </pre>
+      </div>
+    </div>
+  );
+}
+
+function SkillDetail({ skill }: { skill: Skill }) {
+  const outputId = useId();
+  const { expanded: expandedOutput, toggleExpanded: toggleOutput } =
+    useExpandableMemory(`zora:skill-output:${skill.id}`);
+
+  return (
+    <div className="mt-4 space-y-6 border-t border-border/70 pt-5">
       <p className="text-sm text-muted-foreground">{skill.longDescription}</p>
 
       <div>
-        <h3 className="text-sm font-medium mb-2">What it monitors</h3>
-        <ul className="text-sm text-muted-foreground space-y-1.5">
-          {skill.monitors.map((m) => (
-            <li key={m} className="flex items-center gap-2">
-              <div className="h-1 w-1 rounded-full bg-muted-foreground/40" />
-              {m}
+        <h3 className="mb-2 text-sm font-medium">What it monitors</h3>
+        <ul className="space-y-1.5 text-sm text-muted-foreground">
+          {skill.monitors.map((monitor) => (
+            <li key={monitor} className="flex items-center gap-2">
+              <span className="h-1.5 w-1.5 rounded-full bg-muted-foreground/40" />
+              {monitor}
             </li>
           ))}
         </ul>
       </div>
 
       <div>
-        <h3 className="text-sm font-medium mb-2">CLI commands wrapped</h3>
+        <h3 className="mb-2 text-sm font-medium">CLI commands wrapped</h3>
         <div className="space-y-1.5">
-          {skill.wraps.map((cmd) => (
+          {skill.wraps.map((command) => (
             <code
-              key={cmd}
-              className="block text-xs rounded-md border border-border bg-muted/50 px-3 py-2 font-mono"
+              key={command}
+              className="block rounded-md border border-border bg-muted/50 px-3 py-2 text-xs font-mono"
             >
-              {cmd}
+              {command}
             </code>
           ))}
         </div>
@@ -104,40 +251,58 @@ function SkillDetail({ skill }: { skill: Skill }) {
         ))}
       </div>
 
-      <div>
-        <p className="mb-1.5 text-xs text-muted-foreground">Sample prompt:</p>
-        <div className="rounded-md border border-border bg-muted/50 p-3 text-sm italic">
-          &ldquo;{skill.samplePrompt}&rdquo;
+      <div className="space-y-3">
+        <div>
+          <p className="mb-1.5 text-xs text-muted-foreground">Sample prompt</p>
+          <div className="rounded-lg border border-border bg-muted/50 p-3 text-sm italic">
+            &ldquo;{skill.samplePrompt}&rdquo;
+          </div>
         </div>
+
         <button
           type="button"
           className={buttonVariants({ variant: "ghost", size: "sm" })}
           aria-expanded={expandedOutput}
           aria-controls={outputId}
-          onClick={() => setExpandedOutput((v) => !v)}
+          onClick={toggleOutput}
         >
           {expandedOutput ? "Hide" : "Show"} example output
-          <ChevronDownIcon size={12} className={`transition-transform duration-200 ${expandedOutput ? "rotate-180" : ""}`} />
+          <ChevronDownIcon
+            size={12}
+            className={`transition-transform duration-200 ${expandedOutput ? "rotate-180" : ""}`}
+          />
         </button>
+
         {expandedOutput ? (
           <pre
             id={outputId}
-            className="mt-2 overflow-x-auto rounded-md border border-border bg-muted/50 p-4 text-xs font-mono whitespace-pre-wrap"
+            className="overflow-x-auto rounded-lg border border-border bg-muted/50 p-4 text-xs font-mono whitespace-pre-wrap"
           >
             {skill.sampleOutput}
           </pre>
         ) : null}
       </div>
 
-      <a
-        href={skill.githubUrl}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="inline-flex items-center gap-1 text-xs font-mono text-muted-foreground transition-colors hover:text-foreground"
-      >
-        View source
-        <ArrowUpRightIcon size={12} />
-      </a>
+      <div className="flex flex-wrap items-center gap-4 text-xs font-mono text-muted-foreground">
+        <a
+          href={skill.githubUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-1 transition-colors hover:text-foreground"
+        >
+          View source
+          <ArrowUpRightIcon size={12} />
+        </a>
+        <a
+          href={skill.skillMdUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-1 transition-colors hover:text-foreground"
+        >
+          Raw SKILL.md
+          <ArrowUpRightIcon size={12} />
+        </a>
+      </div>
     </div>
   );
 }
@@ -154,14 +319,15 @@ function InstallButton({
   const { isInstalled, install, uninstall, hydrated } = useInstalledSkills();
   const { toast } = useToast();
   const [installing, setInstalling] = useState(false);
-  const [hovered, setHovered] = useState(false);
   const timerRef = useRef<number | null>(null);
   const installed = hydrated && isInstalled(skill.id);
   const state: InstallState = installing ? "installing" : installed ? "installed" : "idle";
 
   useEffect(() => {
     return () => {
-      if (timerRef.current !== null) window.clearTimeout(timerRef.current);
+      if (timerRef.current !== null) {
+        window.clearTimeout(timerRef.current);
+      }
     };
   }, []);
 
@@ -178,36 +344,30 @@ function InstallButton({
 
   function handleUninstall() {
     uninstall(skill.id);
-    setHovered(false);
   }
 
   if (!hydrated) {
-    return (
-      <div className="mt-4 h-[44px] rounded-md border border-border bg-muted/50 animate-pulse" />
-    );
+    return <div className="mt-4 h-[44px] rounded-md border border-border bg-muted/50 animate-pulse" />;
   }
 
   if (state === "installed") {
     return (
-      <button
-        type="button"
-        className="mt-4 min-h-[44px] inline-flex items-center gap-2 rounded-md px-4 py-2.5 text-sm font-medium transition-colors bg-[#3FFF00] text-black hover:bg-red-500/10 hover:text-red-500 border border-transparent hover:border-red-500/20"
-        onMouseEnter={() => setHovered(true)}
-        onMouseLeave={() => setHovered(false)}
-        onClick={handleUninstall}
-      >
-        {hovered ? (
-          <>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
-            Remove
-          </>
-        ) : (
-          <>
-            <CheckIcon size={14} />
-            Installed
-          </>
-        )}
-      </button>
+      <div className="mt-4 flex flex-wrap items-center gap-2">
+        <div className="inline-flex min-h-[44px] items-center gap-2 rounded-md bg-[#3FFF00] px-4 py-2.5 text-sm font-medium text-black">
+          <CheckIcon size={14} />
+          Installed
+        </div>
+        <button
+          type="button"
+          className={cn(
+            buttonVariants({ variant: "outline" }),
+            "border-red-500/20 text-red-500 hover:border-red-500/30 hover:bg-red-500/10 hover:text-red-500"
+          )}
+          onClick={handleUninstall}
+        >
+          Remove
+        </button>
+      </div>
     );
   }
 
@@ -216,7 +376,7 @@ function InstallButton({
       <button
         type="button"
         disabled
-        className="mt-4 min-h-[44px] inline-flex items-center gap-2 rounded-md border border-border px-4 py-2.5 text-sm font-medium text-muted-foreground"
+        className="mt-4 inline-flex min-h-[44px] items-center gap-2 rounded-md border border-border px-4 py-2.5 text-sm font-medium text-muted-foreground"
       >
         <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-muted-foreground/20 border-t-muted-foreground" />
         Installing...
@@ -227,7 +387,7 @@ function InstallButton({
   return (
     <button
       type="button"
-      className="mt-4 min-h-[44px] inline-flex items-center gap-2 rounded-md border border-border px-4 py-2.5 text-sm font-medium transition-colors hover:bg-foreground hover:text-background"
+      className={cn(buttonVariants({ variant: "outline" }), "mt-4")}
       onClick={handleInstall}
     >
       <PlusIcon size={14} />
@@ -239,99 +399,80 @@ function InstallButton({
 function SkillRow({
   skill,
   method,
-  expanded,
-  onToggle,
 }: {
   skill: Skill;
   method: Method;
-  expanded: boolean;
-  onToggle: () => void;
 }) {
+  const detailId = useId();
   const commands = getSkillInstallCommands(skill);
   const command = commands[method];
-  const detailId = useId();
+  const { expanded, toggleExpanded } = useExpandableMemory(`zora:skill-detail:${skill.id}`);
 
   return (
-    <div className="py-8" id={skill.id}>
-      <div>
-        <h2 className="text-lg font-medium">{skill.name}</h2>
-        <p className="text-sm text-muted-foreground mt-0.5">
-          {skill.description}
-        </p>
+    <section className="scroll-mt-20 border-t border-border/80 py-8 first:border-t-0" id={skill.id}>
+      <div className="space-y-3">
+        <div className="space-y-1">
+          <h2 className="text-lg font-medium">{skill.name}</h2>
+          <p className="text-sm text-muted-foreground">{skill.description}</p>
+        </div>
+
+        <div className="flex flex-wrap items-center gap-1.5">
+          <Badge variant="outline" className="text-xs font-normal">
+            {skill.riskLabel}
+          </Badge>
+          {skill.badges.map((badge) => (
+            <Badge key={badge} variant="outline" className="text-xs font-normal">
+              {badge}
+            </Badge>
+          ))}
+        </div>
       </div>
 
-      <div className="mt-4 flex items-center justify-between gap-2 rounded-md border border-border bg-muted/50 px-4 py-3">
-        <code className="text-sm font-mono break-all text-foreground">
-          {command}
-        </code>
-        <CopyButton text={command} />
-      </div>
-
+      <InstallCommandPanel skillName={skill.name} method={method} command={command} />
       <InstallButton skill={skill} command={command} />
 
-      <div>
+      <div className="mt-4">
         <button
           type="button"
           className={buttonVariants({ variant: "ghost", size: "sm" })}
           aria-expanded={expanded}
           aria-controls={detailId}
-          onClick={onToggle}
+          onClick={toggleExpanded}
         >
-          {expanded ? "Hide details" : "Details"}
-          <ChevronDownIcon size={12} className={`transition-transform duration-200 ${expanded ? "rotate-180" : ""}`} />
+          {expanded ? "Hide details" : "Show details"}
+          <ChevronDownIcon
+            size={12}
+            className={`transition-transform duration-200 ${expanded ? "rotate-180" : ""}`}
+          />
         </button>
       </div>
 
-      {expanded && (
+      {expanded ? (
         <div id={detailId}>
           <SkillDetail skill={skill} />
         </div>
-      )}
-    </div>
+      ) : null}
+    </section>
   );
 }
 
 export function SkillsInstallList({ skills }: { skills: Skill[] }) {
-  const [method, setMethod] = useState<Method>("claude");
-  const [expanded, setExpanded] = useState<Set<string>>(new Set());
-
-  function toggleExpanded(id: string) {
-    setExpanded((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) {
-        next.delete(id);
-      } else {
-        next.add(id);
-      }
-      return next;
-    });
-  }
+  const [method, setMethod] = useSessionStorageState<Method>({
+    key: INSTALL_METHOD_STORAGE_KEY,
+    initialValue: "claude",
+    parse: (storedMethod) => (isMethod(storedMethod) ? storedMethod : "claude"),
+    serialize: (value) => value,
+  });
 
   return (
-    <div className="max-w-2xl">
-      <Tabs
-        value={method}
-        onValueChange={(v) => setMethod(v as Method)}
-      >
-        <TabsList className="mb-6">
-          <TabsTrigger value="claude">Claude Code</TabsTrigger>
-          <TabsTrigger value="openclaw">OpenClaw</TabsTrigger>
-          <TabsTrigger value="manual">Manual</TabsTrigger>
-        </TabsList>
-      </Tabs>
+    <div className="max-w-3xl">
+      <InstallMethodPicker method={method} onChange={setMethod} />
 
       <div>
         {skills.map((skill) => (
-          <SkillRow
-            key={skill.id}
-            skill={skill}
-            method={method}
-            expanded={expanded.has(skill.id)}
-            onToggle={() => toggleExpanded(skill.id)}
-          />
+          <SkillRow key={skill.id} skill={skill} method={method} />
         ))}
       </div>
     </div>
   );
 }
-

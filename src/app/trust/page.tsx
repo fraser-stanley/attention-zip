@@ -1,5 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Callout } from "@/components/ui/callout";
 import { Separator } from "@/components/ui/separator";
 
 export default function TrustPage() {
@@ -21,12 +22,15 @@ export default function TrustPage() {
             We wrote every skill in this repo and published the source. You can
             read the code before you install anything.
           </p>
-          <p>
-            <strong>
-              Execution is local to your agent. We don&apos;t hold keys or submit
-              transactions.
-            </strong>
-          </p>
+          <Callout variant="info" title="Execution stays local">
+            <p>
+              We publish source and install instructions.{" "}
+              <strong>
+                We don&apos;t hold keys, submit transactions, or control your
+                local runtime.
+              </strong>
+            </p>
+          </Callout>
           <p className="text-muted-foreground">
             Verification means we reviewed the published skill source in this
             repo. It does not mean we control your local runtime.
@@ -43,6 +47,14 @@ export default function TrustPage() {
           <CardTitle className="text-base">Wallet safety presets</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
+          <Callout variant="warning" title="Never reuse your personal wallet">
+            <p>
+              Today&apos;s skills are read-only. If you experiment with
+              execution-capable workflows later, use a dedicated wallet with
+              bounded funds from day one.
+            </p>
+          </Callout>
+
           <div className="space-y-3">
             <div className="flex items-start gap-3">
               <Badge variant="secondary" className="mt-0.5 shrink-0">

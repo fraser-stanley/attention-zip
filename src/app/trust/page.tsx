@@ -100,23 +100,28 @@ export default function TrustPage() {
         <CardContent>
           <ul className="text-sm text-muted-foreground space-y-2">
             <li className="flex items-center gap-2">
-              <span className="text-destructive">x</span>
+              <span className="text-destructive" aria-hidden="true">x</span>
+              <span className="sr-only">We do not</span>
               Hold or manage private keys
             </li>
             <li className="flex items-center gap-2">
-              <span className="text-destructive">x</span>
+              <span className="text-destructive" aria-hidden="true">x</span>
+              <span className="sr-only">We do not</span>
               Submit transactions on your behalf
             </li>
             <li className="flex items-center gap-2">
-              <span className="text-destructive">x</span>
+              <span className="text-destructive" aria-hidden="true">x</span>
+              <span className="sr-only">We do not</span>
               Enforce execution guardrails server-side
             </li>
             <li className="flex items-center gap-2">
-              <span className="text-destructive">x</span>
+              <span className="text-destructive" aria-hidden="true">x</span>
+              <span className="sr-only">We do not</span>
               Accept third-party skill submissions
             </li>
             <li className="flex items-center gap-2">
-              <span className="text-destructive">x</span>
+              <span className="text-destructive" aria-hidden="true">x</span>
+              <span className="sr-only">We do not</span>
               Guarantee trading outcomes
             </li>
           </ul>

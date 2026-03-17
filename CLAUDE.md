@@ -68,7 +68,8 @@ src/
 │   ├── portfolio-view.tsx          # Simmer-style portfolio (stats, sparkline, positions, skills)
 │   ├── agent-profile-detail.tsx    # Agent profile with PnL, positions, sparkline, holdings
 │   ├── pnl-sparkline.tsx           # SVG sparkline for cumulative PnL charts
-│   ├── activity-ticker.tsx         # Live activity marquee ticker
+│   ├── wallet-connect-modal.tsx     # Mock wallet connect flow (MetaMask/Coinbase/WalletConnect)
+│   ├── activity-ticker.tsx         # Live activity marquee ticker (layout-level, all pages)
 │   ├── activity-ticker-section.tsx # Activity ticker wrapper section
 │   └── ui/                         # shadcn/ui components (button, card, badge, table, tabs, etc.)
 ├── public/
@@ -81,6 +82,7 @@ src/
     ├── zora.ts                     # SDK wrapper: all query functions + formatting helpers
     ├── skills.ts                   # Static skill definitions (5 skills)
     ├── providers.tsx               # React Query provider (30s staleTime)
+    ├── wallet-context.tsx           # Mock wallet state (localStorage, useSyncExternalStore)
     ├── utils.ts                    # cn() helper for className merging
     ├── pnl-utils.ts                # Shared PnL formatting (pnlColor, formatPnl, formatPct)
     ├── portfolio-mock-data.ts      # Mock portfolio data (positions, trades, sparkline)
@@ -96,6 +98,7 @@ src/
 - **Client components still refresh through API routes** (`/api/explore`, `/api/leaderboard`) using React Query. The API remains the public integration surface for external agents and local tooling.
 - **Agent discovery is explicit** via `/api`, `/api/skills`, JSON-LD, and `/.well-known/ai.json`.
 - **Skills are static data** in `src/lib/skills.ts`. No database, no CMS. The homepage grid and skills gallery both render from this array — add a skill to the array and both pages update automatically.
+- **Install commands are agent instructions**, not CLI commands. The Zora CLI has no `install` or `skills` subcommand. The "Tell your agent" tab shows natural-language instructions (`install skill from <url>`); the "curl" tab is the only real shell command.
 - **Install commands are shared** from `src/lib/skills.ts` so the UI and `/api/skills` stay in sync.
 - **The skills page stays intentionally flat** — one shared runtime picker updates every command block, while deeper verification details stay expandable so the list remains fast to scan.
 - **No `config.schema.json`** for skills. Config is documented inline in SKILL.md files, following Bankr/OpenClaw conventions.
@@ -156,7 +159,24 @@ All SDK responses return `{ error, data }`. Always check `response.error` before
 4. **Portfolio Scout** — wallet balance + coin holdings (Bankr-ready bridge skill)
 5. **Momentum Trader** — auto-buys trending Zora coins on momentum signals via Zora CLI. Execution-capable — requires dedicated trader wallet created with `zora setup`.
 
-Skills 1–4 are read-only (no wallet needed). Skill 5 is execution-capable via the Zora CLI's native wallet and buy/sell commands. All use OpenClaw SKILL.md format.
+Skills 1–4 are read-only (no wallet needed). Skill 5 is execution-capable via the Zora CLI's native wallet and buy/sell commands (buy/sell are not yet shipped in the CLI). All use OpenClaw SKILL.md format. The CLI has no SKILL.md parsing — it's purely an agent-runtime convention.
+
+### CLI command reality check
+
+The Zora CLI has 4 commands: `auth`, `explore`, `setup`, `wallet`. The following commands referenced in skills **do not exist** in the CLI:
+- `zora get` — not implemented
+- `zora profile` — not implemented
+- `zora buy` / `zora sell` — not implemented (Momentum Trader depends on these shipping)
+
+Portfolio Scout wraps SDK calls (`getProfileBalances`, `getProfileCoins`) instead of CLI commands.
+
+### Wallet setup
+
+- `zora setup` creates a new EOA keypair or imports an existing private key
+- Keys stored at `~/.config/zora/wallet.json` (mode 0600)
+- `ZORA_PRIVATE_KEY` env var takes precedence over stored wallet
+- `--create` skips interactive prompt, `--force` overwrites existing wallet
+- **No spending limits or scope restrictions** — it's a raw private key
 
 ## Agent-facing endpoints
 

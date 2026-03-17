@@ -49,22 +49,25 @@ export function Nav() {
     setOpen(false);
   }, []);
 
+  const homeRef = useRef<SparklesIconHandle>(null);
+  const skillsRef = useRef<ZapHandle>(null);
+  const dashboardRef = useRef<ChartBarIncreasingIconHandle>(null);
+  const leaderboardRef = useRef<ActivityIconHandle>(null);
+  const portfolioRef = useRef<LayersIconHandle>(null);
+  const trustRef = useRef<ShieldCheckIconHandle>(null);
+
   const iconRefs: Record<string, React.RefObject<IconHandle | null>> = {
-    home: useRef<SparklesIconHandle>(null),
-    skills: useRef<ZapHandle>(null),
-    dashboard: useRef<ChartBarIncreasingIconHandle>(null),
-    leaderboard: useRef<ActivityIconHandle>(null),
-    portfolio: useRef<LayersIconHandle>(null),
-    trust: useRef<ShieldCheckIconHandle>(null),
+    home: homeRef, skills: skillsRef, dashboard: dashboardRef,
+    leaderboard: leaderboardRef, portfolio: portfolioRef, trust: trustRef,
   };
 
   const iconComponents: Record<string, React.ReactNode> = {
-    home: <SparklesIcon ref={iconRefs.home as React.RefObject<SparklesIconHandle>} size={18} />,
-    skills: <ZapIcon ref={iconRefs.skills as React.RefObject<ZapHandle>} size={18} />,
-    dashboard: <ChartBarIncreasingIcon ref={iconRefs.dashboard as React.RefObject<ChartBarIncreasingIconHandle>} size={18} />,
-    leaderboard: <ActivityIcon ref={iconRefs.leaderboard as React.RefObject<ActivityIconHandle>} size={18} />,
-    portfolio: <LayersIcon ref={iconRefs.portfolio as React.RefObject<LayersIconHandle>} size={18} />,
-    trust: <ShieldCheckIcon ref={iconRefs.trust as React.RefObject<ShieldCheckIconHandle>} size={18} />,
+    home: <SparklesIcon ref={homeRef} size={18} />,
+    skills: <ZapIcon ref={skillsRef} size={18} />,
+    dashboard: <ChartBarIncreasingIcon ref={dashboardRef} size={18} />,
+    leaderboard: <ActivityIcon ref={leaderboardRef} size={18} />,
+    portfolio: <LayersIcon ref={portfolioRef} size={18} />,
+    trust: <ShieldCheckIcon ref={trustRef} size={18} />,
   };
 
   useEffect(() => {
@@ -80,7 +83,7 @@ export function Nav() {
   useEffect(() => {
     if (prevPathname.current !== pathname) {
       prevPathname.current = pathname;
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- intentional: close menu on navigation
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- close menu on route change
       close();
     }
   }, [pathname, close]);

@@ -1,5 +1,27 @@
 # Changelog
 
+## 2026-03-17 (CLI audit + UI fixes)
+
+### Added
+- **Wallet connect modal** — mock wallet flow (MetaMask, Coinbase Wallet, WalletConnect) with localStorage persistence and truncated address display.
+- **Activity ticker in layout** — marquee now appears on all pages (moved from homepage-only), white background, normal document flow.
+- Wallet context (`src/lib/wallet-context.tsx`) with `useSyncExternalStore` for SSR-safe state.
+
+### Changed
+- **CLI audit alignment** — removed nonexistent CLI commands from skill `wraps` arrays (`zora get`, `zora profile`). Portfolio Scout now wraps SDK calls. Momentum Trader `buy`/`sell` kept as planned commands.
+- Install tab renamed from "Zora CLI" to "Tell your agent" — install commands are agent instructions, not shell commands.
+- "Manual" tab renamed to "curl".
+- "CLI commands wrapped" heading changed to "Commands wrapped".
+- Trust page updated with accurate wallet details: storage path, `--create` flag, `ZORA_PRIVATE_KEY` env var, no spending limits disclaimer.
+- Card titles use default font instead of condensed (`font-display` removed from `CardTitle`).
+- Nav buttons (Login/Index) no longer show icons.
+- Tab active state uses black fill + white text.
+
+### Fixed
+- Login button now opens wallet connect modal (was a dead button with no handler).
+- Lint errors: ref access during render in nav, setState in effects in wallet modal.
+- Nav logo scaled to 17px. Portfolio loadout buttons standardized. Tab unselected state gets gray fill.
+
 ## 2026-03-17
 
 ### Added

@@ -4,7 +4,6 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { HomeLiveCards } from "@/components/home-live-cards";
 import { HeroSection } from "@/components/hero-section";
-import { ActivityTickerSection } from "@/components/activity-ticker-section";
 import { getExploreData, getLeaderboardData } from "@/lib/data";
 import { skills } from "@/lib/skills";
 import { AnimatedArrowLink } from "@/components/animated-arrow-link";
@@ -51,11 +50,6 @@ export default function Home() {
     <div className="space-y-16">
       {/* Hero */}
       <HeroSection />
-
-      {/* Activity marquee */}
-      <Suspense fallback={null}>
-        <ActivityTickerSection />
-      </Suspense>
 
       {/* Live data cards */}
       <section className="space-y-4">

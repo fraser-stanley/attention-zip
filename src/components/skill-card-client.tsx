@@ -25,9 +25,9 @@ const INSTALL_METHOD_STORAGE_KEY = "zora:skills-install-method";
 const INSTALL_METHODS: Method[] = ["cli", "openclaw", "manual"];
 
 const INSTALL_METHOD_LABELS: Record<Method, string> = {
-  cli: "Zora CLI",
+  cli: "Tell your agent",
   openclaw: "OpenClaw",
-  manual: "Manual",
+  manual: "curl",
 };
 
 function isMethod(value: string | null): value is Method {
@@ -125,7 +125,7 @@ function InstallMethodPicker({
               <TabsTrigger
                 key={item}
                 value={item}
-                className="min-h-[44px] rounded-none border-x-0 border-t-0 border-b-2 border-b-transparent px-0 py-3 text-[13px] font-medium text-muted-foreground hover:bg-transparent hover:text-foreground data-active:border-foreground data-active:bg-transparent data-active:text-foreground lg:px-4"
+                className="min-h-[44px] rounded-none border-none px-0 py-3 text-[13px] font-medium text-muted-foreground hover:bg-foreground/10 hover:text-foreground data-active:bg-foreground data-active:text-background lg:px-4"
               >
                 <span>{INSTALL_METHOD_LABELS[item]}</span>
               </TabsTrigger>
@@ -189,7 +189,7 @@ function SkillDetail({ skill }: { skill: Skill }) {
 
         <div>
           <h3 className="mb-3 text-[11px] font-mono uppercase tracking-[0.18em] text-muted-foreground">
-            CLI commands wrapped
+            Commands wrapped
           </h3>
           <div className="space-y-1.5">
             {skill.wraps.map((command) => (

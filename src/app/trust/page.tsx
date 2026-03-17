@@ -10,7 +10,7 @@ export default function TrustPage() {
   return (
     <div>
       {/* Hero */}
-      <section className="pt-16 pb-20 border-b border-border">
+      <section className="pt-16 pb-20">
         <p className="text-[11px] font-mono uppercase tracking-[0.18em] text-muted-foreground">
           Trust &amp; Safety
         </p>
@@ -24,12 +24,12 @@ export default function TrustPage() {
       </section>
 
       {/* Our model */}
-      <section className="py-20 border-b border-border">
+      <section className="py-20">
         <div className="max-w-2xl">
           <p className="text-[11px] font-mono uppercase tracking-[0.18em] text-muted-foreground">
             Our model
           </p>
-          <h2 className="mt-4 text-2xl tracking-tight sm:text-3xl">
+          <h2 className="mt-4 max-w-4xl text-4xl tracking-[-0.05em] sm:text-5xl lg:text-6xl">
             Source-published, locally executed
           </h2>
           <div className="mt-8 space-y-6 text-base leading-7 text-muted-foreground">
@@ -53,7 +53,7 @@ export default function TrustPage() {
       </section>
 
       {/* Wallet safety presets */}
-      <section className="py-20 border-b border-border">
+      <section className="py-20">
         <p className="text-[11px] font-mono uppercase tracking-[0.18em] text-muted-foreground">
           Wallet safety presets
         </p>
@@ -65,7 +65,7 @@ export default function TrustPage() {
           wallet with bounded funds. Most other skills are read-only.
         </p>
 
-        <div className="mt-12 grid gap-px bg-border sm:grid-cols-3">
+        <div className="mt-12 grid gap-4 sm:grid-cols-3">
           <div className="bg-background p-6 sm:p-8">
             <p className="text-[11px] font-mono uppercase tracking-[0.18em] text-muted-foreground">
               01
@@ -114,7 +114,7 @@ export default function TrustPage() {
       </section>
 
       {/* Boundaries */}
-      <section className="py-20 border-b border-border">
+      <section className="py-20">
         <p className="text-[11px] font-mono uppercase tracking-[0.18em] text-muted-foreground">
           Boundaries
         </p>
@@ -122,7 +122,7 @@ export default function TrustPage() {
           What we don&apos;t do
         </h2>
 
-        <div className="mt-12 max-w-2xl divide-y divide-border">
+        <div className="mt-12 max-w-2xl">
           {boundaries.map((item, i) => (
             <div key={i} className="py-4 flex items-baseline gap-4">
               <span className="text-[11px] font-mono uppercase tracking-[0.18em] text-muted-foreground shrink-0 w-8">

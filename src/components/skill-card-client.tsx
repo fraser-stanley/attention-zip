@@ -36,7 +36,7 @@ function isMethod(value: string | null): value is Method {
 
 function badgeClassName(badge: string) {
   return badge === "Execution"
-    ? "border-amber-500/30 bg-amber-500/20 text-amber-300"
+    ? "border-black bg-black text-white"
     : "";
 }
 
@@ -99,7 +99,7 @@ function InstallMethodPicker({
   onChange: (method: Method) => void;
 }) {
   return (
-    <div className="mb-12 border-y border-border/80 py-4">
+    <div className="mb-12 py-4">
       <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
         <div className="space-y-1">
           <p className="text-[11px] font-mono uppercase tracking-widest text-muted-foreground">
@@ -119,7 +119,7 @@ function InstallMethodPicker({
           <TabsList
             variant="line"
             aria-label="Preferred install method"
-            className="grid w-full grid-cols-3 gap-0 border-b border-border px-0 py-0 lg:inline-flex lg:w-auto"
+            className="grid w-full grid-cols-3 gap-0 px-0 py-0 lg:inline-flex lg:w-auto"
           >
             {INSTALL_METHODS.map((item) => (
               <TabsTrigger
@@ -348,7 +348,7 @@ function SkillRow({
   const { expanded, toggleExpanded } = useExpandableMemory(`zora:skill-detail:${skill.id}`);
 
   return (
-    <section className="scroll-mt-24 border-t border-border/80 py-10 sm:py-12" id={skill.id}>
+    <section className="scroll-mt-24 py-10 sm:py-12" id={skill.id}>
       <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(19rem,23rem)] lg:gap-12">
         <div className="space-y-5">
           <p className="text-[11px] font-mono uppercase tracking-widest text-muted-foreground">
@@ -388,14 +388,14 @@ function SkillRow({
             <button
               type="button"
               className={cn(
-                buttonVariants({ variant: "ghost", size: "sm" }),
-                "h-auto px-0 text-sm text-foreground hover:bg-transparent"
+                buttonVariants({ variant: "outline" }),
+                "w-full sm:w-auto"
               )}
               aria-expanded={expanded}
               aria-controls={detailId}
               onClick={toggleExpanded}
             >
-              {expanded ? "Hide details" : "Inspect details"}
+              {expanded ? "Hide details" : "Learn more"}
               <ChevronDownIcon
                 size={12}
                 className={`transition-transform duration-200 ${expanded ? "rotate-180" : ""}`}

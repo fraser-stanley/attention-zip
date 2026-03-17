@@ -10,7 +10,7 @@ export default function TrustPage() {
   return (
     <div>
       {/* Hero */}
-      <section className="pt-16 pb-20">
+      <section className="pt-4 pb-20">
         <p className="text-[11px] font-mono uppercase tracking-[0.18em] text-muted-foreground">
           Trust &amp; Safety
         </p>

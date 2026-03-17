@@ -36,9 +36,8 @@ export default function SkillsPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(skillJsonLd) }}
       />
-      <section className="grid gap-10 lg:grid-cols-[minmax(0,1.35fr)_minmax(18rem,0.75fr)] lg:items-start">
-          <div className="space-y-4">
-            <h1 className="max-w-4xl font-display text-[clamp(3rem,6vw,5rem)] font-bold leading-[0.94] tracking-tight pt-[0.06em]">
+      <section className="space-y-4">
+            <h1 className="max-w-5xl font-display text-[clamp(3rem,6vw,5rem)] font-bold leading-[0.94] tracking-tight pt-[0.06em]">
               Published skills for the runtime you already use.
             </h1>
             <p className="max-w-2xl text-base leading-7 text-muted-foreground">
@@ -51,23 +50,6 @@ export default function SkillsPage() {
               {skills.length} reviewed skills. 3 install paths. {executionSkillCount} execution
               skill, clearly labeled.
             </p>
-          </div>
-
-          <div className="space-y-4 bg-muted/35 p-5 sm:p-6">
-            <p className="text-[11px] font-mono uppercase tracking-widest text-muted-foreground">
-              Before you enable
-            </p>
-            <div className="space-y-3 text-sm leading-6 text-muted-foreground">
-              <p>
-                Every install path here points to published source. Read-only
-                skills stay in scout mode.
-              </p>
-              <p className="text-foreground">
-                Execution belongs in a dedicated trader wallet with bounded
-                funds. No custody. No server-side execution.
-              </p>
-            </div>
-          </div>
       </section>
 
       <section className="grid max-w-5xl gap-6 sm:grid-cols-3">

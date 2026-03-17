@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 
 export function HeroSection() {
   return (
-    <section className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center pt-16 pb-8">
+    <section className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center pt-4 pb-8">
       <div className="space-y-4">
         <h1 className="text-hero font-medium tracking-tighter leading-[1.1]">
           Give your agent

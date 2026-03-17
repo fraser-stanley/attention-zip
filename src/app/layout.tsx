@@ -86,7 +86,7 @@ export default function RootLayout({
         <Providers>
           <Nav />
           <CommandMenuLoader />
-          <main id="main-content" className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-12">
+          <main id="main-content" className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-14 pb-12">
             {children}
           </main>
           <Footer />

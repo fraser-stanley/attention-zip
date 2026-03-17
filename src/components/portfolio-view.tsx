@@ -1,8 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
-import { buttonVariants } from "@/components/ui/button-variants";
 import { Badge } from "@/components/ui/badge";
 import {
   Card,
@@ -22,6 +20,14 @@ import { formatCompactCurrency } from "@/lib/zora";
 import { pnlColor, formatPnl, formatPct } from "@/lib/pnl-utils";
 import { skills } from "@/lib/skills";
 import { MOCK_PORTFOLIO, type MockPosition } from "@/lib/portfolio-mock-data";
+import { ChartBarIncreasingIcon } from "@/components/ui/chart-bar-increasing";
+import { ClockIcon } from "@/components/ui/clock";
+import { CheckIcon } from "@/components/ui/check";
+import { PlusIcon } from "@/components/ui/plus";
+import { AnimatedArrowLink } from "@/components/animated-arrow-link";
+import { buttonVariants } from "@/components/ui/button-variants";
+import { useInstalledSkills } from "@/lib/installed-skills-context";
+import { useToast } from "@/components/toast";
 
 type PositionFilter = "active" | "resolved" | "all";
 
@@ -99,27 +105,20 @@ function PositionsContent() {
         {activeCount} positions open, {formatCompactCurrency(MOCK_PORTFOLIO.totalValue)} total value
       </p>
 
-      {/* Filter pills */}
-      <div className="flex items-center gap-1">
-        {([
-          { value: "active" as const, count: activeCount },
-          { value: "resolved" as const, count: resolvedCount },
-          { value: "all" as const, count: allCount },
-        ]).map((f) => (
-          <button
-            key={f.value}
-            onClick={() => setFilter(f.value)}
-            className={`px-3 py-1.5 text-sm transition-colors border border-transparent ${
-              filter === f.value
-                ? "bg-foreground text-background"
-                : "bg-muted text-foreground/50 hover:text-foreground hover:bg-foreground/10"
-            }`}
-          >
-            {f.value.charAt(0).toUpperCase() + f.value.slice(1)}{" "}
-            <span className="opacity-50">({f.count})</span>
-          </button>
-        ))}
-      </div>
+      {/* Filter tabs */}
+      <Tabs value={filter} onValueChange={(v) => setFilter(v as PositionFilter)}>
+        <TabsList>
+          <TabsTrigger value="active">
+            Active <span className="opacity-50">({activeCount})</span>
+          </TabsTrigger>
+          <TabsTrigger value="resolved">
+            Resolved <span className="opacity-50">({resolvedCount})</span>
+          </TabsTrigger>
+          <TabsTrigger value="all">
+            All <span className="opacity-50">({allCount})</span>
+          </TabsTrigger>
+        </TabsList>
+      </Tabs>
 
       {/* Table */}
       {positions.length === 0 ? (
@@ -226,16 +225,48 @@ function HistoryContent() {
 }
 
 /* ─── Skills section ─── */
-function InstalledSkills() {
-  const installed = skills.filter((s) =>
-    MOCK_PORTFOLIO.installedSkillIds.includes(s.id)
-  );
-  const available = skills.filter(
-    (s) => !MOCK_PORTFOLIO.installedSkillIds.includes(s.id)
-  );
+
+function EquipButton({ skillId, skillName }: { skillId: string; skillName: string }) {
+  const { install } = useInstalledSkills();
+  const { toast } = useToast();
+  const [state, setState] = useState<"idle" | "installing">("idle");
+
+  function handleEquip() {
+    setState("installing");
+    setTimeout(() => {
+      install(skillId);
+      toast(`${skillName} added to your agent`);
+    }, 800);
+  }
+
+  if (state === "installing") {
+    return (
+      <span className="shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 text-sm text-muted-foreground min-h-[44px]">
+        <span className="h-3 w-3 animate-spin rounded-full border-2 border-muted-foreground/20 border-t-muted-foreground" />
+      </span>
+    );
+  }
 
   return (
-    <div className="space-y-3">
+    <button
+      type="button"
+      className={buttonVariants({ variant: "outline" })}
+      onClick={handleEquip}
+    >
+      <PlusIcon size={14} />
+      Equip
+    </button>
+  );
+}
+
+function InstalledSkills() {
+  const { isInstalled, uninstall, hydrated } = useInstalledSkills();
+
+  const installed = skills.filter((s) => isInstalled(s.id));
+  const available = skills.filter((s) => !isInstalled(s.id));
+
+  return (
+    <div className={`space-y-3 ${!hydrated ? "opacity-50" : ""}`}>
       <h2 className="text-sm font-bold font-sans uppercase tracking-wider">
         Agent Loadout
       </h2>
@@ -251,9 +282,20 @@ function InstalledSkills() {
                     {skill.description}
                   </p>
                 </div>
-                <Badge className="shrink-0 bg-[#3FFF00] text-black border-transparent">
-                  Equipped
-                </Badge>
+                <button
+                  type="button"
+                  className="group shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-md bg-[#3FFF00] text-black border border-transparent transition-colors hover:bg-red-500/10 hover:text-red-500 hover:border-red-500/20 min-h-[44px]"
+                  onClick={() => uninstall(skill.id)}
+                >
+                  <span className="group-hover:hidden inline-flex items-center gap-1.5">
+                    <CheckIcon size={14} />
+                    Equipped
+                  </span>
+                  <span className="hidden group-hover:inline-flex items-center gap-1.5">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                    Remove
+                  </span>
+                </button>
               </div>
             </CardContent>
           </Card>
@@ -269,21 +311,16 @@ function InstalledSkills() {
                     {skill.description}
                   </p>
                 </div>
-                <Badge variant="outline" className="shrink-0">
-                  Equip
-                </Badge>
+                <EquipButton skillId={skill.id} skillName={skill.name} />
               </div>
             </CardContent>
           </Card>
         ))}
       </div>
 
-      <Link
-        href="/skills"
-        className={buttonVariants({ variant: "outline", size: "sm" })}
-      >
+      <AnimatedArrowLink href="/skills">
         Browse all skills
-      </Link>
+      </AnimatedArrowLink>
     </div>
   );
 }
@@ -301,9 +338,18 @@ export function PortfolioView() {
 
         <Tabs defaultValue="positions">
           <TabsList>
-            <TabsTrigger value="positions">Positions</TabsTrigger>
-            <TabsTrigger value="orders">Orders</TabsTrigger>
-            <TabsTrigger value="history">History</TabsTrigger>
+            <TabsTrigger value="positions" className="gap-1.5">
+              <ChartBarIncreasingIcon size={14} />
+              Positions
+            </TabsTrigger>
+            <TabsTrigger value="orders" className="gap-1.5">
+              <ClockIcon size={14} />
+              Orders
+            </TabsTrigger>
+            <TabsTrigger value="history" className="gap-1.5">
+              <ClockIcon size={14} />
+              History
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="positions">

@@ -42,7 +42,7 @@ src/
 │   ├── layout.tsx                  # Root layout (metadata, JSON-LD, Providers, Nav)
 │   ├── globals.css                 # Tailwind imports + CSS variables
 │   ├── dashboard/page.tsx          # Server-rendered shell + streamed dashboard tabs
-│   ├── skills/page.tsx             # Server-rendered skill gallery + JSON-LD
+│   ├── skills/page.tsx             # Server-rendered editorial skill gallery + JSON-LD
 │   ├── leaderboard/page.tsx        # Weekly trader rankings with server-fetched initial data
 │   ├── portfolio/page.tsx          # Mock logged-in portfolio (Simmer-style PnL, positions, skills)
 │   ├── agents/page.tsx             # Agent list (trader leaderboard with portfolio links)
@@ -63,7 +63,7 @@ src/
 │   ├── home-live-cards.tsx         # Hydrated live cards with server initial data
 │   ├── dashboard-tabs.tsx          # Client dashboard tabs + table refresh
 │   ├── leaderboard-table.tsx       # Client leaderboard refresh wrapper
-│   ├── skill-card-client.tsx       # Install block + output toggle
+│   ├── skill-card-client.tsx       # Shared runtime picker + command blocks + expandable skill details
 │   ├── coin-table.tsx              # Reusable coin data table
 │   ├── portfolio-view.tsx          # Simmer-style portfolio (stats, sparkline, positions, skills)
 │   ├── agent-profile-detail.tsx    # Agent profile with PnL, positions, sparkline, holdings
@@ -79,7 +79,7 @@ src/
     ├── data.ts                     # Cached server data helpers for pages and routes
     ├── site.ts                     # Site metadata and URL helpers
     ├── zora.ts                     # SDK wrapper: all query functions + formatting helpers
-    ├── skills.ts                   # Static skill definitions (4 skills)
+    ├── skills.ts                   # Static skill definitions (5 skills)
     ├── providers.tsx               # React Query provider (30s staleTime)
     ├── utils.ts                    # cn() helper for className merging
     ├── pnl-utils.ts                # Shared PnL formatting (pnlColor, formatPnl, formatPct)
@@ -97,6 +97,7 @@ src/
 - **Agent discovery is explicit** via `/api`, `/api/skills`, JSON-LD, and `/.well-known/ai.json`.
 - **Skills are static data** in `src/lib/skills.ts`. No database, no CMS. The homepage grid and skills gallery both render from this array — add a skill to the array and both pages update automatically.
 - **Install commands are shared** from `src/lib/skills.ts` so the UI and `/api/skills` stay in sync.
+- **The skills page stays intentionally flat** — one shared runtime picker updates every command block, while deeper verification details stay expandable so the list remains fast to scan.
 - **No `config.schema.json`** for skills. Config is documented inline in SKILL.md files, following Bankr/OpenClaw conventions.
 - **Command menu is lazy-loaded** through `src/components/command-menu-loader.tsx` so it does not affect the initial page payload.
 - **React Query** handles live refresh after hydration. Initial render is server-owned for `/`, `/dashboard`, and `/leaderboard`.

@@ -3,10 +3,10 @@
 Discover, install, and monitor Zora-native agent skills. Live market data, verified skill gallery, and public leaderboards.
 
 - Live dashboard with trending coins, volume leaders, and creator coins from Zora (Base)
-- 4 verified read-only skills for OpenClaw/Bankr-compatible agents
-- Coin detail pages with holders, swaps, and market stats
+- 5 verified skills with read-only scouts plus one execution-capable trader
+- Agent and portfolio views for mock P&L, holdings, and leaderboard context
 - Weekly trader leaderboard
-- One-click install commands for each skill
+- Shared runtime picker with direct install commands and source links for each skill
 
 ## Quick start
 
@@ -36,8 +36,9 @@ src/
 ├── app/           Pages and API routes
 │   ├── api/       Server-side SDK wrappers (explore, coin, leaderboard)
 │   ├── dashboard/ Tabbed explore view (6 sort options)
-│   ├── skills/    Skill gallery with install commands
-│   ├── coin/      Coin detail pages
+│   ├── skills/    Editorial skill gallery with shared runtime picker
+│   ├── portfolio/ Mock portfolio view
+│   ├── agents/    Agent list and profile pages
 │   ├── leaderboard/
 │   └── trust/     Trust & Safety
 ├── components/    UI components (nav, tables, cards, shadcn/ui)
@@ -52,8 +53,9 @@ src/
 | Creator Pulse | Creator coin ecosystems, featured creators, watchlists | Read-only |
 | Briefing Bot | Structured morning/evening market digest | Read-only |
 | Portfolio Scout | Wallet balance + coin holdings (Bankr-ready) | Read-only |
+| Momentum Trader | Auto-buys trending Zora coins on momentum signals via Zora CLI | Execution-capable |
 
-All skills use the OpenClaw SKILL.md format. No wallet or private key needed.
+All skills use the OpenClaw SKILL.md format. Most are read-only; Momentum Trader should only run in a dedicated trader wallet created with Zora CLI.
 
 ## Deploy
 

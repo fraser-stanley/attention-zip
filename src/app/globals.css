@@ -164,12 +164,25 @@ h1 {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
+  /* Ticker is functional UI (data feed), not decorative — exempt from blanket kill */
+  .ticker-track {
+    animation-duration: 30s !important;
+    animation-iteration-count: infinite !important;
+  }
 }
 
-@keyframes marquee {
+@keyframes ticker-scroll {
   0% { transform: translateX(0); }
   100% { transform: translateX(-50%); }
 }
+
+.ticker-track {
+  display: flex;
+  width: max-content;
+  animation: ticker-scroll 30s linear infinite;
+  will-change: transform;
+}
+
 
 .highlight-block {
   background-color: #3FFF00;

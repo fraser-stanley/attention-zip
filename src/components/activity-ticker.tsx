@@ -1,7 +1,5 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-
 export interface ActivityItem {
   name: string;
   tag: string;
@@ -47,24 +45,16 @@ function TickerItems({ items }: { items: ActivityItem[] }) {
   );
 }
 
+/**
+ * Pure CSS marquee ticker. Animation defined in globals.css as .ticker-track
+ * with a prefers-reduced-motion exemption (functional UI, not decorative).
+ */
 export function ActivityTicker({
   initialItems,
 }: {
   initialItems: ActivityItem[];
 }) {
   const items = initialItems.length > 0 ? initialItems : PLACEHOLDER_ITEMS;
-  const scrollRef = useRef<HTMLDivElement>(null);
-  const [scrollWidth, setScrollWidth] = useState(0);
-
-  useEffect(() => {
-    const el = scrollRef.current;
-    if (!el) return;
-    // Measure the width of one set of items (half the total content)
-    setScrollWidth(el.scrollWidth / 2);
-  }, [items]);
-
-  // Speed: ~50px/s for smooth, visible movement
-  const duration = scrollWidth > 0 ? scrollWidth / 50 : 20;
 
   return (
     <div
@@ -78,17 +68,15 @@ export function ActivityTicker({
         <span className="font-mono text-xs text-muted-foreground">Live</span>
       </div>
 
-      {/* Scrolling content */}
-      <div className="overflow-hidden flex-1 relative">
-        <div
-          ref={scrollRef}
-          className="inline-flex whitespace-nowrap"
-          style={{
-            animation: scrollWidth > 0 ? `marquee ${duration}s linear infinite` : "none",
-          }}
-        >
-          <TickerItems items={items} />
-          <TickerItems items={items} />
+      {/* Scrolling content — pure CSS, two copies for seamless loop */}
+      <div className="overflow-hidden flex-1">
+        <div className="ticker-track">
+          <div className="flex shrink-0">
+            <TickerItems items={items} />
+          </div>
+          <div className="flex shrink-0">
+            <TickerItems items={items} />
+          </div>
         </div>
       </div>
     </div>

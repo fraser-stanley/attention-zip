@@ -1,6 +1,4 @@
 import { SkillsInstallList } from "@/components/skill-card-client";
-import { Callout } from "@/components/ui/callout";
-import { Step, Steps } from "@/components/ui/steps";
 import { getSkillInstallCommands, skills } from "@/lib/skills";
 import { toAbsoluteUrl } from "@/lib/site";
 
@@ -31,57 +29,107 @@ export default function SkillsPage() {
   });
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-14">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(skillJsonLd) }}
       />
-      <div>
-        <h1 className="text-4xl tracking-tight">Skills</h1>
-        <p className="text-sm text-muted-foreground">
-          Each skill is a SKILL.md file we wrote and reviewed. Install into your
-          agent in one command.
-        </p>
-      </div>
+      <section className="border-b border-border pb-10">
+        <div className="grid gap-10 lg:grid-cols-[minmax(0,1.35fr)_minmax(18rem,0.75fr)] lg:items-end">
+          <div className="space-y-4">
+            <p className="text-[11px] font-mono uppercase tracking-[0.18em] text-muted-foreground">
+              Verified install surface
+            </p>
+            <h1 className="max-w-4xl text-4xl tracking-[-0.05em] sm:text-5xl lg:text-6xl">
+              Published Zora skills, install-ready for the agent runtime you
+              already use.
+            </h1>
+            <p className="max-w-2xl text-base leading-7 text-muted-foreground">
+              Each skill here is a readable <code>SKILL.md</code> we wrote and
+              reviewed. Choose <strong>Zora CLI</strong>, <strong>OpenClaw</strong>,
+              or a manual install once, then inspect the exact command and source
+              before enabling anything locally.
+            </p>
+          </div>
 
-      <Callout variant="check" title="Verified source with explicit risk labels">
-        <p>
-          Every install path on this page points back to published source. Most
-          skills are read-only, and any execution-capable skill is labeled
-          clearly so you can review it and isolate it to a dedicated trader
-          wallet before enabling it.
-        </p>
-      </Callout>
-
-      <section className="space-y-4">
-        <div>
-          <h2 className="text-base font-medium">Install flow</h2>
-          <p className="text-sm text-muted-foreground">
-            The install UI is structured like docs: choose a runtime, copy the
-            command, then verify what your agent will run.
-          </p>
+          <div className="relative overflow-hidden border border-border/80 bg-[linear-gradient(180deg,color-mix(in_oklch,var(--foreground)_3%,transparent),transparent)] p-5">
+            <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-foreground/20 to-transparent" />
+            <p className="text-[11px] font-mono uppercase tracking-[0.18em] text-muted-foreground">
+              Before you enable a skill
+            </p>
+            <div className="mt-4 space-y-4 text-sm leading-6 text-muted-foreground">
+              <p>
+                Every install path on this page resolves to published source. Read-only
+                skills stay in scout mode; execution-capable flows belong in a dedicated
+                trader wallet with bounded funds.
+              </p>
+              <p className="text-foreground">
+                No custody. No hidden server-side execution. Just source, commands, and
+                clearly labeled scope.
+              </p>
+            </div>
+          </div>
         </div>
 
-        <Steps>
-          <Step title="Choose the runtime your agent already uses">
-            <p>
-              Switch between <strong>Zora CLI</strong>, <strong>OpenClaw</strong>,
-              or a manual <code>curl</code> install without leaving the page.
+        <div className="mt-8 grid gap-4 border-t border-border pt-4 sm:grid-cols-3">
+          <div className="space-y-1">
+            <p className="text-[11px] font-mono uppercase tracking-[0.18em] text-muted-foreground">
+              5 reviewed skills
             </p>
-          </Step>
-          <Step title="Copy the command for the specific skill">
-            <p>
-              Each skill exposes the matching install command plus the source
-              links you need to inspect before enabling it locally.
+            <p className="text-sm leading-6 text-muted-foreground">
+              Trend, creator, briefing, portfolio, and execution coverage.
             </p>
-          </Step>
-          <Step title="Verify the skill scope before enabling it">
-            <p>
-              Read-only skills can stay in scout mode. Execution-capable skills
-              should only run in a dedicated trader wallet with bounded funds.
+          </div>
+          <div className="space-y-1">
+            <p className="text-[11px] font-mono uppercase tracking-[0.18em] text-muted-foreground">
+              3 install paths
             </p>
-          </Step>
-        </Steps>
+            <p className="text-sm leading-6 text-muted-foreground">
+              Zora CLI, OpenClaw, or manual fetch without leaving the page.
+            </p>
+          </div>
+          <div className="space-y-1">
+            <p className="text-[11px] font-mono uppercase tracking-[0.18em] text-muted-foreground">
+              1 execution skill
+            </p>
+            <p className="text-sm leading-6 text-muted-foreground">
+              Isolated from the read-only scouts and clearly labeled in context.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section className="grid gap-4 sm:grid-cols-3">
+        <div className="border-t border-border pt-4">
+          <p className="text-[11px] font-mono uppercase tracking-[0.18em] text-muted-foreground">
+            01
+          </p>
+          <h2 className="mt-2 text-base font-medium">Choose a runtime once</h2>
+          <p className="mt-2 text-sm leading-6 text-muted-foreground">
+            Switch between Zora CLI, OpenClaw, or manual install. The choice
+            persists while you move around the site.
+          </p>
+        </div>
+        <div className="border-t border-border pt-4">
+          <p className="text-[11px] font-mono uppercase tracking-[0.18em] text-muted-foreground">
+            02
+          </p>
+          <h2 className="mt-2 text-base font-medium">Copy the exact command</h2>
+          <p className="mt-2 text-sm leading-6 text-muted-foreground">
+            Each skill exposes the matching install string directly, without nested
+            cards or repeated method chrome.
+          </p>
+        </div>
+        <div className="border-t border-border pt-4">
+          <p className="text-[11px] font-mono uppercase tracking-[0.18em] text-muted-foreground">
+            03
+          </p>
+          <h2 className="mt-2 text-base font-medium">Verify the scope</h2>
+          <p className="mt-2 text-sm leading-6 text-muted-foreground">
+            Inspect source, wrapped commands, prompts, and example output before
+            you let your agent run anything locally.
+          </p>
+        </div>
       </section>
 
       <SkillsInstallList skills={skills} />

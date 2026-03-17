@@ -11,3 +11,4 @@
 - "Claude Code" install tab renamed to "Zora CLI" across the skills page.
 - Skills JSON-LD `installUrl` now references the CLI install command.
 - CLAUDE.md updated: 5 skills, execution boundary notes, Zora CLI wallet references.
+- Button hover states now use explicit Tailwind variant classes instead of the global `.btn-base` CSS variable hover system, with scoped color transitions and press feedback.

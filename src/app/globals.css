@@ -49,7 +49,6 @@
 }
 
 :root {
-  --duration-base: 200ms;
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
@@ -57,6 +56,7 @@
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.145 0 0);
   --primary: oklch(0.205 0 0);
+  --primary-hover: oklch(0.35 0 0);
   --primary-foreground: oklch(0.985 0 0);
   --secondary: oklch(0.97 0 0);
   --secondary-foreground: oklch(0.205 0 0);
@@ -92,6 +92,7 @@
   --popover: oklch(0.08 0 0);
   --popover-foreground: oklch(0.95 0 0);
   --primary: oklch(0.95 0 0);
+  --primary-hover: oklch(0.8 0 0);
   --primary-foreground: oklch(0.05 0 0);
   --secondary: oklch(0.12 0 0);
   --secondary-foreground: oklch(0.95 0 0);
@@ -123,7 +124,6 @@
 @layer base {
   * {
     @apply border-border outline-ring/50;
-    transition-duration: var(--duration-base);
   }
   body {
     @apply bg-background text-foreground;
@@ -151,24 +151,6 @@ h1 {
 
 .text-hero {
   font-size: clamp(1.875rem, 1.25rem + 2.5vw, 3rem);
-}
-
-.btn-base {
-  --btn-bg: var(--primary);
-  --btn-fg: var(--primary-foreground);
-  --btn-border: transparent;
-  background-color: var(--btn-bg);
-  color: var(--btn-fg);
-  border-color: var(--btn-border);
-}
-
-.btn-base:hover {
-  --btn-bg: var(--btn-hover-bg, var(--btn-bg));
-  --btn-fg: var(--btn-hover-fg, var(--btn-fg));
-  --btn-border: var(--btn-hover-border, var(--btn-border));
-  background-color: var(--btn-bg);
-  color: var(--btn-fg);
-  border-color: var(--btn-border);
 }
 
 @keyframes blink {

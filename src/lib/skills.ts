@@ -81,7 +81,6 @@ export const skills: Skill[] = [
     wraps: [
       "zora explore --type creator-coin -o json",
       "zora explore --sort featured -o json",
-      "zora get <address> -o json",
     ],
     installCommand: "npx zora-cli install",
     samplePrompt:
@@ -159,8 +158,8 @@ Nothing unusual detected. Market is moderately active.`,
       "Holdings changes over time",
     ],
     wraps: [
-      "zora profile balances <address> -o json",
-      "zora profile coins <address> -o json",
+      "@zoralabs/coins-sdk → getProfileBalances()",
+      "@zoralabs/coins-sdk → getProfileCoins()",
     ],
     installCommand: "npx zora-cli install",
     samplePrompt:
@@ -210,9 +209,8 @@ Coins held: 3`,
     ],
     wraps: [
       "zora explore --sort gainers -o json",
-      "zora buy <address> --amount <eth> -o json",
-      "zora sell <address> --amount <tokens> -o json",
-      "zora get <address> -o json",
+      "zora buy <address> --amount <eth>",
+      "zora sell <address> --amount <tokens>",
     ],
     installCommand: "npx zora-cli install",
     samplePrompt:
@@ -253,8 +251,8 @@ export function getSkillById(id: string) {
 
 export function getSkillInstallCommands(skill: Skill): SkillInstallCommands {
   return {
-    cli: "npx zora-cli install",
-    openclaw: "npx skills add zora-cli",
+    cli: `install skill from ${skill.skillMdUrl}`,
+    openclaw: `install skill from ${skill.skillMdUrl}`,
     manual: `curl -O ${skill.skillMdUrl}`,
   };
 }

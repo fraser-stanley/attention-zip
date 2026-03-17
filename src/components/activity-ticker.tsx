@@ -70,7 +70,7 @@ export function ActivityTicker({
     <div
       role="marquee"
       aria-label="Agent activity feed"
-      className="border-y border-border h-8 overflow-hidden flex items-center bg-background"
+      className="border-y border-border h-8 overflow-hidden flex items-center bg-white dark:bg-black"
     >
       {/* LIVE indicator */}
       <div className="flex items-center gap-1.5 px-4 shrink-0 border-r border-border h-full">

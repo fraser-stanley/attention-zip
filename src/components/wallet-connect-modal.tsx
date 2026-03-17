@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { AnimatePresence, motion } from "motion/react";
 import { useWallet } from "@/lib/wallet-context";
@@ -24,8 +24,10 @@ export function WalletConnectModal({ open, onClose }: WalletConnectModalProps) {
   const { toast } = useToast();
   const [mounted, setMounted] = useState(false);
   const [connecting, setConnecting] = useState<string | null>(null);
+  const prevOpen = useRef(open);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- mount detection for portal
     setMounted(true);
   }, []);
 
@@ -40,7 +42,11 @@ export function WalletConnectModal({ open, onClose }: WalletConnectModalProps) {
 
   // Reset connecting state when modal closes
   useEffect(() => {
-    if (!open) setConnecting(null);
+    if (prevOpen.current && !open) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- reset on close transition
+      setConnecting(null);
+    }
+    prevOpen.current = open;
   }, [open]);
 
   function handleConnect(walletName: string) {

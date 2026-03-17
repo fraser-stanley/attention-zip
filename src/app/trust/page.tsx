@@ -77,11 +77,12 @@ export default function TrustPage() {
               </Badge>
               <div>
                 <p className="text-sm font-medium">
-                  Bounded funds, execution enabled
+                  Dedicated wallet, execution enabled
                 </p>
                 <p className="text-xs text-muted-foreground">
                   Required for execution-capable skills. Use a dedicated wallet
-                  with limited funds. Never your personal wallet.
+                  and only fund it with what you can afford to lose. The CLI
+                  does not enforce spending limits.
                 </p>
               </div>
             </div>
@@ -97,7 +98,13 @@ export default function TrustPage() {
                 <p className="text-xs text-muted-foreground">
                   Never use your personal wallet with agent skills. Create a
                   dedicated agent wallet with{" "}
-                  <code className="bg-muted px-1 rounded">zora setup</code>.
+                  <code className="bg-muted px-1 rounded">zora setup</code>{" "}
+                  (or <code className="bg-muted px-1 rounded">zora setup --create</code>{" "}
+                  for non-interactive). Keys are stored locally at{" "}
+                  <code className="bg-muted px-1 rounded">~/.config/zora/wallet.json</code>.
+                  You can also set{" "}
+                  <code className="bg-muted px-1 rounded">ZORA_PRIVATE_KEY</code>{" "}
+                  as an env var instead.
                 </p>
               </div>
             </div>

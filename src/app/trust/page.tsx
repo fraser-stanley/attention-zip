@@ -19,7 +19,7 @@ export default function TrustPage() {
           <span className="highlight-block">You control execution.</span>
         </h1>
         <p className="mt-8 max-w-2xl text-base leading-7 text-muted-foreground">
-          What we do, what we don&apos;t, and how to keep your wallet safe.
+          How this works and how to keep your wallet safe.
         </p>
       </section>
 
@@ -42,12 +42,11 @@ export default function TrustPage() {
               runtime.
             </p>
             <p>
-              Verification means we reviewed the published skill source in this
-              repo. It does not mean we control your local runtime.
+              Verified means we reviewed the source. It does not mean we
+              control your runtime.
             </p>
             <p>
-              If a published skill is execution-capable, that still happens in
-              your local runtime and under your wallet setup.
+              Execution skills still run in your runtime, under your wallet.
             </p>
           </div>
         </div>
@@ -62,9 +61,8 @@ export default function TrustPage() {
           Never reuse your personal wallet
         </h2>
         <p className="mt-4 max-w-2xl text-base leading-7 text-muted-foreground">
-          Most skills are read-only, but execution-capable skills like Momentum
-          Trader should only run in a dedicated wallet with bounded funds from
-          day one.
+          Execution skills like Momentum Trader should only run in a dedicated
+          wallet with bounded funds. Most other skills are read-only.
         </p>
 
         <div className="mt-12 grid gap-px bg-border sm:grid-cols-3">
@@ -77,8 +75,8 @@ export default function TrustPage() {
               Read-only, no funds
             </p>
             <p className="mt-4 text-sm leading-6 text-muted-foreground">
-              For monitoring and alerts only. No wallet needed. Most skills in
-              the gallery work in this mode.
+              Monitoring and alerts only. No wallet needed. Most skills work
+              here.
             </p>
           </div>
 
@@ -91,9 +89,8 @@ export default function TrustPage() {
               Dedicated wallet, execution enabled
             </p>
             <p className="mt-4 text-sm leading-6 text-muted-foreground">
-              Required for execution-capable skills. Use a dedicated wallet and
-              only fund it with what you can afford to lose. The CLI does not
-              enforce spending limits.
+              Required for execution skills. Dedicated wallet, limited funds.
+              Never your personal wallet.
             </p>
           </div>
 

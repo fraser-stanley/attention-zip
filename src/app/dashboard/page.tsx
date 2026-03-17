@@ -31,7 +31,7 @@ export default function DashboardPage() {
       <div>
         <h1 className="text-4xl tracking-tight">Live Dashboard</h1>
         <p className="text-sm text-muted-foreground">
-          Real-time Zora market data. Refreshes every 30 seconds.
+          Zora market data, refreshed every 30 seconds.
         </p>
       </div>
       <Suspense fallback={<DashboardTabsSkeleton />}>

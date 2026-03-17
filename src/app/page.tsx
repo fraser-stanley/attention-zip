@@ -69,7 +69,7 @@ export default function Home() {
           <div>
             <h2 className="text-sm font-medium text-muted-foreground">Skills</h2>
             <p className="text-xs text-muted-foreground mt-1">
-              We wrote these, reviewed them, and published the source. Install in one command.
+              We wrote and reviewed every one. Published source, one-command install.
             </p>
           </div>
           <AnimatedArrowLink href="/skills">

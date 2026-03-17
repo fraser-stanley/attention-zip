@@ -37,35 +37,34 @@ export default function SkillsPage() {
       <section className="border-b border-border pb-10">
         <div className="grid gap-10 lg:grid-cols-[minmax(0,1.35fr)_minmax(18rem,0.75fr)] lg:items-end">
           <div className="space-y-4">
-            <p className="text-[11px] font-mono uppercase tracking-[0.18em] text-muted-foreground">
-              Verified install surface
+            <p className="text-[11px] font-mono uppercase tracking-widest text-muted-foreground">
+              Skill gallery
             </p>
             <h1 className="max-w-4xl text-4xl tracking-[-0.05em] sm:text-5xl lg:text-6xl">
-              Published Zora skills, install-ready for the agent runtime you
-              already use.
+              Published skills for the runtime you already use.
             </h1>
             <p className="max-w-2xl text-base leading-7 text-muted-foreground">
-              Each skill here is a readable <code>SKILL.md</code> we wrote and
-              reviewed. Choose <strong>Zora CLI</strong>, <strong>OpenClaw</strong>,
-              or a manual install once, then inspect the exact command and source
-              before enabling anything locally.
+              Every skill is a <code>SKILL.md</code> we wrote and
+              reviewed. Pick <strong>Zora CLI</strong>, <strong>OpenClaw</strong>,
+              or manual install, then inspect the command and source
+              before you enable anything.
             </p>
           </div>
 
           <div className="relative overflow-hidden border border-border/80 bg-[linear-gradient(180deg,color-mix(in_oklch,var(--foreground)_3%,transparent),transparent)] p-5">
             <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-foreground/20 to-transparent" />
-            <p className="text-[11px] font-mono uppercase tracking-[0.18em] text-muted-foreground">
-              Before you enable a skill
+            <p className="text-[11px] font-mono uppercase tracking-widest text-muted-foreground">
+              Before you enable
             </p>
             <div className="mt-4 space-y-4 text-sm leading-6 text-muted-foreground">
               <p>
-                Every install path on this page resolves to published source. Read-only
-                skills stay in scout mode; execution-capable flows belong in a dedicated
+                Every install path here points to published source. Read-only
+                skills stay in scout mode. Execution skills belong in a dedicated
                 trader wallet with bounded funds.
               </p>
               <p className="text-foreground">
-                No custody. No hidden server-side execution. Just source, commands, and
-                clearly labeled scope.
+                No custody. No server-side execution. Source, commands, and
+                scope you can read.
               </p>
             </div>
           </div>
@@ -73,15 +72,15 @@ export default function SkillsPage() {
 
         <div className="mt-8 grid gap-4 border-t border-border pt-4 sm:grid-cols-3">
           <div className="space-y-1">
-            <p className="text-[11px] font-mono uppercase tracking-[0.18em] text-muted-foreground">
+            <p className="text-[11px] font-mono uppercase tracking-widest text-muted-foreground">
               5 reviewed skills
             </p>
             <p className="text-sm leading-6 text-muted-foreground">
-              Trend, creator, briefing, portfolio, and execution coverage.
+              Trends, momentum, briefings, portfolio, and execution.
             </p>
           </div>
           <div className="space-y-1">
-            <p className="text-[11px] font-mono uppercase tracking-[0.18em] text-muted-foreground">
+            <p className="text-[11px] font-mono uppercase tracking-widest text-muted-foreground">
               3 install paths
             </p>
             <p className="text-sm leading-6 text-muted-foreground">
@@ -89,11 +88,11 @@ export default function SkillsPage() {
             </p>
           </div>
           <div className="space-y-1">
-            <p className="text-[11px] font-mono uppercase tracking-[0.18em] text-muted-foreground">
+            <p className="text-[11px] font-mono uppercase tracking-widest text-muted-foreground">
               1 execution skill
             </p>
             <p className="text-sm leading-6 text-muted-foreground">
-              Isolated from the read-only scouts and clearly labeled in context.
+              Separate from read-only scouts, labeled so you know what it does.
             </p>
           </div>
         </div>
@@ -101,7 +100,7 @@ export default function SkillsPage() {
 
       <section className="grid gap-4 sm:grid-cols-3">
         <div className="border-t border-border pt-4">
-          <p className="text-[11px] font-mono uppercase tracking-[0.18em] text-muted-foreground">
+          <p className="text-[11px] font-mono uppercase tracking-widest text-muted-foreground">
             01
           </p>
           <h2 className="mt-2 text-base font-medium">Choose a runtime once</h2>
@@ -111,23 +110,23 @@ export default function SkillsPage() {
           </p>
         </div>
         <div className="border-t border-border pt-4">
-          <p className="text-[11px] font-mono uppercase tracking-[0.18em] text-muted-foreground">
+          <p className="text-[11px] font-mono uppercase tracking-widest text-muted-foreground">
             02
           </p>
           <h2 className="mt-2 text-base font-medium">Copy the exact command</h2>
           <p className="mt-2 text-sm leading-6 text-muted-foreground">
-            Each skill exposes the matching install string directly, without nested
-            cards or repeated method chrome.
+            Each skill shows the install command for your chosen runtime.
+            Copy and run.
           </p>
         </div>
         <div className="border-t border-border pt-4">
-          <p className="text-[11px] font-mono uppercase tracking-[0.18em] text-muted-foreground">
+          <p className="text-[11px] font-mono uppercase tracking-widest text-muted-foreground">
             03
           </p>
           <h2 className="mt-2 text-base font-medium">Verify the scope</h2>
           <p className="mt-2 text-sm leading-6 text-muted-foreground">
-            Inspect source, wrapped commands, prompts, and example output before
-            you let your agent run anything locally.
+            Read the source, commands, prompts, and example output before
+            your agent runs anything.
           </p>
         </div>
       </section>

@@ -5,57 +5,69 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
+import { buttonVariants } from "@/components/ui/button-variants";
 import { skills } from "@/lib/skills";
+import { ZapIcon } from "@/components/ui/zap";
+import { ChartBarIncreasingIcon } from "@/components/ui/chart-bar-increasing";
+import { ActivityIcon } from "@/components/ui/activity";
+import { LayersIcon } from "@/components/ui/layers";
+import { ShieldCheckIcon } from "@/components/ui/shield-check";
+import { SparklesIcon } from "@/components/ui/sparkles";
+import { UserIcon } from "@/components/ui/user";
+import { MenuIcon } from "@/components/ui/menu";
+import type { ReactNode } from "react";
 
-const sections = [
+type Section = {
+  id: string;
+  label: string;
+  href: string;
+  description: string;
+  icon: ReactNode;
+};
+
+const sections: Section[] = [
   {
     id: "skills",
     label: "Skills",
     href: "/skills",
-    category: "skills",
     description: `${skills.length} skills`,
-    items: skills.map((s) => s.name),
+    icon: <ZapIcon size={18} />,
   },
   {
     id: "dashboard",
     label: "Dashboard",
     href: "/dashboard",
-    category: "data",
     description: "Live market data",
-    items: ["Trending", "Market Cap", "New", "Volume", "Gainers", "Creators"],
+    icon: <ChartBarIncreasingIcon size={18} />,
   },
   {
     id: "leaderboard",
     label: "Leaderboard",
     href: "/leaderboard",
-    category: "data",
     description: "Weekly trader rankings",
-    items: ["Top traders", "Volume leaders", "Most active"],
+    icon: <ActivityIcon size={18} />,
   },
 
   {
     id: "portfolio",
     label: "Portfolio",
     href: "/portfolio",
-    category: "data",
     description: "Your positions & PnL",
-    items: ["PnL summary", "Active positions", "Trade history", "Installed skills"],
+    icon: <LayersIcon size={18} />,
   },
   {
     id: "trust",
     label: "Trust & Safety",
     href: "/trust",
-    category: "info",
     description: "Wallet presets & scope",
-    items: ["Wallet presets", "Scope disclaimers", "Verification"],
+    icon: <ShieldCheckIcon size={18} />,
   },
   {
     id: "about",
     label: "About",
     href: "/",
-    category: "info",
     description: "Project info",
-    items: ["Open source", "Read-only", "No custody"],
+    icon: <SparklesIcon size={18} />,
   },
 ];
 
@@ -63,10 +75,8 @@ const sections = [
 export function Nav() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
-  const [hoveredSection, setHoveredSection] = useState<string | null>(null);
   const close = useCallback(() => {
     setOpen(false);
-    setHoveredSection(null);
   }, []);
 
   useEffect(() => {
@@ -86,8 +96,6 @@ export function Nav() {
       close();
     }
   }, [pathname, close]);
-
-  const hoveredData = sections.find((s) => s.id === hoveredSection);
 
   return (
     <>
@@ -111,15 +119,17 @@ export function Nav() {
             <div className="flex items-center gap-1">
               <button
                 aria-label="Login"
-                className="px-3 py-1.5 min-h-[44px] flex items-center text-sm transition-colors border border-border text-foreground hover:bg-foreground hover:text-background focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground"
+                className={buttonVariants({ variant: "outline" })}
               >
+                <UserIcon size={14} />
                 Login
               </button>
               <button
                 onClick={() => setOpen(true)}
                 aria-label="Open navigation"
-                className="px-3 py-1.5 min-h-[44px] flex items-center text-sm transition-colors bg-foreground text-background hover:bg-background hover:text-foreground border border-transparent hover:border-border focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground"
+                className={buttonVariants({ variant: "default" })}
               >
+                <MenuIcon size={14} />
                 Index
               </button>
             </div>
@@ -149,108 +159,26 @@ export function Nav() {
           )}
         >
           {/* Section grid */}
-          <div className="flex-1 overflow-y-auto">
+          <div className="flex-1 overflow-y-auto" onClick={(e) => { if (e.target === e.currentTarget) close(); }}>
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12">
               <div className="grid gap-px sm:grid-cols-2 lg:grid-cols-3">
                 {sections.map((section) => (
                   <Link
                     key={section.id}
                     href={section.href}
-                    onMouseEnter={() => setHoveredSection(section.id)}
-                    onMouseLeave={() => setHoveredSection(null)}
-                    onFocus={() => setHoveredSection(section.id)}
-                    onBlur={() => setHoveredSection(null)}
-                    className={cn(
-                      "group bg-black p-6 flex flex-col gap-3 transition-colors duration-200 outline-none",
-                      hoveredSection === section.id
-                        ? "bg-white text-black"
-                        : "hover:bg-white hover:text-black focus-visible:bg-white focus-visible:text-black"
-                    )}
+                    className="group bg-black p-6 flex flex-col gap-3 transition-colors duration-200 outline-none hover:bg-white hover:text-black focus-visible:bg-white focus-visible:text-black"
                   >
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm font-medium uppercase tracking-wider">
-                        {section.label}
-                      </span>
-                      <span
-                        className={cn(
-                          "text-xs font-mono",
-                          hoveredSection === section.id
-                            ? "text-black/50"
-                            : "text-white/30 group-hover:text-black/50"
-                        )}
-                      >
-                        {section.items.length}
-                      </span>
-                    </div>
-                    <p
-                      className={cn(
-                        "text-xs",
-                        hoveredSection === section.id
-                          ? "text-black/60"
-                          : "text-white/50 group-hover:text-black/60"
-                      )}
-                    >
+                    <span className="text-sm font-medium uppercase tracking-wider flex items-center gap-2">
+                      {section.icon}
+                      {section.label}
+                    </span>
+                    <p className="text-xs text-white/50 group-hover:text-black/60">
                       {section.description}
                     </p>
-                    <ul className="space-y-1 mt-auto">
-                      {section.items.slice(0, 4).map((item) => (
-                        <li
-                          key={item}
-                          className={cn(
-                            "text-xs font-mono",
-                            hoveredSection === section.id
-                              ? "text-black/70"
-                              : "text-white/40 group-hover:text-black/70"
-                          )}
-                        >
-                          {item}
-                        </li>
-                      ))}
-                      {section.items.length > 4 && (
-                        <li
-                          className={cn(
-                            "text-xs font-mono",
-                            hoveredSection === section.id
-                              ? "text-black/40"
-                              : "text-white/20 group-hover:text-black/40"
-                          )}
-                        >
-                          +{section.items.length - 4} more
-                        </li>
-                      )}
-                    </ul>
                   </Link>
                 ))}
               </div>
 
-              {/* Detail preview */}
-              {hoveredData && (
-                <div className="mt-8 border-t border-white/10 pt-6">
-                  <div className="flex items-center gap-3 mb-4">
-                    <span className="text-xs font-medium uppercase tracking-wider text-white/50">
-                      {hoveredData.label}
-                    </span>
-                    <span className="text-xs font-mono text-white/30">
-                      {hoveredData.items.length} items
-                    </span>
-                  </div>
-                  <div className="grid gap-0 border border-white/10">
-                    {hoveredData.items.map((item, i) => (
-                      <div
-                        key={item}
-                        className="flex items-center justify-between px-4 py-2 border-b border-white/5 last:border-b-0 text-sm"
-                      >
-                        <span className="text-white/70 font-mono text-xs">
-                          {String(i + 1).padStart(2, "0")}
-                        </span>
-                        <span className="text-white/90 text-sm flex-1 ml-4">
-                          {item}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
             </div>
           </div>
 

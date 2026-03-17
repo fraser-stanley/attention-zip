@@ -4,6 +4,14 @@ import { useEffect, useId, useRef, useState } from "react";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { getSkillInstallCommands, type Skill } from "@/lib/skills";
+import { CopyIcon } from "@/components/ui/copy";
+import { CheckIcon } from "@/components/ui/check";
+import { ChevronDownIcon } from "@/components/ui/chevron-down";
+import { ArrowUpRightIcon } from "@/components/ui/arrow-up-right";
+import { PlusIcon } from "@/components/ui/plus";
+import { buttonVariants } from "@/components/ui/button-variants";
+import { useInstalledSkills } from "@/lib/installed-skills-context";
+import { useToast } from "@/components/toast";
 
 type Method = "claude" | "openclaw" | "manual";
 
@@ -41,19 +49,14 @@ function CopyButton({ text }: { text: string }) {
     <button
       type="button"
       onClick={handleCopy}
-      className="shrink-0 p-2 text-muted-foreground/60 transition-colors hover:text-foreground"
+      className={buttonVariants({ variant: "ghost", size: "icon-sm" })}
       aria-label={copied ? "Copied command" : "Copy command"}
       aria-live="polite"
     >
       {copied ? (
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-          <polyline points="3.5 8.5 6.5 11.5 12.5 4.5" />
-        </svg>
+        <CheckIcon size={16} />
       ) : (
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-          <rect x="5.5" y="5.5" width="8" height="8" rx="1" />
-          <path d="M10.5 5.5V3.5a1 1 0 0 0-1-1h-6a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2" />
-        </svg>
+        <CopyIcon size={16} />
       )}
     </button>
   );
@@ -108,12 +111,13 @@ function SkillDetail({ skill }: { skill: Skill }) {
         </div>
         <button
           type="button"
-          className="mt-3 min-h-[44px] text-xs text-muted-foreground transition-colors hover:text-foreground"
+          className={buttonVariants({ variant: "ghost", size: "sm" })}
           aria-expanded={expandedOutput}
           aria-controls={outputId}
           onClick={() => setExpandedOutput((v) => !v)}
         >
           {expandedOutput ? "Hide" : "Show"} example output
+          <ChevronDownIcon size={12} className={`transition-transform duration-200 ${expandedOutput ? "rotate-180" : ""}`} />
         </button>
         {expandedOutput ? (
           <pre
@@ -129,11 +133,106 @@ function SkillDetail({ skill }: { skill: Skill }) {
         href={skill.githubUrl}
         target="_blank"
         rel="noopener noreferrer"
-        className="inline-block text-xs font-mono text-muted-foreground transition-colors hover:text-foreground"
+        className="inline-flex items-center gap-1 text-xs font-mono text-muted-foreground transition-colors hover:text-foreground"
       >
         View source
+        <ArrowUpRightIcon size={12} />
       </a>
     </div>
+  );
+}
+
+type InstallState = "idle" | "installing" | "installed";
+
+function InstallButton({
+  skill,
+  command,
+}: {
+  skill: Skill;
+  command: string;
+}) {
+  const { isInstalled, install, uninstall, hydrated } = useInstalledSkills();
+  const { toast } = useToast();
+  const [installing, setInstalling] = useState(false);
+  const [hovered, setHovered] = useState(false);
+  const timerRef = useRef<number | null>(null);
+  const installed = hydrated && isInstalled(skill.id);
+  const state: InstallState = installing ? "installing" : installed ? "installed" : "idle";
+
+  useEffect(() => {
+    return () => {
+      if (timerRef.current !== null) window.clearTimeout(timerRef.current);
+    };
+  }, []);
+
+  function handleInstall() {
+    navigator.clipboard.writeText(command).catch(() => {});
+    setInstalling(true);
+    timerRef.current = window.setTimeout(() => {
+      install(skill.id);
+      setInstalling(false);
+      toast(`${skill.name} added to your agent`);
+      timerRef.current = null;
+    }, 800);
+  }
+
+  function handleUninstall() {
+    uninstall(skill.id);
+    setHovered(false);
+  }
+
+  if (!hydrated) {
+    return (
+      <div className="mt-4 h-[44px] rounded-md border border-border bg-muted/50 animate-pulse" />
+    );
+  }
+
+  if (state === "installed") {
+    return (
+      <button
+        type="button"
+        className="mt-4 min-h-[44px] inline-flex items-center gap-2 rounded-md px-4 py-2.5 text-sm font-medium transition-colors bg-[#3FFF00] text-black hover:bg-red-500/10 hover:text-red-500 border border-transparent hover:border-red-500/20"
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={() => setHovered(false)}
+        onClick={handleUninstall}
+      >
+        {hovered ? (
+          <>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+            Remove
+          </>
+        ) : (
+          <>
+            <CheckIcon size={14} />
+            Installed
+          </>
+        )}
+      </button>
+    );
+  }
+
+  if (state === "installing") {
+    return (
+      <button
+        type="button"
+        disabled
+        className="mt-4 min-h-[44px] inline-flex items-center gap-2 rounded-md border border-border px-4 py-2.5 text-sm font-medium text-muted-foreground"
+      >
+        <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-muted-foreground/20 border-t-muted-foreground" />
+        Installing...
+      </button>
+    );
+  }
+
+  return (
+    <button
+      type="button"
+      className="mt-4 min-h-[44px] inline-flex items-center gap-2 rounded-md border border-border px-4 py-2.5 text-sm font-medium transition-colors hover:bg-foreground hover:text-background"
+      onClick={handleInstall}
+    >
+      <PlusIcon size={14} />
+      Install
+    </button>
   );
 }
 
@@ -168,15 +267,20 @@ function SkillRow({
         <CopyButton text={command} />
       </div>
 
-      <button
-        type="button"
-        className="mt-3 min-h-[44px] text-xs text-muted-foreground transition-colors hover:text-foreground"
-        aria-expanded={expanded}
-        aria-controls={detailId}
-        onClick={onToggle}
-      >
-        {expanded ? "Hide details" : "Details"}
-      </button>
+      <InstallButton skill={skill} command={command} />
+
+      <div>
+        <button
+          type="button"
+          className={buttonVariants({ variant: "ghost", size: "sm" })}
+          aria-expanded={expanded}
+          aria-controls={detailId}
+          onClick={onToggle}
+        >
+          {expanded ? "Hide details" : "Details"}
+          <ChevronDownIcon size={12} className={`transition-transform duration-200 ${expanded ? "rotate-180" : ""}`} />
+        </button>
+      </div>
 
       {expanded && (
         <div id={detailId}>

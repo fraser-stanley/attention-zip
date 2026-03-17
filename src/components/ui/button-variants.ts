@@ -6,9 +6,9 @@ export const buttonVariants = cva(
     variants: {
       variant: {
         default:
-          "[--btn-bg:var(--primary)] [--btn-fg:var(--primary-foreground)] [--btn-border:transparent] [--btn-hover-bg:color-mix(in_oklch,var(--primary)_80%,transparent)]",
+          "[--btn-bg:var(--primary)] [--btn-fg:var(--primary-foreground)] [--btn-border:transparent] [--btn-hover-bg:oklch(0.3_0_0)]",
         outline:
-          "[--btn-bg:var(--background)] [--btn-fg:var(--foreground)] [--btn-border:var(--border)] [--btn-hover-bg:var(--foreground)] [--btn-hover-fg:var(--background)] aria-expanded:bg-foreground aria-expanded:text-background",
+          "[--btn-bg:var(--background)] [--btn-fg:var(--foreground)] [--btn-border:var(--border)] [--btn-hover-bg:var(--foreground)] [--btn-hover-fg:var(--background)] [--btn-hover-border:var(--foreground)] aria-expanded:bg-foreground aria-expanded:text-background",
         ghost:
           "[--btn-bg:color-mix(in_oklch,var(--foreground)_5%,transparent)] [--btn-fg:color-mix(in_oklch,var(--foreground)_50%,transparent)] [--btn-border:transparent] [--btn-hover-bg:color-mix(in_oklch,var(--foreground)_10%,transparent)] [--btn-hover-fg:var(--foreground)]",
         destructive:

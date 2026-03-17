@@ -47,7 +47,7 @@ src/
 │   ├── portfolio/page.tsx          # Mock logged-in portfolio (Simmer-style PnL, positions, skills)
 │   ├── agents/page.tsx             # Agent list (trader leaderboard with portfolio links)
 │   ├── agents/[address]/page.tsx   # Agent profile (PnL, sparkline, positions, holdings)
-│   ├── trust/page.tsx              # Trust & Safety (wallet presets, scope disclaimers)
+│   ├── trust/page.tsx              # Trust & Safety (editorial manifesto layout, wallet presets, boundaries)
 │   └── api/
 │       ├── route.ts                # API discovery document
 │       ├── skills/route.ts         # Skill catalog for agents

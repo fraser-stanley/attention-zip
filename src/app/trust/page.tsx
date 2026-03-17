@@ -1,171 +1,165 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Callout } from "@/components/ui/callout";
-import { Separator } from "@/components/ui/separator";
+const boundaries = [
+  "Hold or manage private keys",
+  "Submit transactions on your behalf",
+  "Enforce execution guardrails server-side",
+  "Accept third-party skill submissions",
+  "Guarantee trading outcomes",
+];
 
 export default function TrustPage() {
   return (
-    <div className="space-y-8 max-w-3xl">
-      <div>
-        <h1 className="text-4xl tracking-tight">Trust & Safety</h1>
-        <p className="text-sm text-muted-foreground">
+    <div>
+      {/* Hero */}
+      <section className="pt-16 pb-20 border-b border-border">
+        <p className="text-[11px] font-mono uppercase tracking-[0.18em] text-muted-foreground">
+          Trust &amp; Safety
+        </p>
+        <h1 className="mt-6 max-w-4xl text-4xl tracking-[-0.05em] sm:text-5xl lg:text-6xl">
+          We publish source.{" "}
+          <span className="highlight-block">You control execution.</span>
+        </h1>
+        <p className="mt-8 max-w-2xl text-base leading-7 text-muted-foreground">
           What we do, what we don&apos;t, and how to keep your wallet safe.
         </p>
-      </div>
+      </section>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">Our model</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4 text-sm">
-          <p>
-            We wrote every skill in this repo and published the source. You can
-            read the code before you install anything.
+      {/* Our model */}
+      <section className="py-20 border-b border-border">
+        <div className="max-w-2xl">
+          <p className="text-[11px] font-mono uppercase tracking-[0.18em] text-muted-foreground">
+            Our model
           </p>
-          <Callout variant="info" title="Execution stays local">
+          <h2 className="mt-4 text-2xl tracking-tight sm:text-3xl">
+            Source-published, locally executed
+          </h2>
+          <div className="mt-8 space-y-6 text-base leading-7 text-muted-foreground">
             <p>
-              We publish source and install instructions.{" "}
-              <strong>
-                We don&apos;t hold keys, submit transactions, or control your
-                local runtime.
-              </strong>
+              We wrote every skill in this repo and published the source. You can
+              read the code before you install anything.
             </p>
-          </Callout>
-          <p className="text-muted-foreground">
-            Verification means we reviewed the published skill source in this
-            repo. It does not mean we control your local runtime.
-          </p>
-          <p className="text-muted-foreground">
-            If a published skill is execution-capable, that still happens in
-            your local runtime and under your wallet setup.
-          </p>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">Wallet safety presets</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <Callout variant="warning" title="Never reuse your personal wallet">
+            <p className="text-foreground text-lg leading-8">
+              We don&apos;t hold keys, submit transactions, or control your local
+              runtime.
+            </p>
             <p>
-              Most skills are read-only, but execution-capable skills like
-              Momentum Trader should only run in a dedicated wallet with bounded
-              funds from day one.
+              Verification means we reviewed the published skill source in this
+              repo. It does not mean we control your local runtime.
             </p>
-          </Callout>
-
-          <div className="space-y-3">
-            <div className="flex items-start gap-3">
-              <Badge variant="secondary" className="mt-0.5 shrink-0">
-                Scout
-              </Badge>
-              <div>
-                <p className="text-sm font-medium">Read-only, no funds</p>
-                <p className="text-xs text-muted-foreground">
-                  For monitoring and alerts only. No wallet needed. Most skills
-                  in the gallery work in this mode.
-                </p>
-              </div>
-            </div>
-
-            <Separator />
-
-            <div className="flex items-start gap-3">
-              <Badge variant="secondary" className="mt-0.5 shrink-0">
-                Trader
-              </Badge>
-              <div>
-                <p className="text-sm font-medium">
-                  Dedicated wallet, execution enabled
-                </p>
-                <p className="text-xs text-muted-foreground">
-                  Required for execution-capable skills. Use a dedicated wallet
-                  and only fund it with what you can afford to lose. The CLI
-                  does not enforce spending limits.
-                </p>
-              </div>
-            </div>
-
-            <Separator />
-
-            <div className="flex items-start gap-3">
-              <Badge variant="destructive" className="mt-0.5 shrink-0">
-                Personal
-              </Badge>
-              <div>
-                <p className="text-sm font-medium">Not recommended</p>
-                <p className="text-xs text-muted-foreground">
-                  Never use your personal wallet with agent skills. Create a
-                  dedicated agent wallet with{" "}
-                  <code className="bg-muted px-1 rounded">zora setup</code>{" "}
-                  (or <code className="bg-muted px-1 rounded">zora setup --create</code>{" "}
-                  for non-interactive). Keys are stored locally at{" "}
-                  <code className="bg-muted px-1 rounded">~/.config/zora/wallet.json</code>.
-                  You can also set{" "}
-                  <code className="bg-muted px-1 rounded">ZORA_PRIVATE_KEY</code>{" "}
-                  as an env var instead.
-                </p>
-              </div>
-            </div>
+            <p>
+              If a published skill is execution-capable, that still happens in
+              your local runtime and under your wallet setup.
+            </p>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </section>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">What we don&apos;t do</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <ul className="text-sm text-muted-foreground space-y-2">
-            <li className="flex items-center gap-2">
-              <span className="text-destructive" aria-hidden="true">x</span>
-              <span className="sr-only">We do not</span>
-              Hold or manage private keys
-            </li>
-            <li className="flex items-center gap-2">
-              <span className="text-destructive" aria-hidden="true">x</span>
-              <span className="sr-only">We do not</span>
-              Submit transactions on your behalf
-            </li>
-            <li className="flex items-center gap-2">
-              <span className="text-destructive" aria-hidden="true">x</span>
-              <span className="sr-only">We do not</span>
-              Enforce execution guardrails server-side
-            </li>
-            <li className="flex items-center gap-2">
-              <span className="text-destructive" aria-hidden="true">x</span>
-              <span className="sr-only">We do not</span>
-              Accept third-party skill submissions
-            </li>
-            <li className="flex items-center gap-2">
-              <span className="text-destructive" aria-hidden="true">x</span>
-              <span className="sr-only">We do not</span>
-              Guarantee trading outcomes
-            </li>
-          </ul>
-        </CardContent>
-      </Card>
+      {/* Wallet safety presets */}
+      <section className="py-20 border-b border-border">
+        <p className="text-[11px] font-mono uppercase tracking-[0.18em] text-muted-foreground">
+          Wallet safety presets
+        </p>
+        <h2 className="mt-4 text-2xl tracking-tight sm:text-3xl max-w-2xl">
+          Never reuse your personal wallet
+        </h2>
+        <p className="mt-4 max-w-2xl text-base leading-7 text-muted-foreground">
+          Most skills are read-only, but execution-capable skills like Momentum
+          Trader should only run in a dedicated wallet with bounded funds from
+          day one.
+        </p>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">Source code</CardTitle>
-        </CardHeader>
-        <CardContent className="text-sm">
-          <p>
+        <div className="mt-12 grid gap-px bg-border sm:grid-cols-3">
+          <div className="bg-background p-6 sm:p-8">
+            <p className="text-[11px] font-mono uppercase tracking-[0.18em] text-muted-foreground">
+              01
+            </p>
+            <h3 className="mt-3 text-lg font-medium">Scout</h3>
+            <p className="mt-1 text-sm font-mono text-[#3FFF00]">
+              Read-only, no funds
+            </p>
+            <p className="mt-4 text-sm leading-6 text-muted-foreground">
+              For monitoring and alerts only. No wallet needed. Most skills in
+              the gallery work in this mode.
+            </p>
+          </div>
+
+          <div className="bg-background p-6 sm:p-8">
+            <p className="text-[11px] font-mono uppercase tracking-[0.18em] text-muted-foreground">
+              02
+            </p>
+            <h3 className="mt-3 text-lg font-medium">Trader</h3>
+            <p className="mt-1 text-sm font-mono text-foreground">
+              Dedicated wallet, execution enabled
+            </p>
+            <p className="mt-4 text-sm leading-6 text-muted-foreground">
+              Required for execution-capable skills. Use a dedicated wallet and
+              only fund it with what you can afford to lose. The CLI does not
+              enforce spending limits.
+            </p>
+          </div>
+
+          <div className="bg-background p-6 sm:p-8">
+            <p className="text-[11px] font-mono uppercase tracking-[0.18em] text-muted-foreground">
+              03
+            </p>
+            <h3 className="mt-3 text-lg font-medium">Personal</h3>
+            <p className="mt-1 text-sm font-mono text-destructive">
+              Not recommended
+            </p>
+            <p className="mt-4 text-sm leading-6 text-muted-foreground">
+              Never use your personal wallet with agent skills. Create a
+              dedicated agent wallet with{" "}
+              <code className="bg-muted px-1">zora setup</code>. Keys stored
+              locally at{" "}
+              <code className="bg-muted px-1">~/.config/zora/wallet.json</code>.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Boundaries */}
+      <section className="py-20 border-b border-border">
+        <p className="text-[11px] font-mono uppercase tracking-[0.18em] text-muted-foreground">
+          Boundaries
+        </p>
+        <h2 className="mt-4 text-2xl tracking-tight sm:text-3xl">
+          What we don&apos;t do
+        </h2>
+
+        <div className="mt-12 max-w-2xl divide-y divide-border">
+          {boundaries.map((item, i) => (
+            <div key={i} className="py-4 flex items-baseline gap-4">
+              <span className="text-[11px] font-mono uppercase tracking-[0.18em] text-muted-foreground shrink-0 w-8">
+                {String(i + 1).padStart(2, "0")}
+              </span>
+              <p className="text-base leading-7">{item}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Source code */}
+      <section className="py-20">
+        <div className="max-w-2xl">
+          <p className="text-[11px] font-mono uppercase tracking-[0.18em] text-muted-foreground">
+            Source code
+          </p>
+          <h2 className="mt-4 text-2xl tracking-tight sm:text-3xl">
+            Read before you install
+          </h2>
+          <p className="mt-6 text-base leading-7 text-muted-foreground">
             All skill source code is available at{" "}
             <a
               href="https://github.com/fraserstanley/zora-agent-skills"
               target="_blank"
               rel="noopener noreferrer"
-              className="underline hover:text-foreground"
+              className="text-foreground underline underline-offset-4 hover:text-[#3FFF00] transition-colors"
             >
               github.com/fraserstanley/zora-agent-skills
             </a>
             . Review before installing.
           </p>
-        </CardContent>
-      </Card>
+        </div>
+      </section>
     </div>
   );
 }

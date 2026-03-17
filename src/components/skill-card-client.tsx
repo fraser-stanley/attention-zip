@@ -99,40 +99,38 @@ function InstallMethodPicker({
   onChange: (method: Method) => void;
 }) {
   return (
-    <div className="mb-12 border-y border-border/80 py-4">
-      <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-        <div className="space-y-1">
-          <p className="text-[11px] font-mono uppercase tracking-widest text-muted-foreground">
-            Install flow
-          </p>
-          <p className="max-w-xl text-sm leading-6 text-muted-foreground">
-            Pick a runtime. Every command below updates to match, and the
-            choice sticks for this session.
-          </p>
-        </div>
-
-        <Tabs
-          value={method}
-          onValueChange={(value) => onChange(value as Method)}
-          className="w-full gap-0 lg:w-auto"
-        >
-          <TabsList
-            variant="line"
-            aria-label="Preferred install method"
-            className="grid w-full grid-cols-3 gap-0 border-b border-border px-0 py-0 lg:inline-flex lg:w-auto"
-          >
-            {INSTALL_METHODS.map((item) => (
-              <TabsTrigger
-                key={item}
-                value={item}
-                className="min-h-[44px] rounded-none border-none px-0 py-3 text-[13px] font-medium text-muted-foreground hover:bg-foreground/10 hover:text-foreground data-active:bg-foreground data-active:text-background lg:px-4"
-              >
-                <span>{INSTALL_METHOD_LABELS[item]}</span>
-              </TabsTrigger>
-            ))}
-          </TabsList>
-        </Tabs>
+    <div className="mb-10 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+      <div className="space-y-1">
+        <p className="text-[11px] font-mono uppercase tracking-widest text-muted-foreground">
+          Install flow
+        </p>
+        <p className="max-w-xl text-sm leading-6 text-muted-foreground">
+          Pick a runtime. Every command below updates to match, and the
+          choice sticks for this session.
+        </p>
       </div>
+
+      <Tabs
+        value={method}
+        onValueChange={(value) => onChange(value as Method)}
+        className="w-full gap-0 lg:w-auto"
+      >
+        <TabsList
+          variant="line"
+          aria-label="Preferred install method"
+          className="grid w-full grid-cols-3 gap-1 bg-muted p-1 lg:w-auto lg:min-w-[22rem]"
+        >
+          {INSTALL_METHODS.map((item) => (
+            <TabsTrigger
+              key={item}
+              value={item}
+              className="min-h-[44px] rounded-none border-none bg-transparent px-3 py-3 text-[13px] font-medium text-muted-foreground hover:bg-background hover:text-foreground data-active:bg-background data-active:text-foreground lg:px-4"
+            >
+              <span>{INSTALL_METHOD_LABELS[item]}</span>
+            </TabsTrigger>
+          ))}
+        </TabsList>
+      </Tabs>
     </div>
   );
 }
@@ -158,7 +156,7 @@ function InstallCommandPanel({
             : ""
         )}
       />
-      <pre className="overflow-x-auto border border-border bg-[linear-gradient(180deg,color-mix(in_oklch,var(--foreground)_4%,transparent),transparent)] p-4 pr-14 text-sm font-mono leading-6 whitespace-pre-wrap break-all sm:p-5 sm:pr-16">
+      <pre className="overflow-x-auto bg-muted/40 p-4 pr-14 text-sm font-mono leading-6 whitespace-pre-wrap break-all sm:p-5 sm:pr-16">
         <code>{command}</code>
       </pre>
     </div>
@@ -348,7 +346,13 @@ function SkillRow({
   const { expanded, toggleExpanded } = useExpandableMemory(`zora:skill-detail:${skill.id}`);
 
   return (
-    <section className="scroll-mt-24 border-t border-border/80 py-10 sm:py-12" id={skill.id}>
+    <section
+      className={cn(
+        "scroll-mt-24 py-10 sm:py-12",
+        index !== 0 ? "border-t border-border/60" : ""
+      )}
+      id={skill.id}
+    >
       <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(19rem,23rem)] lg:gap-12">
         <div className="space-y-5">
           <p className="text-[11px] font-mono uppercase tracking-widest text-muted-foreground">

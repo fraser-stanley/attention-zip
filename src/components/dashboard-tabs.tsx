@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, createRef } from "react";
+import { useMemo, useState, createRef } from "react";
 import { CoinTable } from "@/components/coin-table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type { CoinNode, SortOption } from "@/lib/zora";
@@ -37,8 +37,11 @@ export function DashboardTabs({
   initialTrendingCoins: CoinNode[];
 }) {
   const [activeTab, setActiveTab] = useState<SortOption>("trending");
-  const iconRefs = useRef(
+  const iconRefs = useMemo(
+    () =>
     Object.fromEntries(TAB_DEFS.map((t) => [t.value, createRef<IconHandle>()])) as Record<SortOption, React.RefObject<IconHandle | null>>
+    ,
+    []
   );
 
   return (
@@ -51,11 +54,11 @@ export function DashboardTabs({
               key={tab.value}
               value={tab.value}
               className="gap-1.5"
-              onMouseEnter={() => iconRefs.current[tab.value]?.current?.startAnimation()}
-              onMouseLeave={() => iconRefs.current[tab.value]?.current?.stopAnimation()}
+              onMouseEnter={() => iconRefs[tab.value]?.current?.startAnimation()}
+              onMouseLeave={() => iconRefs[tab.value]?.current?.stopAnimation()}
             >
               <span className="hidden sm:inline-flex">
-                <Icon size={14} ref={iconRefs.current[tab.value]} />
+                <Icon size={14} ref={iconRefs[tab.value]} />
               </span>
               {tab.label}
             </TabsTrigger>

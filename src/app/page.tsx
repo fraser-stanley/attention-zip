@@ -4,6 +4,8 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { HomeLiveCards } from "@/components/home-live-cards";
 import { HeroSection } from "@/components/hero-section";
+import { HomeValuePropsSection } from "@/components/home-value-props-section";
+import { ActivityTickerSection } from "@/components/activity-ticker-section";
 import { getExploreData, getLeaderboardData } from "@/lib/data";
 import { skills } from "@/lib/skills";
 import { AnimatedArrowLink } from "@/components/animated-arrow-link";
@@ -48,6 +50,11 @@ function HomeLiveCardsSkeleton() {
 export default function Home() {
   return (
     <div className="space-y-16">
+      {/* Activity ticker — full-bleed, breaks out of max-w container */}
+      <div className="-mx-4 sm:-mx-6 lg:-mx-8 -mt-0">
+        <ActivityTickerSection />
+      </div>
+
       {/* Hero */}
       <HeroSection />
 
@@ -62,6 +69,7 @@ export default function Home() {
         </Suspense>
       </section>
 
+      <HomeValuePropsSection />
 
       {/* Skills preview */}
       <section className="space-y-6">

@@ -10,23 +10,17 @@ export function HeroSection() {
     <section className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center pt-16 pb-8">
       <div className="space-y-4">
         <h1 className="text-hero font-medium tracking-tighter leading-[1.1]">
-          Make markets.
+          Give your agent
           <br />
-          Arm your agent.
+          the Zora playbook.
         </h1>
         <p className="text-sm text-muted-foreground max-w-md leading-relaxed">
           Open-source skills for the Zora attention market. One command
           to install. Read-only by default, no keys needed.
         </p>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center">
           <Link href="/skills" className={buttonVariants({ size: "default" })}>
-            Browse skills
-          </Link>
-          <Link
-            href="/dashboard"
-            className={buttonVariants({ variant: "outline", size: "default" })}
-          >
-            Watch live
+            Get started
           </Link>
         </div>
       </div>

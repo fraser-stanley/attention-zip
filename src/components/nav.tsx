@@ -48,6 +48,15 @@ export function Nav() {
   const close = useCallback(() => {
     setOpen(false);
   }, []);
+  const handleOverlayBackgroundClick = useCallback(
+    (e: React.MouseEvent<HTMLDivElement>) => {
+      const target = e.target;
+      if (!(target instanceof HTMLElement)) return;
+      if (target.closest("a, button, [role='button']")) return;
+      close();
+    },
+    [close]
+  );
 
   const homeRef = useRef<SparklesIconHandle>(null);
   const skillsRef = useRef<ZapHandle>(null);
@@ -95,9 +104,16 @@ export function Nav() {
         className="fixed top-0 left-0 right-0 z-50 bg-background"
         inert={open ? true : undefined}
       >
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-7xl px-4 pb-1 sm:px-6 lg:px-8">
           <div className="flex h-11 items-center justify-between py-[2px]">
-            <Link href="/" aria-label="Attention Index home">
+            <Link
+              href="/"
+              aria-label="Attention Index home"
+              onClick={() => {
+                close();
+                setWalletModalOpen(false);
+              }}
+            >
               <Image
                 src="/attention-index-logo.svg"
                 alt="Attention Index"
@@ -158,9 +174,10 @@ export function Nav() {
             "relative h-full flex flex-col text-white transition-transform duration-200 ease-out",
             open ? "translate-y-0" : "translate-y-4"
           )}
+          onClick={handleOverlayBackgroundClick}
         >
           {/* Section grid */}
-          <div className="flex-1 overflow-y-auto" onClick={(e) => { if (e.target === e.currentTarget) close(); }}>
+          <div className="flex-1 overflow-y-auto">
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12">
               <div className="grid gap-px sm:grid-cols-2 lg:grid-cols-3">
                 {sections.map((section) => (

@@ -35,6 +35,10 @@ const activeCount = MOCK_PORTFOLIO.positions.filter((p) => p.status === "active"
 const resolvedCount = MOCK_PORTFOLIO.positions.filter((p) => p.status === "resolved").length;
 const allCount = MOCK_PORTFOLIO.positions.length;
 
+function pnlHighlightClass(value: number) {
+  return value >= 0 ? "bg-[#3FFF00] text-black" : "bg-[#FF00F0] text-black";
+}
+
 /* ─── Simmer-style 2×2 stats grid ─── */
 function PnlStats() {
   const { pnl } = MOCK_PORTFOLIO;
@@ -168,11 +172,19 @@ function PositionRows({ positions }: { positions: MockPosition[] }) {
                 ${currentUnitPrice.toFixed(4)}
               </TableCell>
               <TableCell className="text-right">
-                <p className={`font-mono text-sm font-medium ${pnlColor(pos.pnl)}`}>
-                  {formatCompactCurrency(pos.currentPrice)}
+                <p>
+                  <span
+                    className={`inline-flex items-center px-1.5 py-0.5 text-sm font-mono font-medium ${pnlHighlightClass(pos.pnl)}`}
+                  >
+                    {formatCompactCurrency(pos.currentPrice)}
+                  </span>
                 </p>
-                <p className={`text-xs font-mono ${pnlColor(pos.pnl)}`}>
-                  {formatPnl(pos.pnl)} {formatPct(pos.pnlPct)}
+                <p className="mt-0.5">
+                  <span
+                    className={`inline-flex items-center px-1.5 py-0.5 text-xs font-mono ${pnlHighlightClass(pos.pnl)}`}
+                  >
+                    {formatPnl(pos.pnl)} {formatPct(pos.pnlPct)}
+                  </span>
                 </p>
               </TableCell>
             </TableRow>

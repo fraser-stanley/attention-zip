@@ -6,7 +6,6 @@ import { Nav } from "@/components/nav";
 import { Footer } from "@/components/footer";
 import { CommandMenuLoader } from "@/components/command-menu-loader";
 import { AgentationLoader } from "@/components/agentation-loader";
-import { ActivityTickerSection } from "@/components/activity-ticker-section";
 
 import {
   getSiteUrl,
@@ -87,10 +86,6 @@ export default function RootLayout({
         <Providers>
           <Nav />
           <CommandMenuLoader />
-          <div className="pt-11">
-            <ActivityTickerSection />
-          </div>
-
           <main id="main-content" className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-12">
             {children}
           </main>

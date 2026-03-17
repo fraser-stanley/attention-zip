@@ -241,7 +241,7 @@ function EquipButton({ skillId, skillName }: { skillId: string; skillName: strin
 
   if (state === "installing") {
     return (
-      <span className="shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 text-sm text-muted-foreground min-h-[44px]">
+      <span className="shrink-0 inline-flex items-center justify-center gap-1.5 px-3 py-1.5 text-sm text-muted-foreground min-h-[44px] w-[120px]">
         <span className="h-3 w-3 animate-spin rounded-full border-2 border-muted-foreground/20 border-t-muted-foreground" />
       </span>
     );
@@ -250,7 +250,7 @@ function EquipButton({ skillId, skillName }: { skillId: string; skillName: strin
   return (
     <button
       type="button"
-      className={buttonVariants({ variant: "outline" })}
+      className={`${buttonVariants({ variant: "outline" })} w-[120px] gap-1`}
       onClick={handleEquip}
     >
       <PlusIcon size={14} />
@@ -284,14 +284,14 @@ function InstalledSkills() {
                 </div>
                 <button
                   type="button"
-                  className="group shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-md bg-[#3FFF00] text-black border border-transparent transition-colors hover:bg-red-500/10 hover:text-red-500 hover:border-red-500/20 min-h-[44px]"
+                  className="group shrink-0 inline-flex items-center justify-center gap-1 text-sm font-medium rounded-md border border-transparent transition-colors min-h-[44px] w-[120px] bg-[#3FFF00] text-black hover:bg-[#FF00F0] hover:text-black"
                   onClick={() => uninstall(skill.id)}
                 >
-                  <span className="group-hover:hidden inline-flex items-center gap-1.5">
+                  <span className="group-hover:hidden inline-flex items-center gap-1">
                     <CheckIcon size={14} />
                     Equipped
                   </span>
-                  <span className="hidden group-hover:inline-flex items-center gap-1.5">
+                  <span className="hidden group-hover:inline-flex items-center gap-1">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
                     Remove
                   </span>

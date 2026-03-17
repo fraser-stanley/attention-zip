@@ -112,7 +112,7 @@ export function Nav() {
                 alt="Attention Index"
                 width={140}
                 height={17}
-                className="h-3.5 w-auto dark:invert"
+                className="h-[17px] w-auto dark:invert"
                 priority
               />
             </Link>

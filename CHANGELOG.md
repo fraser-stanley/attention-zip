@@ -23,3 +23,9 @@
 - Homepage skills grid: capped to 4 cards (`skills.slice(0, 4)`) to prevent orphan 5th card on 4-column layout.
 - Trust page "What we don't do" list: added `aria-hidden` on color-only "x" markers + `sr-only` text for screen readers (WCAG 1.4.1).
 - Skill detail and sample-output disclosures now persist during the session instead of collapsing on navigation.
+
+### Fixed (Portfolio UI)
+- Nav logo scaled 1.2× larger (`h-3.5` → `h-[17px]`) for better readability.
+- Agent loadout buttons standardized to `w-[120px]` with tighter icon–text gap so Equip, Equipped, and Remove are visually consistent.
+- Remove hover changed from red outline to pink fill (`#FF00F0`) + black text, matching the Equipped green-fill treatment.
+- Unselected tabs now carry a persistent `bg-foreground/5` fill (matching their hover gray) so they always look clickable.

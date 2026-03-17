@@ -26,7 +26,7 @@ export default function SkillsPage() {
       url: toAbsoluteUrl(`/skills#${skill.id}`),
       downloadUrl: skill.skillMdUrl,
       codeRepository: skill.githubUrl,
-      installUrl: install.claude,
+      installUrl: install.cli,
     };
   });
 
@@ -44,11 +44,12 @@ export default function SkillsPage() {
         </p>
       </div>
 
-      <Callout variant="check" title="Verified source, read-only defaults">
+      <Callout variant="check" title="Verified source with explicit risk labels">
         <p>
-          Every install path on this page points back to published source. Start
-          with read-only skills, review the linked repository, and keep any
-          execution-capable changes isolated to a dedicated agent environment.
+          Every install path on this page points back to published source. Most
+          skills are read-only, and any execution-capable skill is labeled
+          clearly so you can review it and isolate it to a dedicated trader
+          wallet before enabling it.
         </p>
       </Callout>
 
@@ -64,9 +65,8 @@ export default function SkillsPage() {
         <Steps>
           <Step title="Choose the runtime your agent already uses">
             <p>
-              Switch between <strong>Claude Code</strong>,{" "}
-              <strong>OpenClaw</strong>, or a manual <code>curl</code> install
-              without leaving the page.
+              Switch between <strong>Zora CLI</strong>, <strong>OpenClaw</strong>,
+              or a manual <code>curl</code> install without leaving the page.
             </p>
           </Step>
           <Step title="Copy the command for the specific skill">
@@ -75,10 +75,10 @@ export default function SkillsPage() {
               links you need to inspect before enabling it locally.
             </p>
           </Step>
-          <Step title="Verify before you expand scope">
+          <Step title="Verify the skill scope before enabling it">
             <p>
-              All v0 skills are read-only. If you adapt them for execution
-              later, keep those changes in a dedicated wallet and runtime.
+              Read-only skills can stay in scout mode. Execution-capable skills
+              should only run in a dedicated trader wallet with bounded funds.
             </p>
           </Step>
         </Steps>

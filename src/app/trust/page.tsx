@@ -36,8 +36,8 @@ export default function TrustPage() {
             repo. It does not mean we control your local runtime.
           </p>
           <p className="text-muted-foreground">
-            Any execution-capable modifications you make locally are outside the
-            scope of this v0.
+            If a published skill is execution-capable, that still happens in
+            your local runtime and under your wallet setup.
           </p>
         </CardContent>
       </Card>
@@ -49,9 +49,9 @@ export default function TrustPage() {
         <CardContent className="space-y-4">
           <Callout variant="warning" title="Never reuse your personal wallet">
             <p>
-              Today&apos;s skills are read-only. If you experiment with
-              execution-capable workflows later, use a dedicated wallet with
-              bounded funds from day one.
+              Most skills are read-only, but execution-capable skills like
+              Momentum Trader should only run in a dedicated wallet with bounded
+              funds from day one.
             </p>
           </Callout>
 
@@ -63,8 +63,8 @@ export default function TrustPage() {
               <div>
                 <p className="text-sm font-medium">Read-only, no funds</p>
                 <p className="text-xs text-muted-foreground">
-                  For monitoring and alerts only. No wallet needed. All v0 skills
-                  work in this mode.
+                  For monitoring and alerts only. No wallet needed. Most skills
+                  in the gallery work in this mode.
                 </p>
               </div>
             </div>
@@ -80,8 +80,8 @@ export default function TrustPage() {
                   Bounded funds, execution enabled
                 </p>
                 <p className="text-xs text-muted-foreground">
-                  For future execution-capable skills. Use a dedicated wallet with
-                  limited funds. Never your personal wallet.
+                  Required for execution-capable skills. Use a dedicated wallet
+                  with limited funds. Never your personal wallet.
                 </p>
               </div>
             </div>

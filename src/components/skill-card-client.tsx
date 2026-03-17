@@ -18,7 +18,7 @@ import { useInstalledSkills } from "@/lib/installed-skills-context";
 import { getSkillInstallCommands, type Skill } from "@/lib/skills";
 import { cn } from "@/lib/utils";
 
-type Method = "claude" | "openclaw" | "manual";
+type Method = "cli" | "openclaw" | "manual";
 
 type InstallMethodMeta = {
   value: Method;
@@ -31,31 +31,37 @@ const INSTALL_METHOD_STORAGE_KEY = "zora:skills-install-method";
 
 const INSTALL_METHODS: InstallMethodMeta[] = [
   {
-    value: "claude",
-    label: "Claude Code",
-    token: "CC",
-    description: "Install directly from the published GitHub path for Claude Code.",
+    value: "cli",
+    label: "Zora CLI",
+    token: "ZC",
+    description: "Install the packaged skill through Zora CLI in one command.",
   },
   {
     value: "openclaw",
     label: "OpenClaw",
     token: "OC",
-    description: "Use the OpenClaw install syntax against the same reviewed source.",
+    description: "Add the Zora CLI integration through OpenClaw's skills workflow.",
   },
   {
     value: "manual",
     label: "Manual",
-    token: "CLI",
+    token: "MD",
     description: "Fetch the raw SKILL.md when you want to inspect and place it yourself.",
   },
 ];
 
 function isMethod(value: string | null): value is Method {
-  return value === "claude" || value === "openclaw" || value === "manual";
+  return value === "cli" || value === "openclaw" || value === "manual";
 }
 
 function getMethodMeta(method: Method) {
   return INSTALL_METHODS.find((item) => item.value === method) ?? INSTALL_METHODS[0];
+}
+
+function badgeClassName(badge: string) {
+  return badge === "Execution"
+    ? "border-amber-500/25 bg-amber-500/15 text-amber-600 dark:text-amber-300"
+    : "";
 }
 
 function MethodToken({ token }: { token: string }) {
@@ -245,7 +251,11 @@ function SkillDetail({ skill }: { skill: Skill }) {
 
       <div className="flex flex-wrap gap-1.5">
         {skill.badges.map((badge) => (
-          <Badge key={badge} variant="outline" className="text-xs font-normal">
+          <Badge
+            key={badge}
+            variant={badge === "Execution" ? "default" : "outline"}
+            className={cn("text-xs font-normal", badgeClassName(badge))}
+          >
             {badge}
           </Badge>
         ))}
@@ -417,11 +427,23 @@ function SkillRow({
         </div>
 
         <div className="flex flex-wrap items-center gap-1.5">
-          <Badge variant="outline" className="text-xs font-normal">
+          <Badge
+            variant="outline"
+            className={cn(
+              "text-xs font-normal",
+              skill.risk === "medium"
+                ? "border-amber-500/25 bg-amber-500/15 text-amber-600 dark:text-amber-300"
+                : ""
+            )}
+          >
             {skill.riskLabel}
           </Badge>
           {skill.badges.map((badge) => (
-            <Badge key={badge} variant="outline" className="text-xs font-normal">
+            <Badge
+              key={badge}
+              variant={badge === "Execution" ? "default" : "outline"}
+              className={cn("text-xs font-normal", badgeClassName(badge))}
+            >
               {badge}
             </Badge>
           ))}
@@ -459,8 +481,8 @@ function SkillRow({
 export function SkillsInstallList({ skills }: { skills: Skill[] }) {
   const [method, setMethod] = useSessionStorageState<Method>({
     key: INSTALL_METHOD_STORAGE_KEY,
-    initialValue: "claude",
-    parse: (storedMethod) => (isMethod(storedMethod) ? storedMethod : "claude"),
+    initialValue: "cli",
+    parse: (storedMethod) => (isMethod(storedMethod) ? storedMethod : "cli"),
     serialize: (value) => value,
   });
 

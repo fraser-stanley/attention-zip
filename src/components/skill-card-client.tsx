@@ -60,7 +60,7 @@ function getMethodMeta(method: Method) {
 
 function badgeClassName(badge: string) {
   return badge === "Execution"
-    ? "border-amber-500/25 bg-amber-500/15 text-amber-600 dark:text-amber-300"
+    ? "border-amber-500/30 bg-amber-500/20 text-amber-300"
     : "";
 }
 
@@ -432,7 +432,7 @@ function SkillRow({
             className={cn(
               "text-xs font-normal",
               skill.risk === "medium"
-                ? "border-amber-500/25 bg-amber-500/15 text-amber-600 dark:text-amber-300"
+                ? "border-amber-500/30 bg-amber-500/20 text-amber-300"
                 : ""
             )}
           >

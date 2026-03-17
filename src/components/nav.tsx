@@ -13,6 +13,9 @@ import { ActivityIcon, type ActivityIconHandle } from "@/components/ui/activity"
 import { LayersIcon, type LayersIconHandle } from "@/components/ui/layers";
 import { ShieldCheckIcon, type ShieldCheckIconHandle } from "@/components/ui/shield-check";
 import { SparklesIcon, type SparklesIconHandle } from "@/components/ui/sparkles";
+import { useWallet, truncateAddress } from "@/lib/wallet-context";
+import { WalletConnectModal } from "@/components/wallet-connect-modal";
+import { useToast } from "@/components/toast";
 
 type IconHandle = {
   startAnimation: () => void;
@@ -39,6 +42,9 @@ const sections: Section[] = [
 export function Nav() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const [walletModalOpen, setWalletModalOpen] = useState(false);
+  const { address, isConnected, disconnect } = useWallet();
+  const { toast } = useToast();
   const close = useCallback(() => {
     setOpen(false);
   }, []);
@@ -94,17 +100,26 @@ export function Nav() {
                 alt="Attention Index"
                 width={140}
                 height={17}
-                className="h-3.5 w-auto dark:invert"
+                className="h-[17px] w-auto dark:invert"
                 priority
               />
             </Link>
             <div className="flex items-center gap-1">
-              <button
-                aria-label="Login"
-                className={buttonVariants({ variant: "outline" })}
-              >
-                Login
-              </button>
+              {isConnected && address ? (
+                <button
+                  onClick={() => { disconnect(); toast("Disconnected"); }}
+                  className={buttonVariants({ variant: "outline" })}
+                >
+                  {truncateAddress(address)}
+                </button>
+              ) : (
+                <button
+                  onClick={() => setWalletModalOpen(true)}
+                  className={buttonVariants({ variant: "outline" })}
+                >
+                  Login
+                </button>
+              )}
               <button
                 onClick={() => setOpen(true)}
                 aria-label="Open navigation"
@@ -219,6 +234,7 @@ export function Nav() {
         </div>
       </div>
 
+      <WalletConnectModal open={walletModalOpen} onClose={() => setWalletModalOpen(false)} />
     </>
   );
 }

@@ -7,70 +7,34 @@ import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/button-variants";
 import { skills } from "@/lib/skills";
-import { ZapIcon } from "@/components/ui/zap";
-import { ChartBarIncreasingIcon } from "@/components/ui/chart-bar-increasing";
-import { ActivityIcon } from "@/components/ui/activity";
-import { LayersIcon } from "@/components/ui/layers";
-import { ShieldCheckIcon } from "@/components/ui/shield-check";
-import { SparklesIcon } from "@/components/ui/sparkles";
-import { UserIcon } from "@/components/ui/user";
-import { MenuIcon } from "@/components/ui/menu";
-import type { ReactNode } from "react";
+import { ZapIcon, type ZapHandle } from "@/components/ui/zap";
+import { ChartBarIncreasingIcon, type ChartBarIncreasingIconHandle } from "@/components/ui/chart-bar-increasing";
+import { ActivityIcon, type ActivityIconHandle } from "@/components/ui/activity";
+import { LayersIcon, type LayersIconHandle } from "@/components/ui/layers";
+import { ShieldCheckIcon, type ShieldCheckIconHandle } from "@/components/ui/shield-check";
+import { SparklesIcon, type SparklesIconHandle } from "@/components/ui/sparkles";
+
+type IconHandle = {
+  startAnimation: () => void;
+  stopAnimation: () => void;
+};
 
 type Section = {
   id: string;
   label: string;
   href: string;
   description: string;
-  icon: ReactNode;
 };
 
+
 const sections: Section[] = [
-  {
-    id: "skills",
-    label: "Skills",
-    href: "/skills",
-    description: `${skills.length} skills`,
-    icon: <ZapIcon size={18} />,
-  },
-  {
-    id: "dashboard",
-    label: "Dashboard",
-    href: "/dashboard",
-    description: "Live market data",
-    icon: <ChartBarIncreasingIcon size={18} />,
-  },
-  {
-    id: "leaderboard",
-    label: "Leaderboard",
-    href: "/leaderboard",
-    description: "Weekly trader rankings",
-    icon: <ActivityIcon size={18} />,
-  },
-
-  {
-    id: "portfolio",
-    label: "Portfolio",
-    href: "/portfolio",
-    description: "Your positions & PnL",
-    icon: <LayersIcon size={18} />,
-  },
-  {
-    id: "trust",
-    label: "Trust & Safety",
-    href: "/trust",
-    description: "Wallet presets & scope",
-    icon: <ShieldCheckIcon size={18} />,
-  },
-  {
-    id: "about",
-    label: "About",
-    href: "/",
-    description: "Project info",
-    icon: <SparklesIcon size={18} />,
-  },
+  { id: "home", label: "Home", href: "/", description: "Project info" },
+  { id: "skills", label: "Skills", href: "/skills", description: `${skills.length} skills` },
+  { id: "dashboard", label: "Dashboard", href: "/dashboard", description: "Live market data" },
+  { id: "leaderboard", label: "Leaderboard", href: "/leaderboard", description: "Weekly trader rankings" },
+  { id: "portfolio", label: "Portfolio", href: "/portfolio", description: "Your positions & PnL" },
+  { id: "trust", label: "Trust & Safety", href: "/trust", description: "Wallet presets & scope" },
 ];
-
 
 export function Nav() {
   const pathname = usePathname();
@@ -78,6 +42,24 @@ export function Nav() {
   const close = useCallback(() => {
     setOpen(false);
   }, []);
+
+  const iconRefs: Record<string, React.RefObject<IconHandle | null>> = {
+    home: useRef<SparklesIconHandle>(null),
+    skills: useRef<ZapHandle>(null),
+    dashboard: useRef<ChartBarIncreasingIconHandle>(null),
+    leaderboard: useRef<ActivityIconHandle>(null),
+    portfolio: useRef<LayersIconHandle>(null),
+    trust: useRef<ShieldCheckIconHandle>(null),
+  };
+
+  const iconComponents: Record<string, React.ReactNode> = {
+    home: <SparklesIcon ref={iconRefs.home as React.RefObject<SparklesIconHandle>} size={18} />,
+    skills: <ZapIcon ref={iconRefs.skills as React.RefObject<ZapHandle>} size={18} />,
+    dashboard: <ChartBarIncreasingIcon ref={iconRefs.dashboard as React.RefObject<ChartBarIncreasingIconHandle>} size={18} />,
+    leaderboard: <ActivityIcon ref={iconRefs.leaderboard as React.RefObject<ActivityIconHandle>} size={18} />,
+    portfolio: <LayersIcon ref={iconRefs.portfolio as React.RefObject<LayersIconHandle>} size={18} />,
+    trust: <ShieldCheckIcon ref={iconRefs.trust as React.RefObject<ShieldCheckIconHandle>} size={18} />,
+  };
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
@@ -121,7 +103,6 @@ export function Nav() {
                 aria-label="Login"
                 className={buttonVariants({ variant: "outline" })}
               >
-                <UserIcon size={14} />
                 Login
               </button>
               <button
@@ -129,7 +110,6 @@ export function Nav() {
                 aria-label="Open navigation"
                 className={buttonVariants({ variant: "default" })}
               >
-                <MenuIcon size={14} />
                 Index
               </button>
             </div>
@@ -167,9 +147,11 @@ export function Nav() {
                     key={section.id}
                     href={section.href}
                     className="group bg-black p-6 flex flex-col gap-3 transition-colors duration-200 outline-none hover:bg-white hover:text-black focus-visible:bg-white focus-visible:text-black"
+                    onMouseEnter={() => iconRefs[section.id]?.current?.startAnimation()}
+                    onMouseLeave={() => iconRefs[section.id]?.current?.stopAnimation()}
                   >
                     <span className="text-sm font-medium uppercase tracking-wider flex items-center gap-2">
-                      {section.icon}
+                      {iconComponents[section.id]}
                       {section.label}
                     </span>
                     <p className="text-xs text-white/50 group-hover:text-black/60">

@@ -13,6 +13,7 @@ export interface Skill {
   badges: string[];
   githubUrl: string;
   skillMdUrl: string;
+  installs: number;
 }
 
 export interface SkillInstallCommands {
@@ -62,6 +63,7 @@ export const skills: Skill[] = [
       "https://github.com/fraser-stanley/zora-agent-skills/tree/main/trend-scout",
     skillMdUrl:
       "https://raw.githubusercontent.com/fraser-stanley/zora-agent-skills/main/trend-scout/SKILL.md",
+    installs: 1247,
   },
   {
     id: "creator-pulse",
@@ -100,6 +102,7 @@ Watchlist alert:
       "https://github.com/fraser-stanley/zora-agent-skills/tree/main/creator-pulse",
     skillMdUrl:
       "https://raw.githubusercontent.com/fraser-stanley/zora-agent-skills/main/creator-pulse/SKILL.md",
+    installs: 892,
   },
   {
     id: "briefing-bot",
@@ -141,6 +144,7 @@ Nothing unusual detected. Market is moderately active.`,
       "https://github.com/fraser-stanley/zora-agent-skills/tree/main/briefing-bot",
     skillMdUrl:
       "https://raw.githubusercontent.com/fraser-stanley/zora-agent-skills/main/briefing-bot/SKILL.md",
+    installs: 2103,
   },
   {
     id: "portfolio-scout",
@@ -190,6 +194,7 @@ Coins held: 3`,
       "https://github.com/fraser-stanley/zora-agent-skills/tree/main/portfolio-scout",
     skillMdUrl:
       "https://raw.githubusercontent.com/fraser-stanley/zora-agent-skills/main/portfolio-scout/SKILL.md",
+    installs: 634,
   },
   {
     id: "momentum-trader",
@@ -242,6 +247,7 @@ Watching for next signal... (cooldown: 5 min)`,
       "https://github.com/fraser-stanley/zora-agent-skills/tree/main/momentum-trader",
     skillMdUrl:
       "https://raw.githubusercontent.com/fraser-stanley/zora-agent-skills/main/momentum-trader/SKILL.md",
+    installs: 312,
   },
 ];
 

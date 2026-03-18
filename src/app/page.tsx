@@ -80,7 +80,10 @@ export default function Home() {
               className="border-border bg-foreground/5 text-foreground hover:border-foreground/15 hover:bg-foreground/[0.07]"
             >
               <CardHeader className="pb-2">
-                <h3 className="type-card-title-sans">{skill.name}</h3>
+                <div className="flex items-center justify-between">
+                  <h3 className="type-card-title-sans">{skill.name}</h3>
+                  <span className="type-caption text-muted-foreground">{skill.installs.toLocaleString()} installs</span>
+                </div>
               </CardHeader>
               <CardContent className="space-y-3">
                 <p className="type-body-sm text-muted-foreground">

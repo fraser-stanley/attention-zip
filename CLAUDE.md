@@ -123,6 +123,24 @@ All user-facing copy follows the guidelines in `TONE.md`. Key rules:
 - "Execution skills" not "execution-capable skills". "Points to" not "resolves to".
 - Speculation should be tasteful and optimistic, never overpromise.
 
+## Animated buttons with icons
+
+Buttons that contain icons must animate those icons on hover. Use `AnimatedButton` from `@/components/ui/animated-button` instead of the base `Button` or `buttonVariants` for any button with an icon child.
+
+```tsx
+import { AnimatedButton } from "@/components/ui/animated-button";
+import { PlusIcon } from "@/components/ui/plus";
+
+<AnimatedButton variant="outline" onClick={handleClick}>
+  <PlusIcon size={14} />
+  Add item
+</AnimatedButton>
+```
+
+The `AnimatedButton` component automatically detects icon children (components with `displayName` ending in "Icon") and wires their `startAnimation`/`stopAnimation` methods to mouse enter/leave events. The icons use motion/react for smooth animations.
+
+For links styled as buttons with icons, use `AnimatedArrowLink` from `@/components/animated-arrow-link`.
+
 ## shadcn/ui v2 — critical gotcha
 
 shadcn/ui v2 uses `@base-ui/react` instead of Radix. The `Button` component does **not** support `asChild`.

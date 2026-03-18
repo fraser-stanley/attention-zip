@@ -2,6 +2,7 @@
 
 import { useEffect, useId, useRef, useState } from "react";
 
+import { AnimatedButton } from "@/components/ui/animated-button";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button-variants";
 import { ArrowUpRightIcon } from "@/components/ui/arrow-up-right";
@@ -312,14 +313,14 @@ function InstallButton({
   }
 
   return (
-    <button
-      type="button"
-      className={cn(buttonVariants({ variant: "outline" }), "w-full sm:w-auto")}
+    <AnimatedButton
+      variant="outline"
+      className="w-full sm:w-auto"
       onClick={handleInstall}
     >
       <PlusIcon size={14} />
       Install
-    </button>
+    </AnimatedButton>
   );
 }
 
@@ -347,7 +348,11 @@ function SkillRow({
     >
       <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(19rem,23rem)] lg:gap-12">
         <div className="space-y-5">
-          <p className="type-label text-muted-foreground">Skill {String(index + 1).padStart(2, "0")}</p>
+          <div className="flex items-center gap-3">
+            <p className="type-label text-muted-foreground">Skill {String(index + 1).padStart(2, "0")}</p>
+            <span className="type-label text-muted-foreground/60">·</span>
+            <p className="type-label text-muted-foreground">{skill.installs.toLocaleString()} installs</p>
+          </div>
 
           <div className="space-y-2">
             <h2 className="type-section">{skill.name}</h2>

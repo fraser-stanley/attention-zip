@@ -24,7 +24,7 @@ function TickerItems({ items }: { items: ActivityItem[] }) {
       {items.map((item, index) => (
         <span
           key={index}
-          className="inline-flex items-center gap-1.5 px-4 font-mono text-xs whitespace-nowrap"
+          className="type-caption inline-flex items-center gap-1.5 px-4 font-mono whitespace-nowrap"
         >
           <span className="text-foreground">{item.name}</span>
           <span
@@ -65,7 +65,7 @@ export function ActivityTicker({
       {/* LIVE indicator */}
       <div className="flex items-center gap-1.5 px-4 shrink-0 border-r border-border h-full">
         <span className="h-1.5 w-1.5 rounded-full bg-[#3FFF00] animate-pulse" />
-        <span className="font-mono text-xs text-muted-foreground">Live</span>
+        <span className="type-caption font-mono text-muted-foreground">Live</span>
       </div>
 
       {/* Scrolling content — pure CSS, two copies for seamless loop */}

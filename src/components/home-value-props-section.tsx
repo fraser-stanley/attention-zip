@@ -34,16 +34,14 @@ export function HomeValuePropsSection() {
         {valueProps.map((item) => (
           <div
             key={item.title}
-            className="min-h-[18rem] border border-border bg-card p-6 transition-colors duration-200 hover:border-foreground/20"
+            className="flex flex-col justify-between border border-border bg-card p-6 transition-colors duration-200 hover:border-foreground/20"
           >
-            <div className="space-y-5">
-              <p className="max-w-[12ch] font-display text-hero font-medium leading-[1.1] tracking-tighter text-foreground">
-                {item.title}
-              </p>
-              <p className="max-w-[29ch] text-[1.05rem] leading-8 text-muted-foreground">
-                {item.description}
-              </p>
-            </div>
+            <p className="type-card-title-lg max-w-[12ch] text-foreground">
+              {item.title}
+            </p>
+            <p className="type-body-sm mt-6 text-muted-foreground">
+              {item.description}
+            </p>
           </div>
         ))}
       </div>

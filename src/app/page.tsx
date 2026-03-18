@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { HomeLiveCards } from "@/components/home-live-cards";
@@ -32,9 +32,9 @@ function HomeLiveCardsSkeleton() {
       {Array.from({ length: 4 }).map((_, index) => (
         <Card key={index}>
           <CardHeader className="pb-2">
-            <CardTitle className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+            <div className="type-caption uppercase text-muted-foreground">
               <Skeleton className="h-4 w-24" />
-            </CardTitle>
+            </div>
           </CardHeader>
           <CardContent className="space-y-2">
             <Skeleton className="h-5 w-full" />
@@ -64,8 +64,8 @@ export default function Home() {
       <section className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-sm font-medium text-muted-foreground">Skills</h2>
-            <p className="text-xs text-muted-foreground mt-1">
+            <h2 className="type-body-sm font-medium text-muted-foreground">Skills</h2>
+            <p className="type-caption mt-1 text-muted-foreground">
               We wrote and reviewed every one. Published source, one-command install.
             </p>
           </div>
@@ -80,10 +80,10 @@ export default function Home() {
               className="border-border bg-foreground/5 text-foreground hover:border-foreground/15 hover:bg-foreground/[0.07]"
             >
               <CardHeader className="pb-2">
-                <CardTitle className="text-base">{skill.name}</CardTitle>
+                <h3 className="type-card-title-sans">{skill.name}</h3>
               </CardHeader>
               <CardContent className="space-y-3">
-                <p className="text-sm text-muted-foreground">
+                <p className="type-body-sm text-muted-foreground">
                   {skill.description}
                 </p>
                 <div className="flex flex-wrap gap-1">
@@ -91,7 +91,7 @@ export default function Home() {
                     <Badge
                       key={badge}
                       variant={badge === "Execution" ? "default" : "outline"}
-                      className={`text-xs font-normal ${
+                      className={`type-caption font-normal ${
                         badge === "Execution"
                           ? "border-[#3FFF00]/40 bg-[#3FFF00]/14 text-foreground"
                           : "border-border bg-background/70 text-foreground/78"
@@ -110,8 +110,8 @@ export default function Home() {
       {/* Live data cards */}
       <section className="space-y-4">
         <div className="flex items-center justify-between">
-          <h2 className="text-sm font-medium text-muted-foreground">Agent activity</h2>
-          <span className="text-xs text-muted-foreground font-mono">Live</span>
+          <h2 className="type-body-sm font-medium text-muted-foreground">Agent activity</h2>
+          <span className="type-caption font-mono text-muted-foreground">Live</span>
         </div>
         <Suspense fallback={<HomeLiveCardsSkeleton />}>
           <HomeLiveCardsSection />

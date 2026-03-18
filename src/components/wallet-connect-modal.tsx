@@ -93,7 +93,7 @@ export function WalletConnectModal({ open, onClose }: WalletConnectModalProps) {
               className="pointer-events-auto w-full max-w-sm bg-black border border-white/10 overflow-hidden"
             >
               <div className="px-5 pt-5 pb-3">
-                <p className="text-xs font-medium uppercase tracking-wider text-white/50">
+                <p className="type-caption uppercase text-white/50">
                   Connect Wallet
                 </p>
               </div>
@@ -104,7 +104,7 @@ export function WalletConnectModal({ open, onClose }: WalletConnectModalProps) {
                     key={wallet.name}
                     onClick={() => handleConnect(wallet.name)}
                     disabled={connecting !== null}
-                    className="flex items-center gap-3 px-5 py-3.5 text-left text-sm text-white transition-colors hover:bg-white/5 disabled:opacity-50 border-t border-white/5"
+                    className="type-body-sm flex items-center gap-3 border-t border-white/5 px-5 py-3.5 text-left text-white transition-colors hover:bg-white/5 disabled:opacity-50"
                   >
                     <span
                       className="size-3 rounded-full shrink-0"
@@ -112,7 +112,7 @@ export function WalletConnectModal({ open, onClose }: WalletConnectModalProps) {
                     />
                     <span className="flex-1">{wallet.name}</span>
                     {connecting === wallet.name && (
-                      <span className="text-xs text-white/40">Connecting...</span>
+                      <span className="type-caption text-white/40">Connecting...</span>
                     )}
                   </button>
                 ))}

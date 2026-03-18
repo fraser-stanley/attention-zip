@@ -85,7 +85,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
                     <circle cx="12" cy="12" r="10" />
                     <path d="m9 12 2 2 4-4" />
                   </svg>
-                  <span className="text-sm text-white whitespace-nowrap">
+                  <span className="type-body-sm whitespace-nowrap text-white">
                     {current.message}
                   </span>
                 </motion.div>

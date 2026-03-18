@@ -47,23 +47,19 @@ function PnlStats() {
     <div className="grid grid-cols-2 gap-px">
       {/* Profit / Loss */}
       <div className="p-4">
-        <p className="text-xs font-mono uppercase tracking-wider text-muted-foreground mb-2">
-          Profit / Loss
-        </p>
+        <p className="type-label mb-2 text-muted-foreground">Profit / Loss</p>
         <p className="text-5xl font-bold font-display">
           <span className="highlight-block">{formatPnl(pnl.totalPnl)}</span>
-          <span className="ml-1.5 text-sm font-normal font-mono text-muted-foreground">USDC</span>
+          <span className="type-body-sm ml-1.5 font-mono text-muted-foreground">USDC</span>
         </p>
-        <p className={`text-xs font-mono ${pnlColor(pnl.totalPnlPct)}`}>
+        <p className={`type-caption font-mono ${pnlColor(pnl.totalPnlPct)}`}>
           {formatPct(pnl.totalPnlPct)} ROI
         </p>
       </div>
 
       {/* Trades */}
       <div className="p-4 border-l border-border">
-        <p className="text-xs font-mono uppercase tracking-wider text-muted-foreground mb-2">
-          Trades
-        </p>
+        <p className="type-label mb-2 text-muted-foreground">Trades</p>
         <p className="text-5xl font-bold font-display">
           {pnl.totalTrades}
         </p>
@@ -71,9 +67,7 @@ function PnlStats() {
 
       {/* Win Rate */}
       <div className="p-4 border-t border-border">
-        <p className="text-xs font-mono uppercase tracking-wider text-muted-foreground mb-2">
-          Win Rate
-        </p>
+        <p className="type-label mb-2 text-muted-foreground">Win Rate</p>
         <p className="text-5xl font-bold font-display">
           {pnl.winRate}%
         </p>
@@ -81,9 +75,7 @@ function PnlStats() {
 
       {/* W / L */}
       <div className="p-4 border-t border-l border-border">
-        <p className="text-xs font-mono uppercase tracking-wider text-muted-foreground mb-2">
-          W / L
-        </p>
+        <p className="type-label mb-2 text-muted-foreground">W / L</p>
         <p className="text-5xl font-bold font-display">
           {pnl.wins} / {pnl.losses}
         </p>
@@ -126,7 +118,7 @@ function PositionsContent() {
 
       {/* Table */}
       {positions.length === 0 ? (
-        <p className="py-8 text-center text-sm text-muted-foreground">
+        <p className="type-body-sm py-8 text-center text-muted-foreground">
           No {filter} positions.
         </p>
       ) : (
@@ -141,10 +133,10 @@ function PositionRows({ positions }: { positions: MockPosition[] }) {
     <Table>
       <TableHeader>
         <TableRow>
-          <TableHead className="text-xs font-mono uppercase tracking-wider">Market</TableHead>
-          <TableHead className="text-right text-xs font-mono uppercase tracking-wider">Avg</TableHead>
-          <TableHead className="text-right text-xs font-mono uppercase tracking-wider">Current</TableHead>
-          <TableHead className="text-right text-xs font-mono uppercase tracking-wider">Value</TableHead>
+          <TableHead className="type-label">Market</TableHead>
+          <TableHead className="type-label text-right">Avg</TableHead>
+          <TableHead className="type-label text-right">Current</TableHead>
+          <TableHead className="type-label text-right">Value</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -156,32 +148,32 @@ function PositionRows({ positions }: { positions: MockPosition[] }) {
             <TableRow key={pos.address}>
               <TableCell>
                 <div>
-                  <span className="text-sm font-medium">{pos.coin}</span>
-                  <span className="ml-2 text-xs text-muted-foreground font-mono">
+                  <span className="type-body-sm font-medium">{pos.coin}</span>
+                  <span className="type-caption ml-2 font-mono text-muted-foreground">
                     ${pos.symbol}
                   </span>
                 </div>
-                <p className="text-xs text-muted-foreground font-mono mt-0.5">
+                <p className="type-caption mt-0.5 font-mono text-muted-foreground">
                   {pos.quantity.toLocaleString()} tokens at ${avgPrice.toFixed(4)}
                 </p>
               </TableCell>
-              <TableCell className="text-right font-mono text-sm">
+              <TableCell className="type-body-sm text-right font-mono">
                 ${avgPrice.toFixed(4)}
               </TableCell>
-              <TableCell className="text-right font-mono text-sm">
+              <TableCell className="type-body-sm text-right font-mono">
                 ${currentUnitPrice.toFixed(4)}
               </TableCell>
               <TableCell className="text-right">
                 <p>
                   <span
-                    className={`inline-flex items-center px-1.5 py-0.5 text-sm font-mono font-medium ${pnlHighlightClass(pos.pnl)}`}
+                    className={`type-body-sm inline-flex items-center px-1.5 py-0.5 font-mono font-medium ${pnlHighlightClass(pos.pnl)}`}
                   >
                     {formatCompactCurrency(pos.currentPrice)}
                   </span>
                 </p>
                 <p className="mt-0.5">
                   <span
-                    className={`inline-flex items-center px-1.5 py-0.5 text-xs font-mono ${pnlHighlightClass(pos.pnl)}`}
+                    className={`type-caption inline-flex items-center px-1.5 py-0.5 font-mono ${pnlHighlightClass(pos.pnl)}`}
                   >
                     {formatPnl(pos.pnl)} {formatPct(pos.pnlPct)}
                   </span>
@@ -203,30 +195,30 @@ function HistoryContent() {
     <Table>
       <TableHeader>
         <TableRow>
-          <TableHead className="text-xs font-mono uppercase tracking-wider">Coin</TableHead>
-          <TableHead className="text-xs font-mono uppercase tracking-wider">Side</TableHead>
-          <TableHead className="text-right text-xs font-mono uppercase tracking-wider">Amount</TableHead>
-          <TableHead className="text-right text-xs font-mono uppercase tracking-wider">PnL</TableHead>
-          <TableHead className="text-right text-xs font-mono uppercase tracking-wider hidden sm:table-cell">Date</TableHead>
+          <TableHead className="type-label">Coin</TableHead>
+          <TableHead className="type-label">Side</TableHead>
+          <TableHead className="type-label text-right">Amount</TableHead>
+          <TableHead className="type-label text-right">PnL</TableHead>
+          <TableHead className="type-label hidden text-right sm:table-cell">Date</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
         {trades.map((trade) => (
           <TableRow key={`${trade.coin}-${trade.date}`}>
-            <TableCell className="font-mono text-sm">${trade.coin}</TableCell>
+            <TableCell className="type-body-sm font-mono">${trade.coin}</TableCell>
             <TableCell>
               <Badge variant={trade.side === "buy" ? "default" : "outline"}>
                 {trade.side}
               </Badge>
             </TableCell>
-            <TableCell className="text-right font-mono text-sm">
+            <TableCell className="type-body-sm text-right font-mono">
               ${trade.amount.toLocaleString()}
             </TableCell>
-            <TableCell className={`text-right font-mono text-sm ${pnlColor(trade.pnl)}`}>
+            <TableCell className={`type-body-sm text-right font-mono ${pnlColor(trade.pnl)}`}>
               {formatPnl(trade.pnl)}
-              <span className="ml-1 text-xs">{formatPct(trade.pct)}</span>
+              <span className="type-caption ml-1">{formatPct(trade.pct)}</span>
             </TableCell>
-            <TableCell className="text-right text-sm text-muted-foreground hidden sm:table-cell">
+            <TableCell className="type-body-sm hidden text-right text-muted-foreground sm:table-cell">
               {trade.date}
             </TableCell>
           </TableRow>
@@ -253,7 +245,7 @@ function EquipButton({ skillId, skillName }: { skillId: string; skillName: strin
 
   if (state === "installing") {
     return (
-      <span className="shrink-0 inline-flex items-center justify-center gap-1.5 px-3 py-1.5 text-sm text-muted-foreground min-h-[44px] w-[120px]">
+      <span className="type-body-sm inline-flex min-h-[44px] w-[120px] shrink-0 items-center justify-center gap-1.5 px-3 py-1.5 text-muted-foreground">
         <span className="h-3 w-3 animate-spin rounded-full border-2 border-muted-foreground/20 border-t-muted-foreground" />
       </span>
     );
@@ -279,9 +271,7 @@ function InstalledSkills() {
 
   return (
     <div className={`space-y-3 ${!hydrated ? "opacity-50" : ""}`}>
-      <h2 className="text-sm font-bold font-sans uppercase tracking-wider">
-        Agent Loadout
-      </h2>
+      <h2 className="type-label text-foreground">Agent Loadout</h2>
 
       <div className="grid gap-3 sm:grid-cols-2">
         {installed.map((skill) => (
@@ -289,14 +279,14 @@ function InstalledSkills() {
             <CardContent className="p-4">
               <div className="flex items-start justify-between gap-3">
                 <div>
-                  <p className="text-sm font-sans font-medium">{skill.name}</p>
-                  <p className="text-xs text-muted-foreground mt-1">
+                  <p className="type-body-sm font-medium">{skill.name}</p>
+                  <p className="type-caption mt-1 text-muted-foreground">
                     {skill.description}
                   </p>
                 </div>
                 <button
                   type="button"
-                  className="group shrink-0 inline-flex items-center justify-center gap-1 text-sm font-medium rounded-md border border-transparent transition-colors min-h-[44px] w-[120px] bg-[#3FFF00] text-black hover:bg-[#FF00F0] hover:text-black"
+                  className="type-body-sm group inline-flex min-h-[44px] w-[120px] shrink-0 items-center justify-center gap-1 rounded-md border border-transparent bg-[#3FFF00] font-medium text-black transition-colors hover:bg-[#FF00F0] hover:text-black"
                   onClick={() => uninstall(skill.id)}
                 >
                   <span className="group-hover:hidden inline-flex items-center gap-1">
@@ -318,8 +308,8 @@ function InstalledSkills() {
             <CardContent className="p-4">
               <div className="flex items-start justify-between gap-3">
                 <div>
-                  <p className="text-sm font-sans font-medium">{skill.name}</p>
-                  <p className="text-xs text-muted-foreground mt-1">
+                  <p className="type-body-sm font-medium">{skill.name}</p>
+                  <p className="type-caption mt-1 text-muted-foreground">
                     {skill.description}
                   </p>
                 </div>
@@ -369,7 +359,7 @@ export function PortfolioView() {
           </TabsContent>
 
           <TabsContent value="orders">
-            <p className="py-8 text-center text-sm text-muted-foreground">
+            <p className="type-body-sm py-8 text-center text-muted-foreground">
               No open orders.
             </p>
           </TabsContent>

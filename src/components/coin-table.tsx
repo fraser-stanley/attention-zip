@@ -51,7 +51,7 @@ export function CoinTable({
 
   if (error) {
     return (
-      <div className="text-center py-8 text-muted-foreground text-sm">
+      <div className="type-body-sm py-8 text-center text-muted-foreground">
         Failed to load data. Try refreshing.
       </div>
     );
@@ -71,7 +71,7 @@ export function CoinTable({
 
   if (coins.length === 0) {
     return (
-      <div className="text-center py-8 text-muted-foreground text-sm">
+      <div className="type-body-sm py-8 text-center text-muted-foreground">
         No coins found.
       </div>
     );
@@ -81,13 +81,13 @@ export function CoinTable({
     <Table>
       <TableHeader>
         <TableRow>
-          <TableHead className="w-10">#</TableHead>
-          <TableHead>Name</TableHead>
-          {!compact && <TableHead>Address</TableHead>}
-          <TableHead>Type</TableHead>
-          <TableHead className="text-right">Market Cap</TableHead>
-          <TableHead className="text-right">24h Vol</TableHead>
-          <TableHead className="text-right">24h Change</TableHead>
+          <TableHead className="type-label w-10">#</TableHead>
+          <TableHead className="type-label">Name</TableHead>
+          {!compact && <TableHead className="type-label">Address</TableHead>}
+          <TableHead className="type-label">Type</TableHead>
+          <TableHead className="type-label text-right">Market Cap</TableHead>
+          <TableHead className="type-label text-right">24h Vol</TableHead>
+          <TableHead className="type-label text-right">24h Change</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -95,30 +95,30 @@ export function CoinTable({
           const change = formatChange(coin.marketCap, coin.marketCapDelta24h);
           return (
             <TableRow key={coin.address ?? i}>
-              <TableCell className="text-muted-foreground font-mono text-xs">
+              <TableCell className="type-caption font-mono text-muted-foreground">
                 {i + 1}
               </TableCell>
               <TableCell>
                 {coin.name ?? "Unknown"}
               </TableCell>
               {!compact && (
-                <TableCell className="font-mono text-xs text-muted-foreground">
+                <TableCell className="type-caption font-mono text-muted-foreground">
                   {truncateAddress(coin.address ?? "")}
                 </TableCell>
               )}
               <TableCell>
-                <Badge variant="secondary" className="text-xs font-normal">
+                <Badge variant="secondary" className="type-caption font-normal">
                   {coinTypeLabel(coin.coinType)}
                 </Badge>
               </TableCell>
-              <TableCell className="text-right font-mono text-sm">
+              <TableCell className="type-body-sm text-right font-mono">
                 {formatCompactCurrency(coin.marketCap)}
               </TableCell>
-              <TableCell className="text-right font-mono text-sm">
+              <TableCell className="type-body-sm text-right font-mono">
                 {formatCompactCurrency(coin.volume24h)}
               </TableCell>
               <TableCell
-                className={`text-right font-mono text-sm ${
+                className={`type-body-sm text-right font-mono ${
                   change.positive === true
                     ? "text-[#3FFF00]"
                     : change.positive === false

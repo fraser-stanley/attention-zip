@@ -1,8 +1,8 @@
 # Zora Agent Skills
 
-Discover, install, and monitor Zora-native agent skills. Live market data, verified skill gallery, and public leaderboards.
+Discover, install, and monitor Zora-native agent skills. Terminal-style market data, verified skill gallery, and public leaderboards.
 
-- Live dashboard with trending coins, volume leaders, and creator coins from Zora (Base)
+- Homepage terminal market board with trending coins, gainers, volume leaders, and top traders from Zora (Base)
 - 5 verified skills with read-only scouts plus one execution-capable trader
 - Agent and portfolio views for mock P&L, holdings, and leaderboard context
 - Weekly trader leaderboard
@@ -41,9 +41,11 @@ src/
 │   ├── agents/    Agent list and profile pages
 │   ├── leaderboard/
 │   └── trust/     Trust & Safety
-├── components/    UI components (nav, tables, cards, shadcn/ui)
+├── components/    UI components (nav, terminal board, tables, shadcn/ui)
 └── lib/           SDK wrapper, skill data, utilities
 ```
+
+The homepage "Agent activity" module is a light TUI-style board. It server-renders initial rows, refreshes through the public API routes, and uses a subtle CRT sweep during loading so the module still feels live before the next fetch lands.
 
 ## Skills
 

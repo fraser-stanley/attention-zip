@@ -38,7 +38,7 @@ The API key is **optional**. The SDK works without it (uses registered queries),
 ```
 src/
 ├── app/
-│   ├── page.tsx                    # Homepage (hero, live cards, skills preview, waitlist)
+│   ├── page.tsx                    # Homepage (hero, terminal market board, skills preview, waitlist)
 │   ├── layout.tsx                  # Root layout (metadata, JSON-LD, Providers, Nav)
 │   ├── globals.css                 # Tailwind imports + CSS variables
 │   ├── dashboard/page.tsx          # Server-rendered shell + streamed dashboard tabs
@@ -60,7 +60,7 @@ src/
 │   ├── hero-orb-glass.tsx          # Concrete dithered orb (R3F + spring click + velocity rotation)
 │   ├── hero-orb-glass-loader.tsx   # Dynamic import wrapper (ssr: false)
 │   ├── command-menu-loader.tsx     # Lazy client-only command menu mount
-│   ├── home-live-cards.tsx         # Hydrated live cards with server initial data
+│   ├── home-live-cards.tsx         # Hydrated terminal market board with server initial data
 │   ├── dashboard-tabs.tsx          # Client dashboard tabs + table refresh
 │   ├── leaderboard-table.tsx       # Client leaderboard refresh wrapper
 │   ├── skill-card-client.tsx       # Shared runtime picker + command blocks + expandable skill details
@@ -104,9 +104,11 @@ src/
 - **No `config.schema.json`** for skills. Config is documented inline in SKILL.md files, following Bankr/OpenClaw conventions.
 - **Command menu is lazy-loaded** through `src/components/command-menu-loader.tsx` so it does not affect the initial page payload.
 - **React Query** handles live refresh after hydration. Initial render is server-owned for `/`, `/dashboard`, and `/leaderboard`.
+- **Homepage "Agent activity" is a terminal board**, not a 4-card grid. It preloads 8 rows per tab, refreshes through `/api/explore` and `/api/leaderboard`, and uses a subtle CRT-style loading sweep plus simulated preview motion between fetches.
 - **Portfolio page is mock data only** — `src/lib/portfolio-mock-data.ts` provides all positions, trades, PnL stats, and sparkline data. No real wallet connection. Will be replaced with live data when trade history indexing ships.
 - **Agent profiles use mock PnL data** — `src/lib/agent-mock-data.ts` provides mock positions, trades, and sparkline for agent profile pages. Real profile data (holdings, created coins) comes from the SDK.
 - **PnL utilities are shared** — `src/lib/pnl-utils.ts` exports `pnlColor()`, `formatPnl()`, `formatPct()` used by both portfolio and agent profile pages. Gains = `#3FFF00`, losses = `#FF00F0`.
+- **Market colors stay full-strength** — use `#3FFF00`, `#FF00F0`, or no market color at all. Only neutral grays should be faded with opacity.
 - **Green highlight block treatment** — `.highlight-block` class in `globals.css` applies `#3FFF00` bg + black text with `box-decoration-break: clone` for per-line blocks. Used on hero heading and portfolio stat numbers. Primary button variant also uses `#3FFF00`.
 
 ## Tone of voice

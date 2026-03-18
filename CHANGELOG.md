@@ -1,5 +1,16 @@
 # Changelog
 
+## 2026-03-18 (Homepage terminal board)
+
+### Added
+- **Homepage terminal market board** — replaced the old 4-card "Agent activity" module with a single tabbed board for Trending, Gainers, Volume, and Traders.
+- **CRT-style loading sweep** — the board skeleton now uses a subtle top-to-bottom scan treatment instead of static card placeholders.
+
+### Changed
+- Homepage market queries now preload 8 rows per tab so the board has real table density from first paint.
+- Board refreshes and preview shuffles now use full-strength market color on the entire row: `#3FFF00`, `#FF00F0`, or nothing.
+- README and CLAUDE.md now describe the homepage board as a terminal-style market pane instead of live cards.
+
 ## 2026-03-17 (CLI audit + UI fixes)
 
 ### Added

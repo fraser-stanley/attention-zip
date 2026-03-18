@@ -63,7 +63,7 @@ src/
 │   ├── home-live-cards.tsx         # Hydrated terminal market board with server initial data
 │   ├── dashboard-tabs.tsx          # Client dashboard tabs + table refresh
 │   ├── leaderboard-table.tsx       # Client leaderboard refresh wrapper
-│   ├── skill-card-client.tsx       # Shared runtime picker + command blocks + expandable skill details
+│   ├── skill-card-client.tsx       # Shared runtime picker + command blocks + typewriter example output
 │   ├── coin-table.tsx              # Reusable coin data table
 │   ├── portfolio-view.tsx          # Simmer-style portfolio (stats, sparkline, positions, skills)
 │   ├── agent-profile-detail.tsx    # Agent profile with PnL, positions, sparkline, holdings
@@ -100,7 +100,8 @@ src/
 - **Skills are static data** in `src/lib/skills.ts`. No database, no CMS. The homepage grid and skills gallery both render from this array — add a skill to the array and both pages update automatically.
 - **Install commands are agent instructions**, not CLI commands. The Zora CLI has no `install` or `skills` subcommand. The "Tell your agent" tab shows natural-language instructions (`install skill from <url>`); the "curl" tab is the only real shell command.
 - **Install commands are shared** from `src/lib/skills.ts` so the UI and `/api/skills` stay in sync.
-- **The skills page stays intentionally flat** — one shared runtime picker updates every command block, while deeper verification details stay expandable so the list remains fast to scan.
+- **The skills page stays intentionally flat** — one shared runtime picker updates every command block. Only the example output is collapsible (with typewriter animation). No nested accordions.
+- **Tabs use a unified toggle style** — `variant="toggle"` on `TabsList` gives a gray `bg-muted` container with black fill + white text for the selected tab. All tab UIs (skills picker, homepage terminal, portfolio, dashboard) share this pattern via the base `TabsTrigger` component in `src/components/ui/tabs.tsx`.
 - **No `config.schema.json`** for skills. Config is documented inline in SKILL.md files, following Bankr/OpenClaw conventions.
 - **Command menu is lazy-loaded** through `src/components/command-menu-loader.tsx` so it does not affect the initial page payload.
 - **React Query** handles live refresh after hydration. Initial render is server-owned for `/`, `/dashboard`, and `/leaderboard`.

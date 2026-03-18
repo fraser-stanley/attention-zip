@@ -202,6 +202,10 @@
   line-height: 1.4;
 }
 
+@utility animate-blink {
+  animation: blink 1s step-end infinite;
+}
+
 @utility type-display {
   font-family: var(--font-helvetica-hv-cn, "Helvetica Neue"), "Helvetica Neue", "Helvetica", sans-serif;
   font-size: var(--type-display-size);

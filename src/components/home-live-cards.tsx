@@ -598,8 +598,8 @@ export function HomeLiveCards({
         <div className="border-b border-border px-4 py-4">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <TabsList
-              variant="line"
-              className="grid w-full grid-cols-2 gap-1 bg-muted p-1 sm:w-auto sm:grid-cols-4"
+              variant="toggle"
+              className="grid w-full grid-cols-2 sm:w-auto sm:grid-cols-4"
             >
               {TAB_DEFS.map((tab) => {
                 const Icon = tab.icon;
@@ -608,7 +608,7 @@ export function HomeLiveCards({
                   <TabsTrigger
                     key={tab.id}
                     value={tab.id}
-                    className="type-body-sm min-h-[40px] gap-1.5 border-none bg-transparent px-3 py-2 text-muted-foreground hover:bg-background hover:text-foreground data-active:bg-background data-active:text-foreground"
+                    className="type-body-sm min-h-[44px] gap-1.5 px-3 py-2"
                   >
                     <Icon size={13} />
                     {tab.label}

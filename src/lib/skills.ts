@@ -28,7 +28,7 @@ export const skills: Skill[] = [
     name: "Trend Scout",
     description: "Trending coins, new launches, gainers, and momentum signals.",
     longDescription:
-      "Watches trending coins, new launches, and top gainers on Zora. Returns coin name, address, market cap, volume, and 24h change as structured data. Spots momentum before it shows up on dashboards.",
+      "Watches trending coins, new launches, and top gainers on Zora.",
     risk: "none",
     riskLabel: "Read-only \u2014 no wallet needed",
     monitors: [
@@ -71,7 +71,7 @@ export const skills: Skill[] = [
     description:
       "Track creators, their coins, and holdings.",
     longDescription:
-      "Tracks creator coins and featured creators on Zora. Set up a watchlist, get alerts when activity spikes. Covers holdings, volume, and price movement for creators you follow.",
+      "Tracks creator coins and featured creators with watchlist alerts.",
     risk: "none",
     riskLabel: "Read-only \u2014 no wallet needed",
     monitors: [
@@ -110,7 +110,7 @@ Watchlist alert:
     description:
       'Scheduled digest: "what changed on Zora since last check?"',
     longDescription:
-      "Pulls trending, volume, creator, and new-launch data into a morning or evening briefing. Short summary instead of raw numbers.",
+      "Pulls market data into a structured morning or evening briefing.",
     risk: "none",
     riskLabel: "Read-only \u2014 no wallet needed",
     monitors: [
@@ -152,7 +152,7 @@ Nothing unusual detected. Market is moderately active.`,
     description:
       "Wallet balance and coin holdings. Read-only, Bankr-ready.",
     longDescription:
-      "Check any wallet's Zora coin holdings and ETH balance. Same read-only pattern as Bankr. No private key needed, just a wallet address.",
+      "Checks any wallet's Zora coin holdings and ETH balance.",
     risk: "none",
     riskLabel: "Read-only — wallet address only",
     monitors: [
@@ -202,7 +202,7 @@ Coins held: 3`,
     description:
       "Auto-buys trending Zora coins on momentum signals via Zora CLI.",
     longDescription:
-      "Monitors Trend Scout signals for volume spikes, new launches, and top gainers, then executes buys through the Zora CLI on Base. Configurable position size, trailing stops, and cooldown. Create a dedicated trader wallet with zora setup. Never use your personal wallet.",
+      "Monitors momentum signals and executes buys through Zora CLI on Base.",
     risk: "medium",
     riskLabel: "Execution-capable — dedicated wallet required",
     monitors: [

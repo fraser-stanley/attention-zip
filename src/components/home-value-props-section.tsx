@@ -1,7 +1,27 @@
-import { skills } from "@/lib/skills";
-
-const executionSkillCount = skills.filter((skill) => skill.risk !== "none").length;
-const readOnlySkillCount = skills.filter((skill) => skill.risk === "none").length;
+const valueProps = [
+  {
+    title: "Read the skill before it runs",
+    description: (
+      <>
+        Every install path points to a readable
+        <code className="mx-1 bg-muted px-1.5 py-0.5 text-[0.95em]">
+          SKILL.md
+        </code>
+        you can inspect first.
+      </>
+    ),
+  },
+  {
+    title: "Start without keys",
+    description:
+      "Trends, creators, briefings, and portfolio reads stay in scout mode until you choose otherwise.",
+  },
+  {
+    title: "Keep risk explicit",
+    description:
+      "Momentum Trader is labeled separately and belongs in a dedicated trader wallet with bounded funds.",
+  },
+] as const;
 
 export function HomeValuePropsSection() {
   return (
@@ -10,40 +30,22 @@ export function HomeValuePropsSection() {
         Why start here
       </h2>
 
-      <div className="grid gap-6 sm:grid-cols-3">
-        <div className="space-y-2">
-          <p className="text-[11px] font-mono uppercase tracking-widest text-muted-foreground">
-            Published source
-          </p>
-          <p className="text-base font-medium">Read the skill before it runs</p>
-          <p className="text-sm leading-6 text-muted-foreground">
-            Every install path points to a readable
-            <code className="mx-1 bg-muted px-1.5 py-0.5">SKILL.md</code>
-            you can inspect first.
-          </p>
-        </div>
-
-        <div className="space-y-2">
-          <p className="text-[11px] font-mono uppercase tracking-widest text-muted-foreground">
-            {readOnlySkillCount} read-only skills
-          </p>
-          <p className="text-base font-medium">Start without keys</p>
-          <p className="text-sm leading-6 text-muted-foreground">
-            Trends, creators, briefings, and portfolio reads stay in scout
-            mode until you choose otherwise.
-          </p>
-        </div>
-
-        <div className="space-y-2">
-          <p className="text-[11px] font-mono uppercase tracking-widest text-muted-foreground">
-            {executionSkillCount} execution path
-          </p>
-          <p className="text-base font-medium">Keep risk explicit</p>
-          <p className="text-sm leading-6 text-muted-foreground">
-            Momentum Trader is labeled separately and belongs in a dedicated
-            trader wallet with bounded funds.
-          </p>
-        </div>
+      <div className="grid gap-4 lg:grid-cols-3">
+        {valueProps.map((item) => (
+          <div
+            key={item.title}
+            className="min-h-[18rem] border border-border bg-card p-6 transition-colors duration-200 hover:border-foreground/20"
+          >
+            <div className="space-y-5">
+              <p className="max-w-[12ch] font-display text-hero font-medium leading-[1.1] tracking-tighter text-foreground">
+                {item.title}
+              </p>
+              <p className="max-w-[29ch] text-[1.05rem] leading-8 text-muted-foreground">
+                {item.description}
+              </p>
+            </div>
+          </div>
+        ))}
       </div>
     </section>
   );

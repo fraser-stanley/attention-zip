@@ -5,6 +5,14 @@ import { motion } from "motion/react";
 
 const EASE_OUT_QUINT = [0.23, 1, 0.32, 1] as const;
 
+const highlighterStyle: React.CSSProperties = {
+  backgroundColor: "transparent",
+  backgroundImage: "linear-gradient(#3FFF00, #3FFF00)",
+  backgroundRepeat: "no-repeat",
+  backgroundPosition: "left",
+  transformOrigin: "left bottom",
+};
+
 export function HighlighterStroke({ children }: { children: ReactNode }) {
   return (
     <motion.span
@@ -23,13 +31,7 @@ export function HighlighterStroke({ children }: { children: ReactNode }) {
           ease: EASE_OUT_QUINT,
         },
       }}
-      style={{
-        backgroundColor: "transparent",
-        backgroundImage: "linear-gradient(#3FFF00, #3FFF00)",
-        backgroundRepeat: "no-repeat",
-        backgroundPosition: "left",
-        transformOrigin: "left bottom",
-      }}
+      style={highlighterStyle}
     >
       {children}
     </motion.span>

@@ -92,7 +92,7 @@ function TerminalOutput({
     <pre
       ref={ref}
       id={id}
-      className="h-64 overflow-y-auto border border-border bg-foreground/5 px-4 py-3 font-mono text-sm text-foreground/80 whitespace-pre-wrap"
+      className={`h-64 overflow-y-auto ${PRE_BLOCK_CLASS}`}
     >
       {displayed}
       {!typingDone && (

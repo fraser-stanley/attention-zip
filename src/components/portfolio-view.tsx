@@ -17,7 +17,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 import { formatCompactCurrency } from "@/lib/zora";
-import { pnlColor, formatPnl, formatPct } from "@/lib/pnl-utils";
+import { formatPnl, formatPct } from "@/lib/pnl-utils";
 import { skills } from "@/lib/skills";
 import { MOCK_PORTFOLIO, type MockPosition } from "@/lib/portfolio-mock-data";
 import { ChartBarIncreasingIcon } from "@/components/ui/chart-bar-increasing";

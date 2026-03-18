@@ -1,5 +1,18 @@
 # Changelog
 
+## 2026-03-18 (Highlighter animation + homepage refinements)
+
+### Added
+- **Animated highlighter stroke** — hero heading text sweeps left-to-right like a real highlighter pen using motion/react `backgroundSize` animation with `ease-out-quint` easing, subtle `scaleY` press, and `-1.5deg` skew for a hand-drawn feel.
+- **`HighlighterStroke` component** (`src/components/highlighter-stroke.tsx`) — reusable animated highlight, used on homepage and trust page hero headings.
+- **`CopyableCodeBlock` component** (`src/components/copyable-code-block.tsx`) — shared terminal-style copy block used in hero and skills pages.
+- **Homepage get-started steps** and **works-with section** — new homepage content sections.
+- **PnL highlight badges** — gain/loss values in coin table and portfolio now use filled background badges instead of colored text.
+
+### Changed
+- `.highlight-block` padding tightened from `0.1em 0.3em` to `0.02em 0.15em` to hug letterforms.
+- Added `prefers-reduced-motion` CSS exemption for `.highlight-block` so motion/react controls the animation behavior (same pattern as the ticker fix).
+
 ## 2026-03-18 (Homepage terminal board)
 
 ### Added

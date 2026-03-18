@@ -56,7 +56,11 @@ src/
 │       └── agents/[address]/route.ts # Agent profile data
 ├── components/
 │   ├── nav.tsx                     # Navigation bar (7 sections incl. Portfolio)
-│   ├── hero-section.tsx            # Hero layout with orb + CTA (highlight-block headings)
+│   ├── hero-section.tsx            # Hero layout with orb + CTA (animated highlighter headings)
+│   ├── highlighter-stroke.tsx      # Reusable animated highlight sweep (motion/react backgroundSize)
+│   ├── copyable-code-block.tsx     # Terminal-style command block with copy button
+│   ├── home-get-started.tsx        # Homepage get-started steps section
+│   ├── home-works-with.tsx         # Homepage works-with logos section
 │   ├── hero-orb-glass.tsx          # Concrete dithered orb (R3F + spring click + velocity rotation)
 │   ├── hero-orb-glass-loader.tsx   # Dynamic import wrapper (ssr: false)
 │   ├── command-menu-loader.tsx     # Lazy client-only command menu mount
@@ -110,7 +114,7 @@ src/
 - **Agent profiles use mock PnL data** — `src/lib/agent-mock-data.ts` provides mock positions, trades, and sparkline for agent profile pages. Real profile data (holdings, created coins) comes from the SDK.
 - **PnL utilities are shared** — `src/lib/pnl-utils.ts` exports `pnlColor()`, `formatPnl()`, `formatPct()` used by both portfolio and agent profile pages. Gains = `#3FFF00`, losses = `#FF00F0`.
 - **Market colors stay full-strength** — use `#3FFF00`, `#FF00F0`, or no market color at all. Only neutral grays should be faded with opacity.
-- **Green highlight block treatment** — `.highlight-block` class in `globals.css` applies `#3FFF00` bg + black text with `box-decoration-break: clone` for per-line blocks. Used on hero heading and portfolio stat numbers. Primary button variant also uses `#3FFF00`.
+- **Animated highlighter stroke** — `HighlighterStroke` component (`src/components/highlighter-stroke.tsx`) animates a `#3FFF00` background sweep left-to-right using motion/react `backgroundSize` with `ease-out-quint` easing, subtle `scaleY` press from bottom-left, and `-1.5deg` skew for a hand-drawn feel. Used on hero headings (homepage, trust page). The `.highlight-block` CSS class provides the static base styles (color, padding, `box-decoration-break: clone`); the component overrides `background-color` to transparent and drives the background via inline `backgroundImage` + animated `backgroundSize`. A `prefers-reduced-motion` CSS exemption in `globals.css` prevents the blanket `transition-duration: 0.01ms !important` rule from killing the motion/react animation. Portfolio stat numbers still use the static `.highlight-block` class directly.
 
 ## Tone of voice
 

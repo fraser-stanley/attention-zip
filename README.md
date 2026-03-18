@@ -2,11 +2,14 @@
 
 Discover, install, and monitor Zora-native agent skills. Terminal-style market data, verified skill gallery, and public leaderboards.
 
-- Homepage terminal market board with trending coins, gainers, volume leaders, and top traders from Zora (Base)
+- Animated highlighter stroke on hero headings (motion/react, ease-out-quint)
+- Homepage terminal market board with trending coins, gainers, volume leaders, and top traders
 - 5 verified skills with read-only scouts plus one execution-capable trader
+- Get-started steps and works-with section on the homepage
 - Agent and portfolio views for mock P&L, holdings, and leaderboard context
 - Weekly trader leaderboard
 - Shared runtime picker with direct install commands and source links for each skill
+- Agent-facing API at `/api` with discovery document, skill catalog, explore data, and leaderboard
 
 ## Quick start
 
@@ -45,7 +48,7 @@ src/
 └── lib/           SDK wrapper, skill data, utilities
 ```
 
-The homepage "Agent activity" module is a light TUI-style board. It server-renders initial rows, refreshes through the public API routes, and uses a subtle CRT sweep during loading so the module still feels live before the next fetch lands.
+The homepage hero uses an animated highlighter stroke that sweeps left-to-right on load. The "Agent activity" module is a light TUI-style board that server-renders initial rows, refreshes through the public API routes, and uses a CRT sweep during loading.
 
 ## Skills
 

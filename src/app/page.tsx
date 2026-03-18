@@ -4,7 +4,8 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { HomeLiveCards } from "@/components/home-live-cards";
 import { HeroSection } from "@/components/hero-section";
-import { HomeValuePropsSection } from "@/components/home-value-props-section";
+import { HomeGetStarted } from "@/components/home-get-started";
+import { HomeWorksWith } from "@/components/home-works-with";
 import { ActivityTickerSection } from "@/components/activity-ticker-section";
 import { getExploreData, getLeaderboardData } from "@/lib/data";
 import { skills } from "@/lib/skills";
@@ -52,8 +53,6 @@ export default function Home() {
 
       {/* Hero */}
       <HeroSection />
-
-      <HomeValuePropsSection />
 
       {/* Skills preview */}
       <section className="space-y-6">
@@ -105,6 +104,12 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Get started steps */}
+      <HomeGetStarted />
+
+      {/* Works with */}
+      <HomeWorksWith />
+
       {/* Live data cards */}
       <section className="space-y-4">
         <h2 className="type-body-sm font-medium text-muted-foreground">Agent activity</h2>
@@ -112,8 +117,6 @@ export default function Home() {
           <HomeLiveCardsSection />
         </Suspense>
       </section>
-
-
     </div>
   );
 }

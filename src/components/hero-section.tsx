@@ -3,28 +3,42 @@
 import { Suspense } from "react";
 import Link from "next/link";
 import { buttonVariants } from "@/components/ui/button-variants";
+import { CopyableCodeBlock } from "@/components/copyable-code-block";
+import { HighlighterStroke } from "@/components/highlighter-stroke";
 import { HeroOrbGlassLoader } from "@/components/hero-orb-glass-loader";
 import { cn } from "@/lib/utils";
 
 export function HeroSection() {
   return (
     <section className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center pt-4 pb-8">
-      <div className="space-y-4">
+      <div className="space-y-5">
         <h1 className="type-display">
-          Give your agent
+          <HighlighterStroke>Attention moves fast.</HighlighterStroke>
           <br />
-          the Zora playbook.
+          Your agent keeps up.
         </h1>
         <p className="type-body-sm max-w-md text-muted-foreground">
-          Open-source skills for the Zora attention market. One command
-          to install. Read-only by default, no keys needed.
+          Open-source skills for the Zora attention market, from trending coins
+          to execution. One command to install, read-only by default.
         </p>
-        <Link
-          href="/skills"
-          className={cn(buttonVariants({ size: "default" }), "px-8")}
-        >
-          Get started
-        </Link>
+        <CopyableCodeBlock
+          command="install skill from https://skills.zora.co/api/skills?id=trend-scout"
+          className="max-w-lg"
+        />
+        <div className="flex items-center gap-3">
+          <Link
+            href="/skills"
+            className={cn(buttonVariants({ size: "default" }), "px-8")}
+          >
+            Browse skills
+          </Link>
+          <Link
+            href="/trust"
+            className={buttonVariants({ variant: "outline", size: "default" })}
+          >
+            How it works
+          </Link>
+        </div>
       </div>
 
       <div className="flex justify-center lg:justify-end">

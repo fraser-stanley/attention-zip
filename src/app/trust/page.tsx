@@ -1,3 +1,5 @@
+import { HighlighterStroke } from "@/components/highlighter-stroke";
+
 const boundaries = [
   "Hold or manage private keys",
   "Submit transactions on your behalf",
@@ -14,7 +16,7 @@ export default function TrustPage() {
         <p className="type-label text-muted-foreground">Trust &amp; Safety</p>
         <h1 className="type-display mt-6 max-w-4xl">
           We publish source.{" "}
-          <span className="highlight-block">You control execution.</span>
+          <HighlighterStroke>You control execution.</HighlighterStroke>
         </h1>
         <p className="type-body mt-8 max-w-2xl text-muted-foreground">
           How this works and how to keep your wallet safe.

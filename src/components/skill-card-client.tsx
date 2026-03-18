@@ -7,9 +7,9 @@ import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button-variants";
 import { ArrowUpRightIcon } from "@/components/ui/arrow-up-right";
 import { CheckIcon } from "@/components/ui/check";
-import { CopyIcon } from "@/components/ui/copy";
 import { PlusIcon } from "@/components/ui/plus";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { CopyableCodeBlock } from "@/components/copyable-code-block";
 import { useToast } from "@/components/toast";
 import { useExpandableMemory } from "@/hooks/use-expandable-memory";
 import { useSessionStorageState } from "@/hooks/use-session-storage-state";
@@ -68,65 +68,37 @@ function isMethod(value: string | null): value is Method {
   return value === "cli" || value === "openclaw" || value === "manual";
 }
 
-const CODE_BLOCK_CLASS =
-  "overflow-x-auto border border-border bg-muted/50 p-4 font-mono dark:bg-muted/30";
+const PRE_BLOCK_CLASS =
+  "border border-border bg-foreground/5 px-4 py-3 font-mono text-sm text-foreground/80 whitespace-pre-wrap break-all";
 
-function CopyIconButton({
-  text,
-  className,
-  label = "Copy command",
-  toastMessage = "Copied to clipboard",
+function TerminalOutput({
+  id,
+  displayed,
+  typingDone,
 }: {
-  text: string;
-  className?: string;
-  label?: string;
-  toastMessage?: string;
+  id: string;
+  displayed: string;
+  typingDone: boolean;
 }) {
-  const [copied, setCopied] = useState(false);
-  const timeoutRef = useRef<number | null>(null);
-  const { toast } = useToast();
+  const ref = useRef<HTMLPreElement>(null);
 
   useEffect(() => {
-    return () => {
-      if (timeoutRef.current !== null) {
-        window.clearTimeout(timeoutRef.current);
-      }
-    };
-  }, []);
-
-  async function handleCopy() {
-    try {
-      await navigator.clipboard.writeText(text);
-      setCopied(true);
-      toast(toastMessage);
-    } catch {
-      setCopied(false);
-      return;
+    if (ref.current) {
+      ref.current.scrollTop = ref.current.scrollHeight;
     }
-
-    if (timeoutRef.current !== null) {
-      window.clearTimeout(timeoutRef.current);
-    }
-
-    timeoutRef.current = window.setTimeout(() => {
-      setCopied(false);
-    }, 2000);
-  }
+  }, [displayed]);
 
   return (
-    <button
-      type="button"
-      onClick={handleCopy}
-      className={cn(
-        buttonVariants({ variant: "ghost", size: "icon" }),
-        "text-muted-foreground hover:text-foreground",
-        className
-      )}
-      aria-label={copied ? "Copied" : label}
-      aria-live="polite"
+    <pre
+      ref={ref}
+      id={id}
+      className="h-64 overflow-y-auto border border-border bg-foreground/5 px-4 py-3 font-mono text-sm text-foreground/80 whitespace-pre-wrap"
     >
-      {copied ? <CheckIcon size={16} /> : <CopyIcon size={16} />}
-    </button>
+      {displayed}
+      {!typingDone && (
+        <span className="animate-blink">&#9608;</span>
+      )}
+    </pre>
   );
 }
 
@@ -162,28 +134,6 @@ function InstallMethodPicker({
           </TabsList>
         </Tabs>
       </div>
-    </div>
-  );
-}
-
-function InstallCommandPanel({
-  skillName,
-  command,
-}: {
-  skillName: string;
-  command: string;
-}) {
-  return (
-    <div className="relative">
-      <CopyIconButton
-        text={command}
-        label={`Copy ${skillName} install command`}
-        toastMessage={`${skillName} command copied`}
-        className="absolute right-1.5 top-1.5 z-10"
-      />
-      <pre className={cn(CODE_BLOCK_CLASS, "type-body-sm pr-16 whitespace-pre-wrap break-all")}>
-        <code>{command}</code>
-      </pre>
     </div>
   );
 }
@@ -332,12 +282,12 @@ function SkillRow({
         )}
 
         {/* Install command */}
-        <InstallCommandPanel skillName={skill.name} command={command} />
+        <CopyableCodeBlock command={command} />
 
         {/* Commands — always visible */}
         <div>
           <p className="type-label mb-2 text-muted-foreground">Commands</p>
-          <pre className={cn(CODE_BLOCK_CLASS, "type-caption whitespace-pre-wrap break-all")}>
+          <pre className={PRE_BLOCK_CLASS}>
             {skill.wraps.join("\n")}
           </pre>
         </div>
@@ -382,17 +332,9 @@ function SkillRow({
           </a>
         </div>
 
-        {/* Expandable sample output — typewriter effect */}
+        {/* Expandable sample output — fixed-height terminal with auto-scroll */}
         {expandedOutput ? (
-          <pre
-            id={outputId}
-            className={cn(CODE_BLOCK_CLASS, "type-caption whitespace-pre-wrap")}
-          >
-            {displayed}
-            {!typingDone && (
-              <span className="animate-blink">&#9608;</span>
-            )}
-          </pre>
+          <TerminalOutput id={outputId} displayed={displayed} typingDone={typingDone} />
         ) : null}
       </div>
     </section>

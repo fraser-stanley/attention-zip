@@ -173,6 +173,10 @@
     animation-duration: 30s !important;
     animation-iteration-count: infinite !important;
   }
+  /* Highlight sweep is controlled by motion/react which handles reduced-motion via useReducedMotion() */
+  .highlight-block {
+    transition-duration: unset !important;
+  }
 }
 
 @keyframes ticker-scroll {
@@ -195,7 +199,7 @@
 .highlight-block {
   background-color: #3FFF00;
   color: black;
-  padding: 0.1em 0.3em;
+  padding: 0.02em 0.15em;
   box-decoration-break: clone;
   -webkit-box-decoration-break: clone;
   display: inline;

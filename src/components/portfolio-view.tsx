@@ -52,8 +52,10 @@ function PnlStats() {
           <span className="highlight-block">{formatPnl(pnl.totalPnl)}</span>
           <span className="type-body-sm ml-1.5 font-mono text-muted-foreground">USDC</span>
         </p>
-        <p className={`type-caption font-mono ${pnlColor(pnl.totalPnlPct)}`}>
-          {formatPct(pnl.totalPnlPct)} ROI
+        <p className="type-caption font-mono">
+          <span className={`inline-flex items-center px-1.5 py-0.5 ${pnlHighlightClass(pnl.totalPnlPct)}`}>
+            {formatPct(pnl.totalPnlPct)} ROI
+          </span>
         </p>
       </div>
 
@@ -214,9 +216,11 @@ function HistoryContent() {
             <TableCell className="type-body-sm text-right font-mono">
               ${trade.amount.toLocaleString()}
             </TableCell>
-            <TableCell className={`type-body-sm text-right font-mono ${pnlColor(trade.pnl)}`}>
-              {formatPnl(trade.pnl)}
-              <span className="type-caption ml-1">{formatPct(trade.pct)}</span>
+            <TableCell className="type-body-sm text-right font-mono">
+              <span className={`inline-flex items-center px-1.5 py-0.5 font-medium ${pnlHighlightClass(trade.pnl)}`}>
+                {formatPnl(trade.pnl)}
+                <span className="type-caption ml-1">{formatPct(trade.pct)}</span>
+              </span>
             </TableCell>
             <TableCell className="type-body-sm hidden text-right text-muted-foreground sm:table-cell">
               {trade.date}

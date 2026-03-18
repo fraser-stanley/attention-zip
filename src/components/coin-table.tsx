@@ -117,16 +117,18 @@ export function CoinTable({
               <TableCell className="type-body-sm text-right font-mono">
                 {formatCompactCurrency(coin.volume24h)}
               </TableCell>
-              <TableCell
-                className={`type-body-sm text-right font-mono ${
-                  change.positive === true
-                    ? "text-[#3FFF00]"
-                    : change.positive === false
-                    ? "text-[#FF00F0]"
-                    : "text-muted-foreground"
-                }`}
-              >
-                {change.value}
+              <TableCell className="type-body-sm text-right font-mono">
+                {change.positive !== null ? (
+                  <span
+                    className={`inline-flex items-center px-1.5 py-0.5 font-medium ${
+                      change.positive ? "bg-[#3FFF00] text-black" : "bg-[#FF00F0] text-black"
+                    }`}
+                  >
+                    {change.value}
+                  </span>
+                ) : (
+                  <span className="text-muted-foreground">{change.value}</span>
+                )}
               </TableCell>
             </TableRow>
           );

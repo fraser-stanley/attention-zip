@@ -77,7 +77,7 @@ export default function Home() {
           {skills.slice(0, 4).map((skill) => (
             <Card
               key={skill.id}
-              className="hover:border-foreground/30"
+              className="border-border bg-foreground/5 text-foreground hover:border-foreground/15 hover:bg-foreground/[0.07]"
             >
               <CardHeader className="pb-2">
                 <CardTitle className="text-base">{skill.name}</CardTitle>
@@ -91,7 +91,11 @@ export default function Home() {
                     <Badge
                       key={badge}
                       variant={badge === "Execution" ? "default" : "outline"}
-                      className={`text-xs font-normal ${badge === "Execution" ? "bg-amber-500/20 text-amber-300 border-amber-500/30" : ""}`}
+                      className={`text-xs font-normal ${
+                        badge === "Execution"
+                          ? "border-[#3FFF00]/40 bg-[#3FFF00]/14 text-foreground"
+                          : "border-border bg-background/70 text-foreground/78"
+                      }`}
                     >
                       {badge}
                     </Badge>

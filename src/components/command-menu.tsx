@@ -141,7 +141,7 @@ const searchItems = [...pages, ...skillItems, ...dashboardItems];
 const itemById = new Map(searchItems.map((item) => [item.id, item]));
 
 const groupHeadingClass =
-  "[&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:py-1.5 [&_[cmdk-group-heading]]:text-xs [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:uppercase [&_[cmdk-group-heading]]:tracking-wider [&_[cmdk-group-heading]]:text-muted-foreground";
+  "[&_[cmdk-group-heading]]:type-label [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:py-1.5 [&_[cmdk-group-heading]]:text-muted-foreground";
 
 const itemClass =
   "group/item cursor-pointer rounded-lg px-3 py-3 text-left outline-none data-[selected=true]:bg-foreground data-[selected=true]:text-background";
@@ -218,20 +218,20 @@ function SearchResultItem({
     >
       <div className="min-w-0">
         <div className="flex flex-wrap items-center gap-2">
-          <span className="text-sm">{item.title}</span>
+          <span className="type-body-sm">{item.title}</span>
           {item.meta ? (
-            <span className="rounded-full border border-border/70 px-2 py-0.5 text-[11px] font-mono text-muted-foreground group-data-[selected=true]/item:border-background/20 group-data-[selected=true]/item:text-background/70">
+            <span className="type-caption rounded-full border border-border/70 px-2 py-0.5 font-mono text-muted-foreground group-data-[selected=true]/item:border-background/20 group-data-[selected=true]/item:text-background/70">
               {item.meta}
             </span>
           ) : null}
         </div>
-        <span className="mt-1 block text-xs text-muted-foreground group-data-[selected=true]/item:text-background/70">
+        <span className="type-caption mt-1 block text-muted-foreground group-data-[selected=true]/item:text-background/70">
           {item.breadcrumb}
         </span>
       </div>
 
       {recentQuery ? (
-        <span className="shrink-0 text-[11px] font-mono text-muted-foreground group-data-[selected=true]/item:text-background/70">
+        <span className="type-caption shrink-0 font-mono text-muted-foreground group-data-[selected=true]/item:text-background/70">
           “{recentQuery}”
         </span>
       ) : null}
@@ -324,7 +324,7 @@ export function CommandMenu() {
       />
 
       <Command.List className="max-h-[26rem] overflow-y-auto p-2">
-        <Command.Empty className="px-4 py-8 text-center text-sm text-muted-foreground">
+        <Command.Empty className="type-body-sm px-4 py-8 text-center text-muted-foreground">
           No matches for <span className="font-mono text-foreground">{query}</span>.
         </Command.Empty>
 
@@ -360,14 +360,14 @@ export function CommandMenu() {
         </Command.Group>
       </Command.List>
 
-      <div className="flex items-center justify-between border-t border-border px-4 py-2 text-xs font-mono text-muted-foreground">
+      <div className="type-caption flex items-center justify-between border-t border-border px-4 py-2 font-mono text-muted-foreground">
         <span>{modKey}K</span>
         <div className="flex items-center gap-2">
-          <kbd className="border border-border px-1.5 py-0.5 text-[11px]">↑↓</kbd>
+          <kbd className="type-caption border border-border px-1.5 py-0.5">↑↓</kbd>
           <span>select</span>
-          <kbd className="border border-border px-1.5 py-0.5 text-[11px]">↵</kbd>
+          <kbd className="type-caption border border-border px-1.5 py-0.5">↵</kbd>
           <span>open</span>
-          <kbd className="border border-border px-1.5 py-0.5 text-[11px]">esc</kbd>
+          <kbd className="type-caption border border-border px-1.5 py-0.5">esc</kbd>
           <span>close</span>
         </div>
       </div>

@@ -188,11 +188,11 @@ export function Nav() {
                     onMouseEnter={() => iconRefs[section.id]?.current?.startAnimation()}
                     onMouseLeave={() => iconRefs[section.id]?.current?.stopAnimation()}
                   >
-                    <span className="text-sm font-medium uppercase tracking-wider flex items-center gap-2">
+                    <span className="type-body-sm flex items-center gap-2 font-medium uppercase">
                       {iconComponents[section.id]}
                       {section.label}
                     </span>
-                    <p className="text-xs text-white/50 group-hover:text-black/60">
+                    <p className="type-caption text-white/50 group-hover:text-black/60">
                       {section.description}
                     </p>
                   </Link>

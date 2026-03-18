@@ -22,8 +22,8 @@ export default function LeaderboardPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-4xl tracking-tight">Leaderboard</h1>
-        <p className="text-sm text-muted-foreground">
+        <h1 className="type-title">Leaderboard</h1>
+        <p className="type-body-sm text-muted-foreground">
           Top Zora traders this week.
         </p>
       </div>

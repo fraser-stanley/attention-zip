@@ -101,10 +101,8 @@ function InstallMethodPicker({
   return (
     <div className="mb-10 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
       <div className="space-y-1">
-        <p className="text-[11px] font-mono uppercase tracking-widest text-muted-foreground">
-          Install flow
-        </p>
-        <p className="max-w-xl text-sm leading-6 text-muted-foreground">
+        <p className="type-label text-muted-foreground">Install flow</p>
+        <p className="type-body-sm max-w-xl text-muted-foreground">
           Pick a runtime. Every command below updates to match, and the
           choice sticks for this session.
         </p>
@@ -124,7 +122,7 @@ function InstallMethodPicker({
             <TabsTrigger
               key={item}
               value={item}
-              className="min-h-[44px] rounded-none border-none bg-transparent px-3 py-3 text-[13px] font-medium text-muted-foreground hover:bg-background hover:text-foreground data-active:bg-background data-active:text-foreground lg:px-4"
+              className="type-body-sm min-h-[44px] rounded-none border-none bg-transparent px-3 py-3 font-medium text-muted-foreground hover:bg-background hover:text-foreground data-active:bg-background data-active:text-foreground lg:px-4"
             >
               <span>{INSTALL_METHOD_LABELS[item]}</span>
             </TabsTrigger>
@@ -156,7 +154,7 @@ function InstallCommandPanel({
             : ""
         )}
       />
-      <pre className="overflow-x-auto bg-muted/40 p-4 pr-14 text-sm font-mono leading-6 whitespace-pre-wrap break-all sm:p-5 sm:pr-16">
+      <pre className="type-body-sm overflow-x-auto bg-muted/40 p-4 pr-14 font-mono whitespace-pre-wrap break-all sm:p-5 sm:pr-16">
         <code>{command}</code>
       </pre>
     </div>
@@ -172,10 +170,8 @@ function SkillDetail({ skill }: { skill: Skill }) {
     <div className="mt-6 grid gap-6 border-t border-border/70 pt-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)]">
       <div className="grid gap-6 sm:grid-cols-2">
         <div>
-          <h3 className="mb-3 text-[11px] font-mono uppercase tracking-widest text-muted-foreground">
-            What it monitors
-          </h3>
-          <ul className="space-y-1.5 text-sm text-muted-foreground">
+          <h3 className="type-label mb-3 text-muted-foreground">What it monitors</h3>
+          <ul className="type-body-sm space-y-1.5 text-muted-foreground">
             {skill.monitors.map((monitor) => (
               <li key={monitor} className="flex items-center gap-2">
                 <span className="h-1.5 w-1.5 rounded-full bg-muted-foreground/40" />
@@ -186,14 +182,12 @@ function SkillDetail({ skill }: { skill: Skill }) {
         </div>
 
         <div>
-          <h3 className="mb-3 text-[11px] font-mono uppercase tracking-widest text-muted-foreground">
-            Commands wrapped
-          </h3>
+          <h3 className="type-label mb-3 text-muted-foreground">Commands wrapped</h3>
           <div className="space-y-1.5">
             {skill.wraps.map((command) => (
               <code
                 key={command}
-                className="block border border-border bg-muted/40 px-3 py-2 text-xs font-mono break-all"
+                className="type-caption block border border-border bg-muted/40 px-3 py-2 font-mono break-all"
               >
                 {command}
               </code>
@@ -204,10 +198,8 @@ function SkillDetail({ skill }: { skill: Skill }) {
 
       <div className="space-y-3">
         <div>
-          <p className="mb-2 text-[11px] font-mono uppercase tracking-widest text-muted-foreground">
-            Sample prompt
-          </p>
-          <div className="border border-border bg-muted/40 p-3 text-sm italic leading-6">
+          <p className="type-label mb-2 text-muted-foreground">Sample prompt</p>
+          <div className="type-body-sm border border-border bg-muted/40 p-3 italic">
             &ldquo;{skill.samplePrompt}&rdquo;
           </div>
         </div>
@@ -216,7 +208,7 @@ function SkillDetail({ skill }: { skill: Skill }) {
           type="button"
           className={cn(
             buttonVariants({ variant: "ghost", size: "sm" }),
-            "h-auto px-0 text-sm text-foreground hover:bg-transparent"
+            "type-body-sm h-auto px-0 text-foreground hover:bg-transparent"
           )}
           aria-expanded={expandedOutput}
           aria-controls={outputId}
@@ -232,7 +224,7 @@ function SkillDetail({ skill }: { skill: Skill }) {
         {expandedOutput ? (
           <pre
             id={outputId}
-            className="overflow-x-auto border border-border bg-muted/40 p-4 text-xs font-mono leading-6 whitespace-pre-wrap"
+            className="type-caption overflow-x-auto border border-border bg-muted/40 p-4 font-mono whitespace-pre-wrap"
           >
             {skill.sampleOutput}
           </pre>
@@ -288,7 +280,7 @@ function InstallButton({
   if (state === "installed") {
     return (
       <div className="flex flex-wrap items-center gap-2">
-        <div className="inline-flex min-h-[44px] items-center gap-2 bg-[#3FFF00] px-4 py-2.5 text-sm font-medium text-black">
+        <div className="type-body-sm inline-flex min-h-[44px] items-center gap-2 bg-[#3FFF00] px-4 py-2.5 font-medium text-black">
           <CheckIcon size={14} />
           Installed
         </div>
@@ -311,7 +303,7 @@ function InstallButton({
       <button
         type="button"
         disabled
-        className="inline-flex min-h-[44px] w-full items-center justify-center gap-2 border border-border px-4 py-2.5 text-sm font-medium text-muted-foreground sm:w-auto"
+        className="type-body-sm inline-flex min-h-[44px] w-full items-center justify-center gap-2 border border-border px-4 py-2.5 font-medium text-muted-foreground sm:w-auto"
       >
         <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-muted-foreground/20 border-t-muted-foreground" />
         Installing...
@@ -355,20 +347,16 @@ function SkillRow({
     >
       <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(19rem,23rem)] lg:gap-12">
         <div className="space-y-5">
-          <p className="text-[11px] font-mono uppercase tracking-widest text-muted-foreground">
-            Skill {String(index + 1).padStart(2, "0")}
-          </p>
+          <p className="type-label text-muted-foreground">Skill {String(index + 1).padStart(2, "0")}</p>
 
           <div className="space-y-2">
-            <h2 className="text-2xl font-medium tracking-[-0.03em] sm:text-[2rem]">
-              {skill.name}
-            </h2>
-            <p className="max-w-2xl text-sm leading-6 text-muted-foreground sm:text-base">
+            <h2 className="type-section">{skill.name}</h2>
+            <p className="type-body max-w-2xl text-muted-foreground">
               {skill.description}
             </p>
           </div>
 
-          <p className="max-w-2xl text-sm leading-6 text-muted-foreground">
+          <p className="type-body max-w-2xl text-muted-foreground">
             {skill.longDescription}
           </p>
 
@@ -377,7 +365,7 @@ function SkillRow({
               <Badge
                 key={badge}
                 variant={badge === "Execution" ? "default" : "outline"}
-                className={cn("text-xs font-normal", badgeClassName(badge))}
+                className={cn("type-caption font-normal", badgeClassName(badge))}
               >
                 {badge}
               </Badge>
@@ -393,7 +381,7 @@ function SkillRow({
               type="button"
               className={cn(
                 buttonVariants({ variant: "ghost", size: "sm" }),
-                "h-auto px-0 text-sm text-foreground hover:bg-transparent"
+                "type-body-sm h-auto px-0 text-foreground hover:bg-transparent"
               )}
               aria-expanded={expanded}
               aria-controls={detailId}
@@ -407,7 +395,7 @@ function SkillRow({
             </button>
           </div>
 
-          <div className="flex flex-wrap items-center gap-4 text-xs font-mono text-muted-foreground">
+          <div className="type-caption flex flex-wrap items-center gap-4 font-mono text-muted-foreground">
             <a
               href={skill.githubUrl}
               target="_blank"

@@ -35,10 +35,10 @@ export function Footer() {
     <footer className="border-t border-background/10 bg-foreground text-background mt-16">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
         <div className="flex items-center justify-between border-b border-background/10 pb-6 mb-6">
-          <span className="text-xs font-mono uppercase tracking-wider text-background/50">
+          <span className="type-label text-background/50">
             Attention Index
           </span>
-          <span className="text-xs font-mono text-background/30">
+          <span className="type-caption font-mono text-background/30">
             v{API_VERSION}
           </span>
         </div>
@@ -46,7 +46,7 @@ export function Footer() {
         <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
           {columns.map((col) => (
             <div key={col.title}>
-              <h3 className="text-xs font-mono uppercase tracking-wider text-background/50 mb-3">
+              <h3 className="type-label mb-3 text-background/50">
                 {col.title}
               </h3>
               <ul className="space-y-1.5">
@@ -57,7 +57,7 @@ export function Footer() {
                         href={link.href}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1 text-xs font-mono text-background/70 transition-colors duration-150 hover:text-background"
+                        className="type-caption inline-flex items-center gap-1 font-mono text-background/70 transition-colors duration-150 hover:text-background"
                       >
                         {link.label}
                         <ArrowUpRightIcon size={12} />
@@ -65,7 +65,7 @@ export function Footer() {
                     ) : (
                       <Link
                         href={link.href}
-                        className="text-xs font-mono text-background/70 transition-colors duration-150 hover:text-background"
+                        className="type-caption font-mono text-background/70 transition-colors duration-150 hover:text-background"
                       >
                         {link.label}
                       </Link>
@@ -77,20 +77,20 @@ export function Footer() {
           ))}
 
           <div>
-            <h3 className="text-xs font-mono uppercase tracking-wider text-background/50 mb-3">
+            <h3 className="type-label mb-3 text-background/50">
               Legal
             </h3>
-            <p className="text-xs font-mono text-background/70">
+            <p className="type-caption font-mono text-background/70">
               Open source. No custody. No keys.
             </p>
           </div>
         </div>
 
         <div className="mt-8 pt-4 border-t border-background/10 flex items-center justify-between">
-          <p className="text-xs font-mono text-background/30">
+          <p className="type-caption font-mono text-background/30">
             &copy; {new Date().getFullYear()} Attention Index
           </p>
-          <p className="text-xs font-mono text-background/30">
+          <p className="type-caption font-mono text-background/30">
             Read-only by default
           </p>
         </div>

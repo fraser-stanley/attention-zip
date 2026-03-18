@@ -2,7 +2,7 @@
 
 import type { ReactNode } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import type {
   CoinNode,
@@ -19,9 +19,9 @@ import { ActivityIcon } from "@/components/ui/activity";
 type HomeCardSort = "trending" | "gainers" | "volume";
 
 const cardIcons: Record<HomeCardSort, ReactNode> = {
-  trending: <FlameIcon size={14} />,
-  gainers: <TrendingUpIcon size={14} />,
-  volume: <ChartBarIncreasingIcon size={14} />,
+  trending: <FlameIcon size={12} />,
+  gainers: <TrendingUpIcon size={12} />,
+  volume: <ChartBarIncreasingIcon size={12} />,
 };
 
 function CoinCard({
@@ -54,10 +54,10 @@ function CoinCard({
   return (
     <Card>
       <CardHeader className="pb-2">
-        <CardTitle className="text-xs font-medium text-muted-foreground flex items-center gap-1.5">
+        <div className="type-caption flex items-center gap-1.5 text-muted-foreground">
           {cardIcons[sort]}
           {title}
-        </CardTitle>
+        </div>
       </CardHeader>
       <CardContent className="space-y-2">
         {isLoading ? (
@@ -75,7 +75,7 @@ function CoinCard({
             return (
               <div
                 key={coin.address ?? i}
-                className="flex items-center justify-between text-sm px-1 -mx-1 py-0.5"
+                className="type-body-sm -mx-1 flex items-center justify-between px-1 py-0.5"
               >
                 <span className="truncate font-medium">
                   {coin.name ?? "Unknown"}
@@ -85,7 +85,7 @@ function CoinCard({
                     {formatCompactCurrency(coin.marketCap)}
                   </span>
                   <span
-                    className={`font-mono text-xs ${
+                    className={`type-caption font-mono ${
                       change.positive === true
                         ? "text-[#3FFF00]"
                         : change.positive === false
@@ -126,10 +126,10 @@ function LeaderboardCard({ initialTraders }: { initialTraders?: TraderNode[] }) 
   return (
     <Card>
       <CardHeader className="pb-2">
-        <CardTitle className="text-xs font-medium text-muted-foreground flex items-center gap-1.5">
-          <ActivityIcon size={14} />
+        <div className="type-caption flex items-center gap-1.5 text-muted-foreground">
+          <ActivityIcon size={12} />
           Top traders
-        </CardTitle>
+        </div>
       </CardHeader>
       <CardContent className="space-y-2">
         {isLoading ? (
@@ -142,9 +142,9 @@ function LeaderboardCard({ initialTraders }: { initialTraders?: TraderNode[] }) 
           (data?.traders ?? []).map((trader, i) => (
             <div
               key={trader.address ?? i}
-              className="flex items-center justify-between text-sm px-1 -mx-1 py-0.5"
+              className="type-body-sm -mx-1 flex items-center justify-between px-1 py-0.5"
             >
-              <span className="truncate font-mono text-xs">
+              <span className="type-caption truncate font-mono">
                 {truncateAddress(trader.address ?? "")}
               </span>
               <span className="text-muted-foreground shrink-0">

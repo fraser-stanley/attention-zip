@@ -41,7 +41,7 @@ export function LeaderboardTable({
 
   if (error) {
     return (
-      <div className="py-8 text-center text-sm text-muted-foreground">
+      <div className="type-body-sm py-8 text-center text-muted-foreground">
         Failed to load leaderboard. Try refreshing.
       </div>
     );
@@ -61,21 +61,21 @@ export function LeaderboardTable({
     <Table>
       <TableHeader>
         <TableRow>
-          <TableHead className="w-12">Rank</TableHead>
-          <TableHead>Address</TableHead>
-          <TableHead className="text-right">Volume</TableHead>
+          <TableHead className="type-label w-12">Rank</TableHead>
+          <TableHead className="type-label">Address</TableHead>
+          <TableHead className="type-label text-right">Volume</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
         {(data?.traders ?? []).map((trader, index) => (
           <TableRow key={trader.address ?? index}>
-            <TableCell className="font-mono text-sm text-muted-foreground">
+            <TableCell className="type-body-sm font-mono text-muted-foreground">
               #{index + 1}
             </TableCell>
-            <TableCell className="font-mono text-sm">
+            <TableCell className="type-body-sm font-mono">
               {truncateAddress(trader.address ?? "")}
             </TableCell>
-            <TableCell className="text-right font-mono text-sm">
+            <TableCell className="type-body-sm text-right font-mono">
               {formatCompactCurrency(trader.volume)}
             </TableCell>
           </TableRow>

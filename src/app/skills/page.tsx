@@ -37,48 +37,42 @@ export default function SkillsPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(skillJsonLd) }}
       />
       <section className="space-y-4">
-            <h1 className="max-w-5xl font-display text-[clamp(3rem,6vw,5rem)] font-bold leading-[0.94] tracking-tight pt-[0.06em]">
-              Published skills for the runtime you already use.
-            </h1>
-            <p className="max-w-2xl text-base leading-7 text-muted-foreground">
-              Every skill is a <code className="bg-muted px-1.5 py-0.5">SKILL.md</code> we wrote and
+        <h1 className="type-display max-w-5xl pt-[0.06em] leading-[0.94]">
+          Published skills for the runtime you already use.
+        </h1>
+        <p className="type-body max-w-2xl text-muted-foreground">
+          Every skill is a <code className="bg-muted px-1.5 py-0.5">SKILL.md</code> we wrote and
               reviewed. Pick <strong>Zora CLI</strong>, <strong>OpenClaw</strong>,
               or manual install, then inspect the command and source
               before you enable anything.
-            </p>
-            <p className="text-sm leading-6 text-muted-foreground">
-              {skills.length} reviewed skills. 3 install paths. {executionSkillCount} execution
-              skill, clearly labeled.
-            </p>
+        </p>
+        <p className="type-body-sm text-muted-foreground">
+          {skills.length} reviewed skills. 3 install paths. {executionSkillCount} execution
+          skill, clearly labeled.
+        </p>
       </section>
 
       <section className="grid max-w-5xl gap-6 sm:grid-cols-3">
         <div className="space-y-2">
-          <p className="text-[11px] font-mono uppercase tracking-widest text-muted-foreground">
-            01
-          </p>
-          <h2 className="text-base font-medium">Choose a runtime once</h2>
-          <p className="text-sm leading-6 text-muted-foreground">
+          <p className="type-label text-muted-foreground">01</p>
+          <h2 className="type-card-title">Choose a runtime once</h2>
+          <p className="type-body-sm text-muted-foreground">
             Switch between Zora CLI, OpenClaw, or manual install. The choice
             persists while you move around the site.
           </p>
         </div>
         <div className="space-y-2">
-          <p className="text-[11px] font-mono uppercase tracking-widest text-muted-foreground">
-            02
-          </p>
-          <h2 className="text-base font-medium">Copy the exact command</h2>
-          <p className="text-sm leading-6 text-muted-foreground">
+          <p className="type-label text-muted-foreground">02</p>
+          <h2 className="type-card-title">Copy the exact command</h2>
+          <p className="type-body-sm text-muted-foreground">
             Each skill shows the install command for your chosen runtime.
             Copy and run.
           </p>
         </div>
         <div className="space-y-2">
-          <p className="text-[11px] font-mono uppercase tracking-widest text-muted-foreground">
-            03
-          </p>
-          <h2 className="text-base font-medium">Verify the scope</h2>
-          <p className="text-sm leading-6 text-muted-foreground">
+          <p className="type-label text-muted-foreground">03</p>
+          <h2 className="type-card-title">Verify the scope</h2>
+          <p className="type-body-sm text-muted-foreground">
             Read the source, commands, prompts, and example output before
             your agent runs anything.
           </p>

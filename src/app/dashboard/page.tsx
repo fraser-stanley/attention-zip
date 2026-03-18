@@ -29,8 +29,8 @@ export default function DashboardPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-4xl tracking-tight">Live Dashboard</h1>
-        <p className="text-sm text-muted-foreground">
+        <h1 className="type-title">Live Dashboard</h1>
+        <p className="type-body-sm text-muted-foreground">
           Zora market data, refreshed every 30 seconds.
         </p>
       </div>

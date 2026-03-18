@@ -12,10 +12,10 @@ import { AnimatedArrowLink } from "@/components/animated-arrow-link";
 
 async function HomeLiveCardsSection() {
   const [trending, gainers, volume, traders] = await Promise.all([
-    getExploreData("trending", 3),
-    getExploreData("gainers", 3),
-    getExploreData("volume", 3),
-    getLeaderboardData(3),
+    getExploreData("trending", 8),
+    getExploreData("gainers", 8),
+    getExploreData("volume", 8),
+    getLeaderboardData(8),
   ]);
 
   return (
@@ -28,21 +28,16 @@ async function HomeLiveCardsSection() {
 
 function HomeLiveCardsSkeleton() {
   return (
-    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-      {Array.from({ length: 4 }).map((_, index) => (
-        <Card key={index}>
-          <CardHeader className="pb-2">
-            <div className="type-caption uppercase text-muted-foreground">
-              <Skeleton className="h-4 w-24" />
-            </div>
-          </CardHeader>
-          <CardContent className="space-y-2">
-            <Skeleton className="h-5 w-full" />
-            <Skeleton className="h-5 w-full" />
-            <Skeleton className="h-5 w-full" />
-          </CardContent>
-        </Card>
-      ))}
+    <div className="border border-border bg-card">
+      <div className="flex items-center justify-between border-b border-border px-4 py-3">
+        <Skeleton className="h-4 w-28" />
+        <Skeleton className="h-4 w-24" />
+      </div>
+      <div className="space-y-2 px-4 py-4">
+        {Array.from({ length: 8 }).map((_, index) => (
+          <Skeleton key={index} className="h-11 w-full" />
+        ))}
+      </div>
     </div>
   );
 }
@@ -112,10 +107,7 @@ export default function Home() {
 
       {/* Live data cards */}
       <section className="space-y-4">
-        <div className="flex items-center justify-between">
-          <h2 className="type-body-sm font-medium text-muted-foreground">Agent activity</h2>
-          <span className="type-caption font-mono text-muted-foreground">Live</span>
-        </div>
+        <h2 className="type-body-sm font-medium text-muted-foreground">Agent activity</h2>
         <Suspense fallback={<HomeLiveCardsSkeleton />}>
           <HomeLiveCardsSection />
         </Suspense>

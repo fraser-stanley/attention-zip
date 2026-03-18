@@ -278,3 +278,11 @@
   line-height: 1.5;
   text-transform: uppercase;
 }
+
+@utility terminal-board-cols {
+  grid-template-columns: 4rem minmax(0, 1.5fr) 1fr 1fr 0.9fr;
+}
+
+@utility terminal-board-cols-trader {
+  grid-template-columns: 4rem minmax(0, 1.5fr) 1fr;
+}

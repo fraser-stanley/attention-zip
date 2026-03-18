@@ -25,7 +25,7 @@ import { ClockIcon } from "@/components/ui/clock";
 import { CheckIcon } from "@/components/ui/check";
 import { PlusIcon } from "@/components/ui/plus";
 import { AnimatedArrowLink } from "@/components/animated-arrow-link";
-import { buttonVariants } from "@/components/ui/button-variants";
+import { AnimatedButton } from "@/components/ui/animated-button";
 import { useInstalledSkills } from "@/lib/installed-skills-context";
 import { useToast } from "@/components/toast";
 
@@ -252,14 +252,14 @@ function EquipButton({ skillId, skillName }: { skillId: string; skillName: strin
   }
 
   return (
-    <button
-      type="button"
-      className={`${buttonVariants({ variant: "outline" })} w-[120px] gap-1`}
+    <AnimatedButton
+      variant="outline"
+      className="w-[120px] gap-1"
       onClick={handleEquip}
     >
       <PlusIcon size={14} />
       Equip
-    </button>
+    </AnimatedButton>
   );
 }
 
@@ -359,12 +359,15 @@ export function PortfolioView() {
           </TabsContent>
 
           <TabsContent value="orders">
-            <p className="type-body-sm py-8 text-center text-muted-foreground">
-              No open orders.
+            <p className="font-display text-5xl tracking-tight py-6">
+              No open orders
             </p>
           </TabsContent>
 
           <TabsContent value="history">
+            <p className="font-display text-5xl tracking-tight py-6">
+              {MOCK_PORTFOLIO.recentTrades.length} trades
+            </p>
             <HistoryContent />
           </TabsContent>
         </Tabs>

@@ -1,24 +1,17 @@
 "use client";
 
-export interface ActivityItem {
-  name: string;
-  tag: string;
-  value: string;
-  positive: boolean | null;
-}
+import type { TradeActivityItem } from "@/lib/activity-mock-data";
 
-const PLACEHOLDER_ITEMS: ActivityItem[] = [
-  { name: "Base Summer", tag: "trending", value: "$52.4M", positive: null },
-  { name: "Zorb Genesis", tag: "+24.5%", value: "$31.2M", positive: true },
-  { name: "Onchain Radio", tag: "new launch", value: "$14.8M", positive: null },
-  { name: "degen.eth", tag: "+8.2%", value: "$9.5M", positive: true },
-  { name: "Higher", tag: "trending", value: "$1.9M", positive: null },
-  { name: "Enjoy", tag: "-6.3%", value: "$1.4M", positive: false },
-  { name: "Mint Monday", tag: "new launch", value: "$3.1M", positive: null },
-  { name: "Purple Collective", tag: "+7.1%", value: "$4.8M", positive: true },
+export type { TradeActivityItem };
+
+const PLACEHOLDER_ITEMS: TradeActivityItem[] = [
+  { agent: "@MomentumBot", action: "bought", amount: "$8", coin: "Higher", timeAgo: "1m ago" },
+  { agent: "@TrendClaw", action: "sold", amount: "$45", coin: "Enjoy", timeAgo: "3m ago" },
+  { agent: "@AlphaSeeker", action: "bought", amount: "$12", coin: "Zorb Genesis", timeAgo: "4m ago" },
+  { agent: "@BaseTrader", action: "bought", amount: "$22", coin: "Base Summer", timeAgo: "7m ago" },
 ];
 
-function TickerItems({ items }: { items: ActivityItem[] }) {
+function TickerItems({ items }: { items: TradeActivityItem[] }) {
   return (
     <>
       {items.map((item, index) => (
@@ -26,19 +19,23 @@ function TickerItems({ items }: { items: ActivityItem[] }) {
           key={index}
           className="type-caption inline-flex items-center gap-1.5 px-4 font-mono whitespace-nowrap"
         >
-          <span className="text-foreground">{item.name}</span>
+          <span className="text-muted-foreground">{item.agent}</span>
           <span
             className={
-              item.positive === true
+              item.action === "bought"
                 ? "text-[#3FFF00]"
-                : item.positive === false
-                  ? "text-[#FF00F0]"
-                  : "text-muted-foreground"
+                : "text-[#FF00F0]"
             }
           >
-            {item.tag}
+            {item.action}
           </span>
-          <span className="text-muted-foreground">{item.value}</span>
+          <span className="text-foreground">
+            {item.amount} {item.coin}
+          </span>
+          <span className="text-muted-foreground">{item.timeAgo}</span>
+          {index < items.length - 1 && (
+            <span className="text-muted-foreground/30 ml-2">·</span>
+          )}
         </span>
       ))}
     </>
@@ -52,7 +49,7 @@ function TickerItems({ items }: { items: ActivityItem[] }) {
 export function ActivityTicker({
   initialItems,
 }: {
-  initialItems: ActivityItem[];
+  initialItems: TradeActivityItem[];
 }) {
   const items = initialItems.length > 0 ? initialItems : PLACEHOLDER_ITEMS;
 

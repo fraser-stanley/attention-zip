@@ -46,7 +46,7 @@ export function DashboardTabs({
 
   return (
     <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as SortOption)}>
-      <TabsList>
+      <TabsList variant="toggle">
         {TAB_DEFS.map((tab) => {
           const Icon = ICON_COMPONENTS[tab.value];
           return (

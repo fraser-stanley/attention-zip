@@ -188,13 +188,17 @@ export function Nav() {
                     onMouseEnter={() => iconRefs[section.id]?.current?.startAnimation()}
                     onMouseLeave={() => iconRefs[section.id]?.current?.stopAnimation()}
                   >
-                    <span className="type-body-sm flex items-center gap-2 font-medium uppercase">
-                      {iconComponents[section.id]}
-                      {section.label}
-                    </span>
-                    <p className="type-caption text-white/50 group-hover:text-black/60">
-                      {section.description}
-                    </p>
+                    <div className="flex items-start justify-between">
+                      <div className="flex flex-col gap-1">
+                        <span className="type-label text-[0.875rem]">
+                          {section.label}
+                        </span>
+                        <p className="type-caption text-white/50 group-hover:text-black/60">
+                          {section.description}
+                        </p>
+                      </div>
+                      <span className="text-white/50 group-hover:text-black/60 [&_svg]:size-7">{iconComponents[section.id]}</span>
+                    </div>
                   </Link>
                 ))}
               </div>

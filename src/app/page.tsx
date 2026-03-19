@@ -1,11 +1,8 @@
 import { Suspense } from "react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { HomeLiveCards } from "@/components/home-live-cards";
 import { HeroSection } from "@/components/hero-section";
-import { HomeGetStarted } from "@/components/home-get-started";
-import { HomeWorksWith } from "@/components/home-works-with";
 import { ActivityTickerSection } from "@/components/activity-ticker-section";
 import { getExploreData, getLeaderboardData } from "@/lib/data";
 import { skills } from "@/lib/skills";
@@ -55,18 +52,13 @@ export default function Home() {
       {/* Hero */}
       <HeroSection />
 
+      {/* Works with */}
       <WorksWithMarquee />
-
 
       {/* Skills preview */}
       <section className="space-y-6">
         <div className="flex items-center justify-between">
-          <div>
-            <h2 className="type-body-sm font-medium text-muted-foreground">Skills</h2>
-            <p className="type-caption mt-1 text-muted-foreground">
-              We wrote and reviewed every one. Published source, one-command install.
-            </p>
-          </div>
+          <h2 className="type-label text-foreground">Skills</h2>
           <AnimatedArrowLink href="/skills">
             View all
           </AnimatedArrowLink>
@@ -83,40 +75,18 @@ export default function Home() {
                   <span className="type-caption text-muted-foreground">{skill.installs.toLocaleString()} installs</span>
                 </div>
               </CardHeader>
-              <CardContent className="space-y-3">
+              <CardContent>
                 <p className="type-body-sm text-muted-foreground">
                   {skill.description}
                 </p>
-                <div className="flex flex-wrap gap-1">
-                  {skill.badges.map((badge) => (
-                    <Badge
-                      key={badge}
-                      variant={badge === "Execution" ? "default" : "outline"}
-                      className={`type-caption font-normal ${
-                        badge === "Execution"
-                          ? "border-[#3FFF00]/40 bg-[#3FFF00]/14 text-foreground"
-                          : "border-border bg-background/70 text-foreground/78"
-                      }`}
-                    >
-                      {badge}
-                    </Badge>
-                  ))}
-                </div>
               </CardContent>
             </Card>
           ))}
         </div>
       </section>
 
-      {/* Get started steps */}
-      <HomeGetStarted />
-
-      {/* Works with */}
-      <HomeWorksWith />
-
       {/* Live data cards */}
       <section className="space-y-4">
-        <h2 className="type-body-sm font-medium text-muted-foreground">Agent activity</h2>
         <Suspense fallback={<HomeLiveCardsSkeleton />}>
           <HomeLiveCardsSection />
         </Suspense>

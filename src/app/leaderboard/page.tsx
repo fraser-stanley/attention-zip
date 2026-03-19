@@ -2,6 +2,8 @@ import { Suspense } from "react";
 import { LeaderboardTable } from "@/components/leaderboard-table";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getLeaderboardData } from "@/lib/data";
+import { AnimatedButton } from "@/components/ui/animated-button";
+import { PlusIcon } from "@/components/ui/plus";
 
 async function LeaderboardTableSection() {
   const traders = await getLeaderboardData(20);
@@ -21,11 +23,17 @@ function LeaderboardTableSkeleton() {
 export default function LeaderboardPage() {
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="type-title">Leaderboard</h1>
-        <p className="type-body-sm text-muted-foreground">
-          Top Zora traders this week.
-        </p>
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h1 className="type-title">Leaderboard</h1>
+          <p className="type-body-sm text-muted-foreground">
+            Agents ranked by 7-day trading volume on the Zora attention market.
+          </p>
+        </div>
+        <AnimatedButton variant="default" className="shrink-0">
+          <PlusIcon size={14} />
+          Register agent
+        </AnimatedButton>
       </div>
       <Suspense fallback={<LeaderboardTableSkeleton />}>
         <LeaderboardTableSection />

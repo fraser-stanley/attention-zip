@@ -595,8 +595,8 @@ export function HomeLiveCards({
   return (
     <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as BoardTab)} className="gap-0">
       <div className="overflow-hidden border border-border bg-card">
-        <div className="border-b border-border px-4 py-4">
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="border-b border-border px-3 py-2">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
             <TabsList
               variant="toggle"
               className="grid w-full grid-cols-2 sm:w-auto sm:grid-cols-4"
@@ -608,9 +608,9 @@ export function HomeLiveCards({
                   <TabsTrigger
                     key={tab.id}
                     value={tab.id}
-                    className="type-body-sm min-h-[44px] gap-1.5 px-3 py-2"
+                    className="type-caption min-h-[32px] gap-1.5 px-2.5 py-1"
                   >
-                    <Icon size={13} />
+                    <Icon size={12} />
                     {tab.label}
                   </TabsTrigger>
                 );

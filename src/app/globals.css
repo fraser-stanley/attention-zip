@@ -293,11 +293,11 @@
 }
 
 @utility type-label {
-  font-family: var(--font-mono);
-  font-size: var(--type-label-size);
+  font-family: var(--font-helvetica-hv-cn, "Helvetica Neue"), "Helvetica Neue", "Helvetica", sans-serif;
+  font-size: 0.75rem;
   font-weight: 400;
-  letter-spacing: 0.18em;
-  line-height: 1.5;
+  letter-spacing: 0.08em;
+  line-height: 1.1;
   text-transform: uppercase;
 }
 

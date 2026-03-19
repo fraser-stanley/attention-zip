@@ -50,10 +50,7 @@ function PnlStats() {
         <p className="type-label mb-2 text-muted-foreground">Profit / Loss</p>
         <p className="text-5xl font-bold font-display">
           <span className="highlight-block">{formatPnl(pnl.totalPnl)}</span>
-          <span className="type-body-sm ml-1.5 font-mono text-muted-foreground">USDC</span>
-        </p>
-        <p className="type-caption font-mono">
-          <span className={`inline-flex items-center px-1.5 py-0.5 ${pnlHighlightClass(pnl.totalPnlPct)}`}>
+          <span className={`type-body-sm ml-2 inline-flex items-center px-1.5 py-0.5 font-mono align-middle ${pnlHighlightClass(pnl.totalPnlPct)}`}>
             {formatPct(pnl.totalPnlPct)} ROI
           </span>
         </p>
@@ -107,13 +104,13 @@ function PositionsContent() {
       <Tabs value={filter} onValueChange={(v) => setFilter(v as PositionFilter)}>
         <TabsList>
           <TabsTrigger value="active">
-            Active <span className="opacity-50">({activeCount})</span>
+            Active <span className="ml-1 opacity-50">({activeCount})</span>
           </TabsTrigger>
           <TabsTrigger value="resolved">
-            Resolved <span className="opacity-50">({resolvedCount})</span>
+            Resolved <span className="ml-1 opacity-50">({resolvedCount})</span>
           </TabsTrigger>
           <TabsTrigger value="all">
-            All <span className="opacity-50">({allCount})</span>
+            All <span className="ml-1 opacity-50">({allCount})</span>
           </TabsTrigger>
         </TabsList>
       </Tabs>
@@ -268,13 +265,13 @@ function EquipButton({ skillId, skillName }: { skillId: string; skillName: strin
 }
 
 function InstalledSkills() {
-  const { isInstalled, uninstall, hydrated } = useInstalledSkills();
+  const { isInstalled, uninstall } = useInstalledSkills();
 
   const installed = skills.filter((s) => isInstalled(s.id));
   const available = skills.filter((s) => !isInstalled(s.id));
 
   return (
-    <div className={`space-y-3 ${!hydrated ? "opacity-50" : ""}`}>
+    <div className="space-y-3">
       <h2 className="type-label text-foreground">Agent Loadout</h2>
 
       <div className="grid gap-3 sm:grid-cols-2">

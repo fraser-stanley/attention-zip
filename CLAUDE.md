@@ -73,6 +73,7 @@ src/
 │   ├── agent-profile-detail.tsx    # Agent profile with PnL, positions, sparkline, holdings
 │   ├── pnl-sparkline.tsx           # SVG sparkline for cumulative PnL charts
 │   ├── wallet-connect-modal.tsx     # Mock wallet connect flow (MetaMask/Coinbase/WalletConnect)
+│   ├── hover-media-overlay.tsx      # Viewport-centered token image overlay on table row hover (desktop only)
 │   ├── activity-ticker.tsx         # Agent trade feed marquee (Simmer-style, mock data)
 │   ├── activity-ticker-section.tsx # Activity ticker wrapper (imports mock trade data)
 │   └── ui/                         # shadcn/ui components (button, card, badge, table, tabs, etc.)
@@ -116,6 +117,7 @@ src/
 - **Agent profiles use mock PnL data** — `src/lib/agent-mock-data.ts` provides mock positions, trades, and sparkline for agent profile pages. Real profile data (holdings, created coins) comes from the SDK.
 - **PnL utilities are shared** — `src/lib/pnl-utils.ts` exports `pnlColor()`, `formatPnl()`, `formatPct()` used by both portfolio and agent profile pages. Gains = `#3FFF00`, losses = `#FF00F0`.
 - **Market colors stay full-strength** — use `#3FFF00`, `#FF00F0`, or no market color at all. Only neutral grays should be faded with opacity.
+- **Hover media overlay** — Inspired by hausotto.com. When hovering a coin row in `CoinTable` or `HomeLiveCards`, the token's `mediaContent.previewImage.medium` is shown as a large image centered on the viewport (`fixed inset-0 z-50`). Uses `pointer-events: none` so hover detection stays on the table rows. Disabled on touch devices via `(pointer: fine)` media query check in `useHasPointer()` hook (`useSyncExternalStore`-based, SSR-safe). The overlay fades in after the image loads (`loadedUrl === imageUrl` check prevents stale flashes). Mock data in `src/lib/mock-data.ts` includes picsum.photos URLs for dev testing.
 - **Animated highlighter stroke** — `HighlighterStroke` component (`src/components/highlighter-stroke.tsx`) animates a `#3FFF00` background sweep left-to-right using motion/react `backgroundSize` with `ease-out-quint` easing, subtle `scaleY` press from bottom-left, and `-1.5deg` skew for a hand-drawn feel. Used on hero headings (homepage, trust page). The `.highlight-block` CSS class provides the static base styles (color, padding, `box-decoration-break: clone`); the component overrides `background-color` to transparent and drives the background via inline `backgroundImage` + animated `backgroundSize`. A `prefers-reduced-motion` CSS exemption in `globals.css` prevents the blanket `transition-duration: 0.01ms !important` rule from killing the motion/react animation. Portfolio stat numbers still use the static `.highlight-block` class directly.
 
 ## Tone of voice

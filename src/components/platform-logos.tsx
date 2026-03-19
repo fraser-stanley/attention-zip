@@ -80,7 +80,7 @@ function OpenAILogo({ className, size = 20 }: LogoProps) {
   );
 }
 
-/** Generic claw/pincer icon for ZeroClaw, KimiClaw */
+/** Generic claw/pincer icon for KimiClaw */
 function ClawLogo({ className, size = 20 }: LogoProps) {
   return (
     <svg
@@ -119,7 +119,9 @@ function NanoClawLogo({ className, size = 20 }: LogoProps) {
       alt=""
       width={size}
       height={size}
-      className={`${className ?? ""} opacity-40`}
+      loading="lazy"
+      decoding="async"
+      className={className ?? "opacity-40"}
     />
   );
 }

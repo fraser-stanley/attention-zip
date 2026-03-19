@@ -11,7 +11,7 @@ function PlatformItems({ items }: { items: Platform[] }) {
           target="_blank"
           rel="noopener noreferrer"
           title={platform.name}
-          className="flex items-center gap-2 px-6 shrink-0 text-foreground/40 transition-[transform,color] duration-150 ease will-change-transform hover:scale-[1.06] hover:text-foreground/70 focus-visible:scale-[1.06] focus-visible:text-foreground/70 focus-visible:outline-none"
+          className="flex items-center gap-2 px-6 shrink-0 text-foreground/40 transition-[transform,color] duration-150 ease hover:scale-[1.06] hover:text-foreground/70 focus-visible:scale-[1.06] focus-visible:text-foreground/70 focus-visible:outline-none"
         >
           <PlatformLogo
             id={platform.id}

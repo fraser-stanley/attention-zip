@@ -24,7 +24,7 @@ export const platforms: Platform[] = [
     url: "https://github.com/nearai/ironclaw",
     category: "claw",
   },
-{
+  {
     id: "kimiclaw",
     name: "KimiClaw",
     url: "https://kimi-claw.com",

@@ -15,7 +15,8 @@ import { useToast } from "@/components/toast";
 import { useExpandableMemory } from "@/hooks/use-expandable-memory";
 import { useSessionStorageState } from "@/hooks/use-session-storage-state";
 import { useInstalledSkills } from "@/lib/installed-skills-context";
-import { getSkillInstallCommands, type Skill } from "@/lib/skills";
+import { getInstallAllCommands, getSkillRuntimeCommands, type Runtime, type Skill } from "@/lib/skills";
+import { getSiteUrl } from "@/lib/site";
 import { cn } from "@/lib/utils";
 
 function useTypewriter(text: string, active: boolean, speed = 12) {
@@ -53,20 +54,23 @@ function useTypewriter(text: string, active: boolean, speed = 12) {
   return { displayed, done };
 }
 
-type Method = "cli" | "openclaw" | "manual";
+const RUNTIME_STORAGE_KEY = "zora:skills-runtime";
 
-const INSTALL_METHOD_STORAGE_KEY = "zora:skills-install-method";
+const RUNTIMES: Runtime[] = ["openclaw", "claude", "amp", "codex", "opencode", "cursor"];
 
-const INSTALL_METHODS: Method[] = ["cli", "openclaw", "manual"];
-
-const INSTALL_METHOD_LABELS: Record<Method, string> = {
-  cli: "Tell your agent",
+const RUNTIME_LABELS: Record<Runtime, string> = {
   openclaw: "OpenClaw",
-  manual: "curl",
+  claude: "Claude Code",
+  amp: "Amp",
+  codex: "Codex CLI",
+  opencode: "OpenCode",
+  cursor: "Cursor",
 };
 
-function isMethod(value: string | null): value is Method {
-  return value === "cli" || value === "openclaw" || value === "manual";
+const VALID_RUNTIMES = new Set<string>(RUNTIMES);
+
+function isRuntime(value: string | null): value is Runtime {
+  return value !== null && VALID_RUNTIMES.has(value);
 }
 
 const PRE_BLOCK_CLASS =
@@ -103,32 +107,32 @@ function TerminalOutput({
   );
 }
 
-function InstallMethodPicker({
-  method,
+function RuntimePicker({
+  runtime,
   onChange,
 }: {
-  method: Method;
-  onChange: (method: Method) => void;
+  runtime: Runtime;
+  onChange: (runtime: Runtime) => void;
 }) {
   return (
     <div className="sticky top-12 z-40 -mx-4 mb-8 bg-background/95 px-4 py-2.5 backdrop-blur-sm sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8">
       <div className="flex items-center gap-4">
         <Tabs
-          value={method}
-          onValueChange={(value) => onChange(value as Method)}
+          value={runtime}
+          onValueChange={(value) => onChange(value as Runtime)}
           className="w-full gap-0 sm:w-auto"
         >
           <TabsList
-            aria-label="Preferred install method"
-            className="grid w-full grid-cols-3 sm:w-auto sm:min-w-[22rem]"
+            aria-label="Agent runtime"
+            className="flex w-full flex-wrap sm:w-auto"
           >
-            {INSTALL_METHODS.map((item) => (
+            {RUNTIMES.map((item) => (
               <TabsTrigger
                 key={item}
                 value={item}
-                className="type-body-sm min-h-[44px] px-3 py-2 sm:px-4"
+                className="type-body-sm min-h-[44px] px-2.5 py-2 sm:px-3"
               >
-                <span>{INSTALL_METHOD_LABELS[item]}</span>
+                <span>{RUNTIME_LABELS[item]}</span>
               </TabsTrigger>
             ))}
           </TabsList>
@@ -221,16 +225,16 @@ function InstallButton({
 
 function SkillRow({
   skill,
-  method,
+  runtime,
   index,
 }: {
   skill: Skill;
-  method: Method;
+  runtime: Runtime;
   index: number;
 }) {
   const outputId = useId();
-  const commands = getSkillInstallCommands(skill);
-  const command = commands[method];
+  const commands = getSkillRuntimeCommands(skill, getSiteUrl());
+  const command = commands[runtime];
   const { expanded: expandedOutput, toggleExpanded: toggleOutput } =
     useExpandableMemory(`zora:skill-output:${skill.id}`);
   const isExecution = skill.risk !== "none";
@@ -276,6 +280,10 @@ function SkillRow({
 
         {/* Install command */}
         <CopyableCodeBlock command={command} />
+        <p className="type-caption font-mono text-muted-foreground/60">
+          Or download manually:{" "}
+          <code className="select-all">{commands.curl}</code>
+        </p>
 
         {/* Commands — always visible */}
         <div>
@@ -334,21 +342,32 @@ function SkillRow({
   );
 }
 
+function InstallAllBlock({ runtime }: { runtime: Runtime }) {
+  const commands = getInstallAllCommands(getSiteUrl());
+  return (
+    <div className="mb-10">
+      <CopyableCodeBlock command={commands[runtime]} />
+    </div>
+  );
+}
+
 export function SkillsInstallList({ skills }: { skills: Skill[] }) {
-  const [method, setMethod] = useSessionStorageState<Method>({
-    key: INSTALL_METHOD_STORAGE_KEY,
-    initialValue: "cli",
-    parse: (storedMethod) => (isMethod(storedMethod) ? storedMethod : "cli"),
+  const [runtime, setRuntime] = useSessionStorageState<Runtime>({
+    key: RUNTIME_STORAGE_KEY,
+    initialValue: "openclaw",
+    parse: (stored) => (isRuntime(stored) ? stored : "openclaw"),
     serialize: (value) => value,
   });
 
   return (
     <div className="max-w-5xl">
-      <InstallMethodPicker method={method} onChange={setMethod} />
+      <RuntimePicker runtime={runtime} onChange={setRuntime} />
+
+      <InstallAllBlock runtime={runtime} />
 
       <div>
         {skills.map((skill, index) => (
-          <SkillRow key={skill.id} skill={skill} method={method} index={index} />
+          <SkillRow key={skill.id} skill={skill} runtime={runtime} index={index} />
         ))}
       </div>
     </div>

@@ -4,6 +4,8 @@ import { Suspense } from "react";
 import Link from "next/link";
 import { buttonVariants } from "@/components/ui/button-variants";
 import { CopyableCodeBlock } from "@/components/copyable-code-block";
+import { getInstallAllCommands } from "@/lib/skills";
+import { getSiteUrl } from "@/lib/site";
 import { HighlighterStroke } from "@/components/highlighter-stroke";
 import { HeroOrbGlassLoader } from "@/components/hero-orb-glass-loader";
 import { ActivityTickerSection } from "@/components/activity-ticker-section";
@@ -26,7 +28,7 @@ export function HeroSection() {
               to execution. One command to install, read-only by default.
             </p>
             <CopyableCodeBlock
-              command="install skill from https://skills.zora.co/api/skills?id=trend-scout"
+              command={getInstallAllCommands(getSiteUrl()).openclaw}
               className="max-w-lg"
             />
             <div className="flex items-center gap-3">

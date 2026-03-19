@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { SkillsInstallList } from "@/components/skill-card-client";
-import { getSkillInstallCommands, skills } from "@/lib/skills";
-import { toAbsoluteUrl } from "@/lib/site";
+import { getSkillRuntimeCommands, skills } from "@/lib/skills";
+import { getSiteUrl, toAbsoluteUrl } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Skills",
@@ -10,8 +10,9 @@ export const metadata: Metadata = {
 };
 
 export default function SkillsPage() {
+  const baseUrl = getSiteUrl();
   const skillJsonLd = skills.map((skill) => {
-    const install = getSkillInstallCommands(skill);
+    const commands = getSkillRuntimeCommands(skill, baseUrl);
 
     return {
       "@context": "https://schema.org",
@@ -29,9 +30,9 @@ export default function SkillsPage() {
       featureList: [...skill.monitors, ...skill.wraps],
       keywords: skill.badges.join(", "),
       url: toAbsoluteUrl(`/skills#${skill.id}`),
-      downloadUrl: skill.skillMdUrl,
+      downloadUrl: `${baseUrl}/skills/${skill.id}/skill-md`,
       codeRepository: skill.githubUrl,
-      installUrl: install.cli,
+      installUrl: commands.claude,
     };
   });
 
@@ -43,30 +44,30 @@ export default function SkillsPage() {
       />
       <section className="space-y-4">
         <h1 className="type-display max-w-5xl pt-[0.06em] leading-[0.94]">
-          Published skills for the runtime you already use.
+          Send your agent to Zora.
         </h1>
       </section>
 
       <section className="grid max-w-5xl gap-6 sm:grid-cols-3">
         <div className="space-y-1.5">
           <p className="type-label text-muted-foreground">01</p>
-          <h2 className="type-label text-foreground">Pick a runtime</h2>
+          <h2 className="type-label text-foreground">Paste the command</h2>
           <p className="type-body-sm text-muted-foreground">
-            Zora CLI, OpenClaw, or curl. The choice persists for the session.
+            Copy the command for your runtime. Runs in your terminal.
           </p>
         </div>
         <div className="space-y-1.5">
           <p className="type-label text-muted-foreground">02</p>
-          <h2 className="type-label text-foreground">Copy the command</h2>
+          <h2 className="type-label text-foreground">Your agent reads the skill</h2>
           <p className="type-body-sm text-muted-foreground">
-            Each skill shows the install command for your runtime.
+            It fetches the SKILL.md and learns the commands.
           </p>
         </div>
         <div className="space-y-1.5">
           <p className="type-label text-muted-foreground">03</p>
-          <h2 className="type-label text-foreground">Verify the scope</h2>
+          <h2 className="type-label text-foreground">Try it</h2>
           <p className="type-body-sm text-muted-foreground">
-            Read the source, commands, and prompts before enabling.
+            Ask a question. The skill handles the rest.
           </p>
         </div>
       </section>

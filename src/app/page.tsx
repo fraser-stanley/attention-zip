@@ -5,7 +5,6 @@ import { HomeLiveCards, HomeLiveCardsSkeleton } from "@/components/home-live-car
 import { HeroSection } from "@/components/hero-section";
 import { getExploreData, getLeaderboardData } from "@/lib/data";
 import { skills } from "@/lib/skills";
-import { AnimatedArrowLink } from "@/components/animated-arrow-link";
 import { WorksWithMarquee } from "@/components/works-with-marquee";
 
 async function HomeLiveCardsSection() {
@@ -43,9 +42,12 @@ export default function Home() {
                 We wrote and reviewed every one. Published source, one-command install.
               </p>
             </div>
-            <AnimatedArrowLink href="/skills">
+            <Link
+              href="/skills"
+              className="type-label text-foreground hover:text-muted-foreground transition-colors"
+            >
               View all
-            </AnimatedArrowLink>
+            </Link>
           </div>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {skills.slice(0, 4).map((skill) => (

@@ -18,7 +18,7 @@ import { ChartBarIncreasingIcon } from "@/components/ui/chart-bar-increasing";
 import { ClockIcon } from "@/components/ui/clock";
 import { CheckIcon } from "@/components/ui/check";
 import { PlusIcon } from "@/components/ui/plus";
-import { AnimatedArrowLink } from "@/components/animated-arrow-link";
+import Link from "next/link";
 import { AnimatedButton } from "@/components/ui/animated-button";
 import { useInstalledSkills } from "@/lib/installed-skills-context";
 import { useToast } from "@/components/toast";
@@ -407,7 +407,7 @@ function InstalledSkills() {
 
   return (
     <div className="space-y-3">
-      <h2 className="type-label text-foreground">Agent Loadout</h2>
+      <h2 className="type-label text-foreground">Skills</h2>
 
       <div className="grid gap-3 sm:grid-cols-2">
         {installed.map((skill) => (
@@ -456,9 +456,9 @@ function InstalledSkills() {
         ))}
       </div>
 
-      <AnimatedArrowLink href="/skills">
+      <Link href="/skills" className="type-label text-foreground hover:text-muted-foreground transition-colors">
         Browse all skills
-      </AnimatedArrowLink>
+      </Link>
     </div>
   );
 }

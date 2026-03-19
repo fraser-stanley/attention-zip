@@ -5,7 +5,7 @@ import yaml from "yaml";
 import {
   skills,
   getSkillById,
-  getSkillInstallCommands,
+  getSkillRuntimeCommands,
 } from "@/lib/skills";
 
 const ROOT = path.resolve(__dirname, "../..");
@@ -187,21 +187,62 @@ describe("getSkillById", () => {
   });
 });
 
-// --- getSkillInstallCommands ---
+// --- getSkillRuntimeCommands ---
 
-describe("getSkillInstallCommands", () => {
-  it("returns cli, openclaw, and manual keys", () => {
-    const cmds = getSkillInstallCommands(skills[0]);
-    expect(cmds).toHaveProperty("cli");
+const TEST_BASE_URL = "https://example.com";
+
+describe("getSkillRuntimeCommands", () => {
+  it("returns all runtime keys and curl", () => {
+    const cmds = getSkillRuntimeCommands(skills[0], TEST_BASE_URL);
     expect(cmds).toHaveProperty("openclaw");
-    expect(cmds).toHaveProperty("manual");
+    expect(cmds).toHaveProperty("claude");
+    expect(cmds).toHaveProperty("amp");
+    expect(cmds).toHaveProperty("codex");
+    expect(cmds).toHaveProperty("opencode");
+    expect(cmds).toHaveProperty("cursor");
+    expect(cmds).toHaveProperty("curl");
   });
 
-  it("install URLs contain the skill id", () => {
+  it("commands contain the skill id", () => {
     for (const skill of skills) {
-      const cmds = getSkillInstallCommands(skill);
-      expect(cmds.cli).toContain(skill.id);
-      expect(cmds.manual).toContain(skill.id);
+      const cmds = getSkillRuntimeCommands(skill, TEST_BASE_URL);
+      expect(cmds.openclaw).toContain(skill.id);
+      expect(cmds.claude).toContain(skill.id);
+      expect(cmds.amp).toContain(skill.id);
+      expect(cmds.codex).toContain(skill.id);
+      expect(cmds.opencode).toContain(skill.id);
+      expect(cmds.cursor).toContain(skill.id);
+      expect(cmds.curl).toContain(skill.id);
     }
   });
+
+  it("commands contain the base URL", () => {
+    const cmds = getSkillRuntimeCommands(skills[0], TEST_BASE_URL);
+    expect(cmds.claude).toContain(TEST_BASE_URL);
+    expect(cmds.curl).toContain(TEST_BASE_URL);
+  });
+
+  it("openclaw uses clawhub install", () => {
+    const cmds = getSkillRuntimeCommands(skills[0], TEST_BASE_URL);
+    expect(cmds.openclaw).toMatch(/^clawhub install /);
+  });
+
+  it("commands include the action prompt", () => {
+    for (const skill of skills) {
+      const cmds = getSkillRuntimeCommands(skill, TEST_BASE_URL);
+      expect(cmds.claude).toContain(skill.actionPrompt);
+    }
+  });
+});
+
+// --- actionPrompt ---
+
+describe("actionPrompt", () => {
+  it.each(skills.map((s) => [s.id, s]))(
+    "%s has a non-empty actionPrompt",
+    (_id, skill) => {
+      expect(skill.actionPrompt).toBeTruthy();
+      expect(skill.actionPrompt.length).toBeGreaterThan(5);
+    }
+  );
 });

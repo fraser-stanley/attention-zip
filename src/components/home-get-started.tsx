@@ -1,25 +1,33 @@
 import { CopyableCodeBlock } from "@/components/copyable-code-block";
+import { skills, getSkillRuntimeCommands } from "@/lib/skills";
+import { getSiteUrl } from "@/lib/site";
 
-const steps = [
-  {
-    number: "01",
-    title: "Tell your agent",
-    description:
-      "Paste this into any MCP-compatible agent. Claude, Cursor, OpenClaw, or your own.",
-    command:
-      "install skill from https://skills.zora.co/api/skills?id=trend-scout",
-    prefix: "$",
-  },
-  {
-    number: "02",
-    title: "Try it",
-    description: "Ask a question. The skill handles the rest.",
-    command: "Check Zora for trending coins right now",
-    prefix: ">",
-  },
-] as const;
+function getSteps() {
+  const trendScout = skills[0];
+  const commands = getSkillRuntimeCommands(trendScout, getSiteUrl());
+
+  return [
+    {
+      number: "01",
+      title: "Paste the command",
+      description:
+        "Run this in your terminal. Your agent reads the skill and sets up.",
+      command: commands.claude,
+      prefix: "$",
+    },
+    {
+      number: "02",
+      title: "Try it",
+      description: "Ask a question. The skill handles the rest.",
+      command: trendScout.samplePrompt,
+      prefix: ">",
+    },
+  ] as const;
+}
 
 export function HomeGetStarted() {
+  const steps = getSteps();
+
   return (
     <section className="space-y-6">
       <h2 className="type-section">Get started in 2 steps</h2>

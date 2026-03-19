@@ -7,7 +7,7 @@ export interface Skill {
   riskLabel: string;
   monitors: string[];
   wraps: string[];
-  installCommand: string;
+  actionPrompt: string;
   samplePrompt: string;
   sampleOutput: string;
   badges: string[];
@@ -16,10 +16,16 @@ export interface Skill {
   installs: number;
 }
 
-export interface SkillInstallCommands {
-  cli: string;
+export type Runtime = "openclaw" | "claude" | "amp" | "codex" | "opencode" | "cursor";
+
+export interface SkillRuntimeCommands {
   openclaw: string;
-  manual: string;
+  claude: string;
+  amp: string;
+  codex: string;
+  opencode: string;
+  cursor: string;
+  curl: string;
 }
 
 export const skills: Skill[] = [
@@ -43,7 +49,7 @@ export const skills: Skill[] = [
       "zora explore --sort volume --type trend --json",
       "zora explore --sort mcap --type trend --json",
     ],
-    installCommand: "npx zora-cli install",
+    actionPrompt: "show me what's trending on Zora",
     samplePrompt:
       "What topic coins are trending on Zora right now?",
     sampleOutput: `Found 3 trending topic coins on Zora:
@@ -86,7 +92,7 @@ export const skills: Skill[] = [
       "zora explore --sort featured --json",
       "zora get <address> --json",
     ],
-    installCommand: "npx zora-cli install",
+    actionPrompt: "show me top creators on Zora",
     samplePrompt:
       "Show me the top featured creators on Zora and any recent activity on my watchlist.",
     sampleOutput: `Featured creators update:
@@ -128,7 +134,7 @@ Watchlist alert:
       "zora explore --sort new --json",
       "zora explore --type creator-coin --json",
     ],
-    installCommand: "npx zora-cli install",
+    actionPrompt: "give me a Zora market briefing",
     samplePrompt: "Give me my morning Zora briefing.",
     sampleOutput: `Zora Morning Briefing \u2014 Mar 14, 2026
 
@@ -165,7 +171,7 @@ Nothing unusual detected. Market is moderately active.`,
     wraps: [
       "zora balances --json",
     ],
-    installCommand: "npx zora-cli install",
+    actionPrompt: "show my Zora coin holdings",
     samplePrompt:
       "Check my Zora coin holdings.",
     sampleOutput: `Coin Holdings (local wallet):
@@ -216,7 +222,7 @@ Coins held: 3`,
       "zora sell <address> --all -o json --yes",
       "zora balances --json",
     ],
-    installCommand: "npx zora-cli install",
+    actionPrompt: "find momentum trades on Zora",
     samplePrompt:
       "Watch Zora for coins with >20% gains and >$100K volume in the last hour. Auto-buy up to 0.05 ETH per position, max 3 positions. Set a 15% trailing stop.",
     sampleOutput: `Momentum Trader active — scanning gainers...
@@ -254,10 +260,34 @@ export function getSkillById(id: string) {
   return skills.find((skill) => skill.id === id) ?? null;
 }
 
-export function getSkillInstallCommands(skill: Skill): SkillInstallCommands {
+export function getInstallAllCommands(baseUrl: string): SkillRuntimeCommands {
+  const urls = skills.map((s) => `${baseUrl}/skills/${s.id}/skill-md`);
+  const readList = urls.join(" and then read ");
+  const prompt = `Read ${readList}. These are agent skills for the Zora attention market. Confirm what you learned from each.`;
   return {
-    cli: `install skill from ${skill.skillMdUrl}`,
-    openclaw: `install skill from ${skill.skillMdUrl}`,
-    manual: `curl -O ${skill.skillMdUrl}`,
+    openclaw: skills.map((s) => `clawhub install ${s.id}`).join(" && "),
+    claude: `claude -p "${prompt}"`,
+    amp: `amp "${prompt}"`,
+    codex: `codex "${prompt}"`,
+    opencode: `opencode run "${prompt}"`,
+    cursor: `cursor "${prompt}"`,
+    curl: skills.map((s) => `curl -O ${baseUrl}/skills/${s.id}/skill-md`).join(" && "),
+  };
+}
+
+export function getSkillRuntimeCommands(
+  skill: Skill,
+  baseUrl: string,
+): SkillRuntimeCommands {
+  const skillMdUrl = `${baseUrl}/skills/${skill.id}/skill-md`;
+  const prompt = `Read ${skillMdUrl} and ${skill.actionPrompt}`;
+  return {
+    openclaw: `clawhub install ${skill.id}`,
+    claude: `claude -p "${prompt}"`,
+    amp: `amp "${prompt}"`,
+    codex: `codex "${prompt}"`,
+    opencode: `opencode run "${prompt}"`,
+    cursor: `cursor "${prompt}"`,
+    curl: `curl -O ${skillMdUrl}`,
   };
 }

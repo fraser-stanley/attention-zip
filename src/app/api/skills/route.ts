@@ -1,14 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 import {
   getSkillById,
-  getSkillInstallCommands,
+  getSkillRuntimeCommands,
   skills,
   type Skill,
 } from "@/lib/skills";
+import { getSiteUrl } from "@/lib/site";
 
 const CACHE_CONTROL = "public, s-maxage=3600, stale-while-revalidate=86400";
 
 function serializeSkill(skill: Skill) {
+  const baseUrl = getSiteUrl();
   return {
     id: skill.id,
     name: skill.name,
@@ -16,14 +18,15 @@ function serializeSkill(skill: Skill) {
     longDescription: skill.longDescription,
     risk: skill.risk,
     riskLabel: skill.riskLabel,
-    install: getSkillInstallCommands(skill),
+    install: getSkillRuntimeCommands(skill, baseUrl),
     monitors: skill.monitors,
     wraps: skill.wraps,
+    actionPrompt: skill.actionPrompt,
     samplePrompt: skill.samplePrompt,
     sampleOutput: skill.sampleOutput,
     badges: skill.badges,
     githubUrl: skill.githubUrl,
-    skillMdUrl: skill.skillMdUrl,
+    skillMdUrl: `${baseUrl}/skills/${skill.id}/skill-md`,
   };
 }
 

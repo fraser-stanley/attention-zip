@@ -207,19 +207,45 @@ All SDK responses return `{ error, data }`. Always check `response.error` before
 1. **Trend Scout** — trending coins, new launches, gainers, momentum
 2. **Creator Pulse** — creator coin ecosystems, featured creators, watchlists
 3. **Briefing Bot** — structured morning/evening market digest
-4. **Portfolio Scout** — wallet balance + coin holdings (Bankr-ready bridge skill)
+4. **Portfolio Scout** — coin holdings via CLI (local wallet) or SDK (any address). Bankr-ready bridge skill
 5. **Momentum Trader** — auto-buys trending Zora coins on momentum signals via Zora CLI. Execution-capable — requires dedicated trader wallet created with `zora setup`.
 
-Skills 1–4 are read-only (no wallet needed). Skill 5 is execution-capable via the Zora CLI's native wallet and buy/sell commands (buy/sell are not yet shipped in the CLI). All use OpenClaw SKILL.md format. The CLI has no SKILL.md parsing — it's purely an agent-runtime convention.
+Skills 1–4 are read-only (no wallet needed). Skill 5 is execution-capable via the Zora CLI's native wallet and buy/sell commands. All use OpenClaw SKILL.md format. The CLI has no SKILL.md parsing — it's purely an agent-runtime convention.
 
-### CLI command reality check
+### CLI commands
 
-The Zora CLI has 4 commands: `auth`, `explore`, `setup`, `wallet`. The following commands referenced in skills **do not exist** in the CLI:
-- `zora get` — not implemented
-- `zora profile` — not implemented
-- `zora buy` / `zora sell` — not implemented (Momentum Trader depends on these shipping)
+The Zora CLI has 8 commands: `auth`, `explore`, `get`, `buy`, `sell`, `balances`, `setup`, `wallet`.
 
-Portfolio Scout wraps SDK calls (`getProfileBalances`, `getProfileCoins`) instead of CLI commands.
+| Command | Syntax | Notes |
+|---------|--------|-------|
+| `zora explore` | `--sort <sort> --type <type> --limit <n> --json` | Sorts: mcap, volume, new, gainers, trending, featured, last-traded, last-traded-unique. Types: all, trend, creator-coin, post |
+| `zora get` | `zora get <identifier> [--type <type>] --json` | Identifier = 0x address or creator name. NOT ENS. Types: creator-coin, post, trend |
+| `zora buy` | `zora buy <address> --eth <amount> --json` | Also: --percent, --all, --quote (preview only), --yes (skip confirm) |
+| `zora sell` | `zora sell <address> --amount <tokens> --json` | Also: --percent, --all, --to <ETH\|USDC\|ZORA>, --quote, --yes |
+| `zora balances` | `zora balances --json` | **Local wallet only** — no address argument. Returns coin holdings (not native ETH/USDC/ZORA) |
+| `zora setup` | `zora setup [--create] [--force]` | Creates/imports wallet at ~/.config/zora/wallet.json |
+| `zora wallet` | `wallet info`, `wallet export`, `wallet backup` | Keychain-protected backup on macOS |
+| `zora auth` | `auth configure`, `auth status` | API key management |
+
+**CLI behavioral notes:**
+- `--json` output is clean stdout. Errors go to stderr. In JSON mode, errors are also structured: `{"error": "...", "suggestion": "..."}`.
+- Exit codes: 0 = success (including user abort), 1 = all errors.
+- `--yes` skips the trade confirmation prompt only. Validation (API key, wallet, balance checks) still runs.
+- `--sort` and `--type` combine (e.g., `--sort trending --type creator-coin`). Invalid combos return a clear error. Some sorts (`gainers`, `last-traded`, `last-traded-unique`) only support `--type post`.
+- `zora get` returns `uniqueHolders` and `volume24h` but NOT swaps or detailed holder list. Use SDK `getCoinHolders`/`getCoinSwaps` for those.
+- No watch/streaming mode. Single request, single response, exit.
+
+**CLI JSON output shapes:**
+- `explore --json`: `[{ name, address, coinType, marketCap, volume24h, marketCapDelta24h }]`
+- `get --json`: `{ name, address, coinType, marketCap, volume24h, uniqueHolders, createdAt, creatorAddress, creatorHandle }`
+- `balances --json`: `[{ name, symbol, coinType, address, balance, usdValue, priceUsd, marketCap, volume24h }]`
+- `buy/sell --json`: `{ action, coin, address, spent/received, tx }` — `--quote` adds `estimated` and `slippage` instead of `tx`
+
+**`zora balances` limitations:**
+- Returns **coin holdings only** — balance, USD value, market cap, volume per coin. No native ETH/USDC/ZORA.
+- **Local wallet only** — reads from configured private key, no address argument.
+- For arbitrary wallet lookups, use SDK (`getProfileBalances`, `getProfileCoins`).
+- Portfolio Scout wraps both: `zora balances` for the local wallet, SDK for any address.
 
 ### Wallet setup
 

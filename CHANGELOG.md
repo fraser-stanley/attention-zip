@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-03-19 (CLI syntax update)
+
+### Changed
+- **CLI flag update** — all skill `wraps` arrays now use `--json` instead of the old `-o json` syntax.
+- **Momentum Trader buy/sell syntax** — `zora buy <address> --eth <amount> --json` (was `--amount <eth>`), `zora sell` now includes `--json`.
+- **Creator Pulse** — added `zora get <address> --json` to wraps (command now exists in CLI).
+- **Portfolio Scout** — `zora balances --json` for local wallet coin holdings + SDK `getProfileBalances()` for any-wallet lookups. Removed incorrect "ETH balance" references — `zora balances` returns coin holdings only, not native tokens. Updated SKILL.md with CLI + SDK dual-path documentation.
+- **CLAUDE.md** — replaced "CLI command reality check" with full CLI command reference table (8 commands), JSON output schemas, behavioral notes (exit codes, `--yes` scope, sort/type combos), and corrected `zora balances` documentation.
+
 ## 2026-03-18 (Highlighter animation + homepage refinements)
 
 ### Added

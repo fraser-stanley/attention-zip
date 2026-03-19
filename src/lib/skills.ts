@@ -38,9 +38,9 @@ export const skills: Skill[] = [
       "Volume spikes",
     ],
     wraps: [
-      "zora explore --sort trending -o json",
-      "zora explore --sort new -o json",
-      "zora explore --sort gainers -o json",
+      "zora explore --sort trending --json",
+      "zora explore --sort new --json",
+      "zora explore --sort gainers --json",
     ],
     installCommand: "npx zora-cli install",
     samplePrompt:
@@ -81,8 +81,9 @@ export const skills: Skill[] = [
       "Creator coin volume",
     ],
     wraps: [
-      "zora explore --type creator-coin -o json",
-      "zora explore --sort featured -o json",
+      "zora explore --type creator-coin --json",
+      "zora explore --sort featured --json",
+      "zora get <address> --json",
     ],
     installCommand: "npx zora-cli install",
     samplePrompt:
@@ -121,10 +122,10 @@ Watchlist alert:
       "Leaderboard changes",
     ],
     wraps: [
-      "zora explore --sort trending -o json",
-      "zora explore --sort volume -o json",
-      "zora explore --sort new -o json",
-      "zora explore --type creator-coin -o json",
+      "zora explore --sort trending --json",
+      "zora explore --sort volume --json",
+      "zora explore --sort new --json",
+      "zora explore --type creator-coin --json",
     ],
     installCommand: "npx zora-cli install",
     samplePrompt: "Give me my morning Zora briefing.",
@@ -150,39 +151,35 @@ Nothing unusual detected. Market is moderately active.`,
     id: "portfolio-scout",
     name: "Portfolio Scout",
     description:
-      "Wallet balance and coin holdings. Read-only, Bankr-ready.",
+      "Coin holdings and portfolio value. Read-only, Bankr-ready.",
     longDescription:
-      "Checks any wallet's Zora coin holdings and ETH balance.",
+      "Checks your wallet's Zora coin holdings via CLI, or any wallet via SDK.",
     risk: "none",
-    riskLabel: "Read-only — wallet address only",
+    riskLabel: "Read-only — local wallet or address",
     monitors: [
-      "Wallet ETH balance",
       "Coin holdings and values",
       "Portfolio composition",
       "Holdings changes over time",
     ],
     wraps: [
+      "zora balances --json",
       "@zoralabs/coins-sdk → getProfileBalances()",
-      "@zoralabs/coins-sdk → getProfileCoins()",
     ],
     installCommand: "npx zora-cli install",
     samplePrompt:
-      "Check my Zora portfolio at 0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045.",
-    sampleOutput: `Portfolio for 0xd8dA...6045
+      "Check my Zora coin holdings.",
+    sampleOutput: `Coin Holdings (local wallet):
 
-ETH Balance: 2.34 ETH ($7,800)
-
-Coin Holdings:
 1. jacob (creator-coin) — 1,200 tokens
    Value: $4,120 | +8.3% 24h
 
-2. looksmaxxing (trend) — 500 tokens
+2. looksmaxxing (CONTENT) — 500 tokens
    Value: $1,150 | +12.1% 24h
 
-3. based penguin (trend) — 2,000 tokens
+3. based penguin (CONTENT) — 2,000 tokens
    Value: $780 | -3.2% 24h
 
-Total portfolio: ~$13,850
+Total value: ~$6,050
 Coins held: 3`,
     badges: [
       "Works with OpenClaw",
@@ -213,9 +210,9 @@ Coins held: 3`,
       "Cooldown and rate limits",
     ],
     wraps: [
-      "zora explore --sort gainers -o json",
-      "zora buy <address> --amount <eth>",
-      "zora sell <address> --amount <tokens>",
+      "zora explore --sort gainers --json",
+      "zora buy <address> --eth <amount> --json",
+      "zora sell <address> --amount <tokens> --json",
     ],
     installCommand: "npx zora-cli install",
     samplePrompt:

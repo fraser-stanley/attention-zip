@@ -6,6 +6,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/button-variants";
+import { TextMorph } from "@/components/text-morph";
 import { skills } from "@/lib/skills";
 import { ZapIcon, type ZapHandle } from "@/components/ui/zap";
 import { ChartBarIncreasingIcon, type ChartBarIncreasingIconHandle } from "@/components/ui/chart-bar-increasing";
@@ -15,7 +16,6 @@ import { ShieldCheckIcon, type ShieldCheckIconHandle } from "@/components/ui/shi
 import { SparklesIcon, type SparklesIconHandle } from "@/components/ui/sparkles";
 import { useWallet, truncateAddress } from "@/lib/wallet-context";
 import { WalletConnectModal } from "@/components/wallet-connect-modal";
-import { useToast } from "@/components/toast";
 
 type IconHandle = {
   startAnimation: () => void;
@@ -43,8 +43,7 @@ export function Nav() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const [walletModalOpen, setWalletModalOpen] = useState(false);
-  const { address, isConnected, disconnect } = useWallet();
-  const { toast } = useToast();
+  const { address, isConnected } = useWallet();
   const close = useCallback(() => {
     setOpen(false);
   }, []);
@@ -125,21 +124,18 @@ export function Nav() {
             </Link>
             <div className="flex items-center gap-1">
               {isConnected && address ? (
-                <button
-                  onClick={() => { disconnect(); toast("Disconnected"); }}
+                <Link
+                  href="/portfolio"
                   className={buttonVariants({ variant: "outline" })}
                 >
-                  {truncateAddress(address)}
-                </button>
+                  <TextMorph>{truncateAddress(address)}</TextMorph>
+                </Link>
               ) : (
                 <button
-                  onClick={() => {
-                    setOpen(false);
-                    setWalletModalOpen(true);
-                  }}
+                  onClick={() => { setOpen(false); setWalletModalOpen(true); }}
                   className={buttonVariants({ variant: "outline" })}
                 >
-                  Login
+                  <TextMorph>Login</TextMorph>
                 </button>
               )}
               <button

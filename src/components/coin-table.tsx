@@ -1,6 +1,8 @@
 "use client";
 
+import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { useReducedMotion } from "motion/react";
 import { TextMorph } from "@/components/text-morph";
 import {
   Table,
@@ -19,6 +21,66 @@ import {
   truncateAddress,
   coinTypeLabel,
 } from "@/lib/zora";
+import { cn } from "@/lib/utils";
+
+const TICK_MS = 1600;
+const REFRESH_INTERVAL_MS = 30_000;
+
+/** Deterministic pseudo-random for stable oscillation per tick+seed. */
+function pseudoRandom(tick: number, seed: number) {
+  const x = Math.sin(tick * 9301 + seed * 49297) * 49979;
+  return x - Math.floor(x);
+}
+
+type SimulatedCoin = {
+  name: string;
+  address: string;
+  coinType: string | undefined;
+  marketCap: string;
+  volume24h: string;
+  changeValue: number;
+  changeText: string;
+  positive: boolean | null;
+};
+
+function simulateCoins(coins: CoinNode[], tick: number): SimulatedCoin[] {
+  return coins.map((coin, i) => {
+    const change = formatChange(coin.marketCap, coin.marketCapDelta24h);
+    const baseChangeValue = Number.parseFloat(change.value);
+
+    if (tick <= 0) {
+      return {
+        name: coin.name ?? "Unknown",
+        address: coin.address ?? "",
+        coinType: coin.coinType,
+        marketCap: formatCompactCurrency(coin.marketCap),
+        volume24h: formatCompactCurrency(coin.volume24h),
+        changeValue: Number.isFinite(baseChangeValue) ? baseChangeValue : 0,
+        changeText: change.value,
+        positive: change.positive,
+      };
+    }
+
+    const mcapNum = typeof coin.marketCap === "string" ? Number.parseFloat(coin.marketCap) : (coin.marketCap ?? 0);
+    const volNum = typeof coin.volume24h === "string" ? Number.parseFloat(coin.volume24h) : (coin.volume24h ?? 0);
+    const drift = (pseudoRandom(tick, i) - 0.45) * 0.012;
+
+    const simMcap = Math.max(1, (Number.isFinite(mcapNum) ? mcapNum : 0) * (1 + drift));
+    const simVol = Math.max(1, (Number.isFinite(volNum) ? volNum : 0) * (1 - drift * 1.25));
+    const simChange = Number.isFinite(baseChangeValue) ? baseChangeValue + drift * 100 : 0;
+
+    return {
+      name: coin.name ?? "Unknown",
+      address: coin.address ?? "",
+      coinType: coin.coinType,
+      marketCap: formatCompactCurrency(simMcap),
+      volume24h: formatCompactCurrency(simVol),
+      changeValue: simChange,
+      changeText: `${simChange >= 0 ? "+" : ""}${simChange.toFixed(1)}%`,
+      positive: simChange > 0 ? true : simChange < 0 ? false : null,
+    };
+  });
+}
 
 interface CoinTableProps {
   sort: SortOption;
@@ -33,6 +95,9 @@ export function CoinTable({
   compact = false,
   initialCoins,
 }: CoinTableProps) {
+  const reduceMotion = useReducedMotion() ?? false;
+  const [tick, setTick] = useState(0);
+
   const { data, isLoading, error } = useQuery({
     queryKey: ["explore", sort, count],
     queryFn: async () => {
@@ -48,7 +113,17 @@ export function CoinTable({
         }
       : undefined,
     initialDataUpdatedAt: undefined,
+    refetchInterval: REFRESH_INTERVAL_MS,
   });
+
+  useEffect(() => {
+    if (reduceMotion) return;
+    const id = window.setInterval(() => setTick((t) => t + 1), TICK_MS);
+    return () => window.clearInterval(id);
+  }, [reduceMotion]);
+
+  const coins = useMemo(() => data?.coins ?? [], [data]);
+  const simulated = useMemo(() => simulateCoins(coins, tick), [coins, tick]);
 
   if (error) {
     return (
@@ -68,8 +143,6 @@ export function CoinTable({
     );
   }
 
-  const coins = data?.coins ?? [];
-
   if (coins.length === 0) {
     return (
       <div className="type-body-sm py-8 text-center text-muted-foreground">
@@ -79,61 +152,59 @@ export function CoinTable({
   }
 
   return (
-    <Table>
+    <Table className="table-fixed">
       <TableHeader>
         <TableRow>
           <TableHead className="type-label w-10">#</TableHead>
-          <TableHead className="type-label">Name</TableHead>
-          {!compact && <TableHead className="type-label">Address</TableHead>}
-          <TableHead className="type-label">Type</TableHead>
-          <TableHead className="type-label text-right">Market Cap</TableHead>
-          <TableHead className="type-label text-right">24h Vol</TableHead>
-          <TableHead className="type-label text-right">24h Change</TableHead>
+          <TableHead className="type-label w-[20%]">Name</TableHead>
+          {!compact && <TableHead className="type-label w-[16%]">Address</TableHead>}
+          <TableHead className="type-label w-[12%]">Type</TableHead>
+          <TableHead className="type-label w-[16%] text-right">Market Cap</TableHead>
+          <TableHead className="type-label w-[14%] text-right">24h Vol</TableHead>
+          <TableHead className="type-label w-[14%] text-right">24h Change</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
-        {coins.map((coin, i) => {
-          const change = formatChange(coin.marketCap, coin.marketCapDelta24h);
-          return (
-            <TableRow key={coin.address ?? i}>
+        {simulated.map((coin, i) => (
+          <TableRow key={coin.address || i} className="transition-colors hover:bg-muted/35">
+            <TableCell className="type-caption font-mono text-muted-foreground">
+              {i + 1}
+            </TableCell>
+            <TableCell className="type-body-sm font-medium truncate">
+              {coin.name}
+            </TableCell>
+            {!compact && (
               <TableCell className="type-caption font-mono text-muted-foreground">
-                {i + 1}
+                {truncateAddress(coin.address)}
               </TableCell>
-              <TableCell>
-                {coin.name ?? "Unknown"}
-              </TableCell>
-              {!compact && (
-                <TableCell className="type-caption font-mono text-muted-foreground">
-                  {truncateAddress(coin.address ?? "")}
-                </TableCell>
+            )}
+            <TableCell>
+              <Badge variant="secondary" className="type-caption font-normal">
+                {coinTypeLabel(coin.coinType)}
+              </Badge>
+            </TableCell>
+            <TableCell className="type-body-sm text-right font-mono">
+              <TextMorph>{coin.marketCap}</TextMorph>
+            </TableCell>
+            <TableCell className="type-body-sm text-right font-mono">
+              <TextMorph>{coin.volume24h}</TextMorph>
+            </TableCell>
+            <TableCell className="type-body-sm text-right font-mono">
+              {coin.positive !== null ? (
+                <span
+                  className={cn(
+                    "inline-flex items-center px-1.5 py-0.5 font-medium",
+                    coin.positive ? "bg-[#3FFF00] text-black" : "bg-[#FF00F0] text-black"
+                  )}
+                >
+                  <TextMorph>{coin.changeText}</TextMorph>
+                </span>
+              ) : (
+                <span className="text-muted-foreground"><TextMorph>{coin.changeText}</TextMorph></span>
               )}
-              <TableCell>
-                <Badge variant="secondary" className="type-caption font-normal">
-                  {coinTypeLabel(coin.coinType)}
-                </Badge>
-              </TableCell>
-              <TableCell className="type-body-sm text-right font-mono">
-                <TextMorph>{formatCompactCurrency(coin.marketCap)}</TextMorph>
-              </TableCell>
-              <TableCell className="type-body-sm text-right font-mono">
-                <TextMorph>{formatCompactCurrency(coin.volume24h)}</TextMorph>
-              </TableCell>
-              <TableCell className="type-body-sm text-right font-mono">
-                {change.positive !== null ? (
-                  <span
-                    className={`inline-flex items-center px-1.5 py-0.5 font-medium ${
-                      change.positive ? "bg-[#3FFF00] text-black" : "bg-[#FF00F0] text-black"
-                    }`}
-                  >
-                    <TextMorph>{change.value}</TextMorph>
-                  </span>
-                ) : (
-                  <span className="text-muted-foreground"><TextMorph>{change.value}</TextMorph></span>
-                )}
-              </TableCell>
-            </TableRow>
-          );
-        })}
+            </TableCell>
+          </TableRow>
+        ))}
       </TableBody>
     </Table>
   );

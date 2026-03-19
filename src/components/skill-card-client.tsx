@@ -3,6 +3,7 @@
 import { useEffect, useId, useRef, useState } from "react";
 
 import { AnimatedButton } from "@/components/ui/animated-button";
+import { TextMorph } from "@/components/text-morph";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button-variants";
 import { ArrowUpRightIcon } from "@/components/ui/arrow-up-right";
@@ -186,7 +187,7 @@ function InstallButton({
       <div className="flex flex-wrap items-center gap-2">
         <div className="type-body-sm inline-flex min-h-[44px] items-center gap-2 bg-[#3FFF00] px-4 py-2.5 font-medium text-black">
           <CheckIcon size={14} />
-          Equipped
+          <TextMorph>Equipped</TextMorph>
         </div>
         <button
           type="button"
@@ -202,27 +203,19 @@ function InstallButton({
     );
   }
 
-  if (state === "installing") {
-    return (
-      <button
-        type="button"
-        disabled
-        className="type-body-sm inline-flex min-h-[44px] w-full items-center justify-center gap-2 border border-border px-4 py-2.5 font-medium text-muted-foreground sm:w-auto"
-      >
-        <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-muted-foreground/20 border-t-muted-foreground" />
-        Equipping...
-      </button>
-    );
-  }
-
   return (
     <AnimatedButton
-      variant="default"
+      variant={state === "installing" ? "outline" : "default"}
       className="w-full sm:w-auto"
-      onClick={handleInstall}
+      disabled={state === "installing"}
+      onClick={state === "idle" ? handleInstall : undefined}
     >
-      <PlusIcon size={14} />
-      Equip
+      {state === "installing" ? (
+        <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-muted-foreground/20 border-t-muted-foreground" />
+      ) : (
+        <PlusIcon size={14} />
+      )}
+      <TextMorph>{state === "installing" ? "Equipping..." : "Equip"}</TextMorph>
     </AnimatedButton>
   );
 }

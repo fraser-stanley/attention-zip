@@ -181,6 +181,16 @@
   .highlight-block {
     transition-duration: unset !important;
   }
+  /* Torph character morphing is functional UI (live data) — exempt from blanket kill */
+  [torph-root], [torph-root] * {
+    animation-duration: unset !important;
+    transition-duration: unset !important;
+  }
+}
+
+/* Prevent torph container resizing from shifting table layouts */
+[torph-root] {
+  transition-property: none !important;
 }
 
 @keyframes ticker-scroll {

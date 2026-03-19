@@ -5,6 +5,7 @@ import { createPortal } from "react-dom";
 import { AnimatePresence, motion } from "motion/react";
 import { useWallet } from "@/lib/wallet-context";
 import { useToast } from "@/components/toast";
+import { TextMorph } from "@/components/text-morph";
 
 const MOCK_ADDRESS = "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045";
 
@@ -110,10 +111,12 @@ export function WalletConnectModal({ open, onClose }: WalletConnectModalProps) {
                       className="size-3 rounded-full shrink-0"
                       style={{ backgroundColor: wallet.color }}
                     />
-                    <span className="flex-1">{wallet.name}</span>
-                    {connecting === wallet.name && (
-                      <span className="type-caption text-white/40">Connecting...</span>
-                    )}
+                    <span className="flex-1"><TextMorph>{wallet.name}</TextMorph></span>
+                    <span className="type-caption text-white/40">
+                      <TextMorph>
+                        {connecting === wallet.name ? "Connecting..." : ""}
+                      </TextMorph>
+                    </span>
                   </button>
                 ))}
               </div>

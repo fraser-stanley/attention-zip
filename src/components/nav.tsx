@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { TextMorph } from "@/components/text-morph";
 import { skills } from "@/lib/skills";
@@ -40,9 +40,18 @@ export function Nav() {
   const [open, setOpen] = useState(false);
   const [walletModalOpen, setWalletModalOpen] = useState(false);
   const { address, isConnected } = useWallet();
+  const router = useRouter();
   const close = useCallback(() => {
     setOpen(false);
   }, []);
+  const navigateWithClose = useCallback(
+    (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+      e.preventDefault();
+      close();
+      setTimeout(() => router.push(href), 100);
+    },
+    [close, router]
+  );
   const handleOverlayBackgroundClick = useCallback(
     (e: React.MouseEvent<HTMLDivElement>) => {
       const target = e.target;
@@ -141,20 +150,26 @@ export function Nav() {
         inert={!open ? true : undefined}
         aria-hidden={!open}
         className={cn(
-          "fixed inset-0 z-[100] transition-opacity duration-200 ease-out",
+          "fixed inset-0 z-[100]",
           open
-            ? "opacity-100 pointer-events-auto"
-            : "opacity-0 pointer-events-none"
+            ? "pointer-events-auto"
+            : "pointer-events-none"
         )}
       >
         {/* Backdrop */}
-        <div className="absolute inset-0 bg-black/[0.58] backdrop-blur-[6px]" onClick={close} />
+        <div
+          className={cn(
+            "absolute inset-0 bg-black/[0.58] transition-[opacity,backdrop-filter] duration-200 ease-out",
+            open ? "opacity-100 backdrop-blur-[6px]" : "opacity-0 backdrop-blur-0"
+          )}
+          onClick={close}
+        />
 
         {/* Content */}
         <div
           className={cn(
-            "relative h-full flex flex-col text-white transition-transform duration-200 ease-out",
-            open ? "translate-y-0" : "translate-y-4"
+            "relative h-full flex flex-col text-white transition-[transform,opacity] duration-100 ease-out",
+            open ? "translate-y-0 opacity-100" : "translate-y-1 opacity-0"
           )}
           onClick={handleOverlayBackgroundClick}
         >
@@ -166,6 +181,7 @@ export function Nav() {
                   <Link
                     key={section.id}
                     href={section.href}
+                    onClick={(e) => navigateWithClose(e, section.href)}
                     className="group bg-black p-6 flex flex-col gap-3 transition-colors duration-200 outline-none hover:bg-white hover:text-black focus-visible:bg-white focus-visible:text-black focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black"
                     onMouseEnter={() => iconRefs[section.id]?.current?.startAnimation()}
                     onMouseLeave={() => iconRefs[section.id]?.current?.stopAnimation()}

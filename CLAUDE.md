@@ -185,6 +185,16 @@ import { buttonVariants } from "@/components/ui/button-variants"
 
 Import `buttonVariants` from `@/components/ui/button-variants` for server-safe usage with `<Link>`. The interactive `<Button>` component still lives in `@/components/ui/button`.
 
+## Nav overlay transition pattern
+
+The Index menu overlay uses split transitions for a snappy-but-smooth feel:
+
+- **Content** (section grid + logo): `transition-[transform,opacity] duration-100 ease-out` — snaps in/out fast (100ms). High-frequency interaction = minimal animation per Emil's frequency principle.
+- **Backdrop** (blur + tint): `transition-[opacity,backdrop-filter] duration-200 ease-out` — eases blur smoothly at 200ms. Blur filters need more time to avoid choppy rendering.
+- **Navigation links**: `onClick` calls `navigateWithClose()` which closes the menu first, then fires `router.push()` after 100ms so the close transition completes before the page changes.
+
+The parent wrapper has no transition — it only toggles `pointer-events`. Opacity lives on the content and backdrop independently so they can run at different speeds.
+
 ## Modal layering gotcha
 
 The wallet connect modal hit a subtle CSS painting-order bug. Inside `src/components/wallet-connect-modal.tsx`, the backdrop is `absolute`. When the panel wrapper was non-positioned, the backdrop painted above it even though the panel markup came later in the DOM.

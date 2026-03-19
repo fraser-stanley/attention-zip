@@ -1,89 +1,59 @@
 ---
 name: creator-pulse
-description: Creator coin ecosystems, featured creators, and watchlists on Zora.
-version: 0.1.0
+description: Track creator coin ecosystems and featured creators on Zora. Use when your human asks about specific creators, creator coins, or wants a watchlist.
 metadata:
-  openclaw:
-    emoji: "🎨"
-    homepage: https://github.com/fraser-stanley/zora-agent-skills
+  author: "Zora Agent Skills"
+  version: "1.0.0"
+  displayName: "Creator Pulse"
+  difficulty: "beginner"
 ---
 
 # Creator Pulse
 
-Track creator coins and featured creators on Zora. Build a watchlist, spot volume spikes, and monitor holdings changes for specific creators.
+Track creator coin ecosystems and featured creators on Zora. Monitor volume spikes and holdings changes for specific creators.
 
-## Data available
+## When to Use This Skill
 
-- Creator coin listings (all creator-type coins)
-- Featured creators (Zora-curated)
-- Individual coin detail (by address)
-- Holder counts and volume for any coin
+Use when the user asks about:
+- A specific creator or their coin
+- Featured or top creators on Zora
+- Creator coin rankings by market cap or volume
+- Watchlist tracking for creators they follow
 
-## How to use
+## Setup
 
-All data comes from the Zora Agent Skills API. Base URL depends on deployment — use the `api` field from `/.well-known/ai.json`.
+1. Install the Zora CLI: `npm install -g @zoralabs/cli`
+2. (Optional) Configure an API key to reduce rate limiting: `zora auth configure`
+3. No wallet needed. This skill is read-only.
 
-### Endpoints
+## Configuration
 
-**Creator coins**
-```
-GET /api/explore?sort=creators&count=10
-```
+| Setting | Flag | Default | Description |
+|---------|------|---------|-------------|
+| Limit | `--limit` | `10` | Results per query (1-20) |
+| Type | `--type` | `creator-coin` | Filter to creator coins |
+| Sort | `--sort` | `mcap` | One of: `mcap`, `volume`, `featured` |
 
-**Featured creators**
-```
-GET /api/explore?sort=featured&count=10
-```
+## Commands
 
-Parameters:
-- `sort` — required: `creators` or `featured`
-- `count` — optional, 1–20, default 10
-
-### Response shape
-
-```json
-{
-  "coins": [
-    {
-      "name": "jacob",
-      "address": "0xaaaa...bbbb",
-      "symbol": "JACOB",
-      "coinType": "CREATOR",
-      "marketCap": "8100000",
-      "volume24h": "1200000",
-      "marketCapDelta24h": "-283500",
-      "creatorAddress": "0xcccc...dddd",
-      "uniqueHolders": 2341
-    }
-  ],
-  "sort": "creators",
-  "count": 10
-}
+```bash
+zora explore --type creator-coin --json                          # all creator coins by market cap
+zora explore --sort featured --type creator-coin --json          # Zora-curated featured creators
+zora explore --sort volume --type creator-coin --limit 5 --json  # top volume creator coins
+zora get <creator-name> --json                                   # lookup by creator name
+zora get <address> --type creator-coin --json                    # lookup by contract address
 ```
 
-Fields per coin:
-- `name` — display name
-- `address` — contract address on Base (chain 8453)
-- `symbol` — ticker
-- `coinType` — `CREATOR` for creator coins
-- `marketCap` — USD string
-- `volume24h` — USD string
-- `marketCapDelta24h` — absolute USD change in market cap over 24h
-- `creatorAddress` — the creator's wallet
-- `uniqueHolders` — number of unique holders
+## How It Works
 
-To compute percentage change: `delta / (marketCap - delta) * 100`.
+1. Fetch creator coins using the appropriate sort and type filter
+2. Present each creator coin with name, market cap, holder count, 24h volume, and 24h change
+3. For watchlist alerts, compare `marketCapDelta24h` and `volume24h` between checks to detect spikes
+4. Drill into a specific creator with `zora get` for detailed stats
 
-## Watchlist pattern
+## Example Output
 
-To monitor specific creators, fetch the full creator list and filter by `creatorAddress` or `name`. Compare `volume24h` and `marketCapDelta24h` across checks to detect spikes.
-
-## Example
-
-**Prompt:** Show me the top featured creators on Zora and any recent activity on my watchlist.
-
-**Response:**
-
+```
 Featured creators update:
 
 1. jacob (creator-coin) — $8.1M mcap, -3.4% 24h
@@ -94,7 +64,21 @@ Featured creators update:
 
 Watchlist alert:
 ⚠ jacob saw a 15% volume increase in the last hour.
+```
 
-## Scope
+## Troubleshooting
 
-Read-only. No wallet, keys, or transactions. All data is public on-chain data fetched through the Zora protocol SDK.
+**No results for a creator name**
+- `zora get` accepts creator names or 0x addresses. ENS names are not supported.
+
+**Missing holder or swap data**
+- `zora get` returns `uniqueHolders` and `volume24h` but NOT a swap list or holder breakdown. Do not promise detailed holder analytics.
+
+**`--sort featured` returns error with certain types**
+- `--sort featured` supports `--type creator-coin` and `--type post` only.
+
+## Important Notes
+
+- To build a watchlist, fetch the full list periodically and compare `volume24h` and `marketCapDelta24h` across checks.
+- Compute percentage change: `marketCapDelta24h / (marketCap - marketCapDelta24h) * 100`
+- All data is public on-chain data. No wallet or keys needed.

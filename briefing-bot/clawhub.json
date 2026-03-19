@@ -1,0 +1,8 @@
+{
+  "emoji": "📋",
+  "requires": {
+    "bins": ["zora"]
+  },
+  "cron": null,
+  "autostart": false
+}

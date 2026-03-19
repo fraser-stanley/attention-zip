@@ -1,0 +1,15 @@
+{
+  "emoji": "⚡",
+  "requires": {
+    "bins": ["zora"],
+    "env": ["ZORA_API_KEY", "ZORA_PRIVATE_KEY"]
+  },
+  "cron": null,
+  "autostart": false,
+  "tunables": [
+    {"env": "ZORA_MOMENTUM_MAX_ETH", "type": "number", "default": 0.01, "range": [0.001, 0.1], "step": 0.001, "label": "Max ETH per trade"},
+    {"env": "ZORA_MOMENTUM_MAX_POSITIONS", "type": "number", "default": 3, "range": [1, 10], "step": 1, "label": "Max open positions"},
+    {"env": "ZORA_MOMENTUM_MIN_GAIN_PCT", "type": "number", "default": 15, "range": [5, 50], "step": 5, "label": "Min 24h gain % to enter"},
+    {"env": "ZORA_MOMENTUM_TRAILING_STOP", "type": "number", "default": 15, "range": [5, 30], "step": 5, "label": "Trailing stop %"}
+  ]
+}

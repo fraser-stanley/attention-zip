@@ -1,123 +1,89 @@
 ---
 name: briefing-bot
-description: Structured morning/evening Zora market digest.
-version: 0.1.0
+description: Generate a structured morning or evening Zora market digest. Use when your human asks for a briefing, market summary, or wants to know what changed since their last check.
 metadata:
-  openclaw:
-    emoji: "📋"
-    homepage: https://github.com/fraser-stanley/zora-agent-skills
+  author: "Zora Agent Skills"
+  version: "1.0.0"
+  displayName: "Briefing Bot"
+  difficulty: "beginner"
 ---
 
 # Briefing Bot
 
-Pull trending, volume, creator, and new-launch data into a short briefing. Returns a structured digest instead of raw numbers — useful when you want a summary without checking dashboards.
+Generate a structured morning or evening Zora market digest from a single prompt.
 
-## Data available
+## When to Use This Skill
 
-- Market-wide trends
-- Volume leaders
-- New launches
-- Creator coin movements
-- Leaderboard changes (top traders)
+Use when the user says:
+- "Give me my morning briefing"
+- "What changed on Zora since yesterday?"
+- "Market summary"
+- "What's happening on Zora right now?"
 
-## How to use
+## Setup
 
-A briefing combines multiple API calls into one summary. Fetch all data sources, then format as a digest.
+1. Install the Zora CLI: `npm install -g @zoralabs/cli`
+2. Configure an API key (recommended — this skill runs 5 CLI calls per digest): `zora auth configure`
+3. No wallet needed. This skill is read-only.
 
-### Endpoints to call
+## Configuration
 
-**Trending coins**
-```
-GET /api/explore?sort=trending&count=5
-```
+| Setting | Flag | Default | Description |
+|---------|------|---------|-------------|
+| Limit per section | `--limit` | `5` | Coins per section (1-10) |
 
-**Top volume**
-```
-GET /api/explore?sort=volume&count=5
-```
+## Commands
 
-**New launches**
-```
-GET /api/explore?sort=new&count=5
-```
+Run all five, then synthesize:
 
-**Creator coins**
-```
-GET /api/explore?sort=creators&count=5
+```bash
+zora explore --sort trending --limit 5 --json     # trending coins
+zora explore --sort volume --limit 5 --json        # volume leaders
+zora explore --sort new --limit 5 --json           # new launches
+zora explore --sort gainers --limit 5 --json       # top gainers
+zora explore --type creator-coin --limit 5 --json  # creator coin activity
 ```
 
-**Trader leaderboard**
+## How It Works
+
+1. Run all 5 explore commands to gather data across market dimensions
+2. Combine the results into a single briefing with these sections:
+   - **Trending** — top coin by market cap, notable movers
+   - **New launches** — count of new coins, largest by market cap
+   - **Volume leaders** — highest 24h volume, direction
+   - **Top gainers** — biggest 24h market cap increases
+   - **Creator coins** — notable creator coin activity
+3. End with a one-sentence market assessment
+4. Keep the entire briefing under 200 words. Omit sections with no notable data rather than padding.
+
+## Example Output
+
 ```
-GET /api/leaderboard?count=5
-```
-
-Parameters:
-- `sort` — see above per endpoint
-- `count` — optional, 1–20 for explore, 1–50 for leaderboard
-
-### Response shapes
-
-**Explore response** (same for all sort types):
-```json
-{
-  "coins": [
-    {
-      "name": "string",
-      "address": "string",
-      "symbol": "string",
-      "coinType": "TREND | CREATOR | CONTENT",
-      "marketCap": "string (USD)",
-      "volume24h": "string (USD)",
-      "marketCapDelta24h": "string (USD delta)"
-    }
-  ],
-  "sort": "string",
-  "count": 10
-}
-```
-
-**Leaderboard response**:
-```json
-{
-  "traders": [
-    {
-      "address": "string",
-      "volume": "string (USD)"
-    }
-  ],
-  "count": 5
-}
-```
-
-### Briefing structure
-
-Combine the results into sections:
-
-1. **Trending** — top coin by market cap, notable movers
-2. **New launches** — count of new coins, largest by market cap
-3. **Volume leaders** — highest 24h volume, direction
-4. **Creator coins** — notable creator coin activity
-5. **Leaderboard** — top trader, weekly volume
-6. **Assessment** — one sentence: unusual activity or normal market
-
-## Example
-
-**Prompt:** Give me my morning Zora briefing.
-
-**Response:**
-
 Zora Morning Briefing — Mar 14, 2026
 
 Trending: "looksmaxxing" leads at $2.3M mcap (+12.3%).
 3 new coins launched overnight, largest at $45K mcap.
 
 Volume leaders: "frog market" at $3.1M 24h vol (-8.1%).
+Top gainers: "hyperpop" up 22.8% to $950K mcap.
 Creator coins: jacob steady at $8.1M, alysaliu up 5.7%.
 
-Leaderboard: 0xd8dA...6045 climbed to #3 with $42K weekly volume.
-
 Nothing unusual detected. Market is moderately active.
+```
 
-## Scope
+## Troubleshooting
 
-Read-only. No wallet, keys, or transactions. All data is public on-chain data fetched through the Zora protocol SDK.
+**Rate limited during briefing**
+- This skill runs 5 sequential CLI calls. Without an API key, rate limits are likely. Configure one: `zora auth configure`
+
+**Empty sections**
+- Some sorts may return no results during quiet market periods. Omit empty sections from the briefing.
+
+**`--sort gainers` errors**
+- `--sort gainers` only supports `--type post`. The briefing uses it without a type filter, which defaults to post.
+
+## Important Notes
+
+- The CLI has no streaming mode. Each call is a single request-response.
+- Do not return raw JSON to the user. Synthesize into prose.
+- End every briefing with a plain-language assessment: "Market is [quiet/active/volatile]. [Notable signal or 'Nothing unusual.']"

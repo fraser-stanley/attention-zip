@@ -1,94 +1,55 @@
 ---
 name: portfolio-scout
-description: Coin holdings and portfolio value on Zora.
-version: 0.2.0
+description: Check your local wallet's Zora coin holdings. Use when your human asks about their portfolio, coin balances, or holdings value.
 metadata:
-  openclaw:
-    emoji: "💼"
-    homepage: https://github.com/fraser-stanley/zora-agent-skills
+  author: "Zora Agent Skills"
+  version: "1.0.0"
+  displayName: "Portfolio Scout"
+  difficulty: "beginner"
 ---
 
 # Portfolio Scout
 
-Check Zora coin holdings via the CLI (local wallet) or the SDK (any wallet address). Uses the same read-only wallet-check pattern Bankr agents already use.
+Check your local wallet's Zora coin holdings. The read-only check before you trade.
 
-## Data available
+## When to Use This Skill
 
-- Coin holdings with current values
-- Portfolio composition
-- Holdings changes over time (by comparing checks)
+Use when the user says:
+- "Check my Zora holdings"
+- "What coins do I have?"
+- "Show my portfolio"
+- "How much is my wallet worth?"
 
-## How to use
+## Setup
 
-### CLI — local wallet
+1. Install the Zora CLI: `npm install -g @zoralabs/cli`
+2. Create or import a wallet: `zora setup`
+3. (Optional) Configure an API key to reduce rate limiting: `zora auth configure`
 
-If you have a wallet configured via `zora setup`, check your own holdings:
+## Configuration
 
-```
-zora balances --json
-```
+| Setting | Flag | Default | Description |
+|---------|------|---------|-------------|
+| Sort | `--sort` | `balance` | Sort by: `balance`, `value`, `mcap`, `change` |
 
-Returns an array of coin holdings with balance, USD value, market cap, and volume per coin. Local wallet only — no address argument.
+## Commands
 
-### SDK — any wallet
-
-For arbitrary wallet lookups, use the SDK directly:
-
-**Coin balances**
-```typescript
-import { getProfileBalances } from "@zoralabs/coins-sdk";
-
-const response = await getProfileBalances({
-  identifier: "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045",
-  count: 20,
-});
+```bash
+zora balances --json                  # all coin holdings
+zora balances --sort value --json     # sorted by USD value (highest first)
+zora balances --sort change --json    # sorted by 24h change
 ```
 
-**Created coins**
-```typescript
-import { getProfileCoins } from "@zoralabs/coins-sdk";
+## How It Works
 
-const response = await getProfileCoins({
-  identifier: "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045",
-  count: 20,
-});
+1. Run `zora balances --json` to fetch all coin holdings from the local wallet
+2. Parse each holding: coin name, symbol, type, balance, USD value, market cap, 24h volume
+3. Present holdings with name, type, token balance, USD value, and 24h change
+4. Show total portfolio value as a sum of all holdings
+
+## Example Output
+
 ```
-
-Parameters:
-- `identifier` — the wallet address to look up (public address, not a private key)
-- `count` — number of results, default 20
-
-### Response handling
-
-**CLI** returns clean JSON to stdout:
-```json
-[{ "name": "Test Coin", "symbol": "TEST", "coinType": "CONTENT", "address": "0x...", "balance": "12.34", "usdValue": 18.51, "priceUsd": 1.5, "marketCap": 1000000, "volume24h": 1200 }]
-```
-
-**SDK** responses return `{ error, data }`. Always check `response.error` before accessing data.
-
-```typescript
-if (response.error) {
-  // handle error
-}
-const holdings = response.data?.profile?.coinBalances?.edges?.map(e => e.node) ?? [];
-```
-
-### What you get back
-
-Each holding includes:
-- Coin name, symbol, and address
-- Token balance (amount held)
-- Current USD value
-- Coin type (CONTENT, CREATOR, TREND)
-- Market cap and 24h volume
-
-## Example
-
-**Prompt:** Check my Zora coin holdings.
-
-**Response:**
-
 Coin Holdings (local wallet):
 
 1. jacob (CREATOR) — 1,200 tokens
@@ -102,11 +63,22 @@ Coin Holdings (local wallet):
 
 Total value: ~$6,050
 Coins held: 3
+```
 
-## Bankr compatibility
+## Troubleshooting
 
-This skill uses the same read-only wallet lookup pattern as Bankr agents. If you're running a Bankr wallet, point Portfolio Scout at your Bankr wallet address via the SDK to check holdings. Portfolio Scout is the "check before you trade" step for execution skills like Momentum Trader.
+**"No wallet configured"**
+- Run `zora setup` to create a new wallet or import an existing private key.
 
-## Scope
+**"Balance shows nothing but I have tokens"**
+- `zora balances` shows **Zora coin holdings only** — NOT native ETH, USDC, or ZORA token balances. If the user asks about native tokens, explain this limitation.
 
-Read-only. The CLI reads from your local wallet config but does not sign or transact. SDK lookups require only a public wallet address. All data is public on-chain data fetched through the Zora protocol.
+**"Can I check another wallet?"**
+- `zora balances` has no address argument. It reads from the local wallet at `~/.config/zora/wallet.json` only. For arbitrary address lookups, use the API route: `GET /api/agents/<address>`.
+
+## Important Notes
+
+- Wallet-only: reads from `~/.config/zora/wallet.json` or `ZORA_PRIVATE_KEY` env var. No address argument.
+- Returns coin holdings (balance, USD value, market cap, volume per coin), not native ETH/USDC/ZORA.
+- Bankr-compatible: point Bankr agents at a wallet address via the API route for cross-agent portfolio checks.
+- This skill is the "check before you trade" step for execution skills like Momentum Trader.

@@ -20,6 +20,7 @@ Agent skills for the Zora attention market. Skill gallery, live market data, lea
 pnpm install
 pnpm dev          # dev server at localhost:3000
 pnpm build        # production build (primary verification gate)
+pnpm test         # vitest skill structure + data integrity tests
 pnpm lint         # eslint
 ```
 
@@ -36,7 +37,15 @@ The API key is **optional**. The SDK works without it (uses registered queries),
 ## Project structure
 
 ```
+trend-scout/                        # Skill: trending coins, gainers, momentum
+creator-pulse/                      # Skill: creator coin ecosystems
+briefing-bot/                       # Skill: structured market digest
+portfolio-scout/                    # Skill: coin holdings (read-only)
+momentum-trader/                    # Skill: execution-capable momentum trading
 src/
+├── __tests__/
+│   ├── skills-structure.test.ts    # SKILL.md + clawhub.json structural validation
+│   └── skills-data.test.ts         # skills.ts array integrity + cross-file sync
 ├── app/
 │   ├── page.tsx                    # Homepage (hero, terminal market board, skills preview, waitlist)
 │   ├── loading.tsx                 # Homepage loading skeleton (instant nav)
@@ -111,7 +120,7 @@ src/
 - **The skills page stays intentionally flat** — one shared runtime picker updates every command block. Only the example output is collapsible (with typewriter animation). No nested accordions.
 - **Tabs use a single unified style** — `TabsList` always renders with `bg-muted p-1` (gray container) and selected tabs get black fill + white text. No variants — one style for all tab UIs (skills picker, homepage terminal, portfolio, dashboard).
 - **Route-level `loading.tsx` files** exist for `/`, `/dashboard`, and `/leaderboard` — the three routes with async SDK fetches. These render instant skeleton states during navigation so the site feels like a fast SPA. Static pages (`/skills`, `/portfolio`) don't need them.
-- **No `config.schema.json`** for skills. Config is documented inline in SKILL.md files, following Bankr/OpenClaw conventions.
+- **No `config.schema.json`** for skills. Config is documented inline in SKILL.md files, following AgentSkills/OpenClaw conventions. Runtime config (requires, tunables) lives in `clawhub.json`.
 - **Command menu is lazy-loaded** through `src/components/command-menu-loader.tsx` so it does not affect the initial page payload.
 - **React Query** handles live refresh after hydration. Initial render is server-owned for `/`, `/dashboard`, and `/leaderboard`.
 - **Homepage "Agent activity" is a terminal board**, not a 4-card grid. It preloads 8 rows per tab, refreshes through `/api/explore` and `/api/leaderboard`, and uses a subtle CRT-style loading sweep plus simulated preview motion between fetches.
@@ -219,6 +228,59 @@ All SDK responses return `{ error, data }`. Always check `response.error` before
 
 Skills 1–4 are read-only (no wallet needed). Skill 5 is execution-capable via the Zora CLI's native wallet and buy/sell commands. All use OpenClaw SKILL.md format. The CLI has no SKILL.md parsing — it's purely an agent-runtime convention.
 
+### Skill directory structure
+
+Each skill follows the AgentSkills/ClawHub directory convention:
+
+```
+<skill-slug>/
+├── SKILL.md          # AgentSkills-compliant metadata + agent instructions
+├── clawhub.json      # ClawHub registry config (requires, tunables, cron)
+└── scripts/
+    └── validate.sh   # Structural validation script
+```
+
+**SKILL.md frontmatter** uses the AgentSkills format — flat `metadata` strings only:
+```yaml
+---
+name: <skill-slug>          # must match directory name
+description: <max 1024 chars>
+metadata:
+  author: "Zora Agent Skills"
+  version: "1.0.0"
+  displayName: "<Human Name>"
+  difficulty: "beginner|intermediate|advanced"
+---
+```
+
+Do NOT put `requires`, `tunables`, or `openclaw` in SKILL.md frontmatter — those go in `clawhub.json`.
+
+**SKILL.md body** must contain these 8 sections in order:
+1. `## When to Use This Skill`
+2. `## Setup`
+3. `## Configuration`
+4. `## Commands`
+5. `## How It Works`
+6. `## Example Output`
+7. `## Troubleshooting`
+8. `## Important Notes`
+
+**clawhub.json** structure:
+- Read-only skills: `requires.bins: ["zora"]`, no `requires.env`
+- Execution skills: add `requires.env: ["ZORA_API_KEY", "ZORA_PRIVATE_KEY"]` and `tunables` array
+- No `automaton` block (we have no Python entrypoints)
+
+### Skill testing
+
+Run `pnpm test` to validate all skills against the AgentSkills spec. Tests cover:
+- SKILL.md frontmatter fields and format
+- Required body sections present
+- Word count 300–800 per skill
+- CLI flag correctness (`--json` for explore/get/balances, `-o json` for buy/sell)
+- clawhub.json schema validation
+- Cross-file sync (skills.ts IDs match SKILL.md names and directory names)
+- Execution skill safety (risk levels, buy/sell wraps, env requirements)
+
 ### CLI commands
 
 The Zora CLI has 8 commands: `auth`, `explore`, `get`, `buy`, `sell`, `balances`, `setup`, `wallet`.
@@ -227,8 +289,8 @@ The Zora CLI has 8 commands: `auth`, `explore`, `get`, `buy`, `sell`, `balances`
 |---------|--------|-------|
 | `zora explore` | `--sort <sort> --type <type> --limit <n> --json` | Sorts: mcap, volume, new, gainers, trending, featured, last-traded, last-traded-unique. Types: all, trend, creator-coin, post |
 | `zora get` | `zora get <identifier> [--type <type>] --json` | Identifier = 0x address or creator name. NOT ENS. Types: creator-coin, post, trend |
-| `zora buy` | `zora buy <address> --eth <amount> --json` | Also: --percent, --all, --quote (preview only), --yes (skip confirm) |
-| `zora sell` | `zora sell <address> --amount <tokens> --json` | Also: --percent, --all, --to <ETH\|USDC\|ZORA>, --quote, --yes |
+| `zora buy` | `zora buy <address> --eth <amount> -o json` | Uses `-o json` (local flag), NOT `--json`. Also: --percent, --all, --quote (preview only), --yes (skip confirm) |
+| `zora sell` | `zora sell <address> --amount <tokens> -o json` | Uses `-o json` (local flag), NOT `--json`. Also: --percent, --all, --to <ETH\|USDC\|ZORA>, --quote, --yes |
 | `zora balances` | `zora balances --json` | **Local wallet only** — no address argument. Returns coin holdings (not native ETH/USDC/ZORA) |
 | `zora setup` | `zora setup [--create] [--force]` | Creates/imports wallet at ~/.config/zora/wallet.json |
 | `zora wallet` | `wallet info`, `wallet export`, `wallet backup` | Keychain-protected backup on macOS |

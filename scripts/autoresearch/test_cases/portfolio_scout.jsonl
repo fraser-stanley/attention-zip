@@ -1,0 +1,15 @@
+{"id": "check_holdings", "input": "Check my Zora holdings", "context": {}}
+{"id": "whats_in_wallet", "input": "What coins do I have?", "context": {}}
+{"id": "portfolio_value", "input": "How much is my wallet worth?", "context": {}}
+{"id": "show_portfolio", "input": "Show my portfolio", "context": {}}
+{"id": "my_coins", "input": "My coins", "context": {}}
+{"id": "portfolio_breakdown", "input": "Portfolio breakdown", "context": {}}
+{"id": "sorted_by_value", "input": "Show holdings sorted by value", "context": {"sort": "value"}}
+{"id": "sorted_by_change", "input": "Which of my coins moved the most?", "context": {"sort": "change"}}
+{"id": "empty_portfolio", "input": "Check my holdings", "context": {"empty_portfolio": true}}
+{"id": "ask_about_eth", "input": "How much ETH do I have?", "context": {"native_token_question": true}}
+{"id": "other_wallet", "input": "Check wallet 0x1234...", "context": {"other_wallet": true}}
+{"id": "total_value", "input": "Total portfolio value", "context": {}}
+{"id": "position_summary", "input": "Summarize my positions", "context": {}}
+{"id": "before_trading", "input": "Check balances before I trade", "context": {}}
+{"id": "coin_types", "input": "What types of coins do I hold?", "context": {}}

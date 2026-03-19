@@ -153,7 +153,7 @@ Nothing unusual detected. Market is moderately active.`,
     description:
       "Coin holdings and portfolio value. Read-only, Bankr-ready.",
     longDescription:
-      "Checks your wallet's Zora coin holdings via CLI, or any wallet via SDK.",
+      "Checks your local wallet's Zora coin holdings via CLI.",
     risk: "none",
     riskLabel: "Read-only — local wallet or address",
     monitors: [
@@ -163,7 +163,6 @@ Nothing unusual detected. Market is moderately active.`,
     ],
     wraps: [
       "zora balances --json",
-      "@zoralabs/coins-sdk → getProfileBalances()",
     ],
     installCommand: "npx zora-cli install",
     samplePrompt:
@@ -211,8 +210,10 @@ Coins held: 3`,
     ],
     wraps: [
       "zora explore --sort gainers --json",
-      "zora buy <address> --eth <amount> --json",
-      "zora sell <address> --amount <tokens> --json",
+      "zora get <address> --json",
+      "zora buy <address> --eth <amount> -o json --yes",
+      "zora sell <address> --all -o json --yes",
+      "zora balances --json",
     ],
     installCommand: "npx zora-cli install",
     samplePrompt:

@@ -1,95 +1,61 @@
 ---
 name: trend-scout
-description: Trending coins, new launches, gainers, and momentum on Zora.
-version: 0.1.0
+description: Surface trending coins, new launches, and top gainers on Zora. Use when your human asks about momentum, what's trending, new coins, or volume leaders.
 metadata:
-  openclaw:
-    emoji: "📡"
-    homepage: https://github.com/fraser-stanley/zora-agent-skills
+  author: "Zora Agent Skills"
+  version: "1.0.0"
+  displayName: "Trend Scout"
+  difficulty: "beginner"
 ---
 
 # Trend Scout
 
-Spot fast-moving coins on Zora before they show up on dashboards. Returns structured data — coin name, address, market cap, volume, and 24h change — so you can rank, filter, and act on momentum.
+Surface trending coins, new launches, and top gainers on Zora before they appear on dashboards.
 
-## Data available
+## When to Use This Skill
 
-- Trending coins (network-wide momentum)
+Use when the user asks about:
+- What's trending on Zora
 - New coin launches
-- Top gainers by 24h market cap change
-- Top volume coins (24h)
+- Top gainers or biggest movers
+- Volume leaders or volume spikes
+- General market momentum
 
-## How to use
+## Setup
 
-All data comes from the Zora Agent Skills API. Base URL depends on deployment — use the `api` field from `/.well-known/ai.json`.
+1. Install the Zora CLI: `npm install -g @zoralabs/cli`
+2. (Optional) Configure an API key to reduce rate limiting: `zora auth configure`
+3. No wallet needed. This skill is read-only.
 
-### Endpoints
+## Configuration
 
-**Trending coins**
-```
-GET /api/explore?sort=trending&count=10
-```
+| Setting | Flag | Default | Description |
+|---------|------|---------|-------------|
+| Sort | `--sort` | `trending` | One of: `trending`, `new`, `gainers`, `volume`, `mcap` |
+| Limit | `--limit` | `10` | Results per query (1-20) |
+| Type filter | `--type` | `all` | Filter: `all`, `trend`, `creator-coin`, `post` |
 
-**New launches**
-```
-GET /api/explore?sort=new&count=10
-```
+## Commands
 
-**Top gainers (24h)**
-```
-GET /api/explore?sort=gainers&count=10
-```
-
-**Top volume (24h)**
-```
-GET /api/explore?sort=volume&count=10
-```
-
-Parameters:
-- `sort` — required: `trending`, `new`, `gainers`, or `volume`
-- `count` — optional, 1–20, default 10
-
-### Response shape
-
-```json
-{
-  "coins": [
-    {
-      "name": "looksmaxxing",
-      "address": "0x1234...5678",
-      "symbol": "LOOKS",
-      "coinType": "TREND",
-      "marketCap": "2300000",
-      "volume24h": "450200",
-      "marketCapDelta24h": "252000",
-      "creatorAddress": "0xabcd...ef01",
-      "uniqueHolders": 342
-    }
-  ],
-  "sort": "trending",
-  "count": 10
-}
+```bash
+zora explore --sort trending --json           # coins ranked by network momentum
+zora explore --sort new --json                # recently launched coins
+zora explore --sort gainers --json            # top 24h market cap gainers
+zora explore --sort volume --json             # highest 24h volume
+zora explore --sort trending --limit 5 --json # fewer results
+zora get <address> --json                     # detail for a specific coin
 ```
 
-Fields per coin:
-- `name` — display name
-- `address` — contract address on Base (chain 8453)
-- `symbol` — ticker
-- `coinType` — `TREND`, `CREATOR`, or `CONTENT`
-- `marketCap` — USD string
-- `volume24h` — USD string
-- `marketCapDelta24h` — absolute USD change in market cap over 24h
-- `creatorAddress` — wallet that created the coin
-- `uniqueHolders` — number of unique holders
+## How It Works
 
-To compute percentage change: `delta / (marketCap - delta) * 100`.
+1. Fetch explore data using the sort that matches the user's question
+2. Parse the JSON response — each coin includes name, address, market cap, volume, and 24h delta
+3. Rank and present the top results with name, market cap, 24h change, volume, and contract address
+4. For deeper info on a specific coin, follow up with `zora get <address>`
 
-## Example
+## Example Output
 
-**Prompt:** Check Zora for trending coins with significant price movement in the last 24 hours.
-
-**Response:**
-
+```
 Found 3 trending coins with notable movement:
 
 1. looksmaxxing (trend) — $2.3M mcap, +12.3% 24h
@@ -103,7 +69,23 @@ Found 3 trending coins with notable movement:
 3. based penguin (trend) — $780.5K mcap, +31.2% 24h
    Address: 0x9876...5432
    Volume: $95.6K
+```
 
-## Scope
+## Troubleshooting
 
-Read-only. No wallet, keys, or transactions. All data is public on-chain data fetched through the Zora protocol SDK.
+**"Rate limited" or slow responses**
+- Configure an API key: `zora auth configure`
+- Without a key, requests are throttled
+
+**Empty results for `--sort gainers`**
+- `--sort gainers` only supports `--type post`. Do not combine with `--type all` or `--type creator-coin`
+
+**Exit code 1**
+- CLI error. In `--json` mode, errors are structured: `{"error": "...", "suggestion": "..."}`
+
+## Important Notes
+
+- Compute percentage change: `marketCapDelta24h / (marketCap - marketCapDelta24h) * 100`
+- All data is public on-chain data on Base (chain 8453). No wallet or keys needed.
+- `zora get` returns `uniqueHolders` and `volume24h` but NOT swaps or detailed holder lists.
+- `zora get` accepts 0x addresses or creator names, NOT ENS.

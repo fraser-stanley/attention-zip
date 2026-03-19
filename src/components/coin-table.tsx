@@ -1,6 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
+import { TextMorph } from "@/components/text-morph";
 import {
   Table,
   TableBody,
@@ -112,10 +113,10 @@ export function CoinTable({
                 </Badge>
               </TableCell>
               <TableCell className="type-body-sm text-right font-mono">
-                {formatCompactCurrency(coin.marketCap)}
+                <TextMorph>{formatCompactCurrency(coin.marketCap)}</TextMorph>
               </TableCell>
               <TableCell className="type-body-sm text-right font-mono">
-                {formatCompactCurrency(coin.volume24h)}
+                <TextMorph>{formatCompactCurrency(coin.volume24h)}</TextMorph>
               </TableCell>
               <TableCell className="type-body-sm text-right font-mono">
                 {change.positive !== null ? (
@@ -124,10 +125,10 @@ export function CoinTable({
                       change.positive ? "bg-[#3FFF00] text-black" : "bg-[#FF00F0] text-black"
                     }`}
                   >
-                    {change.value}
+                    <TextMorph>{change.value}</TextMorph>
                   </span>
                 ) : (
-                  <span className="text-muted-foreground">{change.value}</span>
+                  <span className="text-muted-foreground"><TextMorph>{change.value}</TextMorph></span>
                 )}
               </TableCell>
             </TableRow>

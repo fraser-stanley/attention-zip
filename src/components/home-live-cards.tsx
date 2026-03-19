@@ -3,8 +3,9 @@
 import type { ComponentType } from "react";
 import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { AnimatePresence, motion, useReducedMotion } from "motion/react";
+import { motion, useReducedMotion } from "motion/react";
 
+import { TextMorph } from "@/components/text-morph";
 import { ActivityIcon } from "@/components/ui/activity";
 import { ChartBarIncreasingIcon } from "@/components/ui/chart-bar-increasing";
 import { FlameIcon } from "@/components/ui/flame";
@@ -210,45 +211,6 @@ function changeChipClass(positive: boolean | null, flashTone: FlashTone, isSelec
   return isSelected ? "text-background/80" : "text-muted-foreground";
 }
 
-function AnimatedValue({
-  value,
-  className,
-}: {
-  value: string;
-  className?: string;
-}) {
-  const reduceMotion = useReducedMotion() ?? false;
-
-  return (
-    <span className="relative inline-grid overflow-hidden">
-      <AnimatePresence initial={false} mode="popLayout">
-        <motion.span
-          key={value}
-          initial={
-            reduceMotion
-              ? { opacity: 1 }
-              : { opacity: 0.35, y: 6, filter: "blur(4px)" }
-          }
-          animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-          exit={
-            reduceMotion
-              ? { opacity: 0 }
-              : { opacity: 0, y: -6, filter: "blur(4px)", position: "absolute" }
-          }
-          transition={
-            reduceMotion
-              ? { duration: 0 }
-              : { duration: 0.2, ease: [0.22, 1, 0.36, 1] }
-          }
-          className={className}
-        >
-          {value}
-        </motion.span>
-      </AnimatePresence>
-    </span>
-  );
-}
-
 function BoardSkeleton() {
   const reduceMotion = useReducedMotion() ?? false;
 
@@ -401,31 +363,34 @@ function TerminalRow({
             {row.name}
           </div>
           <div className="text-right">
-            <AnimatedValue
-              value={row.marketCap}
+            <TextMorph
               className={cn(
                 "type-body-sm inline-flex rounded-sm px-1.5 py-0.5",
                 isFlash ? "text-black/72" : isSelected ? "text-background/80" : "text-muted-foreground"
               )}
-            />
+            >
+              {row.marketCap}
+            </TextMorph>
           </div>
           <div className="text-right">
-            <AnimatedValue
-              value={row.volume}
+            <TextMorph
               className={cn(
                 "type-body-sm inline-flex rounded-sm px-1.5 py-0.5",
                 isFlash ? "text-black/72" : isSelected ? "text-background/80" : "text-muted-foreground"
               )}
-            />
+            >
+              {row.volume}
+            </TextMorph>
           </div>
           <div className="text-right">
-            <AnimatedValue
-              value={row.changeText}
+            <TextMorph
               className={cn(
                 "type-body-sm inline-flex items-center rounded-sm px-1.5 py-0.5 font-mono font-medium",
                 changeChipClass(row.positive, flashTone, isSelected)
               )}
-            />
+            >
+              {row.changeText}
+            </TextMorph>
           </div>
         </>
       ) : (
@@ -439,13 +404,14 @@ function TerminalRow({
             {row.trader}
           </div>
           <div className="text-right">
-            <AnimatedValue
-              value={row.volume}
+            <TextMorph
               className={cn(
                 "type-body-sm inline-flex rounded-sm px-1.5 py-0.5",
                 isFlash ? "text-black/72" : isSelected ? "text-background/80" : "text-muted-foreground"
               )}
-            />
+            >
+              {row.volume}
+            </TextMorph>
           </div>
         </>
       )}
@@ -595,31 +561,29 @@ export function HomeLiveCards({
   return (
     <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as BoardTab)} className="gap-0">
       <div className="overflow-hidden border border-border bg-card">
-        <div className="border-b border-border px-3 py-2">
-          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-            <TabsList
-              variant="toggle"
-              className="grid w-full grid-cols-2 sm:w-auto sm:grid-cols-4"
-            >
-              {TAB_DEFS.map((tab) => {
-                const Icon = tab.icon;
+        <div className="flex flex-col gap-2 border-b border-border bg-muted p-1 sm:flex-row sm:items-center sm:justify-between">
+          <TabsList
+            variant="toggle"
+            className="grid w-full grid-cols-2 bg-transparent p-0 sm:w-auto sm:grid-cols-4"
+          >
+            {TAB_DEFS.map((tab) => {
+              const Icon = tab.icon;
 
-                return (
-                  <TabsTrigger
-                    key={tab.id}
-                    value={tab.id}
-                    className="type-caption min-h-[32px] gap-1.5 px-2.5 py-1"
-                  >
-                    <Icon size={12} />
-                    {tab.label}
-                  </TabsTrigger>
-                );
-              })}
-            </TabsList>
+              return (
+                <TabsTrigger
+                  key={tab.id}
+                  value={tab.id}
+                  className="type-caption min-h-[32px] gap-1.5 px-2.5 py-1"
+                >
+                  <Icon size={12} />
+                  {tab.label}
+                </TabsTrigger>
+              );
+            })}
+          </TabsList>
 
-            <div className="type-caption text-right font-mono text-muted-foreground">
-              {rowSummary(selectedRow, selectedRowIndex)}
-            </div>
+          <div className="type-caption px-2 pb-1 text-right font-mono text-muted-foreground sm:pb-0 sm:pr-2">
+            {rowSummary(selectedRow, selectedRowIndex)}
           </div>
         </div>
 

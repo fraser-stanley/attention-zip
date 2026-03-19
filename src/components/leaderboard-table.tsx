@@ -1,6 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
+import { TextMorph } from "@/components/text-morph";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   Table,
@@ -76,7 +77,7 @@ export function LeaderboardTable({
               {truncateAddress(trader.address ?? "")}
             </TableCell>
             <TableCell className="type-body-sm text-right font-mono">
-              {formatCompactCurrency(trader.volume)}
+              <TextMorph>{formatCompactCurrency(trader.volume)}</TextMorph>
             </TableCell>
           </TableRow>
         ))}

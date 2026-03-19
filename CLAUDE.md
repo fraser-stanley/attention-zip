@@ -73,8 +73,8 @@ src/
 │   ├── agent-profile-detail.tsx    # Agent profile with PnL, positions, sparkline, holdings
 │   ├── pnl-sparkline.tsx           # SVG sparkline for cumulative PnL charts
 │   ├── wallet-connect-modal.tsx     # Mock wallet connect flow (MetaMask/Coinbase/WalletConnect)
-│   ├── activity-ticker.tsx         # Live activity marquee ticker (layout-level, all pages)
-│   ├── activity-ticker-section.tsx # Activity ticker wrapper section
+│   ├── activity-ticker.tsx         # Agent trade feed marquee (Simmer-style, mock data)
+│   ├── activity-ticker-section.tsx # Activity ticker wrapper (imports mock trade data)
 │   └── ui/                         # shadcn/ui components (button, card, badge, table, tabs, etc.)
 ├── public/
 │   └── .well-known/ai.json         # Agent discovery metadata
@@ -91,6 +91,7 @@ src/
     ├── pnl-utils.ts                # Shared PnL formatting (pnlColor, formatPnl, formatPct)
     ├── portfolio-mock-data.ts      # Mock portfolio data (positions, trades, sparkline)
     ├── agent-mock-data.ts          # Mock agent PnL data (positions, trades, sparkline)
+    ├── activity-mock-data.ts       # Mock agent trade entries for ticker marquee
     └── shaders/
         └── dither-effect.ts        # 4x4 Bayer matrix dithering post-process (binary output)
 ├── proxy.ts                        # CORS headers for /api/*
@@ -110,6 +111,7 @@ src/
 - **Command menu is lazy-loaded** through `src/components/command-menu-loader.tsx` so it does not affect the initial page payload.
 - **React Query** handles live refresh after hydration. Initial render is server-owned for `/`, `/dashboard`, and `/leaderboard`.
 - **Homepage "Agent activity" is a terminal board**, not a 4-card grid. It preloads 8 rows per tab, refreshes through `/api/explore` and `/api/leaderboard`, and uses a subtle CRT-style loading sweep plus simulated preview motion between fetches.
+- **Activity ticker shows mock agent trades** — Simmer-style marquee (`@AgentName bought $12 Higher 3m ago`). Mock data in `src/lib/activity-mock-data.ts` with `TradeActivityItem` interface. Green for buys, magenta for sells. Will swap to real trade data when tracking is available.
 - **Portfolio page is mock data only** — `src/lib/portfolio-mock-data.ts` provides all positions, trades, PnL stats, and sparkline data. No real wallet connection. Will be replaced with live data when trade history indexing ships.
 - **Agent profiles use mock PnL data** — `src/lib/agent-mock-data.ts` provides mock positions, trades, and sparkline for agent profile pages. Real profile data (holdings, created coins) comes from the SDK.
 - **PnL utilities are shared** — `src/lib/pnl-utils.ts` exports `pnlColor()`, `formatPnl()`, `formatPct()` used by both portfolio and agent profile pages. Gains = `#3FFF00`, losses = `#FF00F0`.

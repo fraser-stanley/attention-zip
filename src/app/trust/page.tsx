@@ -1,5 +1,3 @@
-import { HighlighterStroke } from "@/components/highlighter-stroke";
-
 const boundaries = [
   "Hold or manage private keys",
   "Submit transactions on your behalf",
@@ -12,13 +10,15 @@ export default function TrustPage() {
   return (
     <div>
       {/* Hero */}
-      <section className="pt-4 pb-20">
-        <p className="type-label text-muted-foreground">Trust &amp; Safety</p>
-        <h1 className="type-display mt-6 max-w-4xl">
+      <section className="pt-16 pb-20">
+        <p className="text-[11px] font-mono uppercase tracking-[0.18em] text-muted-foreground">
+          Trust &amp; Safety
+        </p>
+        <h1 className="mt-6 max-w-4xl text-4xl tracking-[-0.05em] sm:text-5xl lg:text-6xl">
           We publish source.{" "}
-          <HighlighterStroke>You control execution.</HighlighterStroke>
+          <span className="highlight-block">You control execution.</span>
         </h1>
-        <p className="type-body mt-8 max-w-2xl text-muted-foreground">
+        <p className="mt-8 max-w-2xl text-base leading-7 text-muted-foreground">
           How this works and how to keep your wallet safe.
         </p>
       </section>
@@ -26,16 +26,18 @@ export default function TrustPage() {
       {/* Our model */}
       <section className="py-20">
         <div className="max-w-2xl">
-          <p className="type-label text-muted-foreground">Our model</p>
-          <h2 className="type-title mt-4 max-w-4xl">
+          <p className="text-[11px] font-mono uppercase tracking-[0.18em] text-muted-foreground">
+            Our model
+          </p>
+          <h2 className="mt-4 max-w-4xl text-4xl tracking-[-0.05em] sm:text-5xl lg:text-6xl">
             Source-published, locally executed
           </h2>
-          <div className="type-body mt-8 space-y-6 text-muted-foreground">
+          <div className="mt-8 space-y-6 text-base leading-7 text-muted-foreground">
             <p>
               We wrote every skill in this repo and published the source. You can
               read the code before you install anything.
             </p>
-            <p className="type-card-title text-foreground">
+            <p className="text-foreground text-lg leading-8">
               We don&apos;t hold keys, submit transactions, or control your local
               runtime.
             </p>
@@ -52,47 +54,55 @@ export default function TrustPage() {
 
       {/* Wallet safety presets */}
       <section className="py-20">
-        <p className="type-label text-muted-foreground">Wallet safety presets</p>
-        <h2 className="type-section mt-4 max-w-2xl">
+        <p className="text-[11px] font-mono uppercase tracking-[0.18em] text-muted-foreground">
+          Wallet safety presets
+        </p>
+        <h2 className="mt-4 text-2xl tracking-tight sm:text-3xl max-w-2xl">
           Never reuse your personal wallet
         </h2>
-        <p className="type-body mt-4 max-w-2xl text-muted-foreground">
+        <p className="mt-4 max-w-2xl text-base leading-7 text-muted-foreground">
           Execution skills like Momentum Trader should only run in a dedicated
           wallet with bounded funds. Most other skills are read-only.
         </p>
 
         <div className="mt-12 grid gap-4 sm:grid-cols-3">
           <div className="bg-background p-6 sm:p-8">
-            <p className="type-label text-muted-foreground">01</p>
-            <h3 className="type-card-title mt-3">Scout</h3>
-            <p className="type-body-sm mt-1 font-mono text-[#3FFF00]">
+            <p className="text-[11px] font-mono uppercase tracking-[0.18em] text-muted-foreground">
+              01
+            </p>
+            <h3 className="mt-3 text-lg font-medium">Scout</h3>
+            <p className="mt-1 text-sm font-mono text-[#3FFF00]">
               Read-only, no funds
             </p>
-            <p className="type-body-sm mt-4 text-muted-foreground">
+            <p className="mt-4 text-sm leading-6 text-muted-foreground">
               Monitoring and alerts only. No wallet needed. Most skills work
               here.
             </p>
           </div>
 
           <div className="bg-background p-6 sm:p-8">
-            <p className="type-label text-muted-foreground">02</p>
-            <h3 className="type-card-title mt-3">Trader</h3>
-            <p className="type-body-sm mt-1 font-mono text-foreground">
+            <p className="text-[11px] font-mono uppercase tracking-[0.18em] text-muted-foreground">
+              02
+            </p>
+            <h3 className="mt-3 text-lg font-medium">Trader</h3>
+            <p className="mt-1 text-sm font-mono text-foreground">
               Dedicated wallet, execution enabled
             </p>
-            <p className="type-body-sm mt-4 text-muted-foreground">
+            <p className="mt-4 text-sm leading-6 text-muted-foreground">
               Required for execution skills. Dedicated wallet, limited funds.
               Never your personal wallet.
             </p>
           </div>
 
           <div className="bg-background p-6 sm:p-8">
-            <p className="type-label text-muted-foreground">03</p>
-            <h3 className="type-card-title mt-3">Personal</h3>
-            <p className="type-body-sm mt-1 font-mono text-destructive">
+            <p className="text-[11px] font-mono uppercase tracking-[0.18em] text-muted-foreground">
+              03
+            </p>
+            <h3 className="mt-3 text-lg font-medium">Personal</h3>
+            <p className="mt-1 text-sm font-mono text-destructive">
               Not recommended
             </p>
-            <p className="type-body-sm mt-4 text-muted-foreground">
+            <p className="mt-4 text-sm leading-6 text-muted-foreground">
               Never use your personal wallet with agent skills. Create a
               dedicated agent wallet with{" "}
               <code className="bg-muted px-1">zora setup</code>. Keys stored
@@ -105,18 +115,20 @@ export default function TrustPage() {
 
       {/* Boundaries */}
       <section className="py-20">
-        <p className="type-label text-muted-foreground">Boundaries</p>
-        <h2 className="type-section mt-4">
+        <p className="text-[11px] font-mono uppercase tracking-[0.18em] text-muted-foreground">
+          Boundaries
+        </p>
+        <h2 className="mt-4 text-2xl tracking-tight sm:text-3xl">
           What we don&apos;t do
         </h2>
 
         <div className="mt-12 max-w-2xl">
           {boundaries.map((item, i) => (
             <div key={i} className="py-4 flex items-baseline gap-4">
-              <span className="type-label w-8 shrink-0 text-muted-foreground">
+              <span className="text-[11px] font-mono uppercase tracking-[0.18em] text-muted-foreground shrink-0 w-8">
                 {String(i + 1).padStart(2, "0")}
               </span>
-              <p className="type-body text-foreground">{item}</p>
+              <p className="text-base leading-7">{item}</p>
             </div>
           ))}
         </div>
@@ -125,11 +137,13 @@ export default function TrustPage() {
       {/* Source code */}
       <section className="py-20">
         <div className="max-w-2xl">
-          <p className="type-label text-muted-foreground">Source code</p>
-          <h2 className="type-section mt-4">
+          <p className="text-[11px] font-mono uppercase tracking-[0.18em] text-muted-foreground">
+            Source code
+          </p>
+          <h2 className="mt-4 text-2xl tracking-tight sm:text-3xl">
             Read before you install
           </h2>
-          <p className="type-body mt-6 text-muted-foreground">
+          <p className="mt-6 text-base leading-7 text-muted-foreground">
             All skill source code is available at{" "}
             <a
               href="https://github.com/fraserstanley/zora-agent-skills"

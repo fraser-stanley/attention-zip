@@ -241,13 +241,14 @@ function SkillRow({
 
   return (
     <section
-      className={cn(
-        "scroll-mt-32 py-10 sm:py-14",
-        index !== 0 ? "border-t border-border/60" : "",
-        ""
-      )}
+      className="scroll-mt-32 py-10 sm:py-14"
       id={skill.id}
     >
+      {index !== 0 && (
+        <p aria-hidden="true" className="type-caption -mt-10 mb-10 select-none text-border tracking-[0.35em] sm:-mt-14 sm:mb-14">
+          {"- ".repeat(40).trim()}
+        </p>
+      )}
       <div className="max-w-3xl space-y-4">
         {/* Name + description */}
         <h2 className="type-title">{skill.name}</h2>

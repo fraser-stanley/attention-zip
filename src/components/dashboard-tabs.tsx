@@ -57,7 +57,7 @@ export function DashboardTabs({
                 <TabsTrigger
                   key={tab.value}
                   value={tab.value}
-                  className="type-caption min-h-[32px] gap-1.5 px-2.5 py-1"
+                  className="type-caption sm:min-h-[32px] gap-1.5 px-2.5 py-1"
                   onMouseEnter={() => iconRefs[tab.value]?.current?.startAnimation()}
                   onMouseLeave={() => iconRefs[tab.value]?.current?.stopAnimation()}
                 >

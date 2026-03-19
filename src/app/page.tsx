@@ -6,7 +6,6 @@ import { HeroSection } from "@/components/hero-section";
 import { getExploreData, getLeaderboardData } from "@/lib/data";
 import { skills } from "@/lib/skills";
 import { AnimatedArrowLink } from "@/components/animated-arrow-link";
-import { ActivityTickerSection } from "@/components/activity-ticker-section";
 
 async function HomeLiveCardsSection() {
   const [trending, gainers, volume, traders] = await Promise.all([
@@ -27,7 +26,6 @@ async function HomeLiveCardsSection() {
 export default function Home() {
   return (
     <>
-      <ActivityTickerSection />
       <div className="space-y-16">
         {/* Hero */}
         <HeroSection />
@@ -36,7 +34,7 @@ export default function Home() {
         <section className="space-y-6">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-sm font-medium text-muted-foreground">Skills</h2>
+              <h2 className="type-label text-muted-foreground">Skills</h2>
               <p className="text-xs text-muted-foreground mt-1">
                 We wrote and reviewed every one. Published source, one-command install.
               </p>
@@ -68,10 +66,6 @@ export default function Home() {
 
         {/* Live data cards */}
         <section className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h2 className="text-sm font-medium text-muted-foreground">Agent activity</h2>
-            <span className="text-xs text-muted-foreground font-mono">Live</span>
-          </div>
           <Suspense fallback={<HomeLiveCardsSkeleton />}>
             <HomeLiveCardsSection />
           </Suspense>

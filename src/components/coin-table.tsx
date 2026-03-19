@@ -152,7 +152,7 @@ function BoardSkeleton({ count }: { count: number }) {
   return (
     <div className="space-y-0">
       {Array.from({ length: count }).map((_, i) => (
-        <div key={i} className="terminal-board-cols-dashboard grid items-center gap-4 border-b border-border/70 px-4 py-3 last:border-b-0">
+        <div key={i} className="terminal-board-cols-dashboard grid min-w-[56rem] items-center gap-4 border-b border-border/70 px-4 py-3 last:border-b-0">
           <Skeleton className="h-4 w-6" />
           <Skeleton className="h-4 w-3/4" />
           <Skeleton className="h-4 w-2/3" />
@@ -231,14 +231,16 @@ export function CoinTable({
 
   const gridCols = compact ? "terminal-board-cols" : "terminal-board-cols-dashboard";
 
+  const minWidth = compact ? "min-w-[44rem]" : "min-w-[56rem]";
+
   return (
-    <div className="relative" onMouseLeave={() => setHoveredImage(null)}>
+    <div className="relative overflow-x-auto" onMouseLeave={() => setHoveredImage(null)}>
       <HoverMediaOverlay imageUrl={hoveredImage} />
       {/* Header */}
       <div
         className={cn(
           "type-label border-b border-border/70 px-4 py-3 text-muted-foreground",
-          gridCols, "grid w-full gap-4"
+          gridCols, "grid w-full gap-4", minWidth
         )}
       >
         <span>Rank</span>
@@ -273,8 +275,8 @@ export function CoinTable({
               transition: flashTone ? "background-color 0s" : "background-color 200ms cubic-bezier(0.33, 1, 0.68, 1)",
             }}
             className={cn(
-              "group relative min-h-[42px] cursor-default items-center border-b border-border/70 px-4 py-2 last:border-b-0",
-              gridCols, "grid w-full gap-4",
+              "group relative min-h-[44px] cursor-default items-center border-b border-border/70 px-4 py-2 last:border-b-0",
+              gridCols, "grid w-full gap-4", minWidth,
               isFlash ? "text-black" : "",
               !isFlash && isSelected ? "bg-foreground text-background" : "",
               !isFlash && !isSelected ? "hover:bg-muted/35" : ""

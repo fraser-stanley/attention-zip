@@ -243,7 +243,7 @@ export function HomeLiveCardsSkeleton() {
             <div
               key={tab.id}
               className={cn(
-                "flex min-h-[32px] items-center rounded-sm px-2.5 py-1",
+                "flex min-h-[44px] sm:min-h-[32px] items-center rounded-sm px-2.5 py-1",
                 index === 0 ? "bg-foreground text-background" : "bg-transparent"
               )}
             >
@@ -258,7 +258,7 @@ export function HomeLiveCardsSkeleton() {
           ))}
         </div>
 
-        <div className="type-caption px-2 pb-1 text-right font-mono text-muted-foreground sm:pb-0 sm:pr-2">
+        <div className="type-caption hidden px-2 text-right font-mono text-muted-foreground sm:block sm:pr-2">
           <div className="flex justify-end">
             <Skeleton className="h-4 w-20 bg-foreground/10" />
           </div>
@@ -279,7 +279,7 @@ export function HomeLiveCardsSkeleton() {
             {BOARD_SKELETON_ROWS.map((widths, index) => (
               <div
                 key={index}
-                className="terminal-board-cols grid min-h-[42px] w-full items-center border-b border-border/70 px-4 py-2 last:border-b-0"
+                className="terminal-board-cols grid min-h-[44px] w-full items-center border-b border-border/70 px-4 py-2 last:border-b-0"
               >
                 <div className="type-body-sm flex items-center gap-2 font-mono text-muted-foreground/60">
                   <span className="h-2.5 w-2.5 rounded-full bg-foreground/20" />
@@ -345,7 +345,7 @@ function TerminalRow({
         transition: flashTone ? "background-color 0s" : "background-color 200ms cubic-bezier(0.33, 1, 0.68, 1)",
       }}
       className={cn(
-        "group relative min-h-[42px] cursor-default items-center border-b border-border/70 px-4 py-2 last:border-b-0",
+        "group relative min-h-[44px] cursor-default items-center border-b border-border/70 px-4 py-2 last:border-b-0",
         row.kind === "coin"
           ? "terminal-board-cols grid min-w-[44rem] w-full gap-4"
           : "terminal-board-cols-trader grid min-w-[34rem] w-full gap-4",
@@ -600,7 +600,7 @@ export function HomeLiveCards({
                 <TabsTrigger
                   key={tab.id}
                   value={tab.id}
-                  className="type-caption min-h-[32px] gap-1.5 px-2.5 py-1"
+                  className="type-caption sm:min-h-[32px] gap-1.5 px-2.5 py-1"
                 >
                   <Icon size={12} />
                   {tab.label}
@@ -609,7 +609,7 @@ export function HomeLiveCards({
             })}
           </TabsList>
 
-          <div className="type-caption px-2 pb-1 text-right font-mono text-muted-foreground sm:pb-0 sm:pr-2">
+          <div className="type-caption hidden px-2 text-right font-mono text-muted-foreground sm:block sm:pr-2">
             {rowSummary(selectedRow, selectedRowIndex)}
           </div>
         </div>

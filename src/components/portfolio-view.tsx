@@ -9,14 +9,6 @@ import {
   Card,
   CardContent,
 } from "@/components/ui/card";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 import { formatPnl, formatPct } from "@/lib/pnl-utils";
@@ -232,94 +224,97 @@ function PositionsContent({ positions, totalValue }: { positions: MockPosition[]
         <NumberFlow {...FLOW_TIMING} format={FMT_COMPACT} value={totalValue} /> total value
       </p>
 
-      {/* Filter tabs */}
-      <Tabs value={filter} onValueChange={(v) => setFilter(v as PositionFilter)}>
-        <TabsList>
-          <TabsTrigger value="active">
-            Active <span className="ml-1 opacity-50">({activeCount})</span>
-          </TabsTrigger>
-          <TabsTrigger value="resolved">
-            Resolved <span className="ml-1 opacity-50">({resolvedCount})</span>
-          </TabsTrigger>
-          <TabsTrigger value="all">
-            All <span className="ml-1 opacity-50">({allCount})</span>
-          </TabsTrigger>
-        </TabsList>
-      </Tabs>
+      {/* Terminal-style table with filter tabs inside */}
+      <Tabs value={filter} onValueChange={(v) => setFilter(v as PositionFilter)} className="gap-0">
+        <div className="overflow-hidden border border-border bg-card">
+          <div className="flex flex-col gap-2 border-b border-border bg-muted p-1 sm:flex-row sm:items-center sm:justify-between">
+            <TabsList className="grid w-full grid-cols-3 bg-transparent p-0 sm:w-auto">
+              <TabsTrigger value="active" className="type-caption sm:min-h-[32px] gap-1.5 px-2.5 py-1">
+                Active <span className="ml-1 opacity-50">({activeCount})</span>
+              </TabsTrigger>
+              <TabsTrigger value="resolved" className="type-caption sm:min-h-[32px] gap-1.5 px-2.5 py-1">
+                Resolved <span className="ml-1 opacity-50">({resolvedCount})</span>
+              </TabsTrigger>
+              <TabsTrigger value="all" className="type-caption sm:min-h-[32px] gap-1.5 px-2.5 py-1">
+                All <span className="ml-1 opacity-50">({allCount})</span>
+              </TabsTrigger>
+            </TabsList>
+          </div>
 
-      {/* Table */}
-      {filtered.length === 0 ? (
-        <p className="type-body-sm py-8 text-center text-muted-foreground">
-          No {filter} positions.
-        </p>
-      ) : (
-        <PositionRows positions={filtered} />
-      )}
-    </div>
-  );
-}
+          <TabsContent value={filter} className="m-0">
+            <div className="overflow-x-auto">
+              {/* Column headers */}
+              <div className="terminal-board-cols-positions grid min-w-[40rem] w-full gap-4 border-b border-border/70 px-4 py-3 type-label text-muted-foreground">
+                <span>Market</span>
+                <span className="text-right">Avg</span>
+                <span className="text-right">Current</span>
+                <span className="text-right">Value</span>
+              </div>
 
-function PositionRows({ positions }: { positions: MockPosition[] }) {
-  return (
-    <Table className="table-fixed">
-      <TableHeader>
-        <TableRow>
-          <TableHead className="type-label w-[40%]">Market</TableHead>
-          <TableHead className="type-label w-[18%] text-right">Avg</TableHead>
-          <TableHead className="type-label w-[18%] text-right">Current</TableHead>
-          <TableHead className="type-label w-[24%] text-right">Value</TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {positions.map((pos) => {
-          const avgPrice = pos.entryPrice / pos.quantity;
-          const currentUnitPrice = pos.currentPrice / pos.quantity;
-
-          return (
-            <TableRow key={pos.address}>
-              <TableCell>
-                <div>
-                  <span className="type-body-sm font-medium">{pos.coin}</span>
-                  <span className="type-caption ml-2 font-mono text-muted-foreground">
-                    ${pos.symbol}
-                  </span>
+              {/* Rows */}
+              {filtered.length === 0 ? (
+                <div className="type-body-sm px-4 py-8 text-muted-foreground">
+                  No {filter} positions.
                 </div>
-                <p className="type-caption mt-0.5 font-mono text-muted-foreground">
-                  {pos.quantity.toLocaleString()} tokens at ${avgPrice.toFixed(4)}
-                </p>
-              </TableCell>
-              <TableCell className="type-body-sm text-right font-mono">
-                ${avgPrice.toFixed(4)}
-              </TableCell>
-              <TableCell className="type-body-sm text-right font-mono">
-                <NumberFlow {...FLOW_TIMING} format={FMT_PRICE} value={currentUnitPrice} />
-              </TableCell>
-              <TableCell className="text-right">
-                <p>
-                  <span
-                    className={`type-body-sm inline-flex items-center px-1.5 py-0.5 font-mono font-medium ${pnlHighlightClass(pos.currentPrice)}`}
-                  >
-                    <NumberFlow {...FLOW_TIMING} format={FMT_COMPACT} value={pos.currentPrice} />
-                  </span>
-                </p>
-                <p className="mt-0.5">
-                  <span
-                    className={`type-caption inline-flex items-center px-1.5 py-0.5 font-mono ${pnlHighlightClass(pos.pnl)}`}
-                  >
-                    <NumberFlowGroup>
-                      <span className="inline-flex items-center gap-1">
-                        <NumberFlow {...FLOW_TIMING} format={FMT_CURRENCY} value={pos.pnl} />
-                        <NumberFlow {...FLOW_TIMING} format={FMT_PERCENT} value={pos.pnlPct / 100} />
-                      </span>
-                    </NumberFlowGroup>
-                  </span>
-                </p>
-              </TableCell>
-            </TableRow>
-          );
-        })}
-      </TableBody>
-    </Table>
+              ) : (
+                <div>
+                  {filtered.map((pos) => {
+                    const avgPrice = pos.entryPrice / pos.quantity;
+                    const currentUnitPrice = pos.currentPrice / pos.quantity;
+
+                    return (
+                      <div
+                        key={pos.address}
+                        className="terminal-board-cols-positions grid min-w-[40rem] w-full items-center gap-4 min-h-[44px] border-b border-border/70 px-4 py-2 last:border-b-0 hover:bg-muted/35"
+                      >
+                        <div>
+                          <div>
+                            <span className="type-body-sm font-medium">{pos.coin}</span>
+                            <span className="type-caption ml-2 font-mono text-muted-foreground">
+                              ${pos.symbol}
+                            </span>
+                          </div>
+                          <p className="type-caption mt-0.5 font-mono text-muted-foreground">
+                            {pos.quantity.toLocaleString()} tokens at ${avgPrice.toFixed(4)}
+                          </p>
+                        </div>
+                        <div className="type-body-sm text-right font-mono text-muted-foreground">
+                          ${avgPrice.toFixed(4)}
+                        </div>
+                        <div className="type-body-sm text-right font-mono text-muted-foreground">
+                          <NumberFlow {...FLOW_TIMING} format={FMT_PRICE} value={currentUnitPrice} />
+                        </div>
+                        <div className="text-right">
+                          <p>
+                            <span
+                              className={`type-body-sm inline-flex items-center px-1.5 py-0.5 font-mono font-medium ${pnlHighlightClass(pos.currentPrice)}`}
+                            >
+                              <NumberFlow {...FLOW_TIMING} format={FMT_COMPACT} value={pos.currentPrice} />
+                            </span>
+                          </p>
+                          <p className="mt-0.5">
+                            <span
+                              className={`type-caption inline-flex items-center px-1.5 py-0.5 font-mono ${pnlHighlightClass(pos.pnl)}`}
+                            >
+                              <NumberFlowGroup>
+                                <span className="inline-flex items-center gap-1">
+                                  <NumberFlow {...FLOW_TIMING} format={FMT_CURRENCY} value={pos.pnl} />
+                                  <NumberFlow {...FLOW_TIMING} format={FMT_PERCENT} value={pos.pnlPct / 100} />
+                                </span>
+                              </NumberFlowGroup>
+                            </span>
+                          </p>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          </TabsContent>
+        </div>
+      </Tabs>
+    </div>
   );
 }
 
@@ -328,41 +323,47 @@ function HistoryContent() {
   const trades = MOCK_PORTFOLIO.recentTrades;
 
   return (
-    <Table>
-      <TableHeader>
-        <TableRow>
-          <TableHead className="type-label">Coin</TableHead>
-          <TableHead className="type-label">Side</TableHead>
-          <TableHead className="type-label text-right">Amount</TableHead>
-          <TableHead className="type-label text-right">PnL</TableHead>
-          <TableHead className="type-label hidden text-right sm:table-cell">Date</TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {trades.map((trade) => (
-          <TableRow key={`${trade.coin}-${trade.date}`}>
-            <TableCell className="type-body-sm font-mono">${trade.coin}</TableCell>
-            <TableCell>
-              <Badge variant={trade.side === "buy" ? "default" : "outline"}>
-                {trade.side}
-              </Badge>
-            </TableCell>
-            <TableCell className="type-body-sm text-right font-mono">
-              ${trade.amount.toLocaleString()}
-            </TableCell>
-            <TableCell className="type-body-sm text-right font-mono">
-              <span className={`inline-flex items-center px-1.5 py-0.5 font-medium ${pnlHighlightClass(trade.pnl)}`}>
-                {formatPnl(trade.pnl)}
-                <span className="type-caption ml-1">{formatPct(trade.pct)}</span>
-              </span>
-            </TableCell>
-            <TableCell className="type-body-sm hidden text-right text-muted-foreground sm:table-cell">
-              {trade.date}
-            </TableCell>
-          </TableRow>
-        ))}
-      </TableBody>
-    </Table>
+    <div className="overflow-hidden border border-border bg-card">
+      <div className="overflow-x-auto">
+        {/* Column headers */}
+        <div className="terminal-board-cols-history grid min-w-[40rem] w-full gap-4 border-b border-border/70 px-4 py-3 type-label text-muted-foreground">
+          <span>Coin</span>
+          <span>Side</span>
+          <span className="text-right">Amount</span>
+          <span className="text-right">PnL</span>
+          <span className="text-right">Date</span>
+        </div>
+
+        {/* Rows */}
+        <div>
+          {trades.map((trade) => (
+            <div
+              key={`${trade.coin}-${trade.date}`}
+              className="terminal-board-cols-history grid min-w-[40rem] w-full items-center gap-4 min-h-[44px] border-b border-border/70 px-4 py-2 last:border-b-0 hover:bg-muted/35"
+            >
+              <div className="type-body-sm font-mono">${trade.coin}</div>
+              <div>
+                <Badge variant={trade.side === "buy" ? "default" : "outline"}>
+                  {trade.side}
+                </Badge>
+              </div>
+              <div className="type-body-sm text-right font-mono text-muted-foreground">
+                ${trade.amount.toLocaleString()}
+              </div>
+              <div className="type-body-sm text-right font-mono">
+                <span className={`inline-flex items-center px-1.5 py-0.5 font-medium ${pnlHighlightClass(trade.pnl)}`}>
+                  {formatPnl(trade.pnl)}
+                  <span className="type-caption ml-1">{formatPct(trade.pct)}</span>
+                </span>
+              </div>
+              <div className="type-body-sm text-right text-muted-foreground">
+                {trade.date}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
   );
 }
 

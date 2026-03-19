@@ -33,7 +33,7 @@ export default function PortfolioPage() {
       <Link
         href="/"
         aria-label="Back to home"
-        className="type-body-sm inline-flex items-center gap-2 font-mono uppercase text-muted-foreground transition-colors hover:text-foreground"
+        className="type-label inline-flex items-center gap-2 text-muted-foreground transition-colors hover:text-foreground"
       >
         <svg
           width="14"

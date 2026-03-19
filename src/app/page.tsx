@@ -7,6 +7,7 @@ import { getExploreData, getLeaderboardData } from "@/lib/data";
 import { skills } from "@/lib/skills";
 import { AnimatedArrowLink } from "@/components/animated-arrow-link";
 import { ActivityTickerSection } from "@/components/activity-ticker-section";
+import { HomeSkillEquip } from "@/components/home-skill-equip";
 
 async function HomeLiveCardsSection() {
   const [trending, gainers, volume, traders] = await Promise.all([
@@ -31,17 +32,6 @@ export default function Home() {
       <div className="space-y-16">
         {/* Hero */}
         <HeroSection />
-
-        {/* Live data cards */}
-        <section className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h2 className="text-sm font-medium text-muted-foreground">Agent activity</h2>
-            <span className="text-xs text-muted-foreground font-mono">Live</span>
-          </div>
-          <Suspense fallback={<HomeLiveCardsSkeleton />}>
-            <HomeLiveCardsSection />
-          </Suspense>
-        </section>
 
         {/* Skills preview */}
         <section className="space-y-6">
@@ -80,10 +70,22 @@ export default function Home() {
                       </Badge>
                     ))}
                   </div>
+                  <HomeSkillEquip skillId={skill.id} skillName={skill.name} installs={skill.installs} />
                 </CardContent>
               </Card>
             ))}
           </div>
+        </section>
+
+        {/* Live data cards */}
+        <section className="space-y-4">
+          <div className="flex items-center justify-between">
+            <h2 className="text-sm font-medium text-muted-foreground">Agent activity</h2>
+            <span className="text-xs text-muted-foreground font-mono">Live</span>
+          </div>
+          <Suspense fallback={<HomeLiveCardsSkeleton />}>
+            <HomeLiveCardsSection />
+          </Suspense>
         </section>
       </div>
     </>

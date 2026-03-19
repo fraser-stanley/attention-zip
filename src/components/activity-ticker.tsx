@@ -14,17 +14,17 @@ const PLACEHOLDER_ITEMS: TradeActivityItem[] = [
 function TickerItems({ items }: { items: TradeActivityItem[] }) {
   return (
     <>
-      {items.map((item, index) => (
+      {items.map((item) => (
         <span
-          key={index}
+          key={`${item.agent}-${item.coin}`}
           className="type-caption inline-flex items-center gap-1.5 px-4 font-mono whitespace-nowrap"
         >
           <span className="text-muted-foreground">{item.agent}</span>
           <span
             className={
               item.action === "bought"
-                ? "text-[#3FFF00]"
-                : "text-[#FF00F0]"
+                ? "text-[#1a8c00] dark:text-[#3FFF00]"
+                : "text-[#c800a0] dark:text-[#FF88FA]"
             }
           >
             {item.action}
@@ -33,9 +33,6 @@ function TickerItems({ items }: { items: TradeActivityItem[] }) {
             {item.amount} {item.coin}
           </span>
           <span className="text-muted-foreground">{item.timeAgo}</span>
-          {index < items.length - 1 && (
-            <span className="text-muted-foreground/30 ml-2">·</span>
-          )}
         </span>
       ))}
     </>
@@ -55,13 +52,14 @@ export function ActivityTicker({
 
   return (
     <div
-      role="marquee"
+      role="log"
+      aria-live="off"
       aria-label="Agent activity feed"
       className="border-y border-border h-8 overflow-hidden flex items-center bg-white dark:bg-black"
     >
       {/* LIVE indicator */}
       <div className="flex items-center gap-1.5 px-4 shrink-0 border-r border-border h-full">
-        <span className="h-1.5 w-1.5 rounded-full bg-[#3FFF00] animate-pulse" />
+        <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-[#3FFF00] animate-pulse" />
         <span className="type-caption font-mono text-muted-foreground">Live</span>
       </div>
 

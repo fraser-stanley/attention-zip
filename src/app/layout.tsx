@@ -23,7 +23,7 @@ const commitMono = localFont({
 });
 
 const helveticaHeavyCn = localFont({
-  src: "../../public/fonts/HelveticaNeueLTProHvCn.woff",
+  src: "../../public/fonts/HelveticaNeueLTProHvCn.woff2",
   variable: "--font-helvetica-hv-cn",
   weight: "800",
   display: "swap",
@@ -31,7 +31,7 @@ const helveticaHeavyCn = localFont({
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
-  title: SITE_NAME,
+  title: { default: SITE_NAME, template: `%s | ${SITE_NAME}` },
   description: SITE_DESCRIPTION,
   icons: {
     icon: [
@@ -40,6 +40,17 @@ export const metadata: Metadata = {
       { url: "/icon-512.png", sizes: "512x512", type: "image/png" },
     ],
     apple: { url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
+  },
+  openGraph: {
+    type: "website",
+    siteName: SITE_NAME,
+    locale: "en_US",
+  },
+  twitter: {
+    card: "summary_large_image",
+  },
+  other: {
+    "theme-color": "#050505",
   },
 };
 

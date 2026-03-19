@@ -57,6 +57,9 @@ src/
 │   ├── leaderboard/page.tsx        # Weekly trader rankings with server-fetched initial data
 │   ├── leaderboard/loading.tsx     # Leaderboard loading skeleton
 │   ├── portfolio/page.tsx          # Mock logged-in portfolio (Simmer-style PnL, positions, skills)
+│   ├── robots.ts                   # robots.txt via Next.js metadata API
+│   ├── sitemap.ts                  # sitemap.xml with all public routes
+│   ├── manifest.ts                 # PWA manifest (icons, theme, display)
 │   ├── agents/page.tsx             # Agent list (trader leaderboard with portfolio links)
 │   ├── agents/[address]/page.tsx   # Agent profile (PnL, sparkline, positions, holdings)
 │   └── api/

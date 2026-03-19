@@ -1,7 +1,14 @@
+import type { Metadata } from "next";
 import { Suspense } from "react";
 import { DashboardTabs } from "@/components/dashboard-tabs";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getExploreData } from "@/lib/data";
+
+export const metadata: Metadata = {
+  title: "Dashboard",
+  description:
+    "Live Zora market data. Trending coins, top gainers, volume leaders, and featured creators refreshed every 30 seconds.",
+};
 
 async function DashboardTabsSection() {
   const initialTrendingCoins = await getExploreData("trending", 20);

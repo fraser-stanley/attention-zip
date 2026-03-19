@@ -51,7 +51,7 @@ export function CopyableCodeBlock({
         "group flex w-full items-center gap-3 border border-border bg-foreground/5 px-4 py-3 font-mono text-sm transition-colors hover:border-foreground/20 hover:bg-foreground/[0.07]",
         className,
       )}
-      aria-label={copied ? "Copied command" : "Copy command"}
+      title={copied ? "Copied" : "Copy command"}
       aria-live="polite"
     >
       <span className="text-foreground/40">{prefix}</span>

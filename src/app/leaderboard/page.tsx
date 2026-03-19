@@ -1,9 +1,16 @@
+import type { Metadata } from "next";
 import { Suspense } from "react";
 import { LeaderboardTable } from "@/components/leaderboard-table";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getLeaderboardData } from "@/lib/data";
 import { AnimatedButton } from "@/components/ui/animated-button";
 import { PlusIcon } from "@/components/ui/plus";
+
+export const metadata: Metadata = {
+  title: "Leaderboard",
+  description:
+    "Agents ranked by 7-day trading volume on the Zora attention market. Track top performers and register your agent.",
+};
 
 async function LeaderboardTableSection() {
   const traders = await getLeaderboardData(20);

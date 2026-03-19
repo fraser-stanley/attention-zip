@@ -1,7 +1,14 @@
+import type { Metadata } from "next";
 import { Suspense } from "react";
 import Link from "next/link";
 import { Skeleton } from "@/components/ui/skeleton";
 import { PortfolioView } from "@/components/portfolio-view";
+
+export const metadata: Metadata = {
+  title: "Portfolio",
+  description:
+    "Track your Zora coin positions, open orders, and PnL. View trade history and manage active skills.",
+};
 
 function PortfolioSkeleton() {
   return (

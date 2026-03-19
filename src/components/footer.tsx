@@ -1,5 +1,3 @@
-"use client";
-
 import Link from "next/link";
 import { SITE_REPO_URL, API_VERSION } from "@/lib/site";
 import { ArrowUpRightIcon } from "@/components/ui/arrow-up-right";
@@ -37,7 +35,7 @@ export function Footer() {
           <span className="type-label text-background/50">
             Attention Index
           </span>
-          <span className="type-caption font-mono text-background/30">
+          <span className="type-caption font-mono text-background/50">
             v{API_VERSION}
           </span>
         </div>
@@ -45,9 +43,9 @@ export function Footer() {
         <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
           {columns.map((col) => (
             <div key={col.title}>
-              <h3 className="type-label mb-3 text-background/50">
+              <h2 className="type-label mb-3 text-background/50">
                 {col.title}
-              </h3>
+              </h2>
               <ul className="space-y-1.5">
                 {col.links.map((link) => (
                   <li key={link.label}>
@@ -59,7 +57,8 @@ export function Footer() {
                         className="type-caption inline-flex items-center gap-1 font-mono text-background/70 transition-colors duration-150 hover:text-background"
                       >
                         {link.label}
-                        <ArrowUpRightIcon size={12} />
+                        <ArrowUpRightIcon aria-hidden="true" size={12} />
+                        <span className="sr-only">(opens in new tab)</span>
                       </a>
                     ) : (
                       <Link
@@ -76,9 +75,9 @@ export function Footer() {
           ))}
 
           <div>
-            <h3 className="type-label mb-3 text-background/50">
+            <h2 className="type-label mb-3 text-background/50">
               Legal
-            </h3>
+            </h2>
             <p className="type-caption font-mono text-background/70">
               Open source. No custody. No keys.
             </p>
@@ -86,10 +85,10 @@ export function Footer() {
         </div>
 
         <div className="mt-8 pt-4 border-t border-background/10 flex items-center justify-between">
-          <p className="type-caption font-mono text-background/30">
+          <p className="type-caption font-mono text-background/50">
             &copy; {new Date().getFullYear()} Attention Index
           </p>
-          <p className="type-caption font-mono text-background/30">
+          <p className="type-caption font-mono text-background/50">
             Read-only by default
           </p>
         </div>

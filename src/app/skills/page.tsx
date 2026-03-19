@@ -1,6 +1,13 @@
+import type { Metadata } from "next";
 import { SkillsInstallList } from "@/components/skill-card-client";
 import { getSkillInstallCommands, skills } from "@/lib/skills";
 import { toAbsoluteUrl } from "@/lib/site";
+
+export const metadata: Metadata = {
+  title: "Skills",
+  description:
+    "Browse verified agent skills for the Zora attention market. Trending coins, creator analytics, market briefs, portfolio tracking, and momentum trading.",
+};
 
 export default function SkillsPage() {
   const skillJsonLd = skills.map((skill) => {

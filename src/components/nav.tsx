@@ -1,11 +1,9 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { buttonVariants } from "@/components/ui/button-variants";
 import { TextMorph } from "@/components/text-morph";
 import { skills } from "@/lib/skills";
 import { ZapIcon, type ZapHandle } from "@/components/ui/zap";
@@ -102,41 +100,34 @@ export function Nav() {
           <div className="flex h-11 items-center justify-between py-[2px]">
             <Link
               href="/"
-              aria-label="Attention Index home"
               onClick={() => {
                 close();
                 setWalletModalOpen(false);
               }}
+              className="type-label text-foreground py-3"
             >
-              <Image
-                src="/attention-index-logo.svg"
-                alt="Attention Index"
-                width={140}
-                height={17}
-                className="h-[17px] w-auto dark:invert"
-                priority
-              />
+              Attention Index
             </Link>
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-6">
               {isConnected && address ? (
                 <Link
                   href="/portfolio"
-                  className={buttonVariants({ variant: "outline" })}
+                  className="type-label text-muted-foreground hover:text-foreground transition-colors py-3"
                 >
                   <TextMorph>{truncateAddress(address)}</TextMorph>
                 </Link>
               ) : (
                 <button
                   onClick={() => { setOpen(false); setWalletModalOpen(true); }}
-                  className={buttonVariants({ variant: "outline" })}
+                  className="type-label text-muted-foreground hover:text-foreground transition-colors py-3"
                 >
                   <TextMorph>Login</TextMorph>
                 </button>
               )}
               <button
                 onClick={() => setOpen(true)}
-                aria-label="Open navigation"
-                className={buttonVariants({ variant: "default" })}
+                aria-expanded={open}
+                className="type-label text-foreground hover:opacity-70 transition-opacity py-3"
               >
                 Index
               </button>
@@ -175,7 +166,7 @@ export function Nav() {
                   <Link
                     key={section.id}
                     href={section.href}
-                    className="group bg-black p-6 flex flex-col gap-3 transition-colors duration-200 outline-none hover:bg-white hover:text-black focus-visible:bg-white focus-visible:text-black"
+                    className="group bg-black p-6 flex flex-col gap-3 transition-colors duration-200 outline-none hover:bg-white hover:text-black focus-visible:bg-white focus-visible:text-black focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black"
                     onMouseEnter={() => iconRefs[section.id]?.current?.startAnimation()}
                     onMouseLeave={() => iconRefs[section.id]?.current?.stopAnimation()}
                   >
@@ -204,7 +195,7 @@ export function Nav() {
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
               className="w-full h-auto"
-              aria-label="Attention Index"
+              aria-hidden="true"
             >
               <defs>
                 <filter id="dither-logo" x="-10%" y="-10%" width="120%" height="120%">

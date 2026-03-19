@@ -1,15 +1,6 @@
 # Zora Agent Skills
 
-Discover, install, and monitor Zora-native agent skills. Terminal-style market data, verified skill gallery, and public leaderboards.
-
-- Animated highlighter stroke on hero headings (motion/react, ease-out-quint)
-- Homepage terminal market board with trending coins, gainers, volume leaders, and top traders
-- 5 verified skills with read-only scouts plus one execution-capable trader
-- Get-started steps and works-with section on the homepage
-- Agent and portfolio views for mock P&L, holdings, and leaderboard context
-- Weekly trader leaderboard
-- Shared runtime picker with direct install commands and source links for each skill
-- Agent-facing API at `/api` with discovery document, skill catalog, explore data, and leaderboard
+Agent skills for the Zora attention market. Open source, no custody.
 
 ## Quick start
 
@@ -22,59 +13,93 @@ pnpm dev
 
 Open http://localhost:3000.
 
-### Environment (optional)
+## Skills
 
-Create `.env.local` for higher rate limits:
+Five published skills. Each skill directory contains a `SKILL.md` (agent instructions, OpenClaw format) and `clawhub.json` (runtime config).
 
-```
-ZORA_API_KEY=your_key_here
-```
+| Skill | Description | Type |
+|-------|-------------|------|
+| [trend-scout](trend-scout/) | Trending topic coins, new trend launches, volume and mcap leaders | Read-only |
+| [creator-pulse](creator-pulse/) | Creator coin ecosystems, featured creators, watchlists | Read-only |
+| [briefing-bot](briefing-bot/) | Structured morning/evening market digest | Read-only |
+| [portfolio-scout](portfolio-scout/) | Coin holdings and portfolio value (local wallet or any address via SDK) | Read-only |
+| [momentum-trader](momentum-trader/) | Auto-buys trending Zora coins on momentum signals via Zora CLI | Execution |
 
-Get a key from https://zora.co/settings/developer. The app works without one.
+Read-only skills need no wallet. Momentum Trader requires a dedicated trader wallet created with `zora setup`.
+
+## API
+
+Agent-facing endpoints. All responses include cache headers.
+
+| Endpoint | Description |
+|----------|-------------|
+| `GET /api` | Discovery document |
+| `GET /api/skills` | Skill catalog (`?id=<skill-id>` for single lookup) |
+| `GET /api/explore` | Live coin data (`?sort=trending\|mcap\|new\|volume\|gainers\|creators\|featured`, `?count=1-20`) |
+| `GET /api/leaderboard` | Weekly trader rankings (`?count=1-50`) |
+| `GET /api/agents/<address>` | Agent profile (balances, coins, volume, rank) |
+| `GET /.well-known/ai.json` | Agent discovery metadata |
 
 ## Project structure
 
 ```
+trend-scout/           Skill directories (SKILL.md + clawhub.json + scripts/)
+creator-pulse/
+briefing-bot/
+portfolio-scout/
+momentum-trader/
 src/
-├── app/           Pages and API routes
-│   ├── api/       Server-side SDK wrappers (explore, coin, leaderboard)
-│   ├── dashboard/ Tabbed explore view (6 sort options)
-│   ├── skills/    Editorial skill gallery with shared runtime picker
-│   ├── portfolio/ Mock portfolio view
-│   ├── agents/    Agent list and profile pages
-│   ├── leaderboard/
-│   └── trust/     Trust & Safety
-├── components/    UI components (nav, terminal board, tables, shadcn/ui)
-└── lib/           SDK wrapper, skill data, utilities
+├── app/               Pages and API routes
+│   ├── api/           Agent-facing endpoints
+│   ├── dashboard/     Tabbed explore view
+│   ├── skills/        Skill gallery
+│   ├── leaderboard/   Weekly trader rankings
+│   ├── portfolio/     Portfolio view
+│   └── agents/        Agent list and profile pages
+├── components/        UI components (nav, tables, skill cards, shadcn/ui)
+└── lib/               SDK wrapper, skill data, utilities
 ```
 
-The homepage hero uses an animated highlighter stroke that sweeps left-to-right on load. The "Agent activity" module is a light TUI-style board that server-renders initial rows, refreshes through the public API routes, and uses a CRT sweep during loading.
+## Development
 
-## Skills
+```bash
+pnpm dev          # dev server at localhost:3000
+pnpm build        # production build (TypeScript + Next.js compilation)
+pnpm test         # vitest (skill structure, data integrity, cross-file sync)
+pnpm lint         # eslint
+```
 
-| Skill | What it does | Risk |
-|-------|-------------|------|
-| Trend Scout | Trending coins, new launches, gainers, momentum | Read-only |
-| Creator Pulse | Creator coin ecosystems, featured creators, watchlists | Read-only |
-| Briefing Bot | Structured morning/evening market digest | Read-only |
-| Portfolio Scout | Wallet balance + coin holdings (Bankr-ready) | Read-only |
-| Momentum Trader | Auto-buys trending Zora coins on momentum signals via Zora CLI | Execution-capable |
+`pnpm build` is the primary verification gate.
 
-All skills use the OpenClaw SKILL.md format. Most are read-only; Momentum Trader should only run in a dedicated trader wallet created with Zora CLI.
+## Environment
+
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `ZORA_API_KEY` | No | Higher rate limits. Get one at https://zora.co/settings/developer |
+
+Execution skills need `ZORA_API_KEY` and `ZORA_PRIVATE_KEY`. See each skill's `clawhub.json` for required env vars.
 
 ## Deploy
-
-Deploy to Vercel:
 
 ```bash
 vercel
 ```
 
-Set `ZORA_API_KEY` in Vercel environment variables for production.
+Set `ZORA_API_KEY` in Vercel environment variables.
+
+## Documentation
+
+| File | Purpose |
+|------|---------|
+| [CLAUDE.md](CLAUDE.md) | Full project reference: architecture, SDK details, CLI commands, key decisions |
+| [AGENTS.md](AGENTS.md) | Agent contributor guide: SDK queries, pitfalls, how to add skills/pages |
+| [TONE.md](TONE.md) | Copy guidelines and Zora brand principles |
+| [LEARNINGS.md](LEARNINGS.md) | Architectural decisions and trade-offs |
+| [CHANGELOG.md](CHANGELOG.md) | Release history |
 
 ## Tech stack
 
-Next.js 16, Tailwind CSS v4, shadcn/ui v2, React Query, @zoralabs/coins-sdk
+Next.js 16, TypeScript (strict), Tailwind CSS v4, shadcn/ui v2, React Query, @zoralabs/coins-sdk, motion/react, Three.js
 
 ## License
 

@@ -69,7 +69,6 @@ def assert_matches_sort_intent(output: str, context: dict | None = None) -> bool
     sort_signals = {
         "trending": [r'\btrending\b', r'\bmomentum\b', r'\bhot\b'],
         "new": [r'\bnew\b', r'\blaunch', r'\brecent'],
-        "gainers": [r'\bgainer', r'\btop.*gain', r'\bbiggest.*increase'],
         "volume": [r'\bvolume\b', r'\btrading\b', r'\bactiv'],
         "mcap": [r'\bmarket\s*cap\b', r'\blargest\b', r'\bbiggest\b'],
     }

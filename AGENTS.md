@@ -52,10 +52,12 @@ SDK responses are typed as `Record<string, unknown>`. You must narrow before usi
 
 ## How to add a skill
 
-1. Add a new entry to the `skills` array in `src/lib/skills.ts`
-2. Follow the `Skill` interface: `id`, `name`, `description`, `longDescription`, `risk`, `riskLabel`, `monitors`, `wraps`, `installCommand`, `samplePrompt`, `sampleOutput`, `badges`, `githubUrl`
-3. Both the homepage skills preview grid and `/skills` gallery render from this array — no other changes needed
-4. If the skill needs new SDK data, add the wrapper function to `src/lib/zora.ts` and create an API route
+1. Create a skill directory at the project root: `<skill-slug>/SKILL.md`, `<skill-slug>/clawhub.json`, `<skill-slug>/scripts/validate.sh`
+2. Add a new entry to the `skills` array in `src/lib/skills.ts`. The `id` must match the directory name and SKILL.md `name` field.
+3. Follow the `Skill` interface: `id`, `name`, `description`, `longDescription`, `risk`, `riskLabel`, `monitors`, `wraps`, `installCommand`, `samplePrompt`, `sampleOutput`, `badges`, `githubUrl`, `skillMdUrl`, `installs`
+4. Both the homepage skills preview grid and `/skills` gallery render from this array. No other page changes needed.
+5. If the skill needs new SDK data, add the wrapper function to `src/lib/zora.ts` and create an API route
+6. Run `pnpm test` to validate SKILL.md structure, cross-file sync, and CLI flag correctness
 
 ## How to add a page
 
@@ -74,7 +76,12 @@ Follow the existing pattern:
 
 ## Testing
 
-No test suite yet. `pnpm build` is the primary verification gate — it runs TypeScript type checking and Next.js compilation. Always run `pnpm build` after making changes.
+```bash
+pnpm test    # vitest — skill structure + data integrity
+pnpm build   # TypeScript + Next.js compilation
+```
+
+Tests validate SKILL.md frontmatter, required body sections, word count (300-800), CLI flag correctness in wraps, clawhub.json schema, and cross-file sync between skills.ts IDs and skill directories. Always run both after making changes.
 
 ## Formatting helpers
 
@@ -85,19 +92,39 @@ No test suite yet. `pnpm build` is the primary verification gate — it runs Typ
 - `truncateAddress(addr)` — `"0x1234...5678"`
 - `coinTypeLabel(type)` — `"CONTENT"` → `"post"`, `"CREATOR"` → `"creator-coin"`, `"TREND"` → `"trend"`
 
-## Skill format (OpenClaw SKILL.md)
+## Skill format (AgentSkills/ClawHub)
 
-Skills follow the OpenClaw convention:
+Each skill directory follows the AgentSkills convention:
 
-```markdown
----
-name: Skill Name
-description: One-line description
----
-
-# Skill Name
-
-Agent instructions written as markdown...
+```
+<skill-slug>/
+├── SKILL.md          # Agent instructions (OpenClaw format)
+├── clawhub.json      # Runtime config (requires, tunables)
+└── scripts/
+    └── validate.sh   # Structural validation
 ```
 
-YAML frontmatter with `name` and `description`. Markdown body contains the actual agent instructions. No `config.schema.json` — config is documented inline. This matches Bankr's conventions.
+**SKILL.md frontmatter** uses flat `metadata` strings:
+```yaml
+---
+name: <skill-slug>          # must match directory name
+description: <max 1024 chars>
+metadata:
+  author: "Zora Agent Skills"
+  version: "1.0.0"
+  displayName: "<Human Name>"
+  difficulty: "beginner|intermediate|advanced"
+---
+```
+
+**SKILL.md body** must contain these 8 sections in order:
+1. `## When to Use This Skill`
+2. `## Setup`
+3. `## Configuration`
+4. `## Commands`
+5. `## How It Works`
+6. `## Example Output`
+7. `## Troubleshooting`
+8. `## Important Notes`
+
+**clawhub.json**: `requires.bins` for CLI deps, `requires.env` for env vars (execution skills only), `tunables` for configurable parameters. No `config.schema.json`.

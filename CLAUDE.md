@@ -37,7 +37,7 @@ The API key is **optional**. The SDK works without it (uses registered queries),
 ## Project structure
 
 ```
-trend-scout/                        # Skill: trending coins, gainers, momentum
+trend-scout/                        # Skill: trending topic coins, new trends, momentum
 creator-pulse/                      # Skill: creator coin ecosystems
 briefing-bot/                       # Skill: structured market digest
 portfolio-scout/                    # Skill: coin holdings (read-only)
@@ -233,7 +233,7 @@ All SDK responses return `{ error, data }`. Always check `response.error` before
 
 5 first-party verified skills:
 
-1. **Trend Scout** — trending coins, new launches, gainers, momentum
+1. **Trend Scout** — trending topic coins, new trend launches, volume and mcap leaders
 2. **Creator Pulse** — creator coin ecosystems, featured creators, watchlists
 3. **Briefing Bot** — structured morning/evening market digest
 4. **Portfolio Scout** — coin holdings via CLI (local wallet) or SDK (any address). Bankr-ready bridge skill

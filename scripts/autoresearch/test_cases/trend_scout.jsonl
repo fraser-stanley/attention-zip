@@ -1,6 +1,5 @@
 {"id": "whats_trending", "input": "What's trending on Zora?", "context": {"sort": "trending"}}
 {"id": "new_coins", "input": "Show me new coin launches", "context": {"sort": "new"}}
-{"id": "top_gainers", "input": "Top gainers today", "context": {"sort": "gainers"}}
 {"id": "volume_leaders", "input": "What has the most volume?", "context": {"sort": "volume"}}
 {"id": "biggest_coins", "input": "Biggest coins by market cap", "context": {"sort": "mcap"}}
 {"id": "hot_right_now", "input": "What's hot right now?", "context": {"sort": "trending"}}
@@ -8,7 +7,6 @@
 {"id": "new_launches_today", "input": "New launches in the last 24h", "context": {"sort": "new"}}
 {"id": "volume_spike", "input": "Any volume spikes?", "context": {"sort": "volume"}}
 {"id": "top_5", "input": "Top 5 trending", "context": {"sort": "trending", "limit": 5}}
-{"id": "movers", "input": "Biggest movers", "context": {"sort": "gainers"}}
 {"id": "general_market", "input": "What's happening in the market?", "context": {}}
 {"id": "specific_coin", "input": "Tell me about looksmaxxing", "context": {"lookup": true}}
 {"id": "compare_options", "input": "Compare trending vs volume leaders", "context": {}}

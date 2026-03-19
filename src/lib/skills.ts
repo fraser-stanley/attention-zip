@@ -26,26 +26,27 @@ export const skills: Skill[] = [
   {
     id: "trend-scout",
     name: "Trend Scout",
-    description: "Trending coins, new launches, gainers, and momentum signals.",
+    description: "Trending topic coins, new trend launches, and momentum signals.",
     longDescription:
-      "Watches trending coins, new launches, and top gainers on Zora.",
+      "Watches trending topic coins on Zora. Trends are community-driven topics like looksmaxxing or hyperpop.",
     risk: "none",
     riskLabel: "Read-only \u2014 no wallet needed",
     monitors: [
-      "Trending coins",
-      "New coin launches",
-      "Top gainers (24h)",
-      "Volume spikes",
+      "Trending topic coins",
+      "New trend launches",
+      "Volume spikes (trends)",
+      "Market cap leaders (trends)",
     ],
     wraps: [
-      "zora explore --sort trending --json",
-      "zora explore --sort new --json",
-      "zora explore --sort gainers --json",
+      "zora explore --sort trending --type trend --json",
+      "zora explore --sort new --type trend --json",
+      "zora explore --sort volume --type trend --json",
+      "zora explore --sort mcap --type trend --json",
     ],
     installCommand: "npx zora-cli install",
     samplePrompt:
-      "Check Zora for trending coins with significant price movement in the last 24 hours.",
-    sampleOutput: `Found 3 trending coins with notable movement:
+      "What topic coins are trending on Zora right now?",
+    sampleOutput: `Found 3 trending topic coins on Zora:
 
 1. looksmaxxing (trend) \u2014 $2.3M mcap, +12.3% 24h
    Address: 0x1234...5678

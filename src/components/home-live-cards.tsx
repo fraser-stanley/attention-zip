@@ -561,10 +561,10 @@ export function HomeLiveCards({
   return (
     <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as BoardTab)} className="gap-0">
       <div className="overflow-hidden border border-border bg-card">
-        <div className="flex flex-col gap-2 border-b border-border sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col gap-2 border-b border-border bg-muted p-1 sm:flex-row sm:items-center sm:justify-between">
           <TabsList
             variant="toggle"
-            className="grid w-full grid-cols-2 sm:w-auto sm:grid-cols-4"
+            className="grid w-full grid-cols-2 bg-transparent p-0 sm:w-auto sm:grid-cols-4"
           >
             {TAB_DEFS.map((tab) => {
               const Icon = tab.icon;
@@ -582,7 +582,7 @@ export function HomeLiveCards({
             })}
           </TabsList>
 
-          <div className="type-caption px-3 pb-2 text-right font-mono text-muted-foreground sm:pb-0 sm:pr-3">
+          <div className="type-caption px-2 pb-1 text-right font-mono text-muted-foreground sm:pb-0 sm:pr-2">
             {rowSummary(selectedRow, selectedRowIndex)}
           </div>
         </div>

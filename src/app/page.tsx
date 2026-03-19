@@ -1,8 +1,7 @@
 import { Suspense } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Skeleton } from "@/components/ui/skeleton";
-import { HomeLiveCards } from "@/components/home-live-cards";
+import { HomeLiveCards, HomeLiveCardsSkeleton } from "@/components/home-live-cards";
 import { HeroSection } from "@/components/hero-section";
 import { getExploreData, getLeaderboardData } from "@/lib/data";
 import { skills } from "@/lib/skills";
@@ -11,10 +10,10 @@ import { ActivityTickerSection } from "@/components/activity-ticker-section";
 
 async function HomeLiveCardsSection() {
   const [trending, gainers, volume, traders] = await Promise.all([
-    getExploreData("trending", 3),
-    getExploreData("gainers", 3),
-    getExploreData("volume", 3),
-    getLeaderboardData(3),
+    getExploreData("trending", 8),
+    getExploreData("gainers", 8),
+    getExploreData("volume", 8),
+    getLeaderboardData(8),
   ]);
 
   return (
@@ -22,27 +21,6 @@ async function HomeLiveCardsSection() {
       initialCoins={{ trending, gainers, volume }}
       initialTraders={traders}
     />
-  );
-}
-
-function HomeLiveCardsSkeleton() {
-  return (
-    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-      {Array.from({ length: 4 }).map((_, index) => (
-        <Card key={index}>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-              <Skeleton className="h-4 w-24" />
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-2">
-            <Skeleton className="h-5 w-full" />
-            <Skeleton className="h-5 w-full" />
-            <Skeleton className="h-5 w-full" />
-          </CardContent>
-        </Card>
-      ))}
-    </div>
   );
 }
 

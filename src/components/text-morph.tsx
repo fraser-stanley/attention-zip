@@ -1,6 +1,12 @@
 "use client";
 
-import { useEffect, useRef, type ReactNode } from "react";
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
 import { MorphController } from "torph";
 
 interface TextMorphProps {
@@ -24,6 +30,13 @@ function flatten(node: ReactNode): string {
   return "";
 }
 
+/**
+ * Mirrors torph/react's official TextMorph pattern:
+ * - MorphController created eagerly in useRef (not inside an effect)
+ * - attach() in useEffect keyed on serialized config
+ * - update() via useCallback, called from a separate useEffect([text, update])
+ * - dangerouslySetInnerHTML with stable initial text
+ */
 export function TextMorph({
   children,
   className,
@@ -31,40 +44,38 @@ export function TextMorph({
   as: Tag = "span",
 }: TextMorphProps) {
   const ref = useRef<HTMLElement | null>(null);
-  const controllerRef = useRef<MorphController | null>(null);
+  const controllerRef = useRef(new MorphController());
   const text = flatten(children);
+  const [initialHtml] = useState(() => ({ __html: text }));
 
-  // Capture initial text so React never updates the DOM after mount.
-  // Torph owns the element's content from the first useEffect onward.
-  // eslint-disable-next-line react-hooks/refs -- intentional: stable initial value for dangerouslySetInnerHTML, read only once
-  const initialText = useRef(text).current;
+  const configKey = MorphController.serializeConfig({ ease: SPRING_DEFAULTS });
 
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
-
-    const ctrl = new MorphController();
-    controllerRef.current = ctrl;
-    ctrl.attach(el, { ease: SPRING_DEFAULTS });
-
+    const controller = controllerRef.current;
+    controller.attach(el, { ease: SPRING_DEFAULTS });
     return () => {
-      ctrl.destroy();
-      controllerRef.current = null;
+      controller.destroy();
     };
+  }, [configKey]);
+
+  const update = useCallback((value: string) => {
+    controllerRef.current.update(value);
   }, []);
 
   useEffect(() => {
-    controllerRef.current?.update(text);
-  }, [text]);
+    update(text);
+  }, [text, update]);
 
-  const El = Tag as "span";
+  const Element = Tag as "span";
 
   return (
-    <El
+    <Element
       ref={ref as React.Ref<HTMLSpanElement>}
       className={className}
       style={style}
-      dangerouslySetInnerHTML={{ __html: initialText }}
+      dangerouslySetInnerHTML={initialHtml}
       suppressHydrationWarning
     />
   );

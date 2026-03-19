@@ -1,5 +1,6 @@
 "use client";
 
+import NumberFlow, { NumberFlowGroup, type Format } from "@number-flow/react";
 import { useEffect, useMemo, useState } from "react";
 import { useReducedMotion } from "motion/react";
 import { TextMorph } from "@/components/text-morph";
@@ -18,7 +19,6 @@ import {
 } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-import { formatCompactCurrency } from "@/lib/zora";
 import { formatPnl, formatPct } from "@/lib/pnl-utils";
 import { skills } from "@/lib/skills";
 import { MOCK_PORTFOLIO, type MockPosition } from "@/lib/portfolio-mock-data";
@@ -36,9 +36,63 @@ type PositionFilter = "active" | "resolved" | "all";
 const activeCount = MOCK_PORTFOLIO.positions.filter((p) => p.status === "active").length;
 const resolvedCount = MOCK_PORTFOLIO.positions.filter((p) => p.status === "resolved").length;
 const allCount = MOCK_PORTFOLIO.positions.length;
+// Snappy spring-like easing for number transitions
+const TIMING_TRANSFORM: EffectTiming = {
+  duration: 650,
+  easing: "cubic-bezier(0.16, 1, 0.3, 1)", // ease-out-expo
+};
+const TIMING_SPIN: EffectTiming = {
+  duration: 650,
+  easing: "cubic-bezier(0.16, 1, 0.3, 1)",
+};
+const TIMING_OPACITY: EffectTiming = {
+  duration: 350,
+  easing: "ease-out",
+};
+
+const FLOW_TIMING = {
+  transformTiming: TIMING_TRANSFORM,
+  spinTiming: TIMING_SPIN,
+  opacityTiming: TIMING_OPACITY,
+} as const;
+
+const FMT_CURRENCY = {
+  style: "currency",
+  currency: "USD",
+  signDisplay: "always",
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+} satisfies Format;
+const FMT_PERCENT = {
+  style: "percent",
+  signDisplay: "always",
+  minimumFractionDigits: 1,
+  maximumFractionDigits: 1,
+} satisfies Format;
+const FMT_COMPACT = {
+  style: "currency",
+  currency: "USD",
+  notation: "compact",
+  maximumFractionDigits: 1,
+} satisfies Format;
+const FMT_INT = { maximumFractionDigits: 0 } satisfies Format;
+const FMT_PRICE = {
+  style: "currency",
+  currency: "USD",
+  minimumFractionDigits: 4,
+  maximumFractionDigits: 4,
+} satisfies Format;
+const FMT_PCT_UNSIGNED = {
+  style: "percent",
+  maximumFractionDigits: 0,
+} satisfies Format;
 
 function pnlHighlightClass(value: number) {
   return value >= 0 ? "bg-[#3FFF00] text-black" : "bg-[#FF00F0] text-black";
+}
+
+function pnlHighlightBlockClass(value: number) {
+  return `inline px-[0.15em] py-[0.02em] leading-[1.4] box-decoration-clone [-webkit-box-decoration-break:clone] ${pnlHighlightClass(value)}`;
 }
 
 const TICK_MS = 2500;
@@ -53,50 +107,18 @@ function drift(base: number, amplitude: number, tick: number, seed: number) {
   return base + (pseudoRandom(tick, seed) - 0.45) * amplitude;
 }
 
-const ZERO_PNL: typeof MOCK_PORTFOLIO = {
-  ...MOCK_PORTFOLIO,
-  totalValue: 0,
-  pnl: {
-    totalPnl: 0,
-    totalPnlPct: 0,
-    realizedPnl: 0,
-    unrealizedPnl: 0,
-    winRate: 0,
-    totalTrades: 0,
-    wins: 0,
-    losses: 0,
-  },
-  positions: MOCK_PORTFOLIO.positions.map((pos) => ({
-    ...pos,
-    currentPrice: 0,
-    pnl: 0,
-    pnlPct: 0,
-  })),
-};
-
 function useSimulatedPortfolio() {
   const reduceMotion = useReducedMotion() ?? false;
-  const [tick, setTick] = useState(-1);
+  const [tick, setTick] = useState(0);
 
   useEffect(() => {
-    // Two rAFs ensure torph has attached its MorphController before we
-    // change the text, so the zero→real transition actually animates.
-    let raf2: number;
-    const raf1 = requestAnimationFrame(() => {
-      raf2 = requestAnimationFrame(() => setTick(0));
-    });
-    return () => { cancelAnimationFrame(raf1); cancelAnimationFrame(raf2); };
-  }, []);
-
-  useEffect(() => {
-    if (reduceMotion || tick < 0) return;
+    if (reduceMotion) return;
     const id = window.setInterval(() => setTick((t) => t + 1), TICK_MS);
     return () => window.clearInterval(id);
-  }, [reduceMotion, tick]);
+  }, [reduceMotion]);
 
   return useMemo(() => {
     const base = MOCK_PORTFOLIO;
-    if (tick < 0) return ZERO_PNL;
     if (tick === 0) return base;
 
     // Oscillate positions using deterministic pseudo-random per tick
@@ -139,42 +161,56 @@ function useSimulatedPortfolio() {
 /* ─── Simmer-style 2×2 stats grid ─── */
 function PnlStats({ pnl }: { pnl: typeof MOCK_PORTFOLIO.pnl }) {
   return (
-    <div className="grid grid-cols-2 gap-px">
-      {/* Profit / Loss */}
-      <div className="p-4">
-        <p className="type-label mb-2 text-muted-foreground">Profit / Loss</p>
-        <p className="text-5xl font-bold font-display">
-          <span className="highlight-block"><TextMorph>{formatPnl(pnl.totalPnl)}</TextMorph></span>
-          <span className={`type-body-sm ml-2 inline-flex items-center px-1.5 py-0.5 font-mono align-middle ${pnlHighlightClass(pnl.totalPnlPct)}`}>
-            <TextMorph>{`${formatPct(pnl.totalPnlPct)} ROI`}</TextMorph>
-          </span>
-        </p>
-      </div>
+    <NumberFlowGroup>
+      <div className="grid grid-cols-2 gap-px">
+        {/* Profit / Loss */}
+        <div className="p-4">
+          <p className="type-label mb-2 text-muted-foreground">Profit / Loss</p>
+          <p className="text-5xl font-bold font-display">
+            <span className={pnlHighlightBlockClass(pnl.totalPnl)}>
+              <NumberFlow {...FLOW_TIMING} format={FMT_CURRENCY} value={pnl.totalPnl} />
+            </span>
+            <span
+              className={`type-body-sm ml-2 inline-flex items-center px-1.5 py-0.5 font-mono align-middle ${pnlHighlightClass(pnl.totalPnlPct)}`}
+            >
+              <NumberFlow
+                format={FMT_PERCENT}
+                suffix=" ROI"
+                value={pnl.totalPnlPct / 100}
+              />
+            </span>
+          </p>
+        </div>
 
-      {/* Trades */}
-      <div className="p-4 border-l border-border">
-        <p className="type-label mb-2 text-muted-foreground">Trades</p>
-        <p className="text-5xl font-bold font-display">
-          <TextMorph>{String(pnl.totalTrades)}</TextMorph>
-        </p>
-      </div>
+        {/* Trades */}
+        <div className="p-4 border-l border-border">
+          <p className="type-label mb-2 text-muted-foreground">Trades</p>
+          <p className="text-5xl font-bold font-display">
+            <NumberFlow {...FLOW_TIMING} format={FMT_INT} value={pnl.totalTrades} />
+          </p>
+        </div>
 
-      {/* Win Rate */}
-      <div className="p-4 border-t border-border">
-        <p className="type-label mb-2 text-muted-foreground">Win Rate</p>
-        <p className="text-5xl font-bold font-display">
-          <TextMorph>{`${pnl.winRate}%`}</TextMorph>
-        </p>
-      </div>
+        {/* Win Rate */}
+        <div className="p-4 border-t border-border">
+          <p className="type-label mb-2 text-muted-foreground">Win Rate</p>
+          <p className="text-5xl font-bold font-display">
+            <NumberFlow {...FLOW_TIMING} format={FMT_PCT_UNSIGNED} value={pnl.winRate / 100} />
+          </p>
+        </div>
 
-      {/* W / L */}
-      <div className="p-4 border-t border-l border-border">
-        <p className="type-label mb-2 text-muted-foreground">W / L</p>
-        <p className="text-5xl font-bold font-display">
-          <TextMorph>{`${pnl.wins} / ${pnl.losses}`}</TextMorph>
-        </p>
+        {/* W / L */}
+        <div className="p-4 border-t border-l border-border">
+          <p className="type-label mb-2 text-muted-foreground">W / L</p>
+          <p className="text-5xl font-bold font-display">
+            <span className="inline-flex items-baseline gap-2">
+              <NumberFlow {...FLOW_TIMING} format={FMT_INT} value={pnl.wins} />
+              <span>/</span>
+              <NumberFlow {...FLOW_TIMING} format={FMT_INT} value={pnl.losses} />
+            </span>
+          </p>
+        </div>
       </div>
-    </div>
+    </NumberFlowGroup>
   );
 }
 
@@ -192,7 +228,8 @@ function PositionsContent({ positions, totalValue }: { positions: MockPosition[]
     <div className="space-y-4">
       {/* Info banner */}
       <p className="font-display text-5xl tracking-tight py-6">
-        {activeCount} positions open, <TextMorph>{formatCompactCurrency(totalValue)}</TextMorph> total value
+        {activeCount} positions open,{" "}
+        <NumberFlow {...FLOW_TIMING} format={FMT_COMPACT} value={totalValue} /> total value
       </p>
 
       {/* Filter tabs */}
@@ -255,21 +292,26 @@ function PositionRows({ positions }: { positions: MockPosition[] }) {
                 ${avgPrice.toFixed(4)}
               </TableCell>
               <TableCell className="type-body-sm text-right font-mono">
-                <TextMorph>{`$${currentUnitPrice.toFixed(4)}`}</TextMorph>
+                <NumberFlow {...FLOW_TIMING} format={FMT_PRICE} value={currentUnitPrice} />
               </TableCell>
               <TableCell className="text-right">
                 <p>
                   <span
-                    className={`type-body-sm inline-flex items-center px-1.5 py-0.5 font-mono font-medium ${pnlHighlightClass(pos.pnl)}`}
+                    className={`type-body-sm inline-flex items-center px-1.5 py-0.5 font-mono font-medium ${pnlHighlightClass(pos.currentPrice)}`}
                   >
-                    <TextMorph>{formatCompactCurrency(pos.currentPrice)}</TextMorph>
+                    <NumberFlow {...FLOW_TIMING} format={FMT_COMPACT} value={pos.currentPrice} />
                   </span>
                 </p>
                 <p className="mt-0.5">
                   <span
                     className={`type-caption inline-flex items-center px-1.5 py-0.5 font-mono ${pnlHighlightClass(pos.pnl)}`}
                   >
-                    <TextMorph>{`${formatPnl(pos.pnl)} ${formatPct(pos.pnlPct)}`}</TextMorph>
+                    <NumberFlowGroup>
+                      <span className="inline-flex items-center gap-1">
+                        <NumberFlow {...FLOW_TIMING} format={FMT_CURRENCY} value={pos.pnl} />
+                        <NumberFlow {...FLOW_TIMING} format={FMT_PERCENT} value={pos.pnlPct / 100} />
+                      </span>
+                    </NumberFlowGroup>
                   </span>
                 </p>
               </TableCell>

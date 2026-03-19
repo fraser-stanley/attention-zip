@@ -45,39 +45,47 @@ export function DashboardTabs({
   );
 
   return (
-    <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as SortOption)}>
-      <TabsList variant="toggle">
-        {TAB_DEFS.map((tab) => {
-          const Icon = ICON_COMPONENTS[tab.value];
-          return (
-            <TabsTrigger
-              key={tab.value}
-              value={tab.value}
-              className="gap-1.5"
-              onMouseEnter={() => iconRefs[tab.value]?.current?.startAnimation()}
-              onMouseLeave={() => iconRefs[tab.value]?.current?.stopAnimation()}
-            >
-              <span className="hidden sm:inline-flex">
-                <Icon size={14} ref={iconRefs[tab.value]} />
-              </span>
-              {tab.label}
-            </TabsTrigger>
-          );
-        })}
-      </TabsList>
-      {TAB_DEFS.map((tab) => (
-        <TabsContent key={tab.value} value={tab.value}>
-          {activeTab === tab.value && (
-            <CoinTable
-              sort={tab.value}
-              count={20}
-              initialCoins={
-                tab.value === "trending" ? initialTrendingCoins : undefined
-              }
-            />
-          )}
-        </TabsContent>
-      ))}
+    <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as SortOption)} className="gap-0">
+      <div className="overflow-hidden border border-border bg-card">
+        <div className="border-b border-border bg-muted p-1">
+          <TabsList
+            variant="toggle"
+            className="grid w-full grid-cols-3 bg-transparent p-0 sm:w-auto sm:grid-cols-6"
+          >
+            {TAB_DEFS.map((tab) => {
+              const Icon = ICON_COMPONENTS[tab.value];
+              return (
+                <TabsTrigger
+                  key={tab.value}
+                  value={tab.value}
+                  className="type-caption min-h-[32px] gap-1.5 px-2.5 py-1"
+                  onMouseEnter={() => iconRefs[tab.value]?.current?.startAnimation()}
+                  onMouseLeave={() => iconRefs[tab.value]?.current?.stopAnimation()}
+                >
+                  <span className="hidden sm:inline-flex">
+                    <Icon size={12} ref={iconRefs[tab.value]} />
+                  </span>
+                  {tab.label}
+                </TabsTrigger>
+              );
+            })}
+          </TabsList>
+        </div>
+
+        {TAB_DEFS.map((tab) => (
+          <TabsContent key={tab.value} value={tab.value} className="m-0">
+            {activeTab === tab.value && (
+              <CoinTable
+                sort={tab.value}
+                count={20}
+                initialCoins={
+                  tab.value === "trending" ? initialTrendingCoins : undefined
+                }
+              />
+            )}
+          </TabsContent>
+        ))}
+      </div>
     </Tabs>
   );
 }

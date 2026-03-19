@@ -11,6 +11,9 @@ importers:
       '@base-ui/react':
         specifier: ^1.3.0
         version: 1.3.0(@types/react@19.2.14)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
+      '@number-flow/react':
+        specifier: ^0.6.0
+        version: 0.6.0(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
       '@paper-design/shaders-react':
         specifier: ^0.0.72
         version: 0.0.72(@types/react@19.2.14)(react@19.2.3)
@@ -28,7 +31,7 @@ importers:
         version: 5.90.21(react@19.2.3)
       '@zoralabs/coins-sdk':
         specifier: ^0.4.7
-        version: 0.4.7(abitype@1.2.3(typescript@5.9.3)(zod@3.25.76))(viem@2.22.12(typescript@5.9.3)(zod@3.25.76))
+        version: 0.4.7(abitype@1.2.3(typescript@5.9.3)(zod@4.3.6))(viem@2.22.12(typescript@5.9.3)(zod@4.3.6))
       class-variance-authority:
         specifier: ^0.7.1
         version: 0.7.1
@@ -674,6 +677,12 @@ packages:
   '@nolyfill/is-core-module@1.0.39':
     resolution: {integrity: sha512-nn5ozdjYQpUCZlWGuxcJY/KpxkWQs4DcbMCmKojjyrYDEAGy4Ce19NN4v5MduafTwJlbKc99UA8YhSVqq9yPZA==}
     engines: {node: '>=12.4.0'}
+
+  '@number-flow/react@0.6.0':
+    resolution: {integrity: sha512-77Yfc9+zkV2UDSP8phhZzxJGuwxi/Tt1TikmipL+1r3e9GFKEYDZ1XwInj67NoSt3OnOB0KLvvcl3lfPZgBHVQ==}
+    peerDependencies:
+      react: ^18 || ^19
+      react-dom: ^18 || ^19
 
   '@open-draft/deferred-promise@2.2.0':
     resolution: {integrity: sha512-CecwLWx3rhxVQF6V4bAgPS5t+So2sTbPgAzafKkVizyi7tlwpcFpdFqq+wqF2OwNBmqFuu6tOyouTuxgpMfzmA==}
@@ -1896,6 +1905,9 @@ packages:
       jiti:
         optional: true
 
+  esm-env@1.2.2:
+    resolution: {integrity: sha512-Epxrv+Nr/CaL4ZcFGPJIYLWFom+YeV1DqMLHJoEd9SYRxNbaFruBwfEX/kkHUJf55j2+TUbmDcmuilbP1TmXHA==}
+
   espree@10.4.0:
     resolution: {integrity: sha512-j6PAQ2uUr79PZhBjP5C5fhl8e39FmRnOjsD5lGnWrFU8i2G776tBK7+nP8KuQUTTyAZUwfQqXAgrVH5MbH9CYQ==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
@@ -2792,6 +2804,9 @@ packages:
   npm-run-path@6.0.0:
     resolution: {integrity: sha512-9qny7Z9DsQU8Ou39ERsPU4OZQlSTP47ShQzuKZ6PRXpYLtIFgl/DEBYEXKlvcEa+9tHVcK8CF81Y2V72qaZhWA==}
     engines: {node: '>=18'}
+
+  number-flow@0.6.0:
+    resolution: {integrity: sha512-K8flNq2Wqus53vjp/btVo3qXFkagF8dIdYavreBfE7hlvFFG/b1HMGEH6nZL+mlrJ+4lbLP9OmPv3t2rmRkpSQ==}
 
   object-assign@4.1.1:
     resolution: {integrity: sha512-rJgTQnkUnH1sFw8yT6VSU3zD3sWmu6sZhIseY8VX+GRu3P6F7Fu+JNDoXfklElbLJSnc3FUQHVe4cU5hj+BcUg==}
@@ -4300,6 +4315,13 @@ snapshots:
 
   '@nolyfill/is-core-module@1.0.39': {}
 
+  '@number-flow/react@0.6.0(react-dom@19.2.3(react@19.2.3))(react@19.2.3)':
+    dependencies:
+      esm-env: 1.2.2
+      number-flow: 0.6.0
+      react: 19.2.3
+      react-dom: 19.2.3(react@19.2.3)
+
   '@open-draft/deferred-promise@2.2.0': {}
 
   '@open-draft/logger@0.3.0':
@@ -4856,24 +4878,24 @@ snapshots:
 
   '@webgpu/types@0.1.69': {}
 
-  '@zoralabs/coins-sdk@0.4.7(abitype@1.2.3(typescript@5.9.3)(zod@3.25.76))(viem@2.22.12(typescript@5.9.3)(zod@3.25.76))':
+  '@zoralabs/coins-sdk@0.4.7(abitype@1.2.3(typescript@5.9.3)(zod@4.3.6))(viem@2.22.12(typescript@5.9.3)(zod@4.3.6))':
     dependencies:
       '@hey-api/client-fetch': 0.8.4
       '@zoralabs/protocol-deployments': 0.7.5
-      abitype: 1.2.3(typescript@5.9.3)(zod@3.25.76)
-      viem: 2.22.12(typescript@5.9.3)(zod@3.25.76)
+      abitype: 1.2.3(typescript@5.9.3)(zod@4.3.6)
+      viem: 2.22.12(typescript@5.9.3)(zod@4.3.6)
 
   '@zoralabs/protocol-deployments@0.7.5': {}
 
-  abitype@1.0.7(typescript@5.9.3)(zod@3.25.76):
+  abitype@1.0.7(typescript@5.9.3)(zod@4.3.6):
     optionalDependencies:
       typescript: 5.9.3
-      zod: 3.25.76
+      zod: 4.3.6
 
-  abitype@1.2.3(typescript@5.9.3)(zod@3.25.76):
+  abitype@1.2.3(typescript@5.9.3)(zod@4.3.6):
     optionalDependencies:
       typescript: 5.9.3
-      zod: 3.25.76
+      zod: 4.3.6
 
   accepts@2.0.0:
     dependencies:
@@ -5597,6 +5619,8 @@ snapshots:
       jiti: 2.6.1
     transitivePeerDependencies:
       - supports-color
+
+  esm-env@1.2.2: {}
 
   espree@10.4.0:
     dependencies:
@@ -6442,6 +6466,10 @@ snapshots:
       path-key: 4.0.0
       unicorn-magic: 0.3.0
 
+  number-flow@0.6.0:
+    dependencies:
+      esm-env: 1.2.2
+
   object-assign@4.1.1: {}
 
   object-inspect@1.13.4: {}
@@ -6540,14 +6568,14 @@ snapshots:
       object-keys: 1.1.1
       safe-push-apply: 1.0.0
 
-  ox@0.6.5(typescript@5.9.3)(zod@3.25.76):
+  ox@0.6.5(typescript@5.9.3)(zod@4.3.6):
     dependencies:
       '@adraffy/ens-normalize': 1.11.1
       '@noble/curves': 1.9.7
       '@noble/hashes': 1.8.0
       '@scure/bip32': 1.6.0
       '@scure/bip39': 1.5.0
-      abitype: 1.2.3(typescript@5.9.3)(zod@3.25.76)
+      abitype: 1.2.3(typescript@5.9.3)(zod@4.3.6)
       eventemitter3: 5.0.1
     optionalDependencies:
       typescript: 5.9.3
@@ -7351,15 +7379,15 @@ snapshots:
 
   vary@1.1.2: {}
 
-  viem@2.22.12(typescript@5.9.3)(zod@3.25.76):
+  viem@2.22.12(typescript@5.9.3)(zod@4.3.6):
     dependencies:
       '@noble/curves': 1.7.0
       '@noble/hashes': 1.6.1
       '@scure/bip32': 1.6.0
       '@scure/bip39': 1.5.0
-      abitype: 1.0.7(typescript@5.9.3)(zod@3.25.76)
+      abitype: 1.0.7(typescript@5.9.3)(zod@4.3.6)
       isows: 1.0.6(ws@8.18.0)
-      ox: 0.6.5(typescript@5.9.3)(zod@3.25.76)
+      ox: 0.6.5(typescript@5.9.3)(zod@4.3.6)
       ws: 8.18.0
     optionalDependencies:
       typescript: 5.9.3

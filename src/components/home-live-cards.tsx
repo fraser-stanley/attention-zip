@@ -66,6 +66,17 @@ const TAB_DEFS: Array<{
   { id: "volume", label: "Volume", icon: ChartBarIncreasingIcon },
   { id: "traders", label: "Traders", icon: ActivityIcon },
 ];
+const BOARD_SKELETON_TAB_WIDTHS = ["w-20", "w-[4.75rem]", "w-[4.25rem]", "w-[4.5rem]"] as const;
+const BOARD_SKELETON_ROWS = [
+  { coin: "w-[70%]", marketCap: "w-16", volume: "w-14", change: "w-14" },
+  { coin: "w-[62%]", marketCap: "w-14", volume: "w-16", change: "w-12" },
+  { coin: "w-[78%]", marketCap: "w-16", volume: "w-12", change: "w-13" },
+  { coin: "w-[56%]", marketCap: "w-14", volume: "w-14", change: "w-15" },
+  { coin: "w-[68%]", marketCap: "w-12", volume: "w-16", change: "w-12" },
+  { coin: "w-[74%]", marketCap: "w-16", volume: "w-14", change: "w-14" },
+  { coin: "w-[60%]", marketCap: "w-14", volume: "w-12", change: "w-13" },
+  { coin: "w-[66%]", marketCap: "w-16", volume: "w-16", change: "w-12" },
+] as const;
 
 function toNumber(value: string | number | undefined) {
   if (typeof value === "number") return Number.isFinite(value) ? value : 0;
@@ -211,9 +222,7 @@ function changeChipClass(positive: boolean | null, flashTone: FlashTone, isSelec
   return isSelected ? "text-background/80" : "text-muted-foreground";
 }
 
-function BoardSkeleton() {
-  const reduceMotion = useReducedMotion() ?? false;
-
+export function HomeLiveCardsSkeleton() {
   return (
     <div className="relative overflow-hidden border border-border bg-card">
       <div
@@ -224,28 +233,32 @@ function BoardSkeleton() {
             "linear-gradient(180deg, rgba(15, 23, 42, 0.06) 0, rgba(15, 23, 42, 0.06) 1px, transparent 1px, transparent 7px)",
         }}
       />
-      {!reduceMotion ? (
-        <motion.div
-          aria-hidden
-          className="pointer-events-none absolute inset-x-0 top-0 h-14"
-          initial={{ y: "-18%" }}
-          animate={{ y: ["-18%", "118%"] }}
-          transition={{ duration: 1.05, repeat: Infinity, ease: "linear" }}
-          style={{
-            background:
-              "linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(17,24,39,0.08) 40%, rgba(255,255,255,0) 100%)",
-          }}
-        />
-      ) : null}
 
-      <div className="border-b border-border px-4 py-4">
-        <div className="flex items-center justify-between gap-4">
-          <div className="grid w-full max-w-[33rem] grid-cols-2 gap-1 bg-muted p-1 sm:grid-cols-4">
-            {Array.from({ length: 4 }).map((_, index) => (
-              <Skeleton key={index} className="h-10 w-full bg-foreground/10" />
-            ))}
+      <div className="flex flex-col gap-2 border-b border-border bg-muted p-1 sm:flex-row sm:items-center sm:justify-between">
+        <div className="grid w-full grid-cols-2 gap-1 sm:w-auto sm:grid-cols-4">
+          {TAB_DEFS.map((tab, index) => (
+            <div
+              key={tab.id}
+              className={cn(
+                "flex min-h-[32px] items-center rounded-sm px-2.5 py-1",
+                index === 0 ? "bg-foreground text-background" : "bg-transparent"
+              )}
+            >
+              <Skeleton
+                className={cn(
+                  "h-4",
+                  BOARD_SKELETON_TAB_WIDTHS[index],
+                  index === 0 ? "bg-background/20 text-background/50" : "bg-foreground/10"
+                )}
+              />
+            </div>
+          ))}
+        </div>
+
+        <div className="type-caption px-2 pb-1 text-right font-mono text-muted-foreground sm:pb-0 sm:pr-2">
+          <div className="flex justify-end">
+            <Skeleton className="h-4 w-20 bg-foreground/10" />
           </div>
-          <Skeleton className="h-4 w-20 bg-foreground/10" />
         </div>
       </div>
 
@@ -260,23 +273,24 @@ function BoardSkeleton() {
           </div>
 
           <div className="space-y-0">
-            {Array.from({ length: ROW_COUNT }).map((_, index) => (
+            {BOARD_SKELETON_ROWS.map((widths, index) => (
               <div
                 key={index}
-                className="terminal-board-cols grid min-h-[42px] w-full items-center border-b border-border/70 py-2 last:border-b-0"
+                className="terminal-board-cols grid min-h-[42px] w-full items-center border-b border-border/70 px-4 py-2 last:border-b-0"
               >
-                <span className="type-body-sm pl-4 font-mono text-muted-foreground/60">
-                  {String(index + 1).padStart(2, "0")}
-                </span>
-                <Skeleton className="h-3 w-[72%] bg-foreground/10" />
+                <div className="type-body-sm flex items-center gap-2 font-mono text-muted-foreground/60">
+                  <span className="h-2.5 w-2.5 rounded-full bg-foreground/20" />
+                  <span>{String(index + 1).padStart(2, "0")}</span>
+                </div>
+                <Skeleton className={cn("h-3 bg-foreground/10", widths.coin)} />
                 <div className="flex justify-end">
-                  <Skeleton className="h-3 w-16 bg-foreground/10" />
+                  <Skeleton className={cn("h-3 bg-foreground/10", widths.marketCap)} />
                 </div>
                 <div className="flex justify-end">
-                  <Skeleton className="h-3 w-16 bg-foreground/10" />
+                  <Skeleton className={cn("h-3 bg-foreground/10", widths.volume)} />
                 </div>
                 <div className="flex justify-end">
-                  <Skeleton className="h-7 w-14 bg-foreground/10" />
+                  <Skeleton className={cn("h-7 bg-foreground/10", widths.change)} />
                 </div>
               </div>
             ))}
@@ -316,13 +330,16 @@ function TerminalRow({
         damping: 34,
         mass: 0.7,
       }}
+      style={{
+        backgroundColor: flashTone === "green" ? "#3FFF00" : flashTone === "pink" ? "#FF00F0" : undefined,
+        transition: flashTone ? "background-color 0s" : "background-color 200ms cubic-bezier(0.33, 1, 0.68, 1)",
+      }}
       className={cn(
         "group relative min-h-[42px] cursor-default items-center border-b border-border/70 px-4 py-2 last:border-b-0",
         row.kind === "coin"
           ? "terminal-board-cols grid min-w-[44rem] w-full gap-4"
           : "terminal-board-cols-trader grid min-w-[34rem] w-full gap-4",
-        flashTone === "green" ? "bg-[#3FFF00] text-black" : "",
-        flashTone === "pink" ? "bg-[#FF00F0] text-black" : "",
+        isFlash ? "text-black" : "",
         !isFlash && isSelected ? "bg-foreground text-background" : "",
         !isFlash && !isSelected ? "hover:bg-muted/35" : ""
       )}
@@ -598,7 +615,7 @@ export function HomeLiveCards({
           return (
             <TabsContent key={tab.id} value={tab.id} className="m-0">
               {board.isLoading && visibleRows.length === 0 ? (
-                <BoardSkeleton />
+                <HomeLiveCardsSkeleton />
               ) : (
                 <div className="overflow-x-auto">
                   <div

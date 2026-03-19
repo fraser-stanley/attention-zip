@@ -50,21 +50,21 @@ export default function SkillsPage() {
       <section className="grid max-w-5xl gap-6 sm:grid-cols-3">
         <div className="space-y-1.5">
           <p className="type-label text-muted-foreground">01</p>
-          <h2 className="type-card-title-sans">Pick a runtime</h2>
+          <h2 className="type-label text-foreground">Pick a runtime</h2>
           <p className="type-body-sm text-muted-foreground">
             Zora CLI, OpenClaw, or curl. The choice persists for the session.
           </p>
         </div>
         <div className="space-y-1.5">
           <p className="type-label text-muted-foreground">02</p>
-          <h2 className="type-card-title-sans">Copy the command</h2>
+          <h2 className="type-label text-foreground">Copy the command</h2>
           <p className="type-body-sm text-muted-foreground">
             Each skill shows the install command for your runtime.
           </p>
         </div>
         <div className="space-y-1.5">
           <p className="type-label text-muted-foreground">03</p>
-          <h2 className="type-card-title-sans">Verify the scope</h2>
+          <h2 className="type-label text-foreground">Verify the scope</h2>
           <p className="type-body-sm text-muted-foreground">
             Read the source, commands, and prompts before enabling.
           </p>

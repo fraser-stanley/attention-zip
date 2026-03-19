@@ -14,7 +14,7 @@ export function HomeSkillEquip({ skillId, skillName, installs }: { skillId: stri
   const [state, setState] = useState<"idle" | "installing">("idle");
   const installed = isInstalled(skillId);
 
-  function handleEquip() {
+  function handleInstall() {
     setState("installing");
     setTimeout(() => {
       install(skillId);
@@ -36,7 +36,7 @@ export function HomeSkillEquip({ skillId, skillName, installs }: { skillId: stri
           onClick={() => uninstall(skillId)}
         >
           <CheckIcon size={12} />
-          <span className="group-hover:hidden">Equipped</span>
+          <span className="group-hover:hidden">Installed</span>
           <span className="hidden group-hover:inline text-[#FF00F0]">Remove</span>
         </AnimatedButton>
       </div>
@@ -53,14 +53,14 @@ export function HomeSkillEquip({ skillId, skillName, installs }: { skillId: stri
         size="sm"
         className="h-7 gap-1 text-xs"
         disabled={state === "installing"}
-        onClick={state === "idle" ? handleEquip : undefined}
+        onClick={state === "idle" ? handleInstall : undefined}
       >
         {state === "installing" ? (
           <span className="h-2.5 w-2.5 animate-spin rounded-full border-2 border-muted-foreground/20 border-t-muted-foreground" />
         ) : (
           <PlusIcon size={12} />
         )}
-        <TextMorph>{state === "installing" ? "Equipping..." : "Equip"}</TextMorph>
+        <TextMorph>{state === "installing" ? "Installing..." : "Install"}</TextMorph>
       </AnimatedButton>
     </div>
   );

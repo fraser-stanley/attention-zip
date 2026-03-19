@@ -82,6 +82,6 @@
 
 ### Fixed (Portfolio UI)
 - Nav logo scaled 1.2× larger (`h-3.5` → `h-[17px]`) for better readability.
-- Agent loadout buttons standardized to `w-[120px]` with tighter icon–text gap so Equip, Equipped, and Remove are visually consistent.
-- Remove hover changed from red outline to pink fill (`#FF00F0`) + black text, matching the Equipped green-fill treatment.
+- Agent loadout buttons standardized to `w-[120px]` with tighter icon–text gap so Install, Installed, and Remove are visually consistent.
+- Remove hover changed from red outline to pink fill (`#FF00F0`) + black text, matching the Installed green-fill treatment.
 - Unselected tabs now carry a persistent `bg-foreground/5` fill (matching their hover gray) so they always look clickable.

@@ -368,12 +368,12 @@ function HistoryContent() {
 
 /* ─── Skills section ─── */
 
-function EquipButton({ skillId, skillName }: { skillId: string; skillName: string }) {
+function InstallButton({ skillId, skillName }: { skillId: string; skillName: string }) {
   const { install } = useInstalledSkills();
   const { toast } = useToast();
   const [state, setState] = useState<"idle" | "installing">("idle");
 
-  function handleEquip() {
+  function handleInstall() {
     setState("installing");
     setTimeout(() => {
       install(skillId);
@@ -386,14 +386,14 @@ function EquipButton({ skillId, skillName }: { skillId: string; skillName: strin
       variant="outline"
       className="w-[120px] gap-1"
       disabled={state === "installing"}
-      onClick={state === "idle" ? handleEquip : undefined}
+      onClick={state === "idle" ? handleInstall : undefined}
     >
       {state === "installing" ? (
         <span className="h-3 w-3 animate-spin rounded-full border-2 border-muted-foreground/20 border-t-muted-foreground" />
       ) : (
         <PlusIcon size={14} />
       )}
-      <TextMorph>{state === "installing" ? "Equipping..." : "Equip"}</TextMorph>
+      <TextMorph>{state === "installing" ? "Installing..." : "Install"}</TextMorph>
     </AnimatedButton>
   );
 }
@@ -426,7 +426,7 @@ function InstalledSkills() {
                 >
                   <span className="group-hover:hidden inline-flex items-center gap-1">
                     <CheckIcon size={14} />
-                    Equipped
+                    Installed
                   </span>
                   <span className="hidden group-hover:inline-flex items-center gap-1">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
@@ -448,7 +448,7 @@ function InstalledSkills() {
                     {skill.description}
                   </p>
                 </div>
-                <EquipButton skillId={skill.id} skillName={skill.name} />
+                <InstallButton skillId={skill.id} skillName={skill.name} />
               </div>
             </CardContent>
           </Card>

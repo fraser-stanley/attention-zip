@@ -168,7 +168,7 @@ function InstallButton({
     timerRef.current = window.setTimeout(() => {
       install(skill.id);
       setInstalling(false);
-      toast(`${skill.name} equipped`);
+      toast(`${skill.name} installed`);
       timerRef.current = null;
     }, 800);
   }
@@ -186,7 +186,7 @@ function InstallButton({
       <div className="flex flex-wrap items-center gap-2">
         <div className="type-body-sm inline-flex min-h-[44px] items-center gap-2 bg-[#3FFF00] px-4 py-2.5 font-medium text-black">
           <CheckIcon size={14} />
-          <TextMorph>Equipped</TextMorph>
+          <TextMorph>Installed</TextMorph>
         </div>
         <button
           type="button"
@@ -214,7 +214,7 @@ function InstallButton({
       ) : (
         <PlusIcon size={14} />
       )}
-      <TextMorph>{state === "installing" ? "Equipping..." : "Equip"}</TextMorph>
+      <TextMorph>{state === "installing" ? "Installing..." : "Install"}</TextMorph>
     </AnimatedButton>
   );
 }

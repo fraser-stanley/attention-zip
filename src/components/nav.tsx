@@ -12,7 +12,6 @@ import { ZapIcon, type ZapHandle } from "@/components/ui/zap";
 import { ChartBarIncreasingIcon, type ChartBarIncreasingIconHandle } from "@/components/ui/chart-bar-increasing";
 import { ActivityIcon, type ActivityIconHandle } from "@/components/ui/activity";
 import { LayersIcon, type LayersIconHandle } from "@/components/ui/layers";
-import { ShieldCheckIcon, type ShieldCheckIconHandle } from "@/components/ui/shield-check";
 import { SparklesIcon, type SparklesIconHandle } from "@/components/ui/sparkles";
 import { useWallet, truncateAddress } from "@/lib/wallet-context";
 import { WalletConnectModal } from "@/components/wallet-connect-modal";
@@ -36,7 +35,6 @@ const sections: Section[] = [
   { id: "dashboard", label: "Dashboard", href: "/dashboard", description: "Live market data" },
   { id: "leaderboard", label: "Leaderboard", href: "/leaderboard", description: "Weekly trader rankings" },
   { id: "portfolio", label: "Portfolio", href: "/portfolio", description: "Your positions & PnL" },
-  { id: "trust", label: "Trust & Safety", href: "/trust", description: "Wallet presets & scope" },
 ];
 
 export function Nav() {
@@ -62,11 +60,9 @@ export function Nav() {
   const dashboardRef = useRef<ChartBarIncreasingIconHandle>(null);
   const leaderboardRef = useRef<ActivityIconHandle>(null);
   const portfolioRef = useRef<LayersIconHandle>(null);
-  const trustRef = useRef<ShieldCheckIconHandle>(null);
-
   const iconRefs: Record<string, React.RefObject<IconHandle | null>> = {
     home: homeRef, skills: skillsRef, dashboard: dashboardRef,
-    leaderboard: leaderboardRef, portfolio: portfolioRef, trust: trustRef,
+    leaderboard: leaderboardRef, portfolio: portfolioRef,
   };
 
   const iconComponents: Record<string, React.ReactNode> = {
@@ -75,7 +71,6 @@ export function Nav() {
     dashboard: <ChartBarIncreasingIcon ref={dashboardRef} size={18} />,
     leaderboard: <ActivityIcon ref={leaderboardRef} size={18} />,
     portfolio: <LayersIcon ref={portfolioRef} size={18} />,
-    trust: <ShieldCheckIcon ref={trustRef} size={18} />,
   };
 
   useEffect(() => {

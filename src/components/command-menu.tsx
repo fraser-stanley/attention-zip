@@ -66,14 +66,6 @@ const pages: SearchItem[] = [
     group: "Pages",
     keywords: ["positions", "pnl", "holdings"],
   },
-  {
-    id: "page-trust",
-    title: "Trust & Safety",
-    href: "/trust",
-    breadcrumb: "Pages > Trust & Safety",
-    group: "Pages",
-    keywords: ["wallet", "presets", "scope", "security"],
-  },
 ];
 
 const dashboardItems: SearchItem[] = [

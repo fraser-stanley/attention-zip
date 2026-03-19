@@ -119,7 +119,6 @@ function InstallMethodPicker({
           className="w-full gap-0 sm:w-auto"
         >
           <TabsList
-            variant="toggle"
             aria-label="Preferred install method"
             className="grid w-full grid-cols-3 sm:w-auto sm:min-w-[22rem]"
           >

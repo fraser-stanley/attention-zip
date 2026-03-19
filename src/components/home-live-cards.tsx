@@ -591,7 +591,6 @@ export function HomeLiveCards({
       <div className="overflow-hidden border border-border bg-card">
         <div className="flex flex-col gap-2 border-b border-border bg-muted p-1 sm:flex-row sm:items-center sm:justify-between">
           <TabsList
-            variant="toggle"
             className="grid w-full grid-cols-2 bg-transparent p-0 sm:w-auto sm:grid-cols-4"
           >
             {TAB_DEFS.map((tab) => {

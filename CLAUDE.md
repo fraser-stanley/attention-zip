@@ -39,15 +39,17 @@ The API key is **optional**. The SDK works without it (uses registered queries),
 src/
 ├── app/
 │   ├── page.tsx                    # Homepage (hero, terminal market board, skills preview, waitlist)
+│   ├── loading.tsx                 # Homepage loading skeleton (instant nav)
 │   ├── layout.tsx                  # Root layout (metadata, JSON-LD, Providers, Nav)
 │   ├── globals.css                 # Tailwind imports + CSS variables
 │   ├── dashboard/page.tsx          # Server-rendered shell + streamed dashboard tabs
+│   ├── dashboard/loading.tsx       # Dashboard loading skeleton
 │   ├── skills/page.tsx             # Server-rendered editorial skill gallery + JSON-LD
 │   ├── leaderboard/page.tsx        # Weekly trader rankings with server-fetched initial data
+│   ├── leaderboard/loading.tsx     # Leaderboard loading skeleton
 │   ├── portfolio/page.tsx          # Mock logged-in portfolio (Simmer-style PnL, positions, skills)
 │   ├── agents/page.tsx             # Agent list (trader leaderboard with portfolio links)
 │   ├── agents/[address]/page.tsx   # Agent profile (PnL, sparkline, positions, holdings)
-│   ├── trust/page.tsx              # Trust & Safety (editorial manifesto layout, wallet presets, boundaries)
 │   └── api/
 │       ├── route.ts                # API discovery document
 │       ├── skills/route.ts         # Skill catalog for agents
@@ -55,7 +57,7 @@ src/
 │       ├── leaderboard/route.ts    # Trader leaderboard
 │       └── agents/[address]/route.ts # Agent profile data
 ├── components/
-│   ├── nav.tsx                     # Navigation bar (7 sections incl. Portfolio)
+│   ├── nav.tsx                     # Navigation bar (6 sections incl. Portfolio)
 │   ├── hero-section.tsx            # Hero layout with orb + CTA (animated highlighter headings)
 │   ├── highlighter-stroke.tsx      # Reusable animated highlight sweep (motion/react backgroundSize)
 │   ├── copyable-code-block.tsx     # Terminal-style command block with copy button
@@ -107,7 +109,8 @@ src/
 - **Install commands are agent instructions**, not CLI commands. The Zora CLI has no `install` or `skills` subcommand. The "Tell your agent" tab shows natural-language instructions (`install skill from <url>`); the "curl" tab is the only real shell command.
 - **Install commands are shared** from `src/lib/skills.ts` so the UI and `/api/skills` stay in sync.
 - **The skills page stays intentionally flat** — one shared runtime picker updates every command block. Only the example output is collapsible (with typewriter animation). No nested accordions.
-- **Tabs use a unified toggle style** — `variant="toggle"` on `TabsList` gives a gray `bg-muted` container with black fill + white text for the selected tab. All tab UIs (skills picker, homepage terminal, portfolio, dashboard) share this pattern via the base `TabsTrigger` component in `src/components/ui/tabs.tsx`.
+- **Tabs use a single unified style** — `TabsList` always renders with `bg-muted p-1` (gray container) and selected tabs get black fill + white text. No variants — one style for all tab UIs (skills picker, homepage terminal, portfolio, dashboard).
+- **Route-level `loading.tsx` files** exist for `/`, `/dashboard`, and `/leaderboard` — the three routes with async SDK fetches. These render instant skeleton states during navigation so the site feels like a fast SPA. Static pages (`/skills`, `/portfolio`) don't need them.
 - **No `config.schema.json`** for skills. Config is documented inline in SKILL.md files, following Bankr/OpenClaw conventions.
 - **Command menu is lazy-loaded** through `src/components/command-menu-loader.tsx` so it does not affect the initial page payload.
 - **React Query** handles live refresh after hydration. Initial render is server-owned for `/`, `/dashboard`, and `/leaderboard`.
@@ -118,7 +121,7 @@ src/
 - **PnL utilities are shared** — `src/lib/pnl-utils.ts` exports `pnlColor()`, `formatPnl()`, `formatPct()` used by both portfolio and agent profile pages. Gains = `#3FFF00`, losses = `#FF00F0`.
 - **Market colors stay full-strength** — use `#3FFF00`, `#FF00F0`, or no market color at all. Only neutral grays should be faded with opacity.
 - **Hover media overlay** — Inspired by hausotto.com. When hovering a coin row in `CoinTable` or `HomeLiveCards`, the token's `mediaContent.previewImage.medium` is shown as a large image centered on the viewport (`fixed inset-0 z-50`). Uses `pointer-events: none` so hover detection stays on the table rows. Disabled on touch devices via `(pointer: fine)` media query check in `useHasPointer()` hook (`useSyncExternalStore`-based, SSR-safe). The overlay fades in after the image loads (`loadedUrl === imageUrl` check prevents stale flashes). Mock data in `src/lib/mock-data.ts` includes picsum.photos URLs for dev testing.
-- **Animated highlighter stroke** — `HighlighterStroke` component (`src/components/highlighter-stroke.tsx`) animates a `#3FFF00` background sweep left-to-right using motion/react `backgroundSize` with `ease-out-quint` easing, subtle `scaleY` press from bottom-left, and `-1.5deg` skew for a hand-drawn feel. Used on hero headings (homepage, trust page). The `.highlight-block` CSS class provides the static base styles (color, padding, `box-decoration-break: clone`); the component overrides `background-color` to transparent and drives the background via inline `backgroundImage` + animated `backgroundSize`. A `prefers-reduced-motion` CSS exemption in `globals.css` prevents the blanket `transition-duration: 0.01ms !important` rule from killing the motion/react animation. Portfolio stat numbers still use the static `.highlight-block` class directly.
+- **Animated highlighter stroke** — `HighlighterStroke` component (`src/components/highlighter-stroke.tsx`) animates a `#3FFF00` background sweep left-to-right using motion/react `backgroundSize` with `ease-out-quint` easing, subtle `scaleY` press from bottom-left, and `-1.5deg` skew for a hand-drawn feel. Used on hero headings. The `.highlight-block` CSS class provides the static base styles (color, padding, `box-decoration-break: clone`); the component overrides `background-color` to transparent and drives the background via inline `backgroundImage` + animated `backgroundSize`. A `prefers-reduced-motion` CSS exemption in `globals.css` prevents the blanket `transition-duration: 0.01ms !important` rule from killing the motion/react animation. Portfolio stat numbers still use the static `.highlight-block` class directly.
 
 ## Tone of voice
 

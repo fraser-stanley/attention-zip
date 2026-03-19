@@ -49,7 +49,6 @@ export function DashboardTabs({
       <div className="overflow-hidden border border-border bg-card">
         <div className="border-b border-border bg-muted p-1">
           <TabsList
-            variant="toggle"
             className="grid w-full grid-cols-3 bg-transparent p-0 sm:w-auto sm:grid-cols-6"
           >
             {TAB_DEFS.map((tab) => {

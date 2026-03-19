@@ -11,7 +11,6 @@ const columns = [
       { label: "Dashboard", href: "/dashboard" },
       { label: "Skills", href: "/skills" },
       { label: "Leaderboard", href: "/leaderboard" },
-      { label: "Trust & Safety", href: "/trust" },
     ],
   },
   {

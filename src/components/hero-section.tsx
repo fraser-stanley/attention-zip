@@ -33,10 +33,10 @@ export function HeroSection() {
             Browse skills
           </Link>
           <Link
-            href="/trust"
+            href="/dashboard"
             className={buttonVariants({ variant: "outline", size: "default" })}
           >
-            How it works
+            Live data
           </Link>
         </div>
       </div>

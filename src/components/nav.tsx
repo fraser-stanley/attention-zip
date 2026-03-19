@@ -162,7 +162,7 @@ export function Nav() {
         )}
       >
         {/* Backdrop */}
-        <div className="absolute inset-0 bg-black/[0.58] backdrop-blur-[2px]" onClick={close} />
+        <div className="absolute inset-0 bg-black/[0.58] backdrop-blur-[6px]" onClick={close} />
 
         {/* Content */}
         <div

@@ -12,6 +12,7 @@ export const MOCK_COINS: CoinNode[] = [
     uniqueHolders: 12400,
     totalSupply: "1000000000",
     creatorAddress: "0xaaaa1111bbbb2222cccc3333dddd4444eeee5555",
+    mediaContent: { previewImage: { medium: "https://picsum.photos/seed/basesummer/600/400" } },
   },
   {
     name: "Zorb Genesis",
@@ -24,6 +25,7 @@ export const MOCK_COINS: CoinNode[] = [
     uniqueHolders: 8900,
     totalSupply: "500000000",
     creatorAddress: "0xbbbb2222cccc3333dddd4444eeee5555ffff6666",
+    mediaContent: { previewImage: { medium: "https://picsum.photos/seed/zorb/600/400" } },
   },
   {
     name: "Onchain Radio",
@@ -36,6 +38,7 @@ export const MOCK_COINS: CoinNode[] = [
     uniqueHolders: 5200,
     totalSupply: "750000000",
     creatorAddress: "0xcccc3333dddd4444eeee5555ffff6666aaaa7777",
+    mediaContent: { previewImage: { medium: "https://picsum.photos/seed/radio/600/400" } },
   },
   {
     name: "degen.eth",
@@ -48,6 +51,7 @@ export const MOCK_COINS: CoinNode[] = [
     uniqueHolders: 21000,
     totalSupply: "10000000000",
     creatorAddress: "0xdddd4444eeee5555ffff6666aaaa7777bbbb8888",
+    mediaContent: { previewImage: { medium: "https://picsum.photos/seed/degen/600/400" } },
   },
   {
     name: "Nouns DAO Weekly",
@@ -60,6 +64,7 @@ export const MOCK_COINS: CoinNode[] = [
     uniqueHolders: 3100,
     totalSupply: "100000000",
     creatorAddress: "0xeeee5555ffff6666aaaa7777bbbb8888cccc9999",
+    mediaContent: { previewImage: { medium: "https://picsum.photos/seed/nouns/600/400" } },
   },
   {
     name: "Purple Collective",
@@ -72,6 +77,7 @@ export const MOCK_COINS: CoinNode[] = [
     uniqueHolders: 6700,
     totalSupply: "200000000",
     creatorAddress: "0xffff6666aaaa7777bbbb8888cccc9999dddd0000",
+    mediaContent: { previewImage: { medium: "https://picsum.photos/seed/purple/600/400" } },
   },
   {
     name: "Mint Monday",
@@ -84,6 +90,7 @@ export const MOCK_COINS: CoinNode[] = [
     uniqueHolders: 4500,
     totalSupply: "500000000",
     creatorAddress: "0xaaaa7777bbbb8888cccc9999dddd0000eeee1111",
+    mediaContent: { previewImage: { medium: "https://picsum.photos/seed/mint/600/400" } },
   },
   {
     name: "Based Management",
@@ -96,6 +103,7 @@ export const MOCK_COINS: CoinNode[] = [
     uniqueHolders: 2900,
     totalSupply: "100000000",
     creatorAddress: "0xbbbb8888cccc9999dddd0000eeee1111ffff2222",
+    mediaContent: { previewImage: { medium: "https://picsum.photos/seed/mgmt/600/400" } },
   },
   {
     name: "Higher",

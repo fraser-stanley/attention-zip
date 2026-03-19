@@ -4,6 +4,7 @@ import type { ComponentType } from "react";
 import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { motion, useReducedMotion } from "motion/react";
+import { HoverMediaOverlay } from "@/components/hover-media-overlay";
 
 import { TextMorph } from "@/components/text-morph";
 import { ActivityIcon } from "@/components/ui/activity";
@@ -28,6 +29,7 @@ type CoinBoardRow = {
   id: string;
   kind: "coin";
   name: string;
+  mediaUrl: string | null;
   marketCapValue: number;
   marketCap: string;
   volumeValue: number;
@@ -98,6 +100,7 @@ function createCoinRows(coins: CoinNode[] = []): CoinBoardRow[] {
       id,
       kind: "coin",
       name: coin.name ?? coin.symbol ?? "Unknown",
+      mediaUrl: coin.mediaContent?.previewImage?.medium ?? null,
       marketCapValue: toNumber(coin.marketCap),
       marketCap: formatCompactCurrency(coin.marketCap),
       volumeValue: toNumber(coin.volume24h),
@@ -308,6 +311,7 @@ function TerminalRow({
   isSelected,
   rankDelta,
   onSelect,
+  onMediaHover,
 }: {
   row: BoardRow;
   index: number;
@@ -315,15 +319,21 @@ function TerminalRow({
   isSelected: boolean;
   rankDelta: number;
   onSelect: (rowId: string) => void;
+  onMediaHover: (url: string | null) => void;
 }) {
   const movementLabel =
     rankDelta > 0 ? `+${rankDelta}` : rankDelta < 0 ? `${rankDelta}` : null;
   const isFlash = flashTone !== null;
+  const mediaUrl = row.kind === "coin" ? row.mediaUrl : null;
 
   return (
     <motion.div
       layout
-      onMouseEnter={() => onSelect(row.id)}
+      onMouseEnter={() => {
+        onSelect(row.id);
+        onMediaHover(mediaUrl);
+      }}
+      onMouseLeave={() => onMediaHover(null)}
       transition={{
         type: "spring",
         stiffness: 420,
@@ -444,6 +454,7 @@ export function HomeLiveCards({
   initialTraders?: TraderNode[];
 }) {
   const reduceMotion = useReducedMotion() ?? false;
+  const [hoveredMediaUrl, setHoveredMediaUrl] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<BoardTab>("trending");
   const [previewTick, setPreviewTick] = useState(0);
   const [selectedRowIds, setSelectedRowIds] = useState<Record<BoardTab, string | null>>({
@@ -617,7 +628,13 @@ export function HomeLiveCards({
               {board.isLoading && visibleRows.length === 0 ? (
                 <HomeLiveCardsSkeleton />
               ) : (
-                <div className="overflow-x-auto">
+                <div
+                  className="relative overflow-x-auto"
+                  onMouseLeave={() => setHoveredMediaUrl(null)}
+                >
+                  {tab.id === activeTab && (
+                    <HoverMediaOverlay imageUrl={hoveredMediaUrl} />
+                  )}
                   <div
                     className={cn(
                       "type-label border-b border-border/70 px-4 py-3 text-muted-foreground",
@@ -658,6 +675,7 @@ export function HomeLiveCards({
                               updateSelectedRow(tab.id, rowId);
                             }
                           }}
+                          onMediaHover={tab.id === activeTab ? setHoveredMediaUrl : () => {}}
                         />
                       ))
                     )}

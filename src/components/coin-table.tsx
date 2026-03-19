@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { motion, useReducedMotion } from "motion/react";
+import { HoverMediaOverlay } from "@/components/hover-media-overlay";
 import { TextMorph } from "@/components/text-morph";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
@@ -183,6 +184,7 @@ export function CoinTable({
   const reduceMotion = useReducedMotion() ?? false;
   const [tick, setTick] = useState(0);
   const [selectedRowId, setSelectedRowId] = useState<string | null>(null);
+  const [hoveredImage, setHoveredImage] = useState<string | null>(null);
 
   const { data, isLoading, error } = useQuery({
     queryKey: ["explore", sort, count],
@@ -230,7 +232,8 @@ export function CoinTable({
   const gridCols = compact ? "terminal-board-cols" : "terminal-board-cols-dashboard";
 
   return (
-    <div>
+    <div className="relative" onMouseLeave={() => setHoveredImage(null)}>
+      <HoverMediaOverlay imageUrl={hoveredImage} />
       {/* Header */}
       <div
         className={cn(
@@ -259,7 +262,10 @@ export function CoinTable({
           <motion.div
             key={coin.id}
             layout
-            onMouseEnter={() => setSelectedRowId(coin.id)}
+            onMouseEnter={() => {
+              setSelectedRowId(coin.id);
+              setHoveredImage(data?.coins?.[i]?.mediaContent?.previewImage?.medium ?? null);
+            }}
             onMouseLeave={() => setSelectedRowId(null)}
             transition={ROW_SPRING}
             style={{

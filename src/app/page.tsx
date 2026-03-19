@@ -10,6 +10,7 @@ import { ActivityTickerSection } from "@/components/activity-ticker-section";
 import { getExploreData, getLeaderboardData } from "@/lib/data";
 import { skills } from "@/lib/skills";
 import { AnimatedArrowLink } from "@/components/animated-arrow-link";
+import { WorksWithMarquee } from "@/components/works-with-marquee";
 
 async function HomeLiveCardsSection() {
   const [trending, gainers, volume, traders] = await Promise.all([
@@ -53,6 +54,9 @@ export default function Home() {
 
       {/* Hero */}
       <HeroSection />
+
+      <WorksWithMarquee />
+
 
       {/* Skills preview */}
       <section className="space-y-6">

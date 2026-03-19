@@ -168,9 +168,13 @@
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
-  /* Ticker is functional UI (data feed), not decorative — exempt from blanket kill */
+  /* Tickers are functional UI (data feed), not decorative — exempt from blanket kill */
   .ticker-track {
     animation-duration: 30s !important;
+    animation-iteration-count: infinite !important;
+  }
+  .logo-marquee-track {
+    animation-duration: 45s !important;
     animation-iteration-count: infinite !important;
   }
   /* Highlight sweep is controlled by motion/react which handles reduced-motion via useReducedMotion() */
@@ -195,6 +199,16 @@
   animation-play-state: paused;
 }
 
+.logo-marquee-track {
+  display: flex;
+  width: max-content;
+  animation: ticker-scroll 45s linear infinite;
+  will-change: transform;
+}
+
+.logo-marquee-track:hover {
+  animation-play-state: paused;
+}
 
 .highlight-block {
   background-color: #3FFF00;

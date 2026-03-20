@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button-variants";
 import { ArrowUpRightIcon } from "@/components/ui/arrow-up-right";
 import { CheckIcon } from "@/components/ui/check";
+import { CopyIcon } from "@/components/ui/copy";
 import { PlusIcon } from "@/components/ui/plus";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CopyableCodeBlock } from "@/components/copyable-code-block";
@@ -107,37 +108,75 @@ function TerminalOutput({
   );
 }
 
-function RuntimePicker({
+function RuntimeInstallCard({
   runtime,
   onChange,
+  command,
 }: {
   runtime: Runtime;
   onChange: (runtime: Runtime) => void;
+  command: string;
 }) {
+  const [copied, setCopied] = useState(false);
+  const timeoutRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current !== null) window.clearTimeout(timeoutRef.current);
+    };
+  }, []);
+
+  async function handleCopy() {
+    try {
+      await navigator.clipboard.writeText(command);
+      setCopied(true);
+    } catch {
+      return;
+    }
+    if (timeoutRef.current !== null) window.clearTimeout(timeoutRef.current);
+    timeoutRef.current = window.setTimeout(() => setCopied(false), 2000);
+  }
+
   return (
-    <div className="sticky top-12 z-40 -mx-4 mb-8 bg-background/95 px-4 py-2.5 backdrop-blur-sm sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8">
-      <div className="flex items-center gap-4">
-        <Tabs
-          value={runtime}
-          onValueChange={(value) => onChange(value as Runtime)}
-          className="w-full gap-0 sm:w-auto"
+    <div className="max-w-2xl border border-border">
+      {/* Header: runtime tabs */}
+      <Tabs
+        value={runtime}
+        onValueChange={(value) => onChange(value as Runtime)}
+        className="w-full gap-0"
+      >
+        <TabsList
+          aria-label="Agent runtime"
+          className="flex w-full flex-wrap gap-0 border-b border-border bg-transparent p-0"
         >
-          <TabsList
-            aria-label="Agent runtime"
-            className="flex w-full flex-wrap sm:w-auto"
-          >
-            {RUNTIMES.map((item) => (
-              <TabsTrigger
-                key={item}
-                value={item}
-                className="type-body-sm min-h-[44px] px-2.5 py-2 sm:px-3"
-              >
-                <span>{RUNTIME_LABELS[item]}</span>
-              </TabsTrigger>
-            ))}
-          </TabsList>
-        </Tabs>
-      </div>
+          {RUNTIMES.map((item) => (
+            <TabsTrigger
+              key={item}
+              value={item}
+              className="type-body-sm min-h-[44px] px-3 py-2 sm:px-4"
+            >
+              <span>{RUNTIME_LABELS[item]}</span>
+            </TabsTrigger>
+          ))}
+        </TabsList>
+      </Tabs>
+
+      {/* Body: command + copy */}
+      <button
+        type="button"
+        onClick={handleCopy}
+        className="group flex w-full items-center gap-3 bg-foreground/5 px-4 py-3.5 font-mono text-sm transition-colors hover:bg-foreground/[0.07]"
+        title={copied ? "Copied" : "Copy command"}
+        aria-live="polite"
+      >
+        <span className="text-foreground/40">$</span>
+        <span className="flex-1 truncate text-left text-foreground/80">
+          {command}
+        </span>
+        <span className="shrink-0 text-muted-foreground/60 transition-colors group-hover:text-foreground/60">
+          {copied ? <CheckIcon size={16} /> : <CopyIcon size={16} />}
+        </span>
+      </button>
     </div>
   );
 }
@@ -342,16 +381,13 @@ function SkillRow({
   );
 }
 
-function InstallAllBlock({ runtime }: { runtime: Runtime }) {
-  const commands = getInstallAllCommands(getSiteUrl());
-  return (
-    <div className="mb-10">
-      <CopyableCodeBlock command={commands[runtime]} />
-    </div>
-  );
-}
-
-export function SkillsInstallList({ skills }: { skills: Skill[] }) {
+export function SkillsInstallList({
+  skills,
+  children,
+}: {
+  skills: Skill[];
+  children?: React.ReactNode;
+}) {
   const [runtime, setRuntime] = useSessionStorageState<Runtime>({
     key: RUNTIME_STORAGE_KEY,
     initialValue: "openclaw",
@@ -361,9 +397,20 @@ export function SkillsInstallList({ skills }: { skills: Skill[] }) {
 
   return (
     <div className="max-w-5xl">
-      <RuntimePicker runtime={runtime} onChange={setRuntime} />
+      {/* Hero: heading + unified install card */}
+      <section className="space-y-6 mb-12">
+        <h1 className="type-display max-w-5xl pt-[0.06em] leading-[0.94]">
+          Send your agent to Zora.
+        </h1>
+        <RuntimeInstallCard
+          runtime={runtime}
+          onChange={setRuntime}
+          command={getInstallAllCommands(getSiteUrl())[runtime]}
+        />
+      </section>
 
-      <InstallAllBlock runtime={runtime} />
+      {/* Injected content (e.g. 3-step grid) */}
+      {children}
 
       <div>
         {skills.map((skill, index) => (

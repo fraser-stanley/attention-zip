@@ -2,6 +2,17 @@
 
 Decisions, trade-offs, and context that aren't obvious from the code.
 
+## 2026-03-19 — Unified install card + runtime tabs
+
+### TabsList base class override
+The shadcn/ui `TabsList` component applies `gap-1 bg-muted p-1` in its base className. When overriding with `bg-transparent p-0`, the `gap-1` still applies unless explicitly zeroed with `gap-0`. This created a visible gap on the left side of the first tab in the `RuntimeInstallCard`. Always override all three properties (`gap-0 bg-transparent p-0`) when restyling `TabsList` as a flush container.
+
+### Install commands are agent prompts, not shell commands
+The Zora CLI has no `install` or `skills` subcommand. What we call "install" is actually a prompt instruction: `claude -p "Read <url> and <action>"`. The SKILL.md is served from the domain at `/skills/[id]/skill-md` so URLs work in all environments. OpenClaw is the exception — it has a real `clawhub install <skill-id>` command.
+
+### Activity ticker belongs in root layout
+The ticker was originally homepage-only, then moved to `HeroSection`. It makes more sense in the root layout directly under the nav so it appears on every page without each page importing it. Borders were removed since the nav already provides a visual boundary above.
+
 ## 2026-03-17 — Wallet modal painting order
 
 ### DOM order was misleading

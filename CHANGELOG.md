@@ -1,5 +1,24 @@
 # Changelog
 
+## 2026-03-19 (Unified install card + layout refinements)
+
+### Added
+- **Unified `RuntimeInstallCard`** — Simmer/Tempo-inspired component combining runtime tabs + code snippet + copy button in a single bordered card. Used on the skills page hero.
+- **6 runtime tabs** — OpenClaw (default), Claude Code, Amp, Codex CLI, OpenCode, Cursor. Per-runtime install commands generated from `getSkillRuntimeCommands()` and `getInstallAllCommands()`.
+- **SKILL.md serving route** — `GET /skills/[id]/skill-md` serves raw SKILL.md content from the domain, enabling clean URLs in CLI commands.
+- **"Send your agent to Zora" hero** — skills page headline with 3-step install guide (paste, read, try).
+- **Install all CTA** — single command to install every skill, shown in the unified card.
+
+### Changed
+- **Activity ticker moved to root layout** — now appears on all pages directly under the nav. Top and bottom borders removed for a cleaner look.
+- **WorksWithMarquee repositioned** — moved from between hero and skills to between skills cards and live data table on the homepage.
+- **Skills page restructured** — `SkillsInstallList` accepts children, hero + tabs + install-all live inside the component, 3-step grid injected as children.
+- **Per-skill install commands** — each skill row shows a `CopyableCodeBlock` for the selected runtime plus a curl fallback link.
+- **Install commands are agent instructions** — `claude -p "Read <url> and <action>"` pattern instead of nonexistent CLI install subcommands.
+
+### Fixed
+- **TabsList gap** — base `TabsList` component applies `gap-1` which created a visible gap on the left of the first tab in `RuntimeInstallCard`. Fixed by overriding with `gap-0` in the card's className.
+
 ## 2026-03-19 (CLI syntax update)
 
 ### Changed

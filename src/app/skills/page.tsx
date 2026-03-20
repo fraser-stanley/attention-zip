@@ -42,37 +42,31 @@ export default function SkillsPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(skillJsonLd) }}
       />
-      <section className="space-y-4">
-        <h1 className="type-display max-w-5xl pt-[0.06em] leading-[0.94]">
-          Send your agent to Zora.
-        </h1>
-      </section>
-
-      <section className="grid max-w-5xl gap-6 sm:grid-cols-3">
-        <div className="space-y-1.5">
-          <p className="type-label text-muted-foreground">01</p>
-          <h2 className="type-label text-foreground">Paste the command</h2>
-          <p className="type-body-sm text-muted-foreground">
-            Copy the command for your runtime. Runs in your terminal.
-          </p>
-        </div>
-        <div className="space-y-1.5">
-          <p className="type-label text-muted-foreground">02</p>
-          <h2 className="type-label text-foreground">Your agent reads the skill</h2>
-          <p className="type-body-sm text-muted-foreground">
-            It fetches the SKILL.md and learns the commands.
-          </p>
-        </div>
-        <div className="space-y-1.5">
-          <p className="type-label text-muted-foreground">03</p>
-          <h2 className="type-label text-foreground">Try it</h2>
-          <p className="type-body-sm text-muted-foreground">
-            Ask a question. The skill handles the rest.
-          </p>
-        </div>
-      </section>
-
-      <SkillsInstallList skills={skills} />
+      <SkillsInstallList skills={skills}>
+        <section className="grid max-w-5xl gap-6 sm:grid-cols-3 mb-12">
+          <div className="space-y-1.5">
+            <p className="type-label text-muted-foreground">01</p>
+            <h2 className="type-label text-foreground">Paste the command</h2>
+            <p className="type-body-sm text-muted-foreground">
+              Copy the command for your runtime. Runs in your terminal.
+            </p>
+          </div>
+          <div className="space-y-1.5">
+            <p className="type-label text-muted-foreground">02</p>
+            <h2 className="type-label text-foreground">Your agent reads the skill</h2>
+            <p className="type-body-sm text-muted-foreground">
+              It fetches the SKILL.md and learns the commands.
+            </p>
+          </div>
+          <div className="space-y-1.5">
+            <p className="type-label text-muted-foreground">03</p>
+            <h2 className="type-label text-foreground">Try it</h2>
+            <p className="type-body-sm text-muted-foreground">
+              Ask a question. The skill handles the rest.
+            </p>
+          </div>
+        </section>
+      </SkillsInstallList>
     </div>
   );
 }

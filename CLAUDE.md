@@ -54,6 +54,7 @@ src/
 │   ├── dashboard/page.tsx          # Server-rendered shell + streamed dashboard tabs
 │   ├── dashboard/loading.tsx       # Dashboard loading skeleton
 │   ├── skills/page.tsx             # Server-rendered editorial skill gallery + JSON-LD
+│   ├── skills/[id]/skill-md/route.ts # Raw SKILL.md serving for agent consumption
 │   ├── leaderboard/page.tsx        # Weekly trader rankings with server-fetched initial data
 │   ├── leaderboard/loading.tsx     # Leaderboard loading skeleton
 │   ├── portfolio/page.tsx          # Mock logged-in portfolio (Simmer-style PnL, positions, skills)
@@ -118,8 +119,10 @@ src/
 - **Client components still refresh through API routes** (`/api/explore`, `/api/leaderboard`) using React Query. The API remains the public integration surface for external agents and local tooling.
 - **Agent discovery is explicit** via `/api`, `/api/skills`, JSON-LD, and `/.well-known/ai.json`.
 - **Skills are static data** in `src/lib/skills.ts`. No database, no CMS. The homepage grid and skills gallery both render from this array — add a skill to the array and both pages update automatically.
-- **Install commands are agent instructions**, not CLI commands. The Zora CLI has no `install` or `skills` subcommand. The "Tell your agent" tab shows natural-language instructions (`install skill from <url>`); the "curl" tab is the only real shell command.
-- **Install commands are shared** from `src/lib/skills.ts` so the UI and `/api/skills` stay in sync.
+- **Install commands are agent instructions**, not CLI commands. The Zora CLI has no `install` or `skills` subcommand. Each runtime gets a prompt-based command: `claude -p "Read <url> and <action>"`. OpenClaw is the exception with `clawhub install <skill-id>`. The curl tab is the only real shell command.
+- **SKILL.md is served from the domain** at `/skills/[id]/skill-md` (`src/app/skills/[id]/skill-md/route.ts`). This gives agent commands clean URLs that work in any environment.
+- **Install commands are shared** from `src/lib/skills.ts` (`getSkillRuntimeCommands()`, `getInstallAllCommands()`) so the UI and `/api/skills` stay in sync.
+- **The skills page has a unified install card** — `RuntimeInstallCard` in `src/components/skill-card-client.tsx` combines 6 runtime tabs (OpenClaw, Claude Code, Amp, Codex CLI, OpenCode, Cursor) with a copyable code snippet in one bordered card. OpenClaw is the default runtime. Per-skill rows use standalone `CopyableCodeBlock` components.
 - **The skills page stays intentionally flat** — one shared runtime picker updates every command block. Only the example output is collapsible (with typewriter animation). No nested accordions.
 - **Tabs use a single unified style** — `TabsList` always renders with `bg-muted p-1` (gray container) and selected tabs get black fill + white text. No variants — one style for all tab UIs (skills picker, homepage terminal, portfolio, dashboard).
 - **Route-level `loading.tsx` files** exist for `/`, `/dashboard`, and `/leaderboard` — the three routes with async SDK fetches. These render instant skeleton states during navigation so the site feels like a fast SPA. Static pages (`/skills`, `/portfolio`) don't need them.
@@ -127,7 +130,7 @@ src/
 - **Command menu is lazy-loaded** through `src/components/command-menu-loader.tsx` so it does not affect the initial page payload.
 - **React Query** handles live refresh after hydration. Initial render is server-owned for `/`, `/dashboard`, and `/leaderboard`.
 - **Homepage "Agent activity" is a terminal board**, not a 4-card grid. It preloads 8 rows per tab, refreshes through `/api/explore` and `/api/leaderboard`, and uses a subtle CRT-style loading sweep plus simulated preview motion between fetches.
-- **Activity ticker shows mock agent trades** — Simmer-style marquee (`@AgentName bought $12 Higher 3m ago`). Mock data in `src/lib/activity-mock-data.ts` with `TradeActivityItem` interface. Green for buys, magenta for sells. Will swap to real trade data when tracking is available.
+- **Activity ticker shows mock agent trades** — Simmer-style marquee (`@AgentName bought $12 Higher 3m ago`), rendered in the root layout directly under the nav so it appears on every page. No borders — the nav provides the visual boundary above. Mock data in `src/lib/activity-mock-data.ts` with `TradeActivityItem` interface. Green for buys, magenta for sells. Will swap to real trade data when tracking is available.
 - **Portfolio page is mock data only** — `src/lib/portfolio-mock-data.ts` provides all positions, trades, PnL stats, and sparkline data. No real wallet connection. Will be replaced with live data when trade history indexing ships.
 - **Agent profiles use mock PnL data** — `src/lib/agent-mock-data.ts` provides mock positions, trades, and sparkline for agent profile pages. Real profile data (holdings, created coins) comes from the SDK.
 - **PnL utilities are shared** — `src/lib/pnl-utils.ts` exports `pnlColor()`, `formatPnl()`, `formatPct()` used by both portfolio and agent profile pages. Gains = `#3FFF00`, losses = `#FF00F0`.
@@ -345,6 +348,7 @@ The Zora CLI has 8 commands: `auth`, `explore`, `get`, `buy`, `sell`, `balances`
 - `/api/explore` — live explore data with cache headers
 - `/api/leaderboard` — leaderboard data with cache headers
 - `/api/agents/<address>` — agent profile data (balances, coins, volume, rank)
+- `/skills/<id>/skill-md` — raw SKILL.md content (`text/markdown`, 1h cache)
 - `/.well-known/ai.json` — simple discovery document for crawlers and agents
 
 ## Product boundaries

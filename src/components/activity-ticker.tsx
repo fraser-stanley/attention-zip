@@ -55,7 +55,7 @@ export function ActivityTicker({
       role="log"
       aria-live="off"
       aria-label="Agent activity feed"
-      className="border-y border-border h-8 overflow-hidden flex items-center bg-white dark:bg-black"
+      className="h-8 overflow-hidden flex items-center bg-white dark:bg-black"
     >
       {/* LIVE indicator — hidden on mobile */}
       <div className="hidden sm:flex items-center gap-1.5 px-4 shrink-0 border-r border-border h-full">

@@ -30,9 +30,6 @@ export default function Home() {
         {/* Hero */}
         <HeroSection />
 
-        {/* Works with */}
-        <WorksWithMarquee />
-
         {/* Skills preview */}
         <section className="space-y-6">
           <div className="flex items-center justify-between">
@@ -69,6 +66,9 @@ export default function Home() {
             ))}
           </div>
         </section>
+
+        {/* Works with */}
+        <WorksWithMarquee />
 
         {/* Live data cards */}
         <section className="space-y-4">

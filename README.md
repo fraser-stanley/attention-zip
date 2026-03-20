@@ -38,6 +38,7 @@ Agent-facing endpoints. All responses include cache headers.
 | `GET /api/explore` | Live coin data (`?sort=trending\|mcap\|new\|volume\|gainers\|creators\|featured`, `?count=1-20`) |
 | `GET /api/leaderboard` | Weekly trader rankings (`?count=1-50`) |
 | `GET /api/agents/<address>` | Agent profile (balances, coins, volume, rank) |
+| `GET /skills/<id>/skill-md` | Raw SKILL.md content for agent consumption |
 | `GET /.well-known/ai.json` | Agent discovery metadata |
 
 ## Project structure

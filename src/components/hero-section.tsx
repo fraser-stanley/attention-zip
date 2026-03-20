@@ -8,7 +8,6 @@ import { getInstallAllCommands } from "@/lib/skills";
 import { getSiteUrl } from "@/lib/site";
 import { HighlighterStroke } from "@/components/highlighter-stroke";
 import { HeroOrbGlassLoader } from "@/components/hero-orb-glass-loader";
-import { ActivityTickerSection } from "@/components/activity-ticker-section";
 import { cn } from "@/lib/utils";
 
 export function HeroSection() {
@@ -57,9 +56,6 @@ export function HeroSection() {
         </div>
       </div>
 
-      <div className="mt-6">
-        <ActivityTickerSection />
-      </div>
     </section>
   );
 }

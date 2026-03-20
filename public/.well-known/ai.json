@@ -5,6 +5,8 @@
   "skills_endpoint": "/api/skills",
   "explore_endpoint": "/api/explore",
   "leaderboard_endpoint": "/api/leaderboard",
+  "llms_txt": "/llms.txt",
+  "llms_full_txt": "/llms-full.txt",
 
   "documentation": "https://github.com/fraser-stanley/zora-agent-skills"
 }

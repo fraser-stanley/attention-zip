@@ -30,14 +30,14 @@ Use when the user says:
 
 | Setting | Flag | Default | Description |
 |---------|------|---------|-------------|
-| Sort | `--sort` | `balance` | Sort by: `balance`, `value`, `mcap`, `change` |
+| Sort | `--sort` | `usd-value` | Sort by: `usd-value`, `balance`, `market-cap`, `price-change` |
 
 ## Commands
 
 ```bash
 zora balances --json                  # all coin holdings
-zora balances --sort value --json     # sorted by USD value (highest first)
-zora balances --sort change --json    # sorted by 24h change
+zora balances --sort usd-value --json     # sorted by USD value (highest first)
+zora balances --sort price-change --json  # sorted by 24h price change
 ```
 
 ## How It Works

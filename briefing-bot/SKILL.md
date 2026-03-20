@@ -31,10 +31,11 @@ Use when the user says:
 | Setting | Flag | Default | Description |
 |---------|------|---------|-------------|
 | Limit per section | `--limit` | `5` | Coins per section (1-10) |
+| Include portfolio | n/a | `true` | Include holdings section if wallet is configured |
 
 ## Commands
 
-Run all five, then synthesize:
+Run all five market scans, then optionally check holdings:
 
 ```bash
 zora explore --sort trending --limit 5 --json     # trending coins
@@ -42,19 +43,22 @@ zora explore --sort volume --limit 5 --json        # volume leaders
 zora explore --sort new --limit 5 --json           # new launches
 zora explore --sort gainers --limit 5 --json       # top gainers
 zora explore --type creator-coin --limit 5 --json  # creator coin activity
+zora balances --json                               # current holdings (if wallet configured)
 ```
 
 ## How It Works
 
 1. Run all 5 explore commands to gather data across market dimensions
-2. Combine the results into a single briefing with these sections:
+2. If a wallet is configured, run `zora balances --json` to get current holdings
+3. Combine the results into a single briefing with these sections:
    - **Trending** — top coin by market cap, notable movers
    - **New launches** — count of new coins, largest by market cap
    - **Volume leaders** — highest 24h volume, direction
    - **Top gainers** — biggest 24h market cap increases
    - **Creator coins** — notable creator coin activity
-3. End with a one-sentence market assessment
-4. Keep the entire briefing under 200 words. Omit sections with no notable data rather than padding.
+   - **Your holdings** — coins you hold that appear in trending/volume/gainer lists, with current value and 24h change
+4. End with a one-sentence market assessment
+5. Keep the entire briefing under 250 words. Omit sections with no notable data rather than padding.
 
 ## Example Output
 
@@ -67,6 +71,10 @@ Trending: "looksmaxxing" leads at $2.3M mcap (+12.3%).
 Volume leaders: "frog market" at $3.1M 24h vol (-8.1%).
 Top gainers: "hyperpop" up 22.8% to $950K mcap.
 Creator coins: jacob steady at $8.1M, alysaliu up 5.7%.
+
+Your holdings:
+  looksmaxxing — 500 tokens, $1,150 (+12.1% 24h) ⬆ trending
+  jacob — 1,200 tokens, $4,120 (+8.3% 24h)
 
 Nothing unusual detected. Market is moderately active.
 ```
@@ -87,3 +95,5 @@ Nothing unusual detected. Market is moderately active.
 - The CLI has no streaming mode. Each call is a single request-response.
 - Do not return raw JSON to the user. Synthesize into prose.
 - End every briefing with a plain-language assessment: "Market is [quiet/active/volatile]. [Notable signal or 'Nothing unusual.']"
+- `zora balances` is wallet-only (no address argument). If no wallet is configured, skip the holdings section silently.
+- Flag held coins that also appear in trending or gainers lists — this is the most actionable signal in a briefing.

@@ -281,7 +281,7 @@ Do NOT put `requires`, `tunables`, or `openclaw` in SKILL.md frontmatter — tho
 **clawhub.json** structure:
 - Read-only skills: `requires.bins: ["zora"]`, no `requires.env`
 - Execution skills: add `requires.env: ["ZORA_API_KEY", "ZORA_PRIVATE_KEY"]` and `tunables` array
-- No `automaton` block (we have no Python entrypoints)
+- All skills include `"automaton": {"managed": false, "entrypoint": null}` — signals to OpenClaw runtimes that these are CLI wrappers, not standalone scripts
 
 ### Skill testing
 

@@ -34,12 +34,13 @@ Use when the user asks to:
 
 | Setting | Default | Description |
 |---------|---------|-------------|
-| Max ETH per trade | 0.01 | Cap per buy |
-| Max open positions | 3 | Concurrent positions |
-| Min 24h gain | 15% | Minimum gain to trigger entry |
-| Max slippage | 3% | Skip if slippage exceeds this |
-| Trailing stop | 15% | Sell when price drops this far from peak |
-| Cooldown | 5 min | Minimum wait between buys |
+| `ZORA_MOMENTUM_MAX_ETH` | 0.01 | Max ETH per trade |
+| `ZORA_MOMENTUM_MAX_POSITIONS` | 3 | Concurrent open positions |
+| `ZORA_MOMENTUM_MIN_GAIN_PCT` | 15 | Min 24h gain % to trigger entry |
+| Max slippage | 3% | Skip if `--quote` slippage exceeds this |
+| `ZORA_MOMENTUM_TRAILING_STOP` | 15 | Sell when price drops this % from peak |
+| `ZORA_MOMENTUM_COOLDOWN_SEC` | 300 | Seconds between trades |
+| `ZORA_MOMENTUM_DAILY_CAP_ETH` | 0.05 | Max total ETH spent per 24h period |
 
 ## Commands
 
@@ -61,12 +62,16 @@ zora sell <address> --amount 100 --to USDC -o json --yes  # partial exit to USDC
 
 ## How It Works
 
-1. Scan gainers and trending coins for candidates meeting entry criteria (min gain %, min volume)
-2. Validate each candidate with `zora get` — check volume, holder count, coin type
-3. Preview the trade with `--quote` to check slippage before committing
-4. If slippage is acceptable, execute the buy with `--yes` to skip the confirmation prompt
-5. Monitor positions via `zora balances` — track value changes against entry price
-6. Exit when trailing stop triggers or take-profit target is hit
+1. **Check limits first**: verify daily spend is under `ZORA_MOMENTUM_DAILY_CAP_ETH` and cooldown has elapsed since last trade
+2. Scan gainers and trending coins for candidates meeting entry criteria (min gain %, min volume)
+3. Check `zora balances --json` to confirm open positions are under `ZORA_MOMENTUM_MAX_POSITIONS`
+4. Validate each candidate with `zora get` — check volume, holder count, coin type
+5. Preview the trade with `--quote` to check slippage before committing
+6. If slippage is acceptable and all limits pass, execute the buy with `--yes`
+7. **Log the trade** to `~/.config/zora/trade-journal.jsonl`: `{"source": "zora:momentum-trader", "action": "buy", "address": "0x...", "eth": 0.01, "timestamp": "..."}`
+8. Monitor positions via `zora balances` — track value changes against entry price
+9. Exit when trailing stop triggers or take-profit target is hit. Log sells to the journal too.
+10. **Wait** `ZORA_MOMENTUM_COOLDOWN_SEC` seconds before scanning again
 
 ## Example Output
 
@@ -113,4 +118,6 @@ Watching for next signal... (cooldown: 5 min)
 - `--quote` returns estimated token amount and slippage, but no gas estimate.
 - `zora sell` supports `--to ETH|USDC|ZORA` for output token selection. Default is ETH.
 - Private key stored at `~/.config/zora/wallet.json` (mode 0600). `ZORA_PRIVATE_KEY` env var takes precedence.
-- No spending limits in the CLI. Position sizing is your responsibility.
+- **Kill switch**: remove `ZORA_PRIVATE_KEY` or delete `~/.config/zora/wallet.json` to stop all trading immediately.
+- **No server-side guardrails.** The agent enforces caps, cooldowns, and position limits from these instructions. Modified skill = no limits.
+- Source tag `zora:momentum-trader` identifies trades from this skill. Other skills should check the journal before selling positions opened here.

@@ -180,8 +180,8 @@ describe.each(SKILL_DIRS)("%s/clawhub.json", (skill) => {
     expect(content.autostart).toBe(false);
   });
 
-  it("does not contain automaton block", () => {
-    expect(content.automaton).toBeUndefined();
+  it("automaton block declares CLI wrapper (managed: false)", () => {
+    expect(content.automaton).toEqual({ managed: false, entrypoint: null });
   });
 });
 

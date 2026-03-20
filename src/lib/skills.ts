@@ -133,6 +133,7 @@ Watchlist alert:
       "zora explore --sort volume --json",
       "zora explore --sort new --json",
       "zora explore --type creator-coin --json",
+      "zora balances --json",
     ],
     actionPrompt: "give me a Zora market briefing",
     samplePrompt: "Give me my morning Zora briefing.",

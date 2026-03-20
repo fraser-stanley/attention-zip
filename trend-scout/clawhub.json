@@ -4,5 +4,9 @@
     "bins": ["zora"]
   },
   "cron": null,
-  "autostart": false
+  "autostart": false,
+  "automaton": {
+    "managed": false,
+    "entrypoint": null
+  }
 }

@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 import Link from "next/link";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { HomeLiveCards, HomeLiveCardsSkeleton } from "@/components/home-live-cards";
+import { SkillCard } from "@/components/skill-card";
 import { HeroSection } from "@/components/hero-section";
 import { getExploreData, getLeaderboardData } from "@/lib/data";
 import { skills } from "@/lib/skills";
@@ -48,21 +48,7 @@ export default function Home() {
           </div>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {skills.slice(0, 4).map((skill) => (
-              <Link key={skill.id} href={`/skills#${skill.id}`} className="group/skill block">
-                <Card className="h-full transition-[background-color,color,border-color] duration-150 group-hover/skill:border-foreground group-hover/skill:bg-foreground group-hover/skill:text-background">
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-base">{skill.name}</CardTitle>
-                  </CardHeader>
-                  <CardContent className="flex flex-1 flex-col justify-between gap-3">
-                    <p className="text-sm text-muted-foreground group-hover/skill:text-background/70">
-                      {skill.description}
-                    </p>
-                    <span className="type-caption text-muted-foreground font-mono group-hover/skill:text-background/50">
-                      {skill.installs.toLocaleString()} installs
-                    </span>
-                  </CardContent>
-                </Card>
-              </Link>
+              <SkillCard key={skill.id} skill={skill} href={`/skills#${skill.id}`} />
             ))}
           </div>
         </section>

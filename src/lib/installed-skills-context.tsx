@@ -36,9 +36,7 @@ function getSnapshot(): string[] {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (raw === null) {
-      // First visit — seed with demo defaults
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_SEEDS));
-      snapshot = DEFAULT_SEEDS;
+      snapshot = [];
     } else {
       const parsed = JSON.parse(raw) as string[];
       snapshot = Array.isArray(parsed) ? parsed : [];
@@ -47,6 +45,19 @@ function getSnapshot(): string[] {
     snapshot = [];
   }
   return snapshot;
+}
+
+/** Seed default skills — call on wallet connect */
+export function seedDefaultSkills() {
+  const current = getSnapshot();
+  if (current.length === 0) {
+    emit(DEFAULT_SEEDS);
+  }
+}
+
+/** Clear all installed skills — call on wallet disconnect */
+export function clearInstalledSkills() {
+  emit([]);
 }
 
 const SERVER_SNAPSHOT: string[] = [];

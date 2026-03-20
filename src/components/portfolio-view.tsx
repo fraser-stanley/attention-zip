@@ -3,12 +3,7 @@
 import NumberFlow, { NumberFlowGroup, type Format } from "@number-flow/react";
 import { useEffect, useMemo, useState } from "react";
 import { useReducedMotion } from "motion/react";
-import { TextMorph } from "@/components/text-morph";
 import { Badge } from "@/components/ui/badge";
-import {
-  Card,
-  CardContent,
-} from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 import { formatPnl, formatPct } from "@/lib/pnl-utils";
@@ -16,12 +11,8 @@ import { skills } from "@/lib/skills";
 import { MOCK_PORTFOLIO, type MockPosition, type SparklinePoint } from "@/lib/portfolio-mock-data";
 import { ChartBarIncreasingIcon } from "@/components/ui/chart-bar-increasing";
 import { ClockIcon } from "@/components/ui/clock";
-import { CheckIcon } from "@/components/ui/check";
-import { PlusIcon } from "@/components/ui/plus";
 import Link from "next/link";
-import { AnimatedButton } from "@/components/ui/animated-button";
-import { useInstalledSkills } from "@/lib/installed-skills-context";
-import { useToast } from "@/components/toast";
+import { SkillCard } from "@/components/skill-card";
 
 type PositionFilter = "active" | "resolved" | "all";
 
@@ -466,90 +457,14 @@ function HistoryContent() {
 
 /* ─── Skills section ─── */
 
-function InstallButton({ skillId, skillName }: { skillId: string; skillName: string }) {
-  const { install } = useInstalledSkills();
-  const { toast } = useToast();
-  const [state, setState] = useState<"idle" | "installing">("idle");
-
-  function handleInstall() {
-    setState("installing");
-    setTimeout(() => {
-      install(skillId);
-      toast(`${skillName} added to your agent`);
-    }, 800);
-  }
-
-  return (
-    <AnimatedButton
-      variant="outline"
-      className="w-[120px] gap-1"
-      disabled={state === "installing"}
-      onClick={state === "idle" ? handleInstall : undefined}
-    >
-      {state === "installing" ? (
-        <span className="h-3 w-3 animate-spin rounded-full border-2 border-muted-foreground/20 border-t-muted-foreground" />
-      ) : (
-        <PlusIcon size={14} />
-      )}
-      <TextMorph>{state === "installing" ? "Installing..." : "Install"}</TextMorph>
-    </AnimatedButton>
-  );
-}
-
 function InstalledSkills() {
-  const { isInstalled, uninstall } = useInstalledSkills();
-
-  const installed = skills.filter((s) => isInstalled(s.id));
-  const available = skills.filter((s) => !isInstalled(s.id));
-
   return (
     <div className="space-y-3">
       <h2 className="type-label text-foreground">Skills</h2>
 
       <div className="grid gap-3 sm:grid-cols-2">
-        {installed.map((skill) => (
-          <Card key={skill.id}>
-            <CardContent className="p-4">
-              <div className="flex items-start justify-between gap-3">
-                <div>
-                  <p className="type-body-sm font-medium">{skill.name}</p>
-                  <p className="type-caption mt-1 text-muted-foreground">
-                    {skill.description}
-                  </p>
-                </div>
-                <button
-                  type="button"
-                  className="type-body-sm group inline-flex min-h-[44px] w-[120px] shrink-0 items-center justify-center gap-1 rounded-md border border-transparent bg-[#3FFF00] font-medium text-black transition-colors hover:bg-[#FF00F0] hover:text-black"
-                  onClick={() => uninstall(skill.id)}
-                >
-                  <span className="group-hover:hidden inline-flex items-center gap-1">
-                    <CheckIcon size={14} />
-                    Installed
-                  </span>
-                  <span className="hidden group-hover:inline-flex items-center gap-1">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
-                    Remove
-                  </span>
-                </button>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-
-        {available.map((skill) => (
-          <Card key={skill.id} className="border-dashed opacity-60 hover:opacity-100 transition-opacity">
-            <CardContent className="p-4">
-              <div className="flex items-start justify-between gap-3">
-                <div>
-                  <p className="type-body-sm font-medium">{skill.name}</p>
-                  <p className="type-caption mt-1 text-muted-foreground">
-                    {skill.description}
-                  </p>
-                </div>
-                <InstallButton skillId={skill.id} skillName={skill.name} />
-              </div>
-            </CardContent>
-          </Card>
+        {skills.map((skill) => (
+          <SkillCard key={skill.id} skill={skill} />
         ))}
       </div>
 

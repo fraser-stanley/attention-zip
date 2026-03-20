@@ -13,6 +13,7 @@ import { LayersIcon, type LayersIconHandle } from "@/components/ui/layers";
 import { SparklesIcon, type SparklesIconHandle } from "@/components/ui/sparkles";
 import { useWallet, truncateAddress } from "@/lib/wallet-context";
 import { WalletConnectModal } from "@/components/wallet-connect-modal";
+import { WalletMenu } from "@/components/wallet-menu";
 
 type IconHandle = {
   startAnimation: () => void;
@@ -27,7 +28,7 @@ type Section = {
 };
 
 
-const sections: Section[] = [
+const allSections: Section[] = [
   { id: "home", label: "Home", href: "/", description: "Project info" },
   { id: "skills", label: "Skills", href: "/skills", description: `${skills.length} skills` },
   { id: "dashboard", label: "Dashboard", href: "/dashboard", description: "Live market data" },
@@ -39,7 +40,11 @@ export function Nav() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const [walletModalOpen, setWalletModalOpen] = useState(false);
+  const [walletMenuOpen, setWalletMenuOpen] = useState(false);
   const { address, isConnected } = useWallet();
+  const sections = isConnected
+    ? allSections
+    : allSections.filter((s) => s.id !== "portfolio");
   const router = useRouter();
   const close = useCallback(() => {
     setOpen(false);
@@ -81,8 +86,9 @@ export function Nav() {
   };
 
   useEffect(() => {
+    if (!open) return;
     function onKey(e: KeyboardEvent) {
-      if (e.key === "Escape" && open) close();
+      if (e.key === "Escape") close();
     }
     document.addEventListener("keydown", onKey);
     return () => document.removeEventListener("keydown", onKey);
@@ -103,7 +109,7 @@ export function Nav() {
       {/* Persistent header */}
       <header
         className="fixed top-0 left-0 right-0 z-50 bg-background"
-        inert={open ? true : undefined}
+        inert={open || walletMenuOpen ? true : undefined}
       >
         <div className="mx-auto max-w-7xl px-4 pb-1 sm:px-6 lg:px-8">
           <div className="flex h-11 items-center justify-between py-[2px]">
@@ -119,12 +125,12 @@ export function Nav() {
             </Link>
             <div className="flex items-center gap-6">
               {isConnected && address ? (
-                <Link
-                  href="/portfolio"
-                  className="type-label text-muted-foreground hover:text-foreground transition-colors py-3"
-                >
-                  <TextMorph>{truncateAddress(address)}</TextMorph>
-                </Link>
+                  <button
+                    onClick={() => setWalletMenuOpen((v) => !v)}
+                    className="type-label text-muted-foreground hover:text-foreground transition-colors py-3"
+                  >
+                    <TextMorph>{truncateAddress(address)}</TextMorph>
+                  </button>
               ) : (
                 <button
                   onClick={() => { setOpen(false); setWalletModalOpen(true); }}
@@ -259,6 +265,7 @@ export function Nav() {
         </div>
       </div>
 
+      <WalletMenu open={walletMenuOpen} onClose={() => setWalletMenuOpen(false)} />
       <WalletConnectModal open={walletModalOpen} onClose={() => setWalletModalOpen(false)} />
     </>
   );

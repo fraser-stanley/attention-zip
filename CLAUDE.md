@@ -70,7 +70,7 @@ src/
 │       ├── leaderboard/route.ts    # Trader leaderboard
 │       └── agents/[address]/route.ts # Agent profile data
 ├── components/
-│   ├── nav.tsx                     # Navigation bar (6 sections incl. Portfolio)
+│   ├── nav.tsx                     # Navigation bar (6 sections incl. Portfolio + wallet menu toggle)
 │   ├── hero-section.tsx            # Hero layout with orb + CTA (animated highlighter headings)
 │   ├── highlighter-stroke.tsx      # Reusable animated highlight sweep (motion/react backgroundSize)
 │   ├── copyable-code-block.tsx     # Terminal-style command block with copy button
@@ -87,6 +87,9 @@ src/
 │   ├── portfolio-view.tsx          # Simmer-style portfolio (stats, sparkline, positions, skills)
 │   ├── agent-profile-detail.tsx    # Agent profile with PnL, positions, sparkline, holdings
 │   ├── pnl-sparkline.tsx           # SVG sparkline for cumulative PnL charts
+│   ├── skill-card.tsx               # Unified skill card with install/remove states and peer-hover link
+│   ├── portfolio-auth-gate.tsx     # Client redirect gate — sends disconnected users to /
+│   ├── wallet-menu.tsx             # Brutalist wallet dropdown (QR code, balance, copy address, disconnect)
 │   ├── wallet-connect-modal.tsx     # Mock wallet connect flow (MetaMask/Coinbase/WalletConnect)
 │   ├── hover-media-overlay.tsx      # Viewport-centered token image overlay on table row hover (desktop only)
 │   ├── activity-ticker.tsx         # Agent trade feed marquee (Simmer-style, mock data)
@@ -102,7 +105,8 @@ src/
     ├── zora.ts                     # SDK wrapper: all query functions + formatting helpers
     ├── skills.ts                   # Static skill definitions (5 skills)
     ├── providers.tsx               # React Query provider (30s staleTime)
-    ├── wallet-context.tsx           # Mock wallet state (localStorage, useSyncExternalStore)
+    ├── wallet-context.tsx           # Mock wallet state (localStorage, useSyncExternalStore, skill seeding)
+    ├── installed-skills-context.tsx # Installed skills store (localStorage, seed/clear on connect/disconnect)
     ├── utils.ts                    # cn() helper for className merging
     ├── pnl-utils.ts                # Shared PnL formatting (pnlColor, formatPnl, formatPct)
     ├── portfolio-mock-data.ts      # Mock portfolio data (positions, trades, sparkline)
@@ -132,6 +136,9 @@ src/
 - **Homepage "Agent activity" is a terminal board**, not a 4-card grid. It preloads 8 rows per tab, refreshes through `/api/explore` and `/api/leaderboard`, and uses a subtle CRT-style loading sweep plus simulated preview motion between fetches.
 - **Activity ticker shows mock agent trades** — Simmer-style marquee (`@AgentName bought $12 Higher 3m ago`), rendered in the root layout directly under the nav so it appears on every page. No borders — the nav provides the visual boundary above. Mock data in `src/lib/activity-mock-data.ts` with `TradeActivityItem` interface. Green for buys, magenta for sells. Will swap to real trade data when tracking is available.
 - **Portfolio page is mock data only** — `src/lib/portfolio-mock-data.ts` provides all positions, trades, PnL stats, and sparkline data. No real wallet connection. Will be replaced with live data when trade history indexing ships.
+- **Wallet connect gates the portfolio** — `PortfolioAuthGate` redirects disconnected users to `/`. The nav conditionally shows the Portfolio link based on `isConnected`. Connecting a wallet seeds default skills (`trend-scout`, `portfolio-scout`); disconnecting clears them.
+- **Wallet menu uses the same overlay pattern as the Index** — `fixed inset-0 z-[100]`, split backdrop/content transitions (200ms blur, 100ms content snap), rendered outside the `<header>` to avoid `inert` conflicts. Brutalist design: `gap-px` grid cells, QR code spanning rows, condensed bold `font-display` for balance.
+- **Skill cards use `peer/link` for hover isolation** — `SkillCard` places an absolute `<Link>` as `peer/link` at z-0 and buttons at z-10. The card inverts on `peer-hover/link:` but button hover/click does not trigger the card's hover state.
 - **Agent profiles use mock PnL data** — `src/lib/agent-mock-data.ts` provides mock positions, trades, and sparkline for agent profile pages. Real profile data (holdings, created coins) comes from the SDK.
 - **PnL utilities are shared** — `src/lib/pnl-utils.ts` exports `pnlColor()`, `formatPnl()`, `formatPct()` used by both portfolio and agent profile pages. Gains = `#3FFF00`, losses = `#FF00F0`.
 - **Market colors stay full-strength** — use `#3FFF00`, `#FF00F0`, or no market color at all. Only neutral grays should be faded with opacity.

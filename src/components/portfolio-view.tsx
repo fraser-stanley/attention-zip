@@ -13,7 +13,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 import { formatPnl, formatPct } from "@/lib/pnl-utils";
 import { skills } from "@/lib/skills";
-import { MOCK_PORTFOLIO, type MockPosition } from "@/lib/portfolio-mock-data";
+import { MOCK_PORTFOLIO, type MockPosition, type SparklinePoint } from "@/lib/portfolio-mock-data";
 import { ChartBarIncreasingIcon } from "@/components/ui/chart-bar-increasing";
 import { ClockIcon } from "@/components/ui/clock";
 import { CheckIcon } from "@/components/ui/check";
@@ -87,6 +87,96 @@ function pnlHighlightBlockClass(value: number) {
   return `inline px-[0.15em] py-[0.02em] leading-[1.4] box-decoration-clone [-webkit-box-decoration-break:clone] ${pnlHighlightClass(value)}`;
 }
 
+/* ─── Glitchy pixel-grid chart (background decoration) ─── */
+const CHART_VW = 300;
+const CHART_VH = 200;
+const PX_COLS = 60;
+const PX_ROWS = 12;
+const CELL_W = CHART_VW / PX_COLS;
+const CELL_H = CHART_VH / PX_ROWS;
+const CELL_GAP = 0.5;
+
+function buildPixelGrid(
+  data: SparklinePoint[],
+  tick: number,
+): boolean[][] {
+  if (data.length === 0) return [];
+
+  // Interpolate data to PX_COLS columns
+  const interpolated: number[] = [];
+  for (let col = 0; col < PX_COLS; col++) {
+    const t = (col / (PX_COLS - 1)) * (data.length - 1);
+    const lo = Math.floor(t);
+    const hi = Math.min(lo + 1, data.length - 1);
+    const frac = t - lo;
+    interpolated.push(data[lo].value * (1 - frac) + data[hi].value * frac);
+  }
+
+  const max = Math.max(...interpolated) || 1;
+
+  return interpolated.map((value, col) => {
+    // Quantize to row height — how many rows from bottom are "on"
+    const norm = value / max;
+    const jitter = Math.round((pseudoRandom(tick, col * 7 + 3) - 0.5) * 1.4);
+    const baseHeight = Math.round(norm * PX_ROWS) + jitter;
+    const height = Math.max(0, Math.min(PX_ROWS, baseHeight));
+
+    const column: boolean[] = [];
+    for (let row = 0; row < PX_ROWS; row++) {
+      const rowFromBottom = PX_ROWS - 1 - row;
+      if (rowFromBottom < height) {
+        // Filled cell — apply dropout glitch (~15%)
+        const drop = pseudoRandom(tick, col * PX_ROWS + row + 100) < 0.15;
+        column.push(!drop);
+      } else if (rowFromBottom === height || rowFromBottom === height + 1) {
+        // Stray pixel above the line (~20% chance)
+        const stray = pseudoRandom(tick, col * PX_ROWS + row + 200) < 0.2;
+        column.push(stray);
+      } else {
+        column.push(false);
+      }
+    }
+    return column;
+  });
+}
+
+function PnlChart({ data, color, tick }: { data: SparklinePoint[]; color: string; tick: number }) {
+  const grid = useMemo(() => buildPixelGrid(data, tick), [data, tick]);
+
+  // Render ALL cells always — toggle opacity so transitions work in sync with NumberFlow
+  const rects: React.ReactNode[] = [];
+  for (let col = 0; col < grid.length; col++) {
+    for (let row = 0; row < PX_ROWS; row++) {
+      const on = grid[col]?.[row] ?? false;
+      rects.push(
+        <rect
+          key={col * PX_ROWS + row}
+          x={col * CELL_W + CELL_GAP}
+          y={row * CELL_H + CELL_GAP}
+          width={CELL_W - CELL_GAP * 2}
+          height={CELL_H - CELL_GAP * 2}
+          fill={color}
+          opacity={on ? 1 : 0}
+          shapeRendering="crispEdges"
+          style={{ transition: "opacity 650ms cubic-bezier(0.16, 1, 0.3, 1)" }}
+        />,
+      );
+    }
+  }
+
+  return (
+    <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
+      <svg
+        viewBox={`0 0 ${CHART_VW} ${CHART_VH}`}
+        preserveAspectRatio="none"
+        className="h-full w-full"
+      >
+        {rects}
+      </svg>
+    </div>
+  );
+}
+
 const TICK_MS = 2500;
 
 /** Simple deterministic hash for stable oscillation per tick+seed. */
@@ -109,7 +199,7 @@ function useSimulatedPortfolio() {
     return () => window.clearInterval(id);
   }, [reduceMotion]);
 
-  return useMemo(() => {
+  const portfolio = useMemo(() => {
     const base = MOCK_PORTFOLIO;
     if (tick === 0) return base;
 
@@ -134,10 +224,15 @@ function useSimulatedPortfolio() {
     const wins = Math.round(drift(base.pnl.wins, 0.8, tick, 200));
     const losses = base.pnl.totalTrades - wins;
 
+    const sparkline = base.sparkline.map((pt, i) => ({
+      value: pt.value + (pseudoRandom(tick, i + 500) - 0.45) * pt.value * 0.02,
+    }));
+
     return {
       ...base,
       totalValue,
       positions,
+      sparkline,
       pnl: {
         ...base.pnl,
         totalPnl,
@@ -148,16 +243,18 @@ function useSimulatedPortfolio() {
       },
     };
   }, [tick]);
+
+  return { portfolio, tick };
 }
 
 /* ─── Simmer-style 2×2 stats grid ─── */
 function PnlStats({ pnl }: { pnl: typeof MOCK_PORTFOLIO.pnl }) {
   return (
     <NumberFlowGroup>
-      <div className="grid grid-cols-2 gap-px">
+      <div className="relative z-10 grid grid-cols-2 gap-px">
         {/* Profit / Loss */}
         <div className="p-4">
-          <p className="type-label mb-2 text-muted-foreground">Profit / Loss</p>
+          <p className="type-label mb-2 text-black">Profit / Loss</p>
           <p className="text-5xl font-bold font-display">
             <span className={pnlHighlightBlockClass(pnl.totalPnl)}>
               <NumberFlow {...FLOW_TIMING} format={FMT_CURRENCY} value={pnl.totalPnl} />
@@ -175,24 +272,24 @@ function PnlStats({ pnl }: { pnl: typeof MOCK_PORTFOLIO.pnl }) {
         </div>
 
         {/* Trades */}
-        <div className="p-4 border-l border-border">
-          <p className="type-label mb-2 text-muted-foreground">Trades</p>
+        <div className="p-4 border-l border-dashed border-black/30">
+          <p className="type-label mb-2 text-black">Trades</p>
           <p className="text-5xl font-bold font-display">
             <NumberFlow {...FLOW_TIMING} format={FMT_INT} value={pnl.totalTrades} />
           </p>
         </div>
 
         {/* Win Rate */}
-        <div className="p-4 border-t border-border">
-          <p className="type-label mb-2 text-muted-foreground">Win Rate</p>
+        <div className="p-4 border-t border-dashed border-black/30">
+          <p className="type-label mb-2 text-black">Win Rate</p>
           <p className="text-5xl font-bold font-display">
             <NumberFlow {...FLOW_TIMING} format={FMT_PCT_UNSIGNED} value={pnl.winRate / 100} />
           </p>
         </div>
 
         {/* W / L */}
-        <div className="p-4 border-t border-l border-border">
-          <p className="type-label mb-2 text-muted-foreground">W / L</p>
+        <div className="p-4 border-t border-l border-dashed border-black/30">
+          <p className="type-label mb-2 text-black">W / L</p>
           <p className="text-5xl font-bold font-display">
             <span className="inline-flex items-baseline gap-2">
               <NumberFlow {...FLOW_TIMING} format={FMT_INT} value={pnl.wins} />
@@ -465,12 +562,19 @@ function InstalledSkills() {
 
 /* ─── Main export ─── */
 export function PortfolioView() {
-  const portfolio = useSimulatedPortfolio();
+  const { portfolio, tick } = useSimulatedPortfolio();
 
   return (
     <div className="space-y-8">
-      {/* Stats */}
-      <PnlStats pnl={portfolio.pnl} />
+      {/* Stats + background chart */}
+      <div className="relative overflow-hidden">
+        <PnlChart
+          data={portfolio.sparkline}
+          color={portfolio.pnl.totalPnl >= 0 ? "#3FFF00" : "#FF00F0"}
+          tick={tick}
+        />
+        <PnlStats pnl={portfolio.pnl} />
+      </div>
 
       {/* Market section */}
       <div className="space-y-4">

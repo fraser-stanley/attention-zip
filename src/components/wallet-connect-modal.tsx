@@ -6,6 +6,7 @@ import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { useWallet } from "@/lib/wallet-context";
 import { useToast } from "@/components/toast";
 import { TextMorph } from "@/components/text-morph";
+import { BrailleSpinner } from "@/components/ui/braille-spinner";
 
 const MOCK_ADDRESS = "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045";
 
@@ -165,7 +166,8 @@ export function WalletConnectModal({ open, onClose }: WalletConnectModalProps) {
                       style={{ backgroundColor: wallet.color }}
                     />
                     <span className="flex-1"><TextMorph>{wallet.name}</TextMorph></span>
-                    <span className="type-caption text-white/40">
+                    <span className="type-caption text-white/40 flex items-center gap-1.5">
+                      {connecting === wallet.name && <BrailleSpinner name="scan" />}
                       <TextMorph>
                         {connecting === wallet.name ? "Connecting..." : ""}
                       </TextMorph>

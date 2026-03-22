@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils"
+import { BrailleSpinner } from "@/components/ui/braille-spinner"
 
 function Skeleton({ className, ...props }: React.ComponentProps<"div">) {
   return (
@@ -7,7 +8,7 @@ function Skeleton({ className, ...props }: React.ComponentProps<"div">) {
       className={cn("flex items-center bg-muted/50 font-mono text-muted-foreground/30", className)}
       {...props}
     >
-      <span className="ml-2 animate-[blink_1s_step-end_infinite]">&#x2588;</span>
+      <BrailleSpinner className="ml-2" />
     </div>
   )
 }

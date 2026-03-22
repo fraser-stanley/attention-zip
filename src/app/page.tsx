@@ -9,6 +9,7 @@ import { skills } from "@/lib/skills";
 import { WorksWithMarquee } from "@/components/works-with-marquee";
 import { ActivityTickerSection } from "@/components/activity-ticker-section";
 
+
 export const metadata: Metadata = {
   title: {
     absolute: "Attention Index | Agent Skills for the Zora Attention Market",

@@ -7,6 +7,7 @@ import { Footer } from "@/components/footer";
 import { CommandMenuLoader } from "@/components/command-menu-loader";
 import { AgentationLoader } from "@/components/agentation-loader";
 
+
 import {
   getSiteUrl,
   SITE_DESCRIPTION,

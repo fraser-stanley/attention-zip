@@ -3,6 +3,7 @@
 import { useEffect, useId, useRef, useState } from "react";
 
 import { AnimatedButton } from "@/components/ui/animated-button";
+import { BrailleSpinner } from "@/components/ui/braille-spinner";
 import { TextMorph } from "@/components/text-morph";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button-variants";
@@ -145,20 +146,22 @@ function RuntimeInstallCard({
         onValueChange={(value) => onChange(value as Runtime)}
         className="w-full gap-0"
       >
-        <TabsList
-          aria-label="Agent runtime"
-          className="flex w-full flex-wrap gap-0 border-b border-border bg-transparent p-0"
-        >
-          {RUNTIMES.map((item) => (
-            <TabsTrigger
-              key={item}
-              value={item}
-              className="type-body-sm min-h-[44px] px-3 py-2 sm:px-4"
-            >
-              <span>{RUNTIME_LABELS[item]}</span>
-            </TabsTrigger>
-          ))}
-        </TabsList>
+        <div className="border-b border-border bg-muted p-1">
+          <TabsList
+            aria-label="Agent runtime"
+            className="flex w-full flex-wrap justify-start bg-transparent p-0"
+          >
+            {RUNTIMES.map((item) => (
+              <TabsTrigger
+                key={item}
+                value={item}
+                className="type-caption sm:min-h-[32px] gap-1.5 px-2.5 py-1"
+              >
+                <span>{RUNTIME_LABELS[item]}</span>
+              </TabsTrigger>
+            ))}
+          </TabsList>
+        </div>
       </Tabs>
 
       {/* Body: command + copy */}
@@ -253,7 +256,7 @@ function InstallButton({
       onClick={state === "idle" ? handleInstall : undefined}
     >
       {state === "installing" ? (
-        <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-muted-foreground/20 border-t-muted-foreground" />
+        <BrailleSpinner name="scan" className="text-sm" />
       ) : (
         <PlusIcon size={14} />
       )}

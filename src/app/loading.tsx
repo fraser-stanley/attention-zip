@@ -5,7 +5,9 @@ import { ActivityTickerSection } from "@/components/activity-ticker-section";
 export default function HomeLoading() {
   return (
     <>
-      <ActivityTickerSection />
+      <div className="-mt-8 mb-8 -mx-4 sm:-mx-6 lg:-mx-8">
+        <ActivityTickerSection />
+      </div>
       <div className="space-y-16">
         <HeroSection />
 

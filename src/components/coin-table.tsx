@@ -5,7 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { motion, useReducedMotion } from "motion/react";
 import { HoverMediaOverlay } from "@/components/hover-media-overlay";
 import { TextMorph } from "@/components/text-morph";
-import { Skeleton } from "@/components/ui/skeleton";
+import { BrailleSpinner } from "@/components/ui/braille-spinner";
 import { Badge } from "@/components/ui/badge";
 import type { CoinNode, ExploreApiResponse, SortOption } from "@/lib/zora";
 import {
@@ -150,18 +150,8 @@ function changeChipClass(positive: boolean | null, flashTone: FlashTone, isSelec
 
 function BoardSkeleton({ count }: { count: number }) {
   return (
-    <div className="space-y-0">
-      {Array.from({ length: count }).map((_, i) => (
-        <div key={i} className="terminal-board-cols-dashboard grid min-w-[56rem] items-center gap-4 border-b border-border/70 px-4 py-3 last:border-b-0">
-          <Skeleton className="h-4 w-6" />
-          <Skeleton className="h-4 w-3/4" />
-          <Skeleton className="h-4 w-2/3" />
-          <Skeleton className="h-5 w-12" />
-          <Skeleton className="ml-auto h-4 w-16" />
-          <Skeleton className="ml-auto h-4 w-14" />
-          <Skeleton className="ml-auto h-5 w-16" />
-        </div>
-      ))}
+    <div className="flex items-center justify-center text-muted-foreground/50" style={{ minHeight: `${count * 44}px` }}>
+      <BrailleSpinner name="scan" className="text-lg" />
     </div>
   );
 }

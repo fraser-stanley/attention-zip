@@ -6,7 +6,6 @@ import { Nav } from "@/components/nav";
 import { Footer } from "@/components/footer";
 import { CommandMenuLoader } from "@/components/command-menu-loader";
 import { AgentationLoader } from "@/components/agentation-loader";
-import { ActivityTickerSection } from "@/components/activity-ticker-section";
 
 import {
   getSiteUrl,
@@ -42,6 +41,9 @@ export const metadata: Metadata = {
     ],
     apple: { url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
   },
+  alternates: {
+    canonical: "/",
+  },
   openGraph: {
     type: "website",
     siteName: SITE_NAME,
@@ -72,6 +74,15 @@ const webApplicationJsonLd = {
   sameAs: [SITE_REPO_URL],
 };
 
+const organizationJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  name: SITE_NAME,
+  url: siteUrl,
+  logo: `${siteUrl}/icon-512.png`,
+  sameAs: [SITE_REPO_URL],
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -83,6 +94,10 @@ export default function RootLayout({
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(webApplicationJsonLd) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
         />
       </head>
       <body
@@ -97,7 +112,6 @@ export default function RootLayout({
         </a>
         <Providers>
           <Nav />
-          <ActivityTickerSection />
           <CommandMenuLoader />
           <main id="main-content" className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-20 pb-12">
             {children}

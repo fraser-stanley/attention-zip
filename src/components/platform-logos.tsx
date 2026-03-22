@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 interface LogoProps {
   className?: string;
   size?: number;
@@ -113,14 +115,11 @@ function NearLogo({ className, size = 20 }: LogoProps) {
 /** NanoClaw mascot logo (PNG — too complex for inline SVG) */
 function NanoClawLogo({ className, size = 20 }: LogoProps) {
   return (
-    // eslint-disable-next-line @next/next/no-img-element
-    <img
+    <Image
       src="/nanoclaw.png"
       alt=""
       width={size}
       height={size}
-      loading="lazy"
-      decoding="async"
       className={className ?? "opacity-40"}
     />
   );

@@ -46,7 +46,6 @@ export function HoverMediaOverlay({ imageUrl }: HoverMediaOverlayProps) {
         alt=""
         width={420}
         height={420}
-        unoptimized
         onLoad={handleLoad}
         className="max-h-[50vh] max-w-[420px] object-contain"
       />

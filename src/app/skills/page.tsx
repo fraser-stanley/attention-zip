@@ -1,16 +1,49 @@
 import type { Metadata } from "next";
 import { SkillsInstallList } from "@/components/skill-card-client";
 import { getSkillRuntimeCommands, skills } from "@/lib/skills";
-import { getSiteUrl, toAbsoluteUrl } from "@/lib/site";
+import { getSiteUrl, toAbsoluteUrl, breadcrumbJsonLd } from "@/lib/site";
 
 export const metadata: Metadata = {
-  title: "Skills",
+  title: "Verified Agent Skills for Zora",
   description:
     "Browse verified agent skills for the Zora attention market. Trending coins, creator analytics, market briefs, portfolio tracking, and momentum trading.",
+  alternates: { canonical: "/skills" },
+};
+
+const howToJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "HowTo",
+  name: "How to install an agent skill for Zora",
+  description:
+    "Install a verified agent skill in your AI coding agent.",
+  step: [
+    {
+      "@type": "HowToStep",
+      position: 1,
+      name: "Paste the command",
+      text: "Copy the command for your runtime. Runs in your terminal.",
+    },
+    {
+      "@type": "HowToStep",
+      position: 2,
+      name: "Your agent reads the skill",
+      text: "It fetches the SKILL.md and learns the commands.",
+    },
+    {
+      "@type": "HowToStep",
+      position: 3,
+      name: "Try it",
+      text: "Ask a question. The skill handles the rest.",
+    },
+  ],
 };
 
 export default function SkillsPage() {
   const baseUrl = getSiteUrl();
+  const skillsBreadcrumb = breadcrumbJsonLd([
+    { name: "Home", url: baseUrl },
+    { name: "Skills", url: `${baseUrl}/skills` },
+  ]);
   const skillJsonLd = skills.map((skill) => {
     const commands = getSkillRuntimeCommands(skill, baseUrl);
 
@@ -41,6 +74,14 @@ export default function SkillsPage() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(skillJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(skillsBreadcrumb) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(howToJsonLd) }}
       />
       <SkillsInstallList skills={skills}>
         <section className="grid max-w-5xl gap-6 sm:grid-cols-3 mb-12">

@@ -3,11 +3,13 @@ import { Suspense } from "react";
 import { DashboardTabs } from "@/components/dashboard-tabs";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getExploreData } from "@/lib/data";
+import { getSiteUrl, breadcrumbJsonLd } from "@/lib/site";
 
 export const metadata: Metadata = {
-  title: "Dashboard",
+  title: "Live Market Dashboard",
   description:
     "Live Zora market data. Trending coins, top gainers, volume leaders, and featured creators refreshed every 30 seconds.",
+  alternates: { canonical: "/dashboard" },
 };
 
 async function DashboardTabsSection() {
@@ -33,8 +35,18 @@ function DashboardTabsSkeleton() {
 }
 
 export default function DashboardPage() {
+  const baseUrl = getSiteUrl();
+  const dashboardBreadcrumb = breadcrumbJsonLd([
+    { name: "Home", url: baseUrl },
+    { name: "Dashboard", url: `${baseUrl}/dashboard` },
+  ]);
+
   return (
     <div className="space-y-6">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(dashboardBreadcrumb) }}
+      />
       <div>
         <h1 className="type-label text-foreground">Live Dashboard</h1>
         <p className="type-body-sm text-muted-foreground">

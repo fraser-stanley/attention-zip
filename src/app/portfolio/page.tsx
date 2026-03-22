@@ -2,16 +2,28 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { PortfolioView } from "@/components/portfolio-view";
 import { PortfolioAuthGate } from "@/components/portfolio-auth-gate";
+import { getSiteUrl, breadcrumbJsonLd } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Portfolio",
   description:
     "Track your Zora coin positions, open orders, and PnL. View trade history and manage active skills.",
+  alternates: { canonical: "/portfolio" },
 };
 
 export default function PortfolioPage() {
+  const baseUrl = getSiteUrl();
+  const portfolioBreadcrumb = breadcrumbJsonLd([
+    { name: "Home", url: baseUrl },
+    { name: "Portfolio", url: `${baseUrl}/portfolio` },
+  ]);
+
   return (
     <PortfolioAuthGate>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(portfolioBreadcrumb) }}
+      />
       <div className="space-y-6">
         <Link
           href="/"

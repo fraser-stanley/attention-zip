@@ -55,22 +55,24 @@ export function ActivityTicker({
       role="log"
       aria-live="off"
       aria-label="Agent activity feed"
-      className="h-8 overflow-hidden flex items-center bg-white dark:bg-black"
+      className="h-8 overflow-hidden"
     >
-      {/* LIVE indicator — hidden on mobile */}
-      <div className="hidden sm:flex items-center gap-1.5 px-4 shrink-0 border-r border-border h-full">
-        <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-[#3FFF00] animate-pulse" />
-        <span className="type-caption font-mono text-muted-foreground">Live</span>
-      </div>
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 flex items-center h-full">
+        {/* LIVE indicator — hidden on mobile */}
+        <div className="hidden sm:flex items-center gap-1.5 pr-4 shrink-0 border-r border-border h-full -ml-[9px]">
+          <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-[#3FFF00] animate-pulse" />
+          <span className="type-label text-muted-foreground">Live</span>
+        </div>
 
-      {/* Scrolling content — pure CSS, two copies for seamless loop */}
-      <div className="overflow-hidden flex-1">
-        <div className="ticker-track">
-          <div className="flex shrink-0">
-            <TickerItems items={items} />
-          </div>
-          <div className="flex shrink-0">
-            <TickerItems items={items} />
+        {/* Scrolling content — pure CSS, two copies for seamless loop */}
+        <div className="overflow-hidden flex-1">
+          <div className="ticker-track">
+            <div className="flex shrink-0">
+              <TickerItems items={items} />
+            </div>
+            <div className="flex shrink-0">
+              <TickerItems items={items} />
+            </div>
           </div>
         </div>
       </div>

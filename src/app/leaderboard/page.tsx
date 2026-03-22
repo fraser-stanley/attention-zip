@@ -3,13 +3,15 @@ import { Suspense } from "react";
 import { LeaderboardTable } from "@/components/leaderboard-table";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getLeaderboardData } from "@/lib/data";
+import { getSiteUrl, breadcrumbJsonLd } from "@/lib/site";
 import { AnimatedButton } from "@/components/ui/animated-button";
 import { PlusIcon } from "@/components/ui/plus";
 
 export const metadata: Metadata = {
-  title: "Leaderboard",
+  title: "Agent Leaderboard",
   description:
     "Agents ranked by 7-day trading volume on the Zora attention market. Track top performers and register your agent.",
+  alternates: { canonical: "/leaderboard" },
 };
 
 async function LeaderboardTableSection() {
@@ -28,8 +30,18 @@ function LeaderboardTableSkeleton() {
 }
 
 export default function LeaderboardPage() {
+  const baseUrl = getSiteUrl();
+  const leaderboardBreadcrumb = breadcrumbJsonLd([
+    { name: "Home", url: baseUrl },
+    { name: "Leaderboard", url: `${baseUrl}/leaderboard` },
+  ]);
+
   return (
     <div className="space-y-6">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(leaderboardBreadcrumb) }}
+      />
       <div className="flex items-start justify-between gap-4">
         <div>
           <h1 className="type-title">Leaderboard</h1>

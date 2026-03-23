@@ -7,7 +7,6 @@ export interface Skill {
   difficulty: "beginner" | "intermediate" | "advanced";
   risk: "none" | "low" | "medium";
   riskLabel: string;
-  bestWhen: string;
   tags: string[];
   monitors: string[];
   commands: string[];
@@ -57,13 +56,11 @@ export const skills: Skill[] = [
     description:
       "Scans trend coins, ranks the leaders, and alerts on new entrants.",
     longDescription:
-      "Runs a scheduled trend scan across trending, new, volume, and market cap views. It stores the last snapshot, flags fresh entrants, and highlights watchlist matches.",
+      "Scans trending, new, volume, and market cap views on a schedule and flags what changed.",
     category: "attention",
     difficulty: "beginner",
     risk: "none",
     riskLabel: "Read-only, no wallet needed",
-    bestWhen:
-      "Use it when you want a recurring view of the fastest-moving topics on Zora without trading.",
     tags: ["trends", "alerts", "volume", "watchlists"],
     monitors: [
       "Trending trend coins",
@@ -121,13 +118,11 @@ Saved snapshot to ~/.config/zora-agent-skills/trend-scout/state.json`,
     description:
       "Tracks featured creators, creator-coin momentum, and watchlist changes.",
     longDescription:
-      "Runs a recurring creator-coin scan, compares watchlist stats between runs, and surfaces creators that move into featured, trending, or high-volume lists.",
+      "Tracks creator coins across featured, trending, and volume lists and alerts on watchlist changes.",
     category: "analytics",
     difficulty: "intermediate",
     risk: "none",
     riskLabel: "Read-only, no wallet needed",
-    bestWhen:
-      "Use it when you follow creators and want alerts instead of manually checking creator coins.",
     tags: ["creators", "watchlists", "featured", "volume"],
     monitors: [
       "Featured creators",
@@ -180,13 +175,11 @@ Saved snapshot to ~/.config/zora-agent-skills/creator-pulse/state.json`,
     name: "Briefing Bot",
     description: "Builds a scheduled Zora market briefing from live CLI scans.",
     longDescription:
-      "Runs a fixed set of market scans, merges them into a short operator briefing, and stores the previous snapshot so repeated runs can call out what changed.",
+      "Merges five market scans into one briefing and diffs it against the previous run.",
     category: "utility",
     difficulty: "intermediate",
     risk: "none",
     riskLabel: "Read-only, wallet optional",
-    bestWhen:
-      "Use it for morning and evening check-ins when you want one compact market summary instead of five separate commands.",
     tags: ["briefing", "summaries", "alerts", "digest"],
     monitors: [
       "Trending coins",
@@ -242,13 +235,11 @@ Assessment: Active tape. Trend flow is stronger than creator flow today.`,
     description:
       "Tracks wallet balances, position changes, and portfolio concentration.",
     longDescription:
-      "Runs a wallet snapshot, stores the previous position state, and flags new positions, exits, concentration risk, and drawdowns across coin holdings.",
+      "Snapshots wallet positions on a schedule and flags concentration, new entries, and exits.",
     category: "analytics",
     difficulty: "intermediate",
     risk: "none",
     riskLabel: "Read-only, wallet needed",
-    bestWhen:
-      "Use it when you want a recurring portfolio check before you trade or after another execution skill runs.",
     tags: ["portfolio", "risk", "positions", "wallet"],
     monitors: [
       "Spendable wallet balances",
@@ -307,13 +298,11 @@ Tracked coin value: $6,050.00`,
     description:
       "Runs a repeatable momentum loop with dry-run mode, quotes, and trailing exits.",
     longDescription:
-      "Scans gainers and trending coins, filters candidates with CLI data, quotes every entry, and keeps a local position state so each scheduled run can manage exits.",
+      "Scans gainers and trending coins, quotes entries, and manages exits from a local position state.",
     category: "trading",
     difficulty: "advanced",
     risk: "medium",
     riskLabel: "Execution skill, dedicated wallet required",
-    bestWhen:
-      "Use it when you want a managed momentum loop that starts in dry-run mode and only goes live after you review the settings.",
     tags: ["trading", "momentum", "quotes", "trailing-stops"],
     monitors: [
       "Momentum candidates",

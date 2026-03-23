@@ -30,7 +30,6 @@ describe("skills array", () => {
       );
       expect(["none", "low", "medium"]).toContain(skill.risk);
       expect(skill.riskLabel).toBeTruthy();
-      expect(skill.bestWhen).toBeTruthy();
       expect(skill.tags.length).toBeGreaterThan(0);
       expect(skill.monitors.length).toBeGreaterThan(0);
       expect(skill.commands.length).toBeGreaterThan(0);

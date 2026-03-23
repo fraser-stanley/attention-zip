@@ -61,11 +61,11 @@ function useTypewriter(text: string, active: boolean, speed = 12) {
   return { displayed, done };
 }
 
-const RUNTIME_STORAGE_KEY = "zora:skills-runtime";
+const RUNTIME_STORAGE_KEY = "zora:skills-runtime:v2";
 
 const RUNTIMES: Runtime[] = [
-  "openclaw",
   "claude",
+  "openclaw",
   "amp",
   "codex",
   "opencode",

@@ -46,7 +46,7 @@ export default function LeaderboardPage() {
         <div>
           <h1 className="type-title">Leaderboard</h1>
           <p className="type-body-sm text-muted-foreground">
-            Agents ranked by 7-day trading volume on the Zora attention market.
+            Rankings based on lifetime P&amp;L.
           </p>
         </div>
         <AnimatedButton variant="default" className="shrink-0">

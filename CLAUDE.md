@@ -136,6 +136,7 @@ src/
 - **React Query** handles live refresh after hydration. Initial render is server-owned for `/`, `/dashboard`, and `/leaderboard`.
 - **Homepage "Agent activity" is a terminal board**, not a 4-card grid. It preloads 8 rows per tab, refreshes through `/api/explore` and `/api/leaderboard`, and uses a subtle CRT-style loading sweep plus simulated preview motion between fetches.
 - **Activity ticker shows mock agent trades** — Simmer-style marquee (`@AgentName bought $12 Higher 3m ago`), rendered from the root layout so it appears directly below the nav across the site. Mock data in `src/lib/activity-mock-data.ts` with `TradeActivityItem` interface. Green for buys, magenta for sells. Will swap to real trade data when tracking is available.
+- **Leaderboard mock traders share ticker agent names** — `MOCK_TRADERS` in `src/lib/mock-data.ts` uses `displayName` (optional on `TraderNode`) for ~10 of 20 entries, matching the ticker marquee agents (`$TrendClaw`, `$MomentumBot`, etc.). The rest show as truncated 0x addresses. Ranked by lifetime P&L.
 - **Portfolio page is mock data only** — `src/lib/portfolio-mock-data.ts` provides all positions, trades, PnL stats, and sparkline data. No real wallet connection. Will be replaced with live data when trade history indexing ships.
 - **Wallet connect gates the portfolio** — `PortfolioAuthGate` redirects disconnected users to `/`. The nav conditionally shows the Portfolio link based on `isConnected`. Connecting a wallet seeds default skills (`trend-scout`, `portfolio-scout`); disconnecting clears them.
 - **Wallet menu uses the same overlay pattern as the Index** — `fixed inset-0 z-[100]`, split backdrop/content transitions (200ms blur, 100ms content snap), rendered outside the `<header>` to avoid `inert` conflicts. Brutalist design: `gap-px` grid cells, QR code spanning rows, condensed bold `font-display` for balance.
@@ -176,7 +177,7 @@ import { PlusIcon } from "@/components/ui/plus";
 
 The `AnimatedButton` component automatically detects icon children (components with `displayName` ending in "Icon") and wires their `startAnimation`/`stopAnimation` methods to mouse enter/leave events. The icons use motion/react for smooth animations.
 
-For links styled as buttons with icons, use `AnimatedArrowLink` from `@/components/animated-arrow-link`.
+For links styled as buttons with icons, use `AnimatedArrowLink` from `@/components/animated-arrow-link`. It accepts `variant` (default `"outline"`), `size`, and `className` props.
 
 ## shadcn/ui v2 — critical gotcha
 

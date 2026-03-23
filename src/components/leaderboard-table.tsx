@@ -31,6 +31,7 @@ function pseudoRandom(tick: number, seed: number) {
 
 type SimulatedTrader = {
   address: string;
+  displayName?: string;
   volume: string;
 };
 
@@ -42,6 +43,7 @@ function simulateTraders(traders: TraderNode[], tick: number): SimulatedTrader[]
     if (tick <= 0) {
       return {
         address: trader.address ?? "",
+        displayName: trader.displayName,
         volume: formatCompactCurrency(trader.volume),
       };
     }
@@ -51,6 +53,7 @@ function simulateTraders(traders: TraderNode[], tick: number): SimulatedTrader[]
 
     return {
       address: trader.address ?? "",
+      displayName: trader.displayName,
       volume: formatCompactCurrency(simVol),
     };
   });
@@ -124,7 +127,7 @@ export function LeaderboardTable({
               #{index + 1}
             </TableCell>
             <TableCell className="type-body-sm font-mono">
-              {truncateAddress(trader.address)}
+              {trader.displayName ? `$${trader.displayName}` : truncateAddress(trader.address)}
             </TableCell>
             <TableCell className="type-body-sm text-right font-mono">
               <TextMorph>{trader.volume}</TextMorph>

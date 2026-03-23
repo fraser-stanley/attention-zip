@@ -1,14 +1,12 @@
 "use client";
 
 import { Suspense } from "react";
-import Link from "next/link";
-import { buttonVariants } from "@/components/ui/button-variants";
 import { CopyableCodeBlock } from "@/components/copyable-code-block";
 import { getInstallAllCommands } from "@/lib/skills";
 import { getSiteUrl } from "@/lib/site";
 import { HighlighterStroke } from "@/components/highlighter-stroke";
 import { HeroOrbGlassLoader } from "@/components/hero-orb-glass-loader";
-import { cn } from "@/lib/utils";
+import { AnimatedArrowLink } from "@/components/animated-arrow-link";
 
 export function HeroSection() {
   return (
@@ -31,18 +29,19 @@ export function HeroSection() {
               className="max-w-lg"
             />
             <div className="flex items-center gap-3">
-              <Link
+              <AnimatedArrowLink
                 href="/skills"
-                className={cn(buttonVariants({ size: "default" }), "flex-1 px-8 sm:flex-initial")}
+                variant="default"
+                className="flex-1 px-8 sm:flex-initial"
               >
-                Browse skills
-              </Link>
-              <Link
+                Install skills
+              </AnimatedArrowLink>
+              <AnimatedArrowLink
                 href="/dashboard"
-                className={cn(buttonVariants({ variant: "outline", size: "default" }), "flex-1 sm:flex-initial")}
+                className="flex-1 sm:flex-initial"
               >
-                Live data
-              </Link>
+                See the market
+              </AnimatedArrowLink>
             </div>
           </div>
         </div>

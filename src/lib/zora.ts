@@ -48,6 +48,7 @@ export interface CoinNode {
 
 export interface TraderNode {
   address?: string;
+  displayName?: string;
   volume?: string;
 }
 

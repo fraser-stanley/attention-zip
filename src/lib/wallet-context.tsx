@@ -10,6 +10,7 @@ import {
 import { seedDefaultSkills, clearInstalledSkills } from "@/lib/installed-skills-context";
 
 const STORAGE_KEY = "zora:wallet";
+type WalletSnapshot = string | null | undefined;
 
 interface WalletContextValue {
   address: string | null;
@@ -28,7 +29,7 @@ const WalletContext = createContext<WalletContextValue>({
 });
 
 let listeners: Array<() => void> = [];
-let snapshot: string | null | undefined = undefined;
+let snapshot: WalletSnapshot = undefined;
 
 function getSnapshot(): string | null {
   if (snapshot !== undefined) return snapshot;
@@ -40,8 +41,8 @@ function getSnapshot(): string | null {
   return snapshot;
 }
 
-function getServerSnapshot(): string | null {
-  return null;
+function getServerSnapshot(): WalletSnapshot {
+  return undefined;
 }
 
 function subscribe(listener: () => void) {
@@ -70,8 +71,13 @@ export function truncateAddress(address: string): string {
 }
 
 export function WalletProvider({ children }: { children: ReactNode }) {
-  const address = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
-  const hydrated = typeof window !== "undefined";
+  const storedAddress = useSyncExternalStore<WalletSnapshot>(
+    subscribe,
+    getSnapshot,
+    getServerSnapshot,
+  );
+  const hydrated = storedAddress !== undefined;
+  const address = storedAddress ?? null;
 
   const connect = useCallback((addr: string) => {
     emit(addr);
@@ -84,7 +90,9 @@ export function WalletProvider({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <WalletContext value={{ address, isConnected: address !== null, hydrated, connect, disconnect }}>
+    <WalletContext
+      value={{ address, isConnected: typeof storedAddress === "string", hydrated, connect, disconnect }}
+    >
       {children}
     </WalletContext>
   );

@@ -78,97 +78,113 @@ function pnlHighlightBlockClass(value: number) {
   return `inline px-[0.15em] py-[0.02em] leading-[1.4] box-decoration-clone [-webkit-box-decoration-break:clone] ${pnlHighlightClass(value)}`;
 }
 
-/* ─── Glitchy pixel-grid chart (background decoration) ─── */
-const CHART_VW = 300;
-const CHART_VH = 200;
-const PX_COLS = 60;
-const PX_ROWS = 12;
-const CELL_W = CHART_VW / PX_COLS;
-const CELL_H = CHART_VH / PX_ROWS;
-const CELL_GAP = 0.5;
+/* ─── Live trade feed simulation ─── */
+const TRADE_GRID_COLS = 35;
+const TRADE_GRID_ROWS = 7;
+const TRADE_WINDOW_SIZE = TRADE_GRID_COLS * TRADE_GRID_ROWS;
+const TICK_MS = 1500;
+const SPARKLINE_BUFFER_SIZE = TRADE_WINDOW_SIZE + TRADE_GRID_ROWS * 6;
+const TRADE_SLOT_BUFFER_SIZE = TRADE_WINDOW_SIZE + TRADE_GRID_ROWS * 6;
+const LIVE_EDGE_SETTLE_TICKS = 3;
+const INITIAL_TRADE_COUNT = Math.max(1, MOCK_PORTFOLIO.pnl.totalTrades);
+const INITIAL_SLOT_COUNT = TRADE_WINDOW_SIZE;
+const TRADE_SLOT_INTERVAL_TICKS = 2;
+const TRADE_EVENT_THRESHOLD = 0.64;
 
-function buildPixelGrid(
-  data: SparklinePoint[],
-  tick: number,
-): boolean[][] {
+type TradeSlot = {
+  id: number;
+  bornTick: number;
+  direction: "up" | "down" | null;
+};
+
+function resampleSparkline(data: SparklinePoint[], count: number): SparklinePoint[] {
   if (data.length === 0) return [];
+  if (data.length === 1) {
+    return Array.from({ length: count }, () => ({
+      value: data[0].value,
+      bornTick: -LIVE_EDGE_SETTLE_TICKS,
+    }));
+  }
 
-  // Interpolate data to PX_COLS columns
-  const interpolated: number[] = [];
-  for (let col = 0; col < PX_COLS; col++) {
-    const t = (col / (PX_COLS - 1)) * (data.length - 1);
+  return Array.from({ length: count }, (_, index) => {
+    const t = (index / Math.max(1, count - 1)) * (data.length - 1);
     const lo = Math.floor(t);
     const hi = Math.min(lo + 1, data.length - 1);
     const frac = t - lo;
-    interpolated.push(data[lo].value * (1 - frac) + data[hi].value * frac);
-  }
 
-  const max = Math.max(...interpolated) || 1;
-
-  return interpolated.map((value, col) => {
-    // Quantize to row height — how many rows from bottom are "on"
-    const norm = value / max;
-    const jitter = Math.round((pseudoRandom(tick, col * 7 + 3) - 0.5) * 1.4);
-    const baseHeight = Math.round(norm * PX_ROWS) + jitter;
-    const height = Math.max(0, Math.min(PX_ROWS, baseHeight));
-
-    const column: boolean[] = [];
-    for (let row = 0; row < PX_ROWS; row++) {
-      const rowFromBottom = PX_ROWS - 1 - row;
-      if (rowFromBottom < height) {
-        // Filled cell — apply dropout glitch (~15%)
-        const drop = pseudoRandom(tick, col * PX_ROWS + row + 100) < 0.15;
-        column.push(!drop);
-      } else if (rowFromBottom === height || rowFromBottom === height + 1) {
-        // Stray pixel above the line (~20% chance)
-        const stray = pseudoRandom(tick, col * PX_ROWS + row + 200) < 0.2;
-        column.push(stray);
-      } else {
-        column.push(false);
-      }
-    }
-    return column;
+    return {
+      value: data[lo].value * (1 - frac) + data[hi].value * frac,
+      bornTick: -LIVE_EDGE_SETTLE_TICKS,
+    };
   });
 }
 
-function PnlChart({ data, color, tick }: { data: SparklinePoint[]; color: string; tick: number }) {
-  const grid = useMemo(() => buildPixelGrid(data, tick), [data, tick]);
-
-  // Render ALL cells always — toggle opacity so transitions work in sync with NumberFlow
-  const rects: React.ReactNode[] = [];
-  for (let col = 0; col < grid.length; col++) {
-    for (let row = 0; row < PX_ROWS; row++) {
-      const on = grid[col]?.[row] ?? false;
-      rects.push(
-        <rect
-          key={col * PX_ROWS + row}
-          x={col * CELL_W + CELL_GAP}
-          y={row * CELL_H + CELL_GAP}
-          width={CELL_W - CELL_GAP * 2}
-          height={CELL_H - CELL_GAP * 2}
-          fill={color}
-          opacity={on ? 1 : 0}
-          shapeRendering="crispEdges"
-          style={{ transition: "opacity 650ms cubic-bezier(0.16, 1, 0.3, 1)" }}
-        />,
-      );
-    }
-  }
-
-  return (
-    <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
-      <svg
-        viewBox={`0 0 ${CHART_VW} ${CHART_VH}`}
-        preserveAspectRatio="none"
-        className="h-full w-full"
-      >
-        {rects}
-      </svg>
-    </div>
-  );
+function buildTradeSlot(direction: TradeSlot["direction"], id: number, bornTick: number): TradeSlot {
+  return { id, bornTick, direction };
 }
 
-const TICK_MS = 2500;
+function buildInitialTradeSlots(data: SparklinePoint[], count: number) {
+  const points = resampleSparkline(data, count);
+  const directions = points.map((point, index) => {
+    const open = points[Math.max(0, index - 1)]?.value ?? point.value;
+    const direction: TradeSlot["direction"] = point.value >= open ? "up" : "down";
+    return {
+      direction,
+      bornTick: point.bornTick ?? -LIVE_EDGE_SETTLE_TICKS,
+    };
+  });
+  const slots = Array.from({ length: INITIAL_SLOT_COUNT }, (_, index) =>
+    buildTradeSlot(null, index, -LIVE_EDGE_SETTLE_TICKS),
+  );
+
+  directions.forEach((trade, tradeIndex) => {
+    let slotIndex = Math.round(
+      (tradeIndex / Math.max(1, directions.length - 1)) * (INITIAL_SLOT_COUNT - 1),
+    );
+
+    while (slotIndex < INITIAL_SLOT_COUNT && slots[slotIndex]?.direction !== null) {
+      slotIndex += 1;
+    }
+
+    if (slotIndex >= INITIAL_SLOT_COUNT) {
+      slotIndex = INITIAL_SLOT_COUNT - 1;
+      while (slotIndex >= 0 && slots[slotIndex]?.direction !== null) {
+        slotIndex -= 1;
+      }
+    }
+
+    if (slotIndex >= 0 && slotIndex < INITIAL_SLOT_COUNT) {
+      slots[slotIndex] = buildTradeSlot(trade.direction, slots[slotIndex].id, trade.bornTick);
+    }
+  });
+
+  return slots;
+}
+
+function nextSparklineValue(buffer: SparklinePoint[], tick: number) {
+  if (buffer.length === 0) return 0;
+
+  const last = buffer[buffer.length - 1]?.value ?? 0;
+  const recent = buffer.slice(-6);
+  const recentSlope =
+    recent.length > 1
+      ? (recent[recent.length - 1].value - recent[0].value) / (recent.length - 1)
+      : last * 0.01;
+  const momentum = recentSlope * 0.68;
+  const drift = last * (0.003 + Math.sin(tick * 0.55) * 0.005);
+  const noise = (pseudoRandom(tick, 999) - 0.5) * last * 0.055;
+  const impulseDirection = pseudoRandom(tick, 1200) < 0.44 ? -1 : 1;
+  const impulse =
+    pseudoRandom(tick, 1201) < 0.38
+      ? impulseDirection * last * (0.016 + pseudoRandom(tick, 1202) * 0.045)
+      : 0;
+  const correction =
+    pseudoRandom(tick, 1203) < 0.22
+      ? -last * (0.01 + pseudoRandom(tick, 1204) * 0.024)
+      : 0;
+
+  return Math.max(last * 0.8, last + momentum + drift + noise + impulse + correction);
+}
 
 /** Simple deterministic hash for stable oscillation per tick+seed. */
 function pseudoRandom(tick: number, seed: number) {
@@ -176,48 +192,105 @@ function pseudoRandom(tick: number, seed: number) {
   return x - Math.floor(x);
 }
 
-function drift(base: number, amplitude: number, tick: number, seed: number) {
-  return base + (pseudoRandom(tick, seed) - 0.45) * amplitude;
-}
-
 function useSimulatedPortfolio() {
   const reduceMotion = useReducedMotion() ?? false;
-  const [tick, setTick] = useState(0);
+  const [simulation, setSimulation] = useState<{
+    tick: number;
+    sparkline: SparklinePoint[];
+    tradeSlots: TradeSlot[];
+    nextSlotId: number;
+    lastSlotTick: number;
+    upTrades: number;
+    downTrades: number;
+  }>(() => {
+    const sparkline = resampleSparkline(MOCK_PORTFOLIO.sparkline, INITIAL_TRADE_COUNT);
+    const tradeSlots = buildInitialTradeSlots(MOCK_PORTFOLIO.sparkline, INITIAL_TRADE_COUNT);
+    const upTrades = tradeSlots.filter((trade) => trade.direction === "up").length;
+    const downTrades = tradeSlots.filter((trade) => trade.direction === "down").length;
+
+    return {
+      tick: 0,
+      sparkline,
+      tradeSlots,
+      nextSlotId: tradeSlots.length,
+      lastSlotTick: 0,
+      upTrades,
+      downTrades,
+    };
+  });
 
   useEffect(() => {
     if (reduceMotion) return;
-    const id = window.setInterval(() => setTick((t) => t + 1), TICK_MS);
+    const id = window.setInterval(() => {
+      setSimulation((current) => {
+        const nextTick = current.tick + 1;
+        const nextPoint = {
+          value: nextSparklineValue(current.sparkline, nextTick),
+          bornTick: nextTick,
+        };
+
+        const shouldAdvanceTradeGrid =
+          nextTick - current.lastSlotTick >= TRADE_SLOT_INTERVAL_TICKS;
+
+        let tradeSlots = current.tradeSlots;
+        let nextSlotId = current.nextSlotId;
+        let lastSlotTick = current.lastSlotTick;
+        let upTrades = current.upTrades;
+        let downTrades = current.downTrades;
+
+        if (shouldAdvanceTradeGrid) {
+          const open = current.sparkline[current.sparkline.length - 1]?.value ?? nextPoint.value;
+          const shouldAddTrade = pseudoRandom(nextTick, 1500) >= TRADE_EVENT_THRESHOLD;
+          const nextSlot = buildTradeSlot(
+            shouldAddTrade ? (nextPoint.value >= open ? "up" : "down") : null,
+            nextSlotId++,
+            nextTick,
+          );
+
+          tradeSlots = [...current.tradeSlots, nextSlot].slice(-TRADE_SLOT_BUFFER_SIZE);
+          upTrades += nextSlot.direction === "up" ? 1 : 0;
+          downTrades += nextSlot.direction === "down" ? 1 : 0;
+          lastSlotTick = nextTick;
+        }
+
+        return {
+          tick: nextTick,
+          sparkline: [...current.sparkline, nextPoint].slice(-SPARKLINE_BUFFER_SIZE),
+          tradeSlots,
+          nextSlotId,
+          lastSlotTick,
+          upTrades,
+          downTrades,
+        };
+      });
+    }, TICK_MS);
     return () => window.clearInterval(id);
   }, [reduceMotion]);
 
+  const { tick, sparkline, tradeSlots, upTrades, downTrades } = simulation;
   const portfolio = useMemo(() => {
     const base = MOCK_PORTFOLIO;
-    if (tick === 0) return base;
+    const positions =
+      tick === 0
+        ? base.positions
+        : base.positions.map((pos, i) => {
+            const priceDelta = pos.currentPrice * (pseudoRandom(tick, i) - 0.45) * 0.015;
+            const currentPrice = Math.max(1, pos.currentPrice + priceDelta);
+            const pnl = currentPrice - pos.entryPrice;
+            const pnlPct = (pnl / pos.entryPrice) * 100;
 
-    // Oscillate positions using deterministic pseudo-random per tick
-    const positions = base.positions.map((pos, i) => {
-      const priceDelta = pos.currentPrice * (pseudoRandom(tick, i) - 0.45) * 0.015;
-      const currentPrice = Math.max(1, pos.currentPrice + priceDelta);
-      const pnl = currentPrice - pos.entryPrice;
-      const pnlPct = (pnl / pos.entryPrice) * 100;
-
-      return { ...pos, currentPrice, pnl, pnlPct };
-    });
+            return { ...pos, currentPrice, pnl, pnlPct };
+          });
 
     // Derive totals from positions
     const totalValue = positions.reduce((sum, p) => sum + p.currentPrice, 0);
     const totalPnl = positions.reduce((sum, p) => sum + p.pnl, 0);
     const totalEntry = positions.reduce((sum, p) => sum + p.entryPrice, 0);
     const totalPnlPct = (totalPnl / totalEntry) * 100;
-
-    // Small oscillation on win rate
-    const winRate = Math.round(drift(base.pnl.winRate, 1.5, tick, 100));
-    const wins = Math.round(drift(base.pnl.wins, 0.8, tick, 200));
-    const losses = base.pnl.totalTrades - wins;
-
-    const sparkline = base.sparkline.map((pt, i) => ({
-      value: pt.value + (pseudoRandom(tick, i + 500) - 0.45) * pt.value * 0.02,
-    }));
+    const totalTrades = upTrades + downTrades;
+    const wins = upTrades;
+    const losses = downTrades;
+    const winRate = totalTrades > 0 ? Math.round((wins / totalTrades) * 100) : 0;
 
     return {
       ...base,
@@ -228,14 +301,15 @@ function useSimulatedPortfolio() {
         ...base.pnl,
         totalPnl,
         totalPnlPct,
-        winRate: Math.max(0, Math.min(100, winRate)),
-        wins: Math.max(0, wins),
-        losses: Math.max(0, losses),
+        totalTrades,
+        winRate,
+        wins,
+        losses,
       },
     };
-  }, [tick]);
+  }, [downTrades, sparkline, tick, upTrades]);
 
-  return { portfolio, tick };
+  return { portfolio, tick, tradeSlots };
 }
 
 /* ─── Simmer-style 2×2 stats grid ─── */
@@ -375,7 +449,7 @@ function PositionsContent({ positions, totalValue }: { positions: MockPosition[]
                         <div className="text-right">
                           <p>
                             <span
-                              className={`type-body-sm inline-flex items-center px-1.5 py-0.5 font-mono font-medium ${pnlHighlightClass(pos.currentPrice)}`}
+                              className={`type-body-sm inline-flex items-center px-1.5 py-0.5 font-mono font-medium ${pnlHighlightClass(pos.pnl)}`}
                             >
                               <NumberFlow {...FLOW_TIMING} format={FMT_COMPACT} value={pos.currentPrice} />
                             </span>
@@ -460,34 +534,33 @@ function HistoryContent() {
 function InstalledSkills() {
   return (
     <div className="space-y-3">
-      <h2 className="type-label text-foreground">Skills</h2>
+      <div className="flex items-center justify-between gap-4">
+        <h2 className="type-label text-foreground">Skills</h2>
+        <Link
+          href="/skills"
+          className="type-label text-muted-foreground transition-colors hover:text-foreground"
+        >
+          View all
+        </Link>
+      </div>
 
       <div className="grid gap-3 sm:grid-cols-2">
         {skills.map((skill) => (
           <SkillCard key={skill.id} skill={skill} />
         ))}
       </div>
-
-      <Link href="/skills" className="type-label text-foreground hover:text-muted-foreground transition-colors">
-        Browse all skills
-      </Link>
     </div>
   );
 }
 
 /* ─── Main export ─── */
 export function PortfolioView() {
-  const { portfolio, tick } = useSimulatedPortfolio();
+  const { portfolio } = useSimulatedPortfolio();
 
   return (
     <div className="space-y-8">
-      {/* Stats + background chart */}
+      {/* Stats */}
       <div className="relative overflow-hidden">
-        <PnlChart
-          data={portfolio.sparkline}
-          color={portfolio.pnl.totalPnl >= 0 ? "#3FFF00" : "#FF00F0"}
-          tick={tick}
-        />
         <PnlStats pnl={portfolio.pnl} />
       </div>
 

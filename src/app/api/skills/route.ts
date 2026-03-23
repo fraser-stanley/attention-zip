@@ -20,7 +20,6 @@ function serializeSkill(skill: Skill) {
     difficulty: skill.difficulty,
     risk: skill.risk,
     riskLabel: skill.riskLabel,
-    bestWhen: skill.bestWhen,
     tags: skill.tags,
     requires: skill.requires,
     automation: skill.automation,

@@ -312,9 +312,6 @@ function SkillRow({
         <p className="type-body text-muted-foreground">
           {skill.longDescription}
         </p>
-        <p className="type-caption font-mono text-muted-foreground">
-          Best when: {skill.bestWhen}
-        </p>
 
         {/* Badges */}
         {skill.badges.length > 0 && (

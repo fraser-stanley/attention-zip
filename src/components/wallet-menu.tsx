@@ -77,7 +77,15 @@ export function WalletMenu({ open, onClose }: WalletMenuProps) {
       />
 
       {/* Panel */}
-      <div className="relative h-full">
+      <div
+        className="relative h-full"
+        onClick={(e) => {
+          const target = e.target;
+          if (!(target instanceof HTMLElement)) return;
+          if (target.closest("a, button, [role='button']")) return;
+          onClose();
+        }}
+      >
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex justify-end pt-14">
             <div

@@ -1,12 +1,28 @@
 {
   "emoji": "📋",
   "requires": {
-    "bins": ["zora"]
+    "bins": ["zora", "node"]
   },
-  "cron": null,
+  "cron": "0 9,21 * * *",
   "autostart": false,
   "automaton": {
-    "managed": false,
-    "entrypoint": null
-  }
+    "managed": true,
+    "entrypoint": "scripts/run.mjs"
+  },
+  "tunables": [
+    {
+      "env": "ZORA_BRIEFING_LIMIT",
+      "type": "number",
+      "default": 5,
+      "range": [3, 20],
+      "step": 1,
+      "label": "Results per scan"
+    },
+    {
+      "env": "ZORA_BRIEFING_INCLUDE_PORTFOLIO",
+      "type": "boolean",
+      "default": true,
+      "label": "Include portfolio overlap"
+    }
+  ]
 }

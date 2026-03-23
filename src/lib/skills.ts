@@ -3,10 +3,25 @@ export interface Skill {
   name: string;
   description: string;
   longDescription: string;
+  category: "attention" | "analytics" | "trading" | "utility";
+  difficulty: "beginner" | "intermediate" | "advanced";
   risk: "none" | "low" | "medium";
   riskLabel: string;
+  bestWhen: string;
+  tags: string[];
   monitors: string[];
-  wraps: string[];
+  commands: string[];
+  requires: {
+    bins: string[];
+    env: string[];
+  };
+  automation: {
+    managed: boolean;
+    cron: string | null;
+    autostart: boolean;
+    entrypoint: string | null;
+    dryRunByDefault: boolean;
+  };
   actionPrompt: string;
   samplePrompt: string;
   sampleOutput: string;
@@ -16,7 +31,13 @@ export interface Skill {
   installs: number;
 }
 
-export type Runtime = "openclaw" | "claude" | "amp" | "codex" | "opencode" | "cursor";
+export type Runtime =
+  | "openclaw"
+  | "claude"
+  | "amp"
+  | "codex"
+  | "opencode"
+  | "cursor";
 
 export interface SkillRuntimeCommands {
   openclaw: string;
@@ -25,47 +46,71 @@ export interface SkillRuntimeCommands {
   codex: string;
   opencode: string;
   cursor: string;
-  curl: string;
+  manual: string;
 }
+
+const REPO_URL = "https://github.com/fraser-stanley/zora-agent-skills";
 
 export const skills: Skill[] = [
   {
     id: "trend-scout",
     name: "Trend Scout",
-    description: "Trending topic coins, new trend launches, and momentum signals.",
+    description:
+      "Scans trend coins, ranks the leaders, and alerts on new entrants.",
     longDescription:
-      "Watches trending topic coins on Zora. Trends are community-driven topics like looksmaxxing or hyperpop.",
+      "Runs a scheduled trend scan across trending, new, volume, and market cap views. It stores the last snapshot, flags fresh entrants, and highlights watchlist matches.",
+    category: "attention",
+    difficulty: "beginner",
     risk: "none",
-    riskLabel: "Read-only \u2014 no wallet needed",
+    riskLabel: "Read-only, no wallet needed",
+    bestWhen:
+      "Use it when you want a recurring view of the fastest-moving topics on Zora without trading.",
+    tags: ["trends", "alerts", "volume", "watchlists"],
     monitors: [
-      "Trending topic coins",
+      "Trending trend coins",
       "New trend launches",
-      "Volume spikes (trends)",
-      "Market cap leaders (trends)",
+      "Volume leaders",
+      "Market cap leaders",
+      "Watchlist hits",
     ],
-    wraps: [
-      "zora explore --sort trending --type trend --json",
-      "zora explore --sort new --type trend --json",
-      "zora explore --sort volume --type trend --json",
-      "zora explore --sort mcap --type trend --json",
+    commands: [
+      "zora explore --sort trending --type trend --limit 8 --json",
+      "zora explore --sort new --type trend --limit 8 --json",
+      "zora explore --sort volume --type trend --limit 8 --json",
+      "zora explore --sort mcap --type trend --limit 8 --json",
+      "zora get <address> --type trend --json",
     ],
-    actionPrompt: "show me what's trending on Zora",
+    requires: {
+      bins: ["zora", "node"],
+      env: [],
+    },
+    automation: {
+      managed: true,
+      cron: "*/30 * * * *",
+      autostart: false,
+      entrypoint: "scripts/run.mjs",
+      dryRunByDefault: false,
+    },
+    actionPrompt:
+      "install or mirror the Trend Scout skill and explain how to run its scheduled trend scan",
     samplePrompt:
-      "What topic coins are trending on Zora right now?",
-    sampleOutput: `Found 3 trending topic coins on Zora:
+      "Install Trend Scout and tell me what it reports every 30 minutes.",
+    sampleOutput: `Trend Scout
+Run at 2026-03-23T13:30:00Z
 
-1. looksmaxxing (trend) \u2014 $2.3M mcap, +12.3% 24h
-   Address: 0x1234...5678
-   Volume: $450.2K
+Trending leaders:
+1. looksmaxxing, $2.3M mcap, +12.3%, $450.2K volume
+2. hyperpop, $950.2K mcap, +22.8%, $210.4K volume
 
-2. hyperpop (trend) \u2014 $950.2K mcap, +22.8% 24h
-   Address: 0xabcd...ef01
-   Volume: $210.4K
+New entrants since the last run:
+- hyperpop entered the trending top 8
+- based penguin entered the volume top 8
 
-3. based penguin (trend) \u2014 $780.5K mcap, +31.2% 24h
-   Address: 0x9876...5432
-   Volume: $95.6K`,
-    badges: ["Works with OpenClaw", "Zora CLI ready", "Read-only"],
+Watchlist:
+- 0x1234...5678 is live in the trending table
+
+Saved snapshot to ~/.config/zora-agent-skills/trend-scout/state.json`,
+    badges: ["Managed skill", "CLI native", "Read-only"],
     githubUrl:
       "https://github.com/fraser-stanley/zora-agent-skills/tree/main/trend-scout",
     skillMdUrl:
@@ -76,36 +121,57 @@ export const skills: Skill[] = [
     id: "creator-pulse",
     name: "Creator Pulse",
     description:
-      "Track creators, their coins, and holdings.",
+      "Tracks featured creators, creator-coin momentum, and watchlist changes.",
     longDescription:
-      "Tracks creator coins and featured creators with watchlist alerts.",
+      "Runs a recurring creator-coin scan, compares watchlist stats between runs, and surfaces creators that move into featured, trending, or high-volume lists.",
+    category: "analytics",
+    difficulty: "intermediate",
     risk: "none",
-    riskLabel: "Read-only \u2014 no wallet needed",
+    riskLabel: "Read-only, no wallet needed",
+    bestWhen:
+      "Use it when you follow specific creators and want alerts instead of manually checking creator coins.",
+    tags: ["creators", "watchlists", "featured", "volume"],
     monitors: [
-      "Creator coin ecosystems",
       "Featured creators",
-      "Creator holdings changes",
-      "Creator coin volume",
+      "Trending creator coins",
+      "Top creator-coin volume",
+      "Watchlist market cap changes",
+      "Watchlist holder changes",
     ],
-    wraps: [
-      "zora explore --type creator-coin --json",
-      "zora explore --sort featured --json",
-      "zora get <address> --json",
+    commands: [
+      "zora explore --sort featured --type creator-coin --limit 8 --json",
+      "zora explore --sort trending --type creator-coin --limit 8 --json",
+      "zora explore --sort volume --type creator-coin --limit 8 --json",
+      "zora get <handle-or-address> --type creator-coin --json",
     ],
-    actionPrompt: "show me top creators on Zora",
+    requires: {
+      bins: ["zora", "node"],
+      env: [],
+    },
+    automation: {
+      managed: true,
+      cron: "*/30 * * * *",
+      autostart: false,
+      entrypoint: "scripts/run.mjs",
+      dryRunByDefault: false,
+    },
+    actionPrompt:
+      "install or mirror the Creator Pulse skill and explain its creator watchlist alerts",
     samplePrompt:
-      "Show me the top featured creators on Zora and any recent activity on my watchlist.",
-    sampleOutput: `Featured creators update:
+      "Install Creator Pulse and summarize what it would alert me on.",
+    sampleOutput: `Creator Pulse
+Run at 2026-03-23T13:30:00Z
 
-1. jacob (creator-coin) \u2014 $8.1M mcap, -3.4% 24h
-   Holders: 2,341 | Volume: $1.2M
+Featured creators:
+1. jacob, $8.1M mcap, $1.2M volume, 2,341 holders
+2. alysaliu, $4.2M mcap, $890.3K volume, 1,890 holders
 
-2. alysaliu (creator-coin) \u2014 $4.2M mcap, +5.7% 24h
-   Holders: 1,890 | Volume: $890.3K
+Watchlist alerts:
+- jacob volume rose 14.8% since the last run
+- alysaliu gained 67 holders since the last run
 
-Watchlist alert:
-\u26a0 jacob saw a 15% volume increase in the last hour.`,
-    badges: ["Works with OpenClaw", "Zora CLI ready", "Read-only"],
+Saved snapshot to ~/.config/zora-agent-skills/creator-pulse/state.json`,
+    badges: ["Managed skill", "Watchlists", "Read-only"],
     githubUrl:
       "https://github.com/fraser-stanley/zora-agent-skills/tree/main/creator-pulse",
     skillMdUrl:
@@ -115,40 +181,59 @@ Watchlist alert:
   {
     id: "briefing-bot",
     name: "Briefing Bot",
-    description:
-      'Scheduled digest: "what changed on Zora since last check?"',
+    description: "Builds a scheduled Zora market briefing from live CLI scans.",
     longDescription:
-      "Pulls market data into a structured morning or evening briefing.",
+      "Runs a fixed set of market scans, merges them into a short operator briefing, and stores the previous snapshot so repeated runs can call out what changed.",
+    category: "utility",
+    difficulty: "intermediate",
     risk: "none",
-    riskLabel: "Read-only \u2014 no wallet needed",
+    riskLabel: "Read-only, wallet optional",
+    bestWhen:
+      "Use it for morning and evening check-ins when you want one compact market summary instead of five separate commands.",
+    tags: ["briefing", "summaries", "alerts", "digest"],
     monitors: [
-      "Market-wide trends",
-      "Volume leaders",
+      "Trending coins",
+      "Top volume",
       "New launches",
-      "Creator coin movements",
-      "Leaderboard changes",
+      "Top gainers",
+      "Portfolio overlap",
     ],
-    wraps: [
-      "zora explore --sort trending --json",
-      "zora explore --sort volume --json",
-      "zora explore --sort new --json",
-      "zora explore --type creator-coin --json",
+    commands: [
+      "zora explore --sort trending --limit 5 --json",
+      "zora explore --sort volume --limit 5 --json",
+      "zora explore --sort new --limit 5 --json",
+      "zora explore --sort gainers --limit 5 --json",
       "zora balance --json",
     ],
-    actionPrompt: "give me a Zora market briefing",
-    samplePrompt: "Give me my morning Zora briefing.",
-    sampleOutput: `Zora Morning Briefing \u2014 Mar 14, 2026
+    requires: {
+      bins: ["zora", "node"],
+      env: [],
+    },
+    automation: {
+      managed: true,
+      cron: "0 9,21 * * *",
+      autostart: false,
+      entrypoint: "scripts/run.mjs",
+      dryRunByDefault: false,
+    },
+    actionPrompt:
+      "install or mirror the Briefing Bot skill and explain its daily briefing schedule",
+    samplePrompt:
+      "Install Briefing Bot and show me the kind of briefing it emits.",
+    sampleOutput: `Zora Briefing
+Run at 2026-03-23T09:00:00Z
 
-Trending: "looksmaxxing" leads at $2.3M mcap (+12.3%).
-3 new coins launched overnight, largest at $45K mcap.
+Trending: looksmaxxing leads at $2.3M mcap, up 12.3%.
+Volume: frog market leads at $3.1M volume.
+New: 3 launches since the last run, largest is $45K mcap.
+Gainers: hyperpop leads at +22.8%.
 
-Volume leaders: "frog market" at $3.1M 24h vol (-8.1%).
-Creator coins: jacob steady at $8.1M, alysaliu up 5.7%.
+Portfolio overlap:
+- looksmaxxing is both held and trending
+- jacob is both held and a creator leader
 
-Leaderboard: 0xd8dA...6045 climbed to #3 with $42K weekly volume.
-
-Nothing unusual detected. Market is moderately active.`,
-    badges: ["Works with OpenClaw", "Zora CLI ready", "Read-only"],
+Assessment: Active tape. Trend flow is stronger than creator flow today.`,
+    badges: ["Managed skill", "Briefings", "Read-only"],
     githubUrl:
       "https://github.com/fraser-stanley/zora-agent-skills/tree/main/briefing-bot",
     skillMdUrl:
@@ -159,41 +244,62 @@ Nothing unusual detected. Market is moderately active.`,
     id: "portfolio-scout",
     name: "Portfolio Scout",
     description:
-      "Coin holdings and portfolio value. Read-only, Bankr-ready.",
+      "Tracks wallet balances, position changes, and portfolio concentration.",
     longDescription:
-      "Checks your local wallet's Zora coin holdings via CLI.",
+      "Runs a wallet snapshot, stores the previous position state, and flags new positions, exits, concentration risk, and drawdowns across coin holdings.",
+    category: "analytics",
+    difficulty: "intermediate",
     risk: "none",
-    riskLabel: "Read-only — local wallet or address",
+    riskLabel: "Read-only, wallet needed",
+    bestWhen:
+      "Use it when you want a recurring portfolio check before you trade or after another execution skill runs.",
+    tags: ["portfolio", "risk", "positions", "wallet"],
     monitors: [
-      "Coin holdings and values",
-      "Portfolio composition",
-      "Holdings changes over time",
+      "Spendable wallet balances",
+      "Coin positions by value",
+      "New and closed positions",
+      "Portfolio concentration",
+      "Run-to-run drawdowns",
     ],
-    wraps: [
+    commands: [
       "zora balance --json",
+      "zora balance spendable --json",
+      "zora balance coins --sort usd-value --limit 20 --json",
+      "zora balance coins --sort price-change --limit 20 --json",
     ],
-    actionPrompt: "show my Zora coin holdings",
+    requires: {
+      bins: ["zora", "node"],
+      env: ["ZORA_PRIVATE_KEY"],
+    },
+    automation: {
+      managed: true,
+      cron: "0 */4 * * *",
+      autostart: false,
+      entrypoint: "scripts/run.mjs",
+      dryRunByDefault: false,
+    },
+    actionPrompt:
+      "install or mirror the Portfolio Scout skill and explain its portfolio risk checks",
     samplePrompt:
-      "Check my Zora coin holdings.",
-    sampleOutput: `Coin Holdings (local wallet):
+      "Install Portfolio Scout and show me the report it produces every few hours.",
+    sampleOutput: `Portfolio Scout
+Run at 2026-03-23T12:00:00Z
 
-1. jacob (creator-coin) — 1,200 tokens
-   Value: $4,120 | +8.3% 24h
+Spendable:
+- 0.42 ETH
+- 183.20 USDC
+- 95.11 ZORA
 
-2. looksmaxxing (CONTENT) — 500 tokens
-   Value: $1,150 | +12.1% 24h
+Coin positions:
+1. jacob, $4,120.00, 68.1% of tracked coin value
+2. looksmaxxing, $1,150.00, 19.0% of tracked coin value
 
-3. based penguin (CONTENT) — 2,000 tokens
-   Value: $780 | -3.2% 24h
+Alerts:
+- Concentration warning: jacob is above the 35% threshold
+- based penguin is no longer held
 
-Total value: ~$6,050
-Coins held: 3`,
-    badges: [
-      "Works with OpenClaw",
-      "Bankr-ready",
-      "Zora CLI ready",
-      "Read-only",
-    ],
+Tracked coin value: $6,050.00`,
+    badges: ["Managed skill", "Risk checks", "Wallet required"],
     githubUrl:
       "https://github.com/fraser-stanley/zora-agent-skills/tree/main/portfolio-scout",
     skillMdUrl:
@@ -204,51 +310,62 @@ Coins held: 3`,
     id: "momentum-trader",
     name: "Momentum Trader",
     description:
-      "Auto-buys trending Zora coins on momentum signals via Zora CLI.",
+      "Runs a repeatable momentum loop with dry-run mode, quotes, and trailing exits.",
     longDescription:
-      "Monitors momentum signals and executes buys through Zora CLI on Base.",
+      "Scans gainers and trending coins, filters candidates with CLI data, quotes every entry, and keeps a local position state so each scheduled run can manage exits.",
+    category: "trading",
+    difficulty: "advanced",
     risk: "medium",
-    riskLabel: "Execution-capable — dedicated wallet required",
+    riskLabel: "Execution skill, dedicated wallet required",
+    bestWhen:
+      "Use it when you want a managed momentum loop that starts in dry-run mode and only goes live after you review the settings.",
+    tags: ["trading", "momentum", "quotes", "trailing-stops"],
     monitors: [
-      "Trend Scout momentum signals",
-      "Volume spike detection",
-      "New launch sniping window",
-      "Position P&L and trailing stops",
-      "Cooldown and rate limits",
+      "Momentum candidates",
+      "Quote slippage",
+      "Position count",
+      "Daily spend cap",
+      "Trailing stop exits",
     ],
-    wraps: [
-      "zora explore --sort gainers --json",
+    commands: [
+      "zora explore --sort gainers --limit 12 --json",
+      "zora explore --sort trending --limit 12 --json",
       "zora get <address> --json",
-      "zora buy <address> --eth <amount> -o json --yes",
-      "zora sell <address> --all -o json --yes",
-      "zora balance --json",
+      "zora balance coins --sort usd-value --limit 20 --json",
+      "zora buy <address> --eth <amount> --quote -o json",
+      "zora buy <address> --eth <amount> --slippage <pct> -o json --yes",
+      "zora sell <address> --percent 100 --to eth --slippage <pct> -o json --yes",
     ],
-    actionPrompt: "find momentum trades on Zora",
+    requires: {
+      bins: ["zora", "node"],
+      env: ["ZORA_PRIVATE_KEY"],
+    },
+    automation: {
+      managed: true,
+      cron: "*/10 * * * *",
+      autostart: false,
+      entrypoint: "scripts/run.mjs",
+      dryRunByDefault: true,
+    },
+    actionPrompt:
+      "install or mirror the Momentum Trader skill and explain how its dry-run mode and trailing exits work",
     samplePrompt:
-      "Watch Zora for coins with >20% gains and >$100K volume in the last hour. Auto-buy up to 0.05 ETH per position, max 3 positions. Set a 15% trailing stop.",
-    sampleOutput: `Momentum Trader active — scanning gainers...
+      "Install Momentum Trader and show me a dry-run cycle before I turn it live.",
+    sampleOutput: `Momentum Trader
+Run at 2026-03-23T13:40:00Z
+Mode: dry-run
 
-Signal detected:
-  hyperpop — +28.3% 1h, $210K vol, $950K mcap
-  Meets criteria: >20% gain, >$100K volume
+Open positions tracked: 1
+- looksmaxxing, entry $0.00021, peak $0.00024, current $0.00023
 
-Executing buy via Zora CLI:
-  Bought 0.05 ETH of hyperpop at $0.00019/token
-  Position: 263 tokens | Entry: $0.00019
-  Trailing stop set: -15% from peak
+Candidates:
+1. hyperpop, +28.3%, $210K volume
+   Quote: 0.01 ETH -> 263 HYPERPOP, slippage 1.2%
+   Action: dry-run only, no order sent
 
-\u26a0 Buy skipped: frog market — slippage too high (4.2% > max 3%). Will retry in 30s.
-
-Active positions (2/3):
-  1. hyperpop — +4.2% since entry, stop at $0.000185
-  2. looksmaxxing — +11.8% since entry, stop at $0.000210
-
-Watching for next signal... (cooldown: 5 min)`,
-    badges: [
-      "Execution",
-      "Zora CLI native",
-      "Requires trader wallet",
-    ],
+No exits fired.
+State saved to ~/.config/zora-agent-skills/momentum-trader/state.json`,
+    badges: ["Managed skill", "Dry-run by default", "Execution"],
     githubUrl:
       "https://github.com/fraser-stanley/zora-agent-skills/tree/main/momentum-trader",
     skillMdUrl:
@@ -262,17 +379,17 @@ export function getSkillById(id: string) {
 }
 
 export function getInstallAllCommands(baseUrl: string): SkillRuntimeCommands {
-  const urls = skills.map((s) => `${baseUrl}/skills/${s.id}/skill-md`);
-  const readList = urls.join(" and then read ");
-  const prompt = `Read ${readList}. These are agent skills for the Zora attention market. Confirm what you learned from each.`;
+  const skillsUrl = `${baseUrl}/api/skills`;
+  const prompt = `Read ${skillsUrl}. Install or mirror the Zora skills that fit this runtime. Use ${REPO_URL} for the entrypoint files.`;
+
   return {
-    openclaw: skills.map((s) => `clawhub install ${s.id}`).join(" && "),
+    openclaw: skills.map((skill) => `clawhub install ${skill.id}`).join(" && "),
     claude: `claude -p "${prompt}"`,
     amp: `amp "${prompt}"`,
     codex: `codex "${prompt}"`,
     opencode: `opencode run "${prompt}"`,
     cursor: `cursor "${prompt}"`,
-    curl: skills.map((s) => `curl -O ${baseUrl}/skills/${s.id}/skill-md`).join(" && "),
+    manual: `git clone --depth 1 ${REPO_URL}`,
   };
 }
 
@@ -281,7 +398,8 @@ export function getSkillRuntimeCommands(
   baseUrl: string,
 ): SkillRuntimeCommands {
   const skillMdUrl = `${baseUrl}/skills/${skill.id}/skill-md`;
-  const prompt = `Read ${skillMdUrl} and ${skill.actionPrompt}`;
+  const prompt = `Read ${skillMdUrl}. Use ${skill.githubUrl} for the entrypoint files. ${skill.actionPrompt}.`;
+
   return {
     openclaw: `clawhub install ${skill.id}`,
     claude: `claude -p "${prompt}"`,
@@ -289,6 +407,6 @@ export function getSkillRuntimeCommands(
     codex: `codex "${prompt}"`,
     opencode: `opencode run "${prompt}"`,
     cursor: `cursor "${prompt}"`,
-    curl: `curl -O ${skillMdUrl}`,
+    manual: `git clone --depth 1 ${REPO_URL} && cd zora-agent-skills/${skill.id}`,
   };
 }

@@ -11,14 +11,15 @@ function getSteps() {
       number: "01",
       title: "Paste the command",
       description:
-        "Run this in your terminal. Your agent reads the skill and sets up.",
+        "Run this in your terminal. Then review the entrypoint and env vars.",
       command: commands.claude,
       prefix: "$",
     },
     {
       number: "02",
-      title: "Try it",
-      description: "Ask a question. The skill handles the rest.",
+      title: "Run the skill",
+      description:
+        "Trigger the entrypoint once before you move it onto a schedule.",
       command: trendScout.samplePrompt,
       prefix: ">",
     },

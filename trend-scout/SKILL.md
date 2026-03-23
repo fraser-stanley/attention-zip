@@ -1,92 +1,94 @@
 ---
 name: trend-scout
-description: Surface trending topic coins on Zora. Use when your human asks about trends like looksmaxxing or hyperpop, new topic launches, or volume leaders among trends.
+description: Run a managed trend scan on Zora. Use when your human wants recurring coverage of trend coins, new entrants, volume leaders, or a small watchlist without placing trades.
 metadata:
   author: "Zora Agent Skills"
-  version: "1.0.0"
+  version: "2.0.0"
   displayName: "Trend Scout"
   difficulty: "beginner"
 ---
 
 # Trend Scout
 
-Surface trending topic coins on Zora. Trends are community-driven topics like looksmaxxing, hyperpop, or based penguin — distinct from creator coins and posts.
+Trend Scout is a managed read-only skill for the Zora attention market. It runs four CLI scans, stores the last snapshot, and tells you what changed since the previous run.
 
 ## When to Use This Skill
 
-Use when the user asks about:
-- What topic coins are trending on Zora
+Use this skill when the user asks for:
+
+- A recurring trend report
 - New trend launches
-- Volume leaders among trend coins
-- Market cap leaders in trends
-- General trend momentum
+- Volume or market cap leaders among trend coins
+- Watchlist alerts for specific trend names or addresses
+- A low-risk market scan before doing any trading
 
 ## Setup
 
-1. Install the Zora CLI: `npm install -g @zoralabs/cli`
-2. (Optional) Configure an API key to reduce rate limiting: `zora auth configure`
-3. No wallet needed. This skill is read-only.
+1. Install the Zora CLI. Use the published package or a standalone binary.
+2. Make sure `node` is available. The managed entrypoint is `scripts/run.mjs`.
+3. Run `./scripts/validate.sh` from this folder before the first scheduled run.
+4. If you want higher rate limits, configure `ZORA_API_KEY`, but the skill does not require it.
 
 ## Configuration
 
-| Setting | Flag | Default | Description |
-|---------|------|---------|-------------|
-| Sort | `--sort` | `trending` | One of: `trending`, `new`, `volume`, `mcap` |
-| Limit | `--limit` | `10` | Results per query (1-20) |
-| Type filter | `--type` | `trend` | Always `trend` for this skill |
+Tune the run with these env vars:
+
+| Env                         | Default | Description                                     |
+| --------------------------- | ------- | ----------------------------------------------- |
+| `ZORA_TREND_LIMIT`          | `8`     | Number of results per scan, clamped to 1-20     |
+| `ZORA_TREND_MIN_VOLUME_USD` | `0`     | Drops low-liquidity rows from the report        |
+| `ZORA_TREND_WATCHLIST`      | empty   | Comma-separated names or addresses to highlight |
+
+The default cron in `clawhub.json` is every 30 minutes. `autostart` stays off so you can inspect the output before scheduling it.
 
 ## Commands
 
 ```bash
-zora explore --sort trending --type trend --json           # trends ranked by network momentum
-zora explore --sort new --type trend --json                # recently launched trends
-zora explore --sort volume --type trend --json             # highest 24h volume among trends
-zora explore --sort mcap --type trend --json               # largest trends by market cap
-zora explore --sort trending --type trend --limit 5 --json # fewer results
-zora get <address> --json                                  # detail for a specific coin
+node scripts/run.mjs
+zora explore --sort trending --type trend --limit 8 --json
+zora explore --sort new --type trend --limit 8 --json
+zora explore --sort volume --type trend --limit 8 --json
+zora explore --sort mcap --type trend --limit 8 --json
+zora get <address> --type trend --json
 ```
 
 ## How It Works
 
-1. Fetch explore data filtered to trend-type coins using the sort that matches the user's question
-2. Parse the JSON response — each coin includes name, address, market cap, volume, and 24h delta
-3. Rank and present the top results with name, market cap, 24h change, volume, and contract address
-4. For deeper info on a specific coin, follow up with `zora get <address>`
+Each run fetches four trend-specific explore tables through the CLI. The entrypoint applies the volume floor, normalizes coin ids, and saves the resulting address lists to `~/.config/zora-agent-skills/trend-scout/state.json`.
+
+On the next run it compares the new lists against the stored snapshot. That is how it detects entrants into the trending, new, volume, and market cap views without needing an external database. Watchlist hits are resolved from the current scan results, so names work when they appear in the returned tables and addresses always work.
+
+This is a template. The current signal is simple table diffing. You can remix it by adding a tighter volume floor, a longer watchlist, or another post-processing step before the output is sent to a human or another agent.
 
 ## Example Output
 
-```
-Found 3 trending topic coins on Zora:
+```text
+Trend Scout
+Run at 2026-03-23T13:30:00Z
 
-1. looksmaxxing (trend) — $2.3M mcap, +12.3% 24h
-   Address: 0x1234...5678
-   Volume: $450.2K
+Trending leaders:
+1. looksmaxxing, $2.3M, +12.3%, $450.2K volume
+2. hyperpop, $950.2K, +22.8%, $210.4K volume
 
-2. hyperpop (trend) — $950.2K mcap, +22.8% 24h
-   Address: 0xabcd...ef01
-   Volume: $210.4K
+New entrants since the last run:
+- hyperpop entered the trending view
+- based penguin entered the volume view
 
-3. based penguin (trend) — $780.5K mcap, +31.2% 24h
-   Address: 0x9876...5432
-   Volume: $95.6K
+Watchlist:
+- 0x1234...5678 is live in the current trend scan
 ```
 
 ## Troubleshooting
 
-**"Rate limited" or slow responses**
-- Configure an API key: `zora auth configure`
-- Without a key, requests are throttled
+If you see empty sections, lower `ZORA_TREND_MIN_VOLUME_USD`. The filter is applied after the CLI response, so an aggressive floor can remove every row.
 
-**No `--sort gainers` for trends**
-- `--sort gainers` only supports `--type post`. This skill uses `--type trend`, so gainers is not available. Use `--sort trending` or `--sort volume` to find momentum instead.
+If the watchlist misses a named trend, switch that entry to an address. `zora get --type trend` is address-first today, so the runtime is most reliable when the watchlist uses 0x identifiers.
 
-**Exit code 1**
-- CLI error. In `--json` mode, errors are structured: `{"error": "...", "suggestion": "..."}`
+If the CLI returns a rate-limit error, add an API key or widen the cron interval.
 
 ## Important Notes
 
-- All commands in this skill use `--type trend` to filter for topic coins. For creator coins, see Creator Pulse.
-- Compute percentage change: `marketCapDelta24h / (marketCap - marketCapDelta24h) * 100`
-- All data is public on-chain data on Base (chain 8453). No wallet or keys needed.
-- `zora get` returns `uniqueHolders` and `volume24h` but NOT swaps or detailed holder lists.
-- `zora get` accepts 0x addresses or creator names, NOT ENS.
+- This skill never places orders and never needs a wallet.
+- Local state is part of the behavior. Deleting the state file resets entrant detection.
+- The managed entrypoint is the production surface. The raw CLI commands are there for debugging and manual spot checks.
+- Keep the output short. Trend Scout is meant to be a heartbeat, not a full market memo.

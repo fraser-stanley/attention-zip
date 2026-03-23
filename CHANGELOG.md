@@ -1,5 +1,18 @@
 # Changelog
 
+## 2026-03-23 (Managed skill runtime hardening)
+
+### Added
+- **Managed entrypoint integration harness** — `src/__tests__/skill-entrypoints.test.ts` now runs each `scripts/run.mjs` worker against a stubbed `zora` binary with isolated `HOME`, persisted state, and journal assertions.
+
+### Changed
+- **Managed skill release shape** — all five first-party skills now ship as real managed runtimes with `scripts/run.mjs`, `automaton.managed`, cron metadata, tunables, and richer catalog/API metadata instead of prompt-only wrappers.
+- **Merge verification flow** — documented `pnpm lint`, `pnpm typecheck`, `pnpm test`, and `pnpm build` as the release gate, plus the distinction between stubbed integration tests and host-level `scripts/validate.sh`.
+- **Docs alignment** — README, AGENTS.md, and CLAUDE.md now reflect `@zoralabs/coins-sdk@0.5.1`, `zora balance`, and the managed entrypoint test coverage.
+
+### Fixed
+- **Direct TypeScript checks** — test typing now passes `tsc --noEmit` without relying on Next.js build-only coverage.
+
 ## 2026-03-19 (Unified install card + layout refinements)
 
 ### Added
@@ -25,8 +38,8 @@
 - **CLI flag update** — all skill `wraps` arrays now use `--json` instead of the old `-o json` syntax.
 - **Momentum Trader buy/sell syntax** — `zora buy <address> --eth <amount> --json` (was `--amount <eth>`), `zora sell` now includes `--json`.
 - **Creator Pulse** — added `zora get <address> --json` to wraps (command now exists in CLI).
-- **Portfolio Scout** — `zora balances --json` for local wallet coin holdings + SDK `getProfileBalances()` for any-wallet lookups. Removed incorrect "ETH balance" references — `zora balances` returns coin holdings only, not native tokens. Updated SKILL.md with CLI + SDK dual-path documentation.
-- **CLAUDE.md** — replaced "CLI command reality check" with full CLI command reference table (8 commands), JSON output schemas, behavioral notes (exit codes, `--yes` scope, sort/type combos), and corrected `zora balances` documentation.
+- **Portfolio Scout** — `zora balance --json` for local wallet coin holdings + SDK `getProfileBalances()` for any-wallet lookups. Removed incorrect "ETH balance" references — `zora balance` returns coin holdings only, not native tokens. Updated SKILL.md with CLI + SDK dual-path documentation.
+- **CLAUDE.md** — replaced "CLI command reality check" with full CLI command reference table (8 commands), JSON output schemas, behavioral notes (exit codes, `--yes` scope, sort/type combos), and corrected `zora balance` documentation.
 
 ## 2026-03-18 (Highlighter animation + homepage refinements)
 

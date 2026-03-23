@@ -3,16 +3,19 @@ set -euo pipefail
 
 echo "Validating trend-scout..."
 
-if ! command -v zora &>/dev/null; then
-  echo "FAIL: zora CLI not found. Install with: npm install -g @zoralabs/cli"
+command -v zora >/dev/null || {
+  echo "FAIL: zora CLI not found."
   exit 1
-fi
-echo "  ✓ zora CLI installed"
+}
+echo "  ok zora CLI installed"
 
-if ! zora auth status &>/dev/null; then
-  echo "  ⚠ API key not configured (optional). Run: zora auth configure"
-else
-  echo "  ✓ API key configured"
-fi
+command -v node >/dev/null || {
+  echo "FAIL: node not found."
+  exit 1
+}
+echo "  ok node installed"
+
+node --check scripts/run.mjs >/dev/null
+echo "  ok entrypoint parses"
 
 echo "PASS: trend-scout ready"

@@ -1,99 +1,92 @@
 ---
 name: briefing-bot
-description: Generate a structured morning or evening Zora market digest. Use when your human asks for a briefing, market summary, or wants to know what changed since their last check.
+description: Run a scheduled Zora briefing. Use when your human wants a compact market digest that rolls trending, volume, new launches, gainers, and optional portfolio overlap into one report.
 metadata:
   author: "Zora Agent Skills"
-  version: "1.0.0"
+  version: "2.0.0"
   displayName: "Briefing Bot"
-  difficulty: "beginner"
+  difficulty: "intermediate"
 ---
 
 # Briefing Bot
 
-Generate a structured morning or evening Zora market digest from a single prompt.
+Briefing Bot is a managed market digest. It runs the core Zora scans, keeps a small local snapshot, and prints a short summary that is easy to read on a schedule.
 
 ## When to Use This Skill
 
-Use when the user says:
-- "Give me my morning briefing"
-- "What changed on Zora since yesterday?"
-- "Market summary"
-- "What's happening on Zora right now?"
+Use this skill when the user asks for:
+
+- A morning or evening Zora briefing
+- One compact market summary instead of several commands
+- A recurring check-in that can mention portfolio overlap
+- A short operator note before deeper research or trading
 
 ## Setup
 
-1. Install the Zora CLI: `npm install -g @zoralabs/cli`
-2. Configure an API key (recommended — this skill runs 5 CLI calls per digest): `zora auth configure`
-3. No wallet needed. This skill is read-only.
+1. Install the Zora CLI and make sure `node` is available.
+2. Run `./scripts/validate.sh`.
+3. If the wallet is configured, the skill can include held-coin overlap. If not, it still runs.
+4. The manifest uses a twice-daily cron. Trigger it manually first.
 
 ## Configuration
 
-| Setting | Flag | Default | Description |
-|---------|------|---------|-------------|
-| Limit per section | `--limit` | `5` | Coins per section (1-10) |
-| Include portfolio | n/a | `true` | Include holdings section if wallet is configured |
+| Env                               | Default | Description                        |
+| --------------------------------- | ------- | ---------------------------------- |
+| `ZORA_BRIEFING_LIMIT`             | `5`     | Rows fetched per market scan       |
+| `ZORA_BRIEFING_INCLUDE_PORTFOLIO` | `true`  | Toggles the wallet overlap section |
+
+The default schedule is `0 9,21 * * *`. Adjust it if your agent already has another heartbeat cadence.
 
 ## Commands
 
-Run all five market scans, then optionally check holdings:
-
 ```bash
-zora explore --sort trending --limit 5 --json     # trending coins
-zora explore --sort volume --limit 5 --json        # volume leaders
-zora explore --sort new --limit 5 --json           # new launches
-zora explore --sort gainers --limit 5 --json       # top gainers
-zora explore --type creator-coin --limit 5 --json  # creator coin activity
-zora balance --json                               # current holdings (if wallet configured)
+node scripts/run.mjs
+zora explore --sort trending --limit 5 --json
+zora explore --sort volume --limit 5 --json
+zora explore --sort new --limit 5 --json
+zora explore --sort gainers --limit 5 --json
+zora balance --json
 ```
 
 ## How It Works
 
-1. Run all 5 explore commands to gather data across market dimensions
-2. If a wallet is configured, run `zora balance --json` to get current holdings
-3. Combine the results into a single briefing with these sections:
-   - **Trending** — top coin by market cap, notable movers
-   - **New launches** — count of new coins, largest by market cap
-   - **Volume leaders** — highest 24h volume, direction
-   - **Top gainers** — biggest 24h market cap increases
-   - **Creator coins** — notable creator coin activity
-   - **Your holdings** — coins you hold that appear in trending/volume/gainer lists, with current value and 24h change
-4. End with a one-sentence market assessment
-5. Keep the entire briefing under 250 words. Omit sections with no notable data rather than padding.
+The entrypoint runs four read-only market scans through the CLI and stores the ids from each table in `~/.config/zora-agent-skills/briefing-bot/state.json`. On the next run it compares the current `new` table against the previous one so it can say what launched since the last report.
+
+If `ZORA_BRIEFING_INCLUDE_PORTFOLIO=true`, the script also attempts `zora balance --json`. That step is optional. If no wallet is configured, the briefing continues and simply notes that the overlap check was skipped.
+
+This is a template. The default output is intentionally short. Remix it by changing the assessment rule, adding creator coverage, or forwarding the finished text into another reporting system.
 
 ## Example Output
 
-```
-Zora Morning Briefing — Mar 14, 2026
+```text
+Zora Briefing
+Run at 2026-03-23T09:00:00Z
 
-Trending: "looksmaxxing" leads at $2.3M mcap (+12.3%).
-3 new coins launched overnight, largest at $45K mcap.
+Trending: looksmaxxing leads at $2.3M, +12.3%.
+Volume: frog market leads at $3.1M volume.
+New: 3 fresh launches since the last run, largest is $45K.
+Gainers: hyperpop leads at +22.8%.
 
-Volume leaders: "frog market" at $3.1M 24h vol (-8.1%).
-Top gainers: "hyperpop" up 22.8% to $950K mcap.
-Creator coins: jacob steady at $8.1M, alysaliu up 5.7%.
+Portfolio overlap:
+- looksmaxxing is both held and active in the market scans
 
-Your holdings:
-  looksmaxxing — 500 tokens, $1,150 (+12.1% 24h) ⬆ trending
-  jacob — 1,200 tokens, $4,120 (+8.3% 24h)
-
-Nothing unusual detected. Market is moderately active.
+Assessment: Active tape. Momentum is broad enough to watch closely.
 ```
 
 ## Troubleshooting
 
-**Rate limited during briefing**
-- This skill runs 5 sequential CLI calls. Without an API key, rate limits are likely. Configure one: `zora auth configure`
+If the portfolio section is failing, disable it first and fix the wallet separately. A briefing that skips the wallet is better than a briefing that does not run.
 
-**Empty sections**
-- Some sorts may return no results during quiet market periods. Omit empty sections from the briefing.
+If the report feels repetitive, widen the cron interval or increase the scan limit. Very short schedules on quiet market days will naturally look similar.
 
-**`--sort gainers` errors**
-- `--sort gainers` only supports `--type post`. The briefing uses it without a type filter, which defaults to post.
+If `new` looks empty, remember that the script compares against its own local snapshot, not a global launch index.
 
 ## Important Notes
 
-- The CLI has no streaming mode. Each call is a single request-response.
-- Do not return raw JSON to the user. Synthesize into prose.
-- End every briefing with a plain-language assessment: "Market is [quiet/active/volatile]. [Notable signal or 'Nothing unusual.']"
-- `zora balance` is wallet-only (no address argument). If no wallet is configured, skip the holdings section silently.
-- Flag held coins that also appear in trending or gainers lists — this is the most actionable signal in a briefing.
+- Briefing Bot is read-only.
+- The entrypoint is meant to be run once per schedule, not as a long-lived daemon.
+- The saved snapshot is local. If you move runtimes, you move the baseline too.
+- Keep the output under control. The point is a compact briefing, not a wall of market data.
+- The CLI has no streaming mode. Each run is a small batch of request-response calls.
+- Do not return raw JSON to the human. The useful output is the synthesized briefing.
+- `zora balance` is wallet-only. If no wallet is configured, skip the portfolio section cleanly.

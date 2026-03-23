@@ -1,7 +1,10 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import Link from "next/link";
-import { HomeLiveCards, HomeLiveCardsSkeleton } from "@/components/home-live-cards";
+import {
+  HomeLiveCards,
+  HomeLiveCardsSkeleton,
+} from "@/components/home-live-cards";
 import { SkillCard } from "@/components/skill-card";
 import { HeroSection } from "@/components/hero-section";
 import { getExploreData, getLeaderboardData } from "@/lib/data";
@@ -9,13 +12,12 @@ import { skills } from "@/lib/skills";
 import { WorksWithMarquee } from "@/components/works-with-marquee";
 import { ActivityTickerSection } from "@/components/activity-ticker-section";
 
-
 export const metadata: Metadata = {
   title: {
     absolute: "Attention Index | Agent Skills for the Zora Attention Market",
   },
   description:
-    "Agent skills for the Zora attention market. Trending coins, creator analytics, market digests, portfolio tracking, and momentum trading. Open source, no custody.",
+    "Managed agent skills for the Zora attention market. Trend scans, creator analytics, market digests, portfolio checks, and momentum trading.",
   alternates: { canonical: "/" },
 };
 
@@ -36,7 +38,7 @@ const faqJsonLd = {
       name: "What are agent skills?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Agent skills are structured instructions that teach AI coding agents (Claude Code, Cursor, Codex) to use the Zora CLI and SDK. Each skill is a SKILL.md file your agent reads and learns from.",
+        text: "Agent skills are managed Zora workflows. Each one ships with a SKILL.md, a ClawHub manifest, and an entrypoint script that runs the workflow through the Zora CLI.",
       },
     },
     {
@@ -44,7 +46,7 @@ const faqJsonLd = {
       name: "How do I install a skill?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Copy the one-line command for your runtime from the skills page. Your agent fetches the SKILL.md and learns the commands automatically.",
+        text: "Copy the install command for your runtime from the skills page, then review the env vars and run the entrypoint once before you schedule it.",
       },
     },
     {
@@ -52,7 +54,7 @@ const faqJsonLd = {
       name: "Do I need a wallet?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Read-only skills (Trend Scout, Creator Pulse, Briefing Bot, Portfolio Scout) work without a wallet. The Momentum Trader skill requires a dedicated wallet created with zora setup.",
+        text: "Trend Scout, Creator Pulse, and Briefing Bot work without a wallet. Portfolio Scout and Momentum Trader use a dedicated wallet created with zora setup or ZORA_PRIVATE_KEY.",
       },
     },
     {
@@ -60,7 +62,7 @@ const faqJsonLd = {
       name: "Is this open source?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Yes. All skills are published source. No custody, no server-side execution, no paid features.",
+        text: "Yes. All skills are published source. They run through the Zora CLI and store their own local state. No custody or hosted execution layer is built into this site.",
       },
     },
   ],
@@ -106,7 +108,8 @@ export default function Home() {
             <div>
               <h2 className="type-label text-muted-foreground">Skills</h2>
               <p className="text-xs text-muted-foreground mt-1">
-                We wrote and reviewed every one. Published source, one-command install.
+                Managed templates with real entrypoints, published source, and
+                one-command install.
               </p>
             </div>
             <Link
@@ -118,7 +121,11 @@ export default function Home() {
           </div>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {skills.slice(0, 4).map((skill) => (
-              <SkillCard key={skill.id} skill={skill} href={`/skills#${skill.id}`} />
+              <SkillCard
+                key={skill.id}
+                skill={skill}
+                href={`/skills#${skill.id}`}
+              />
             ))}
           </div>
         </section>

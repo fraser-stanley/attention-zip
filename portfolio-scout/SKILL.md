@@ -1,84 +1,93 @@
 ---
 name: portfolio-scout
-description: Check your local wallet's Zora coin holdings. Use when your human asks about their portfolio, coin balances, or holdings value.
+description: Run a managed wallet check on Zora. Use when your human wants recurring portfolio snapshots, concentration alerts, or position-change reports from a dedicated wallet.
 metadata:
   author: "Zora Agent Skills"
-  version: "1.0.0"
+  version: "2.0.0"
   displayName: "Portfolio Scout"
-  difficulty: "beginner"
+  difficulty: "intermediate"
 ---
 
 # Portfolio Scout
 
-Check your local wallet's Zora coin holdings. The read-only check before you trade.
+Portfolio Scout is a managed wallet monitor. It snapshots spendable balances and coin positions, compares them with the previous run, and highlights concentration or drawdown risk.
 
 ## When to Use This Skill
 
-Use when the user says:
-- "Check my Zora holdings"
-- "What coins do I have?"
-- "Show my portfolio"
-- "How much is my wallet worth?"
+Use this skill when the user asks for:
+
+- A recurring portfolio report
+- Coin position changes since the last check
+- Concentration warnings before placing new trades
+- A wallet health check after another execution skill runs
 
 ## Setup
 
-1. Install the Zora CLI: `npm install -g @zoralabs/cli`
-2. Create or import a wallet: `zora setup`
-3. (Optional) Configure an API key to reduce rate limiting: `zora auth configure`
+1. Install the Zora CLI and make sure `node` is available.
+2. Configure a wallet with `zora setup` or set `ZORA_PRIVATE_KEY`.
+3. Run `./scripts/validate.sh`.
+4. Trigger the entrypoint manually before you put it on a schedule.
 
 ## Configuration
 
-| Setting | Flag | Default | Description |
-|---------|------|---------|-------------|
-| Sort | `--sort` | `usd-value` | Sort by: `usd-value`, `balance`, `market-cap`, `price-change` |
+| Env                                      | Default | Description                                        |
+| ---------------------------------------- | ------- | -------------------------------------------------- |
+| `ZORA_PORTFOLIO_LIMIT`                   | `20`    | Max tracked coin positions                         |
+| `ZORA_PORTFOLIO_CONCENTRATION_ALERT_PCT` | `35`    | Alert when one position exceeds this share         |
+| `ZORA_PORTFOLIO_DRAWNDOWN_ALERT_PCT`     | `15`    | Alert on run-to-run value drops above this percent |
+
+The default cron is every 4 hours. Keep it on a wallet dedicated to this workflow if you want the cleanest history.
 
 ## Commands
 
 ```bash
-zora balance --json                  # all coin holdings
-zora balance --sort usd-value --json     # sorted by USD value (highest first)
-zora balance --sort price-change --json  # sorted by 24h price change
+node scripts/run.mjs
+zora balance --json
+zora balance spendable --json
+zora balance coins --sort usd-value --limit 20 --json
+zora balance coins --sort price-change --limit 20 --json
 ```
 
 ## How It Works
 
-1. Run `zora balance --json` to fetch all coin holdings from the local wallet
-2. Parse each holding: coin name, symbol, type, balance, USD value, market cap, 24h volume
-3. Present holdings with name, type, token balance, USD value, and 24h change
-4. Show total portfolio value as a sum of all holdings
+The entrypoint calls `zora balance --json`, which returns both spendable wallet balances and coin positions. It stores the tracked coin positions plus total tracked coin value in `~/.config/zora-agent-skills/portfolio-scout/state.json`.
+
+On the next run it compares the current snapshot against the saved state. That is how it flags newly opened positions, closed positions, concentration risk, and simple run-to-run drawdowns. It does not need an external service because the comparison is local.
+
+This is a template. The default logic is meant to be safe and readable. You can tighten the concentration threshold, add extra exit logic, or forward the output into another agent that decides what to do next.
 
 ## Example Output
 
-```
-Coin Holdings (local wallet):
+```text
+Portfolio Scout
+Run at 2026-03-23T12:00:00Z
 
-1. jacob (CREATOR) — 1,200 tokens
-   Value: $4,120 | +8.3% 24h
+Spendable:
+- 0.42 ETH
+- 183.20 USDC
 
-2. looksmaxxing (CONTENT) — 500 tokens
-   Value: $1,150 | +12.1% 24h
+Coin positions:
+1. jacob, $4,120.00, 68.1% of tracked coin value
+2. looksmaxxing, $1,150.00, 19.0% of tracked coin value
 
-3. based penguin (CONTENT) — 2,000 tokens
-   Value: $780 | -3.2% 24h
-
-Total value: ~$6,050
-Coins held: 3
+Alerts:
+- Concentration warning: jacob is above the 35% threshold
+- based penguin is no longer held
 ```
 
 ## Troubleshooting
 
-**"No wallet configured"**
-- Run `zora setup` to create a new wallet or import an existing private key.
+If the skill says no wallet is configured, run `zora setup` or export `ZORA_PRIVATE_KEY`. This skill is wallet-backed and cannot run in a fully anonymous mode.
 
-**"Balance shows nothing but I have tokens"**
-- `zora balance` shows **Zora coin holdings only** — NOT native ETH, USDC, or ZORA token balances. If the user asks about native tokens, explain this limitation.
+If the concentration warning feels too sensitive, raise `ZORA_PORTFOLIO_CONCENTRATION_ALERT_PCT`.
 
-**"Can I check another wallet?"**
-- `zora balance` has no address argument. It reads from the local wallet at `~/.config/zora/wallet.json` only. For arbitrary address lookups, use the API route: `GET /api/agents/<address>`.
+If positions appear to vanish, verify that the wallet is the dedicated wallet you expect. Portfolio Scout reports what the CLI sees for the active wallet source.
+
+If the user wants an arbitrary address lookup, use the API or SDK instead. `zora balance` is still tied to the local configured wallet.
 
 ## Important Notes
 
-- Wallet-only: reads from `~/.config/zora/wallet.json` or `ZORA_PRIVATE_KEY` env var. No address argument.
-- Returns coin holdings (balance, USD value, market cap, volume per coin), not native ETH/USDC/ZORA.
-- Bankr-compatible: point Bankr agents at a wallet address via the API route for cross-agent portfolio checks.
-- This skill is the "check before you trade" step for execution skills like Momentum Trader.
+- Portfolio Scout is read-only. It does not place or cancel orders.
+- The drawdown check is a simple run-to-run comparison, not a full performance engine.
+- Local state is required for change detection. Deleting the state file resets the baseline.
+- This skill is best as a companion to execution skills, not a replacement for them.

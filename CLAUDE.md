@@ -10,7 +10,7 @@ Agent skills for the Zora attention market. Skill gallery, live market data, lea
 - **Tailwind CSS v4** with `@tailwindcss/postcss`
 - **shadcn/ui v2** — uses `@base-ui/react` (NOT Radix)
 - **React Query** (`@tanstack/react-query`) for client-side caching
-- **@zoralabs/coins-sdk v0.4.7** for all Zora protocol data
+- **@zoralabs/coins-sdk v0.5.1** for all Zora protocol data
 - **pnpm** for package management
 - Deploy target: **Vercel**
 
@@ -19,9 +19,10 @@ Agent skills for the Zora attention market. Skill gallery, live market data, lea
 ```bash
 pnpm install
 pnpm dev          # dev server at localhost:3000
-pnpm build        # production build (primary verification gate)
-pnpm test         # vitest skill structure + data integrity tests
+pnpm typecheck    # direct TypeScript check (tsc --noEmit)
 pnpm lint         # eslint
+pnpm test         # vitest skill structure + managed entrypoint tests
+pnpm build        # production build (primary verification gate)
 ```
 
 ### Environment
@@ -123,9 +124,9 @@ src/
 - **Client components still refresh through API routes** (`/api/explore`, `/api/leaderboard`) using React Query. The API remains the public integration surface for external agents and local tooling.
 - **Agent discovery is explicit** via `/api`, `/api/skills`, JSON-LD, and `/.well-known/ai.json`.
 - **Skills are static data** in `src/lib/skills.ts`. No database, no CMS. The homepage grid and skills gallery both render from this array — add a skill to the array and both pages update automatically.
-- **Install commands are agent instructions**, not CLI commands. The Zora CLI has no `install` or `skills` subcommand. Each runtime gets a prompt-based command: `claude -p "Read <url> and <action>"`. OpenClaw is the exception with `clawhub install <skill-id>`. The curl tab is the only real shell command.
+- **Skills are managed templates**, not prompt-only wrappers. Each public skill now has a real `scripts/run.mjs` entrypoint, `clawhub.json` cron metadata, and source-backed manual install path.
+- **Install commands are shared** from `src/lib/skills.ts` (`getSkillRuntimeCommands()`, `getInstallAllCommands()`) so the UI and `/api/skills` stay in sync. OpenClaw installs via `clawhub install <skill-id>`. Other runtimes get a prompt-based install helper plus a manual `git clone` fallback.
 - **SKILL.md is served from the domain** at `/skills/[id]/skill-md` (`src/app/skills/[id]/skill-md/route.ts`). This gives agent commands clean URLs that work in any environment.
-- **Install commands are shared** from `src/lib/skills.ts` (`getSkillRuntimeCommands()`, `getInstallAllCommands()`) so the UI and `/api/skills` stay in sync.
 - **The skills page has a unified install card** — `RuntimeInstallCard` in `src/components/skill-card-client.tsx` combines 6 runtime tabs (OpenClaw, Claude Code, Amp, Codex CLI, OpenCode, Cursor) with a copyable code snippet in one bordered card. OpenClaw is the default runtime. Per-skill rows use standalone `CopyableCodeBlock` components.
 - **The skills page stays intentionally flat** — one shared runtime picker updates every command block. Only the example output is collapsible (with typewriter animation). No nested accordions.
 - **Tabs use a single unified style** — `TabsList` always renders with `bg-muted p-1` (gray container) and selected tabs get black fill + white text. No variants — one style for all tab UIs (skills picker, homepage terminal, portfolio, dashboard). The preferred pattern is a wrapper `<div className="border-b border-border bg-muted p-1">` around `<TabsList className="grid ... bg-transparent p-0">`. **Gotcha:** The base `TabsList` component has `justify-center` baked in. `cn()` / tailwind-merge will NOT remove it when you pass `flex w-full` — you must explicitly add `justify-start` to left-align tabs, or use `grid` layout which avoids the issue.
@@ -134,7 +135,7 @@ src/
 - **Command menu is lazy-loaded** through `src/components/command-menu-loader.tsx` so it does not affect the initial page payload.
 - **React Query** handles live refresh after hydration. Initial render is server-owned for `/`, `/dashboard`, and `/leaderboard`.
 - **Homepage "Agent activity" is a terminal board**, not a 4-card grid. It preloads 8 rows per tab, refreshes through `/api/explore` and `/api/leaderboard`, and uses a subtle CRT-style loading sweep plus simulated preview motion between fetches.
-- **Activity ticker shows mock agent trades** — Simmer-style marquee (`@AgentName bought $12 Higher 3m ago`), rendered on the homepage only (`src/app/page.tsx` and `src/app/loading.tsx`). Positioned with negative margins to sit flush below the fixed nav in the `pt-20` gap. Mock data in `src/lib/activity-mock-data.ts` with `TradeActivityItem` interface. Green for buys, magenta for sells. Will swap to real trade data when tracking is available.
+- **Activity ticker shows mock agent trades** — Simmer-style marquee (`@AgentName bought $12 Higher 3m ago`), rendered from the root layout so it appears directly below the nav across the site. Mock data in `src/lib/activity-mock-data.ts` with `TradeActivityItem` interface. Green for buys, magenta for sells. Will swap to real trade data when tracking is available.
 - **Portfolio page is mock data only** — `src/lib/portfolio-mock-data.ts` provides all positions, trades, PnL stats, and sparkline data. No real wallet connection. Will be replaced with live data when trade history indexing ships.
 - **Wallet connect gates the portfolio** — `PortfolioAuthGate` redirects disconnected users to `/`. The nav conditionally shows the Portfolio link based on `isConnected`. Connecting a wallet seeds default skills (`trend-scout`, `portfolio-scout`); disconnecting clears them.
 - **Wallet menu uses the same overlay pattern as the Index** — `fixed inset-0 z-[100]`, split backdrop/content transitions (200ms blur, 100ms content snap), rendered outside the `<header>` to avoid `inert` conflicts. Brutalist design: `gap-px` grid cells, QR code spanning rows, condensed bold `font-display` for balance.
@@ -170,7 +171,7 @@ import { PlusIcon } from "@/components/ui/plus";
 <AnimatedButton variant="outline" onClick={handleClick}>
   <PlusIcon size={14} />
   Add item
-</AnimatedButton>
+</AnimatedButton>;
 ```
 
 The `AnimatedButton` component automatically detects icon children (components with `displayName` ending in "Icon") and wires their `startAnimation`/`stopAnimation` methods to mouse enter/leave events. The icons use motion/react for smooth animations.
@@ -182,15 +183,21 @@ For links styled as buttons with icons, use `AnimatedArrowLink` from `@/componen
 shadcn/ui v2 uses `@base-ui/react` instead of Radix. The `Button` component does **not** support `asChild`.
 
 Wrong:
+
 ```tsx
-<Button asChild><Link href="/foo">Go</Link></Button>
+<Button asChild>
+  <Link href="/foo">Go</Link>
+</Button>
 ```
 
 Correct:
-```tsx
-import { buttonVariants } from "@/components/ui/button-variants"
 
-<Link href="/foo" className={buttonVariants({ variant: "outline" })}>Go</Link>
+```tsx
+import { buttonVariants } from "@/components/ui/button-variants";
+
+<Link href="/foo" className={buttonVariants({ variant: "outline" })}>
+  Go
+</Link>;
 ```
 
 Import `buttonVariants` from `@/components/ui/button-variants` for server-safe usage with `<Link>`. The interactive `<Button>` component still lives in `@/components/ui/button`.
@@ -221,21 +228,21 @@ Do not assume DOM order alone will put modal content above an `absolute` sibling
 
 The `@zoralabs/coins-sdk` functions use different parameter names. These are documented here because they caused build failures during initial development:
 
-| Function | Parameters | Notes |
-|----------|-----------|-------|
-| `getTrendingAll` | `{ count }` | |
-| `getCoinsMostValuable` | `{ count }` | |
-| `getCoinsNew` | `{ count }` | |
-| `getCoinsTopVolume24h` | `{ count }` | |
-| `getCoinsTopGainers` | `{ count }` | |
-| `getCreatorCoins` | `{ count }` | |
-| `getFeaturedCreators` | `{ first }` | NOT `count` |
-| `getTraderLeaderboard` | `{ first }` | NOT `count` |
-| `getCoin` | `{ address, chain }` | chain is number (8453 for Base) |
-| `getCoinSwaps` | `{ address, chain, first }` | `chain` is number, `first` not `count` |
-| `getCoinHolders` | `{ chainId, address, count }` | `chainId` not `chain` |
-| `getProfileBalances` | `{ identifier, count }` | `identifier` is wallet address |
-| `getProfileCoins` | `{ identifier, count }` | `identifier` is wallet address |
+| Function               | Parameters                    | Notes                                  |
+| ---------------------- | ----------------------------- | -------------------------------------- |
+| `getTrendingAll`       | `{ count }`                   |                                        |
+| `getCoinsMostValuable` | `{ count }`                   |                                        |
+| `getCoinsNew`          | `{ count }`                   |                                        |
+| `getCoinsTopVolume24h` | `{ count }`                   |                                        |
+| `getCoinsTopGainers`   | `{ count }`                   |                                        |
+| `getCreatorCoins`      | `{ count }`                   |                                        |
+| `getFeaturedCreators`  | `{ first }`                   | NOT `count`                            |
+| `getTraderLeaderboard` | `{ first }`                   | NOT `count`                            |
+| `getCoin`              | `{ address, chain }`          | chain is number (8453 for Base)        |
+| `getCoinSwaps`         | `{ address, chain, first }`   | `chain` is number, `first` not `count` |
+| `getCoinHolders`       | `{ chainId, address, count }` | `chainId` not `chain`                  |
+| `getProfileBalances`   | `{ identifier, count }`       | `identifier` is wallet address         |
+| `getProfileCoins`      | `{ identifier, count }`       | `identifier` is wallet address         |
 
 All SDK responses return `{ error, data }`. Always check `response.error` before accessing data.
 
@@ -264,9 +271,10 @@ Each skill follows the AgentSkills/ClawHub directory convention:
 ```
 
 **SKILL.md frontmatter** uses the AgentSkills format — flat `metadata` strings only:
+
 ```yaml
 ---
-name: <skill-slug>          # must match directory name
+name: <skill-slug> # must match directory name
 description: <max 1024 chars>
 metadata:
   author: "Zora Agent Skills"
@@ -279,6 +287,7 @@ metadata:
 Do NOT put `requires`, `tunables`, or `openclaw` in SKILL.md frontmatter — those go in `clawhub.json`.
 
 **SKILL.md body** must contain these 8 sections in order:
+
 1. `## When to Use This Skill`
 2. `## Setup`
 3. `## Configuration`
@@ -289,37 +298,44 @@ Do NOT put `requires`, `tunables`, or `openclaw` in SKILL.md frontmatter — tho
 8. `## Important Notes`
 
 **clawhub.json** structure:
-- Read-only skills: `requires.bins: ["zora"]`, no `requires.env`
-- Execution skills: add `requires.env: ["ZORA_API_KEY", "ZORA_PRIVATE_KEY"]` and `tunables` array
-- All skills include `"automaton": {"managed": false, "entrypoint": null}` — signals to OpenClaw runtimes that these are CLI wrappers, not standalone scripts
+
+- All skills use a managed entrypoint: `automaton.managed: true`, `automaton.entrypoint: "scripts/run.mjs"`
+- All skills require `zora` and `node` in `requires.bins`
+- Wallet-backed skills add `requires.env: ["ZORA_PRIVATE_KEY"]`
+- Tunables live in `clawhub.json`, not SKILL.md frontmatter
 
 ### Skill testing
 
-Run `pnpm test` to validate all skills against the AgentSkills spec. Tests cover:
+Run `pnpm lint`, `pnpm typecheck`, `pnpm test`, and `pnpm build` before merge. `pnpm test` validates all skills against the AgentSkills spec. Tests cover:
+
 - SKILL.md frontmatter fields and format
 - Required body sections present
 - Word count 300–800 per skill
 - CLI flag correctness (`--json` for explore/get/balance, `-o json` for buy/sell)
-- clawhub.json schema validation
+- Managed `clawhub.json` metadata (`automaton`, cron, tunables, env requirements)
 - Cross-file sync (skills.ts IDs match SKILL.md names and directory names)
-- Execution skill safety (risk levels, buy/sell wraps, env requirements)
+- Process-level managed entrypoint behavior via `src/__tests__/skill-entrypoints.test.ts` with a stubbed `zora` binary, isolated `HOME`, and state/journal assertions
+- Execution skill safety (dry-run journal writes, no accidental `--yes`, live exit path, env requirements)
+
+`scripts/validate.sh` remains a separate host-readiness check. It requires a real `zora` binary on `PATH`, and wallet-backed skills also require a configured wallet.
 
 ### CLI commands
 
 The Zora CLI has 8 commands: `auth`, `explore`, `get`, `buy`, `sell`, `balance`, `setup`, `wallet`.
 
-| Command | Syntax | Notes |
-|---------|--------|-------|
-| `zora explore` | `--sort <sort> --type <type> --limit <n> --json` | Sorts: mcap, volume, new, gainers, trending, featured, last-traded, last-traded-unique. Types: all, trend, creator-coin, post |
-| `zora get` | `zora get <identifier> [--type <type>] --json` | Identifier = 0x address or creator name. NOT ENS. Types: creator-coin, post, trend |
-| `zora buy` | `zora buy <address> --eth <amount> -o json` | Uses `-o json` (local flag), NOT `--json`. Also: --usd, --token (eth/usdc/zora), --percent, --all, --quote (preview only), --yes (skip confirm), --slippage, --debug |
-| `zora sell` | `zora sell <address> --amount <tokens> -o json` | Uses `-o json` (local flag), NOT `--json`. Also: --usd, --token (alias for --to), --percent, --all, --to <ETH\|USDC\|ZORA>, --quote, --yes, --slippage, --debug |
-| `zora balance` | `zora balance [spendable\|coins] --json` | Subcommands: (none) = wallet + coins, `spendable` = ETH/USDC/ZORA only, `coins` = coin holdings with --sort |
-| `zora setup` | `zora setup [--create] [--force]` | Creates/imports wallet at ~/.config/zora/wallet.json |
-| `zora wallet` | `wallet info`, `wallet export`, `wallet backup` | Keychain-protected backup on macOS |
-| `zora auth` | `auth configure`, `auth status` | API key management |
+| Command        | Syntax                                           | Notes                                                                                                                                                                |
+| -------------- | ------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `zora explore` | `--sort <sort> --type <type> --limit <n> --json` | Sorts: mcap, volume, new, gainers, trending, featured, last-traded, last-traded-unique. Types: all, trend, creator-coin, post                                        |
+| `zora get`     | `zora get <identifier> [--type <type>] --json`   | Identifier = 0x address or creator name. NOT ENS. Types: creator-coin, post, trend                                                                                   |
+| `zora buy`     | `zora buy <address> --eth <amount> -o json`      | Uses `-o json` (local flag), NOT `--json`. Also: --usd, --token (eth/usdc/zora), --percent, --all, --quote (preview only), --yes (skip confirm), --slippage, --debug |
+| `zora sell`    | `zora sell <address> --amount <tokens> -o json`  | Uses `-o json` (local flag), NOT `--json`. Also: --usd, --token (alias for --to), --percent, --all, --to <ETH\|USDC\|ZORA>, --quote, --yes, --slippage, --debug      |
+| `zora balance` | `zora balance [spendable\|coins] --json`         | Subcommands: (none) = wallet + coins, `spendable` = ETH/USDC/ZORA only, `coins` = coin holdings with --sort                                                          |
+| `zora setup`   | `zora setup [--create] [--force]`                | Creates/imports wallet at ~/.config/zora/wallet.json                                                                                                                 |
+| `zora wallet`  | `wallet info`, `wallet export`                   | Wallet inspection and export                                                                                                                                         |
+| `zora auth`    | `auth configure`, `auth status`                  | API key management                                                                                                                                                   |
 
 **CLI behavioral notes:**
+
 - `--json` output is clean stdout. Errors go to stderr. In JSON mode, errors are also structured: `{"error": "...", "suggestion": "..."}`.
 - Exit codes: 0 = success (including user abort), 1 = all errors.
 - `--yes` skips the trade confirmation prompt only. Validation (API key, wallet, balance checks) still runs.
@@ -328,6 +344,7 @@ The Zora CLI has 8 commands: `auth`, `explore`, `get`, `buy`, `sell`, `balance`,
 - No watch/streaming mode. Single request, single response, exit.
 
 **CLI JSON output shapes:**
+
 - `explore --json`: `{ coins: [{ name, address, coinType, marketCap, volume24h, marketCapDelta24h }], pageInfo: { endCursor, hasNextPage } }`
 - `get --json`: `{ name, address, coinType, marketCap, volume24h, uniqueHolders, createdAt, creatorAddress, creatorHandle }`
 - `balance --json`: `{ wallet: [{ symbol, balance, usdValue, priceUsd }], coins: [{ rank, name, symbol, balance, usdValue, priceUsd, marketCap, marketCapChange24h, volume24h }] }`
@@ -335,6 +352,7 @@ The Zora CLI has 8 commands: `auth`, `explore`, `get`, `buy`, `sell`, `balance`,
 - `sell -o json`: `{ action, coin, address, sold: { amount, raw, symbol }, received: { amount, raw, symbol, source }, tx }` — `--quote` returns `estimated` and `slippage` instead
 
 **`zora balance` subcommands:**
+
 - `zora balance` — returns both wallet tokens (ETH/USDC/ZORA) and coin positions
 - `zora balance spendable` — ETH/USDC/ZORA balances only
 - `zora balance coins` — coin holdings with sorting (--sort usd-value, balance, market-cap, price-change)

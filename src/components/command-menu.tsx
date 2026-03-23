@@ -125,8 +125,13 @@ const skillItems: SearchItem[] = skills.map((skill) => ({
   href: `/skills#${skill.id}`,
   breadcrumb: `Skills > ${skill.name} > Install`,
   group: "Skills",
-  keywords: [skill.description, skill.riskLabel, ...skill.badges],
-  meta: skill.riskLabel.split("—")[0]?.trim() ?? skill.riskLabel,
+  keywords: [
+    skill.description,
+    skill.riskLabel,
+    skill.category,
+    ...skill.badges,
+  ],
+  meta: skill.category,
 }));
 
 const searchItems = [...pages, ...skillItems, ...dashboardItems];
@@ -141,7 +146,7 @@ const itemClass =
 function useModKey() {
   const isMac =
     typeof navigator !== "undefined"
-      ? navigator.platform?.toUpperCase().includes("MAC") ?? true
+      ? (navigator.platform?.toUpperCase().includes("MAC") ?? true)
       : true;
 
   return isMac ? "⌘" : "Ctrl+";
@@ -173,7 +178,7 @@ function readRecentEntries() {
           (entry) =>
             typeof entry?.id === "string" &&
             typeof entry?.query === "string" &&
-            itemById.has(entry.id)
+            itemById.has(entry.id),
         )
       : [];
   } catch {
@@ -185,7 +190,7 @@ function writeRecentEntries(entries: RecentEntry[]) {
   try {
     window.sessionStorage.setItem(
       RECENT_SEARCHES_KEY,
-      JSON.stringify(entries.slice(0, RECENT_SEARCH_LIMIT))
+      JSON.stringify(entries.slice(0, RECENT_SEARCH_LIMIT)),
     );
   } catch {
     // sessionStorage can be blocked
@@ -295,7 +300,10 @@ export function CommandMenu() {
             const item = itemById.get(entry.id);
             return item ? { item, query: entry.query } : null;
           })
-          .filter((entry): entry is { item: SearchItem; query: string } => entry !== null)
+          .filter(
+            (entry): entry is { item: SearchItem; query: string } =>
+              entry !== null,
+          )
       : [];
 
   return (
@@ -317,7 +325,8 @@ export function CommandMenu() {
 
       <Command.List className="max-h-[26rem] overflow-y-auto p-2">
         <Command.Empty className="type-body-sm px-4 py-8 text-center text-muted-foreground">
-          No matches for <span className="font-mono text-foreground">{query}</span>.
+          No matches for{" "}
+          <span className="font-mono text-foreground">{query}</span>.
         </Command.Empty>
 
         {recentItems.length > 0 ? (
@@ -335,19 +344,31 @@ export function CommandMenu() {
 
         <Command.Group heading="Pages" className={groupHeadingClass}>
           {pages.map((item) => (
-            <SearchResultItem key={item.id} item={item} onSelect={() => navigate(item)} />
+            <SearchResultItem
+              key={item.id}
+              item={item}
+              onSelect={() => navigate(item)}
+            />
           ))}
         </Command.Group>
 
         <Command.Group heading="Skills" className={groupHeadingClass}>
           {skillItems.map((item) => (
-            <SearchResultItem key={item.id} item={item} onSelect={() => navigate(item)} />
+            <SearchResultItem
+              key={item.id}
+              item={item}
+              onSelect={() => navigate(item)}
+            />
           ))}
         </Command.Group>
 
         <Command.Group heading="Dashboard" className={groupHeadingClass}>
           {dashboardItems.map((item) => (
-            <SearchResultItem key={item.id} item={item} onSelect={() => navigate(item)} />
+            <SearchResultItem
+              key={item.id}
+              item={item}
+              onSelect={() => navigate(item)}
+            />
           ))}
         </Command.Group>
       </Command.List>
@@ -355,11 +376,17 @@ export function CommandMenu() {
       <div className="type-caption flex items-center justify-between border-t border-border px-4 py-2 font-mono text-muted-foreground">
         <span>{modKey}K</span>
         <div className="flex items-center gap-2">
-          <kbd className="type-caption border border-border px-1.5 py-0.5">↑↓</kbd>
+          <kbd className="type-caption border border-border px-1.5 py-0.5">
+            ↑↓
+          </kbd>
           <span>select</span>
-          <kbd className="type-caption border border-border px-1.5 py-0.5">↵</kbd>
+          <kbd className="type-caption border border-border px-1.5 py-0.5">
+            ↵
+          </kbd>
           <span>open</span>
-          <kbd className="type-caption border border-border px-1.5 py-0.5">esc</kbd>
+          <kbd className="type-caption border border-border px-1.5 py-0.5">
+            esc
+          </kbd>
           <span>close</span>
         </div>
       </div>

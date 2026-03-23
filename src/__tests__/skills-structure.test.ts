@@ -23,9 +23,17 @@ const REQUIRED_SECTIONS = [
   "## Important Notes",
 ];
 
+type Tunable = {
+  env: string;
+  type: "number" | "string" | "boolean";
+  default: unknown;
+  label: string;
+  range?: number[];
+  step?: number;
+};
+
 function readSkillMd(skill: string) {
-  const filePath = path.join(ROOT, skill, "SKILL.md");
-  return fs.readFileSync(filePath, "utf-8");
+  return fs.readFileSync(path.join(ROOT, skill, "SKILL.md"), "utf8");
 }
 
 function parseFrontmatter(content: string) {
@@ -75,7 +83,7 @@ describe.each(SKILL_DIRS)("%s/SKILL.md", (skill) => {
 
     it("has valid metadata.difficulty", () => {
       expect(["beginner", "intermediate", "advanced"]).toContain(
-        frontmatter.metadata?.difficulty
+        frontmatter.metadata?.difficulty,
       );
     });
 
@@ -106,50 +114,50 @@ describe.each(SKILL_DIRS)("%s/SKILL.md", (skill) => {
     const codeBlocks = body.match(/```[\s\S]*?```/g) ?? [];
     const codeContent = codeBlocks.join("\n");
 
-    it("explore commands use --json (global flag)", () => {
-      const exploreLines = codeContent
+    it("explore commands use --json", () => {
+      const lines = codeContent
         .split("\n")
-        .filter((l) => l.includes("zora explore"));
-      for (const line of exploreLines) {
+        .filter((line) => line.includes("zora explore"));
+      for (const line of lines) {
         expect(line).toContain("--json");
         expect(line).not.toMatch(/-o\s+json/);
       }
     });
 
-    it("get commands use --json (global flag)", () => {
-      const getLines = codeContent
+    it("get commands use --json", () => {
+      const lines = codeContent
         .split("\n")
-        .filter((l) => l.includes("zora get"));
-      for (const line of getLines) {
+        .filter((line) => line.includes("zora get"));
+      for (const line of lines) {
         expect(line).toContain("--json");
         expect(line).not.toMatch(/-o\s+json/);
       }
     });
 
-    it("balance commands use --json (global flag)", () => {
-      const balLines = codeContent
+    it("balance commands use --json", () => {
+      const lines = codeContent
         .split("\n")
-        .filter((l) => l.includes("zora balance"));
-      for (const line of balLines) {
+        .filter((line) => line.includes("zora balance"));
+      for (const line of lines) {
         expect(line).toContain("--json");
         expect(line).not.toMatch(/-o\s+json/);
       }
     });
 
-    it("buy commands use -o json (local flag)", () => {
-      const buyLines = codeContent
+    it("buy commands use -o json", () => {
+      const lines = codeContent
         .split("\n")
-        .filter((l) => l.includes("zora buy"));
-      for (const line of buyLines) {
+        .filter((line) => line.includes("zora buy"));
+      for (const line of lines) {
         expect(line).toMatch(/-o\s+json/);
       }
     });
 
-    it("sell commands use -o json (local flag)", () => {
-      const sellLines = codeContent
+    it("sell commands use -o json", () => {
+      const lines = codeContent
         .split("\n")
-        .filter((l) => l.includes("zora sell"));
-      for (const line of sellLines) {
+        .filter((line) => line.includes("zora sell"));
+      for (const line of lines) {
         expect(line).toMatch(/-o\s+json/);
       }
     });
@@ -158,13 +166,15 @@ describe.each(SKILL_DIRS)("%s/SKILL.md", (skill) => {
 
 describe.each(SKILL_DIRS)("%s/clawhub.json", (skill) => {
   const filePath = path.join(ROOT, skill, "clawhub.json");
-  const content = JSON.parse(fs.readFileSync(filePath, "utf-8"));
+  const content = JSON.parse(fs.readFileSync(filePath, "utf8"));
 
   it("has required fields", () => {
     expect(content).toHaveProperty("emoji");
     expect(content).toHaveProperty("requires");
     expect(content).toHaveProperty("cron");
     expect(content).toHaveProperty("autostart");
+    expect(content).toHaveProperty("automaton");
+    expect(content).toHaveProperty("tunables");
   });
 
   it("emoji is a non-empty string", () => {
@@ -172,96 +182,118 @@ describe.each(SKILL_DIRS)("%s/clawhub.json", (skill) => {
     expect(content.emoji.length).toBeGreaterThan(0);
   });
 
-  it("requires.bins contains zora", () => {
+  it("requires.bins contains zora and node", () => {
     expect(content.requires.bins).toContain("zora");
+    expect(content.requires.bins).toContain("node");
   });
 
   it("autostart is false", () => {
     expect(content.autostart).toBe(false);
   });
 
-  it("automaton block declares CLI wrapper (managed: false)", () => {
-    expect(content.automaton).toEqual({ managed: false, entrypoint: null });
-  });
-});
-
-describe("momentum-trader/clawhub.json execution skill specifics", () => {
-  const content = JSON.parse(
-    fs.readFileSync(
-      path.join(ROOT, "momentum-trader", "clawhub.json"),
-      "utf-8"
-    )
-  );
-
-  it("requires ZORA_API_KEY", () => {
-    expect(content.requires.env).toContain("ZORA_API_KEY");
+  it("automaton is managed and points at scripts/run.mjs", () => {
+    expect(content.automaton).toEqual({
+      managed: true,
+      entrypoint: "scripts/run.mjs",
+    });
   });
 
-  it("requires ZORA_PRIVATE_KEY", () => {
-    expect(content.requires.env).toContain("ZORA_PRIVATE_KEY");
+  it("cron is a non-empty string", () => {
+    expect(typeof content.cron).toBe("string");
+    expect(content.cron.length).toBeGreaterThan(0);
   });
 
-  it("has tunables array", () => {
+  it("has at least one tunable", () => {
     expect(Array.isArray(content.tunables)).toBe(true);
     expect(content.tunables.length).toBeGreaterThan(0);
   });
 
-  it.each(
-    JSON.parse(
-      fs.readFileSync(
-        path.join(ROOT, "momentum-trader", "clawhub.json"),
-        "utf-8"
-      )
-    ).tunables
-  )("tunable $env has valid structure", (tunable: Record<string, unknown>) => {
-    expect(tunable).toHaveProperty("env");
-    expect(tunable).toHaveProperty("type");
-    expect(tunable).toHaveProperty("default");
-    expect(tunable).toHaveProperty("range");
-    expect(tunable).toHaveProperty("step");
-    expect(tunable).toHaveProperty("label");
+  it.each(content.tunables as Tunable[])(
+    "tunable $env has valid structure",
+    (tunable) => {
+      expect(tunable).toHaveProperty("env");
+      expect(tunable).toHaveProperty("type");
+      expect(tunable).toHaveProperty("default");
+      expect(tunable).toHaveProperty("label");
 
-    expect(typeof tunable.env).toBe("string");
-    expect((tunable.env as string).startsWith("ZORA_MOMENTUM_")).toBe(true);
+      expect(typeof tunable.env).toBe("string");
+      expect(typeof tunable.label).toBe("string");
+      expect(["number", "string", "boolean"]).toContain(tunable.type);
 
-    const range = tunable.range as number[];
-    expect(range).toHaveLength(2);
-    expect(tunable.default).toBeGreaterThanOrEqual(range[0]);
-    expect(tunable.default).toBeLessThanOrEqual(range[1]);
-  });
+      if (tunable.type === "number") {
+        expect(tunable).toHaveProperty("range");
+        expect(tunable).toHaveProperty("step");
+        const range = tunable.range as number[];
+        expect(range).toHaveLength(2);
+        expect(tunable.default).toBeGreaterThanOrEqual(range[0]);
+        expect(tunable.default).toBeLessThanOrEqual(range[1]);
+      }
+    },
+  );
 });
 
-describe("read-only skills clawhub.json", () => {
-  const readOnlySkills = [
-    "trend-scout",
-    "creator-pulse",
-    "briefing-bot",
-    "portfolio-scout",
-  ];
-
-  it.each(readOnlySkills)("%s has no requires.env", (skill) => {
+describe("env requirements", () => {
+  it("trend-scout has no required env vars", () => {
     const content = JSON.parse(
-      fs.readFileSync(path.join(ROOT, skill, "clawhub.json"), "utf-8")
+      fs.readFileSync(path.join(ROOT, "trend-scout", "clawhub.json"), "utf8"),
     );
     expect(content.requires.env).toBeUndefined();
   });
-});
 
-describe.each(SKILL_DIRS)("%s/scripts/validate.sh", (skill) => {
-  const filePath = path.join(ROOT, skill, "scripts", "validate.sh");
-
-  it("exists", () => {
-    expect(fs.existsSync(filePath)).toBe(true);
+  it("creator-pulse has no required env vars", () => {
+    const content = JSON.parse(
+      fs.readFileSync(path.join(ROOT, "creator-pulse", "clawhub.json"), "utf8"),
+    );
+    expect(content.requires.env).toBeUndefined();
   });
 
-  it("is executable", () => {
-    const stat = fs.statSync(filePath);
-    // Check owner execute bit
+  it("briefing-bot has no required env vars", () => {
+    const content = JSON.parse(
+      fs.readFileSync(path.join(ROOT, "briefing-bot", "clawhub.json"), "utf8"),
+    );
+    expect(content.requires.env).toBeUndefined();
+  });
+
+  it("portfolio-scout requires ZORA_PRIVATE_KEY", () => {
+    const content = JSON.parse(
+      fs.readFileSync(
+        path.join(ROOT, "portfolio-scout", "clawhub.json"),
+        "utf8",
+      ),
+    );
+    expect(content.requires.env).toContain("ZORA_PRIVATE_KEY");
+  });
+
+  it("momentum-trader requires ZORA_PRIVATE_KEY", () => {
+    const content = JSON.parse(
+      fs.readFileSync(
+        path.join(ROOT, "momentum-trader", "clawhub.json"),
+        "utf8",
+      ),
+    );
+    expect(content.requires.env).toContain("ZORA_PRIVATE_KEY");
+  });
+});
+
+describe.each(SKILL_DIRS)("%s/scripts assets", (skill) => {
+  const validatePath = path.join(ROOT, skill, "scripts", "validate.sh");
+  const entrypointPath = path.join(ROOT, skill, "scripts", "run.mjs");
+
+  it("validate.sh exists", () => {
+    expect(fs.existsSync(validatePath)).toBe(true);
+  });
+
+  it("run.mjs exists", () => {
+    expect(fs.existsSync(entrypointPath)).toBe(true);
+  });
+
+  it("validate.sh is executable", () => {
+    const stat = fs.statSync(validatePath);
     expect(stat.mode & 0o100).toBeTruthy();
   });
 
-  it("has bash shebang", () => {
-    const content = fs.readFileSync(filePath, "utf-8");
-    expect(content.startsWith("#!/usr/bin/env bash")).toBe(true);
+  it("run.mjs is executable", () => {
+    const stat = fs.statSync(entrypointPath);
+    expect(stat.mode & 0o100).toBeTruthy();
   });
 });

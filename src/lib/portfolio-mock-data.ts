@@ -36,6 +36,7 @@ export interface MockPortfolioPnl {
 
 export interface SparklinePoint {
   value: number;
+  bornTick?: number;
 }
 
 export interface MockPortfolio {
@@ -100,11 +101,11 @@ export const MOCK_PORTFOLIO: MockPortfolio = {
       status: "active",
       side: "long",
       entryPrice: 800,
-      currentPrice: 995.6,
+      currentPrice: 679.56,
       quantity: 5_200,
       entryDate: "Mar 11",
-      pnl: 195.6,
-      pnlPct: 24.5,
+      pnl: -120.44,
+      pnlPct: -15.1,
     },
     {
       coin: "Zora",
@@ -128,11 +129,11 @@ export const MOCK_PORTFOLIO: MockPortfolio = {
       status: "active",
       side: "long",
       entryPrice: 1_200,
-      currentPrice: 1_380.12,
+      currentPrice: 1_143.08,
       quantity: 6_400,
       entryDate: "Mar 12",
-      pnl: 180.12,
-      pnlPct: 15.0,
+      pnl: -56.92,
+      pnlPct: -4.7,
     },
     {
       coin: "Degen",

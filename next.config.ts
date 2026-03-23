@@ -7,6 +7,7 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "**.zora.co" },
       { protocol: "https", hostname: "ipfs.decentralized-content.com" },
       { protocol: "https", hostname: "magic.decentralized-content.com" },
+      { protocol: "https", hostname: "**.choicecdn.com" },
     ],
   },
   async headers() {

@@ -49,7 +49,7 @@ Use when the user asks to:
 zora explore --sort gainers --json            # find momentum candidates
 zora explore --sort trending --json           # broader trend scan
 zora get <address> --json                     # validate candidate (volume, holders)
-zora balances --json                          # check current positions
+zora balance --json                          # check current positions
 ```
 
 **Trading** (use `-o json` local flag):
@@ -64,12 +64,12 @@ zora sell <address> --amount 100 --to USDC -o json --yes  # partial exit to USDC
 
 1. **Check limits first**: verify daily spend is under `ZORA_MOMENTUM_DAILY_CAP_ETH` and cooldown has elapsed since last trade
 2. Scan gainers and trending coins for candidates meeting entry criteria (min gain %, min volume)
-3. Check `zora balances --json` to confirm open positions are under `ZORA_MOMENTUM_MAX_POSITIONS`
+3. Check `zora balance --json` to confirm open positions are under `ZORA_MOMENTUM_MAX_POSITIONS`
 4. Validate each candidate with `zora get` — check volume, holder count, coin type
 5. Preview the trade with `--quote` to check slippage before committing
 6. If slippage is acceptable and all limits pass, execute the buy with `--yes`
 7. **Log the trade** to `~/.config/zora/trade-journal.jsonl`: `{"source": "zora:momentum-trader", "action": "buy", "address": "0x...", "eth": 0.01, "timestamp": "..."}`
-8. Monitor positions via `zora balances` — track value changes against entry price
+8. Monitor positions via `zora balance` — track value changes against entry price
 9. Exit when trailing stop triggers or take-profit target is hit. Log sells to the journal too.
 10. **Wait** `ZORA_MOMENTUM_COOLDOWN_SEC` seconds before scanning again
 

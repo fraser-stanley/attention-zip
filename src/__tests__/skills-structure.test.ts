@@ -126,10 +126,10 @@ describe.each(SKILL_DIRS)("%s/SKILL.md", (skill) => {
       }
     });
 
-    it("balances commands use --json (global flag)", () => {
+    it("balance commands use --json (global flag)", () => {
       const balLines = codeContent
         .split("\n")
-        .filter((l) => l.includes("zora balances"));
+        .filter((l) => l.includes("zora balance"));
       for (const line of balLines) {
         expect(line).toContain("--json");
         expect(line).not.toMatch(/-o\s+json/);

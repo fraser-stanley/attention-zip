@@ -14,9 +14,9 @@ The Zora CLI has 8 commands. All data is public on-chain data on Base.
 |---------|--------|-----------|-------|
 | `zora explore` | `--sort <sort> --type <type> --limit <n>` | `--json` | Sorts: mcap, volume, new, gainers, trending, featured, last-traded, last-traded-unique. Types: all, trend, creator-coin, post |
 | `zora get` | `<identifier> [--type <type>]` | `--json` | Identifier = 0x address or creator name. NOT ENS. Returns uniqueHolders + volume24h |
-| `zora buy` | `<address> --eth <amount>` | `-o json` | Also: --percent, --all, --quote (preview), --yes (skip confirm) |
-| `zora sell` | `<address> --amount <tokens>` | `-o json` | Also: --percent, --all, --to ETH|USDC|ZORA, --quote, --yes |
-| `zora balances` | (no args) | `--json` | Local wallet only. Coin holdings, not native ETH/USDC/ZORA. Sort: usd-value, balance, market-cap, price-change |
+| `zora buy` | `<address> --eth <amount>` | `-o json` | Also: --usd, --token (eth/usdc/zora), --percent, --all, --quote (preview), --yes (skip confirm), --slippage, --debug |
+| `zora sell` | `<address> --amount <tokens>` | `-o json` | Also: --usd, --token (alias for --to), --percent, --all, --to ETH|USDC|ZORA, --quote, --yes, --slippage, --debug |
+| `zora balance` | `[spendable\|coins]` | `--json` | Subcommands: (none) = wallet + coins, `spendable` = ETH/USDC/ZORA only, `coins` = coin holdings with --sort |
 | `zora setup` | `[--create] [--force]` | n/a | Creates/imports wallet at ~/.config/zora/wallet.json |
 | `zora wallet` | `info`, `export`, `backup` | n/a | Keychain-protected backup on macOS |
 | `zora auth` | `configure`, `status` | n/a | API key at ~/.config/zora/config.json |
@@ -25,10 +25,11 @@ The Zora CLI has 8 commands. All data is public on-chain data on Base.
 
 ### JSON output shapes
 
-- `explore --json`: `[{ name, address, coinType, marketCap, volume24h, marketCapDelta24h }]`
+- `explore --json`: `{ coins: [{ name, address, coinType, marketCap, volume24h, marketCapDelta24h }], pageInfo: { endCursor, hasNextPage } }`
 - `get --json`: `{ name, address, coinType, marketCap, volume24h, uniqueHolders, createdAt, creatorAddress, creatorHandle }`
-- `balances --json`: `[{ name, symbol, coinType, address, balance, usdValue, priceUsd, marketCap, volume24h }]`
-- `buy/sell -o json`: `{ action, coin, address, spent/received, tx }` — `--quote` adds `estimated` and `slippage` instead of `tx`
+- `balance --json`: `{ wallet: [{ symbol, balance, usdValue, priceUsd }], coins: [{ rank, name, symbol, balance, usdValue, priceUsd, marketCap, marketCapChange24h, volume24h }] }`
+- `buy -o json`: `{ action, coin, address, spent: { amount, raw, symbol }, received: { amount, raw, symbol }, tx }` — `--quote` returns `estimated` and `slippage` instead of `received`/`tx`
+- `sell -o json`: `{ action, coin, address, sold: { amount, raw, symbol }, received: { amount, raw, symbol, source }, tx }` — `--quote` returns `estimated` and `slippage` instead
 
 ### Sort/type compatibility
 
@@ -104,12 +105,12 @@ zora explore --sort volume --limit 5 --json
 zora explore --sort new --limit 5 --json
 zora explore --sort gainers --limit 5 --json
 zora explore --type creator-coin --limit 5 --json
-zora balances --json
+zora balance --json
 ```
 
 **How it works:**
 1. Run all 5 explore commands
-2. If wallet is configured, run `zora balances` for holdings
+2. If wallet is configured, run `zora balance` for holdings
 3. Combine into sections: trending, new launches, volume leaders, top gainers, creator coins, your holdings
 4. Flag held coins that appear in trending/gainer lists
 5. End with one-sentence market assessment
@@ -128,9 +129,9 @@ Check your local wallet's Zora coin holdings.
 
 **Commands:**
 ```
-zora balances --json                         # all coin holdings
-zora balances --sort usd-value --json        # sorted by USD value (highest first)
-zora balances --sort price-change --json     # sorted by 24h price change
+zora balance --json                         # all coin holdings
+zora balance --sort usd-value --json        # sorted by USD value (highest first)
+zora balance --sort price-change --json     # sorted by 24h price change
 ```
 
 Sort options: `usd-value` (default), `balance`, `market-cap`, `price-change`.
@@ -155,7 +156,7 @@ zora buy <address> --quote -o json           # dry-run ALWAYS first
 zora buy <address> --eth 0.01 -o json --yes  # execute buy
 zora sell <address> --all -o json --yes      # exit position
 zora sell <address> --amount 100 --to USDC -o json --yes  # partial exit
-zora balances --json                         # check positions
+zora balance --json                         # check positions
 ```
 
 **Safety rails (tunables):**
@@ -196,7 +197,7 @@ Base URL: https://zora-agent-skills.vercel.app
 |----------|-------------|--------|
 | GET /api | API discovery document | — |
 | GET /api/skills | Skill catalog JSON | `id` (optional, e.g. `trend-scout`) |
-| GET /api/explore | Live coin data by sort | `sort` (trending\|mcap\|new\|volume\|gainers\|creators\|featured), `count` (1-20) |
+| GET /api/explore | Live coin data by sort | `sort` (trending\|mcap\|new\|volume\|gainers\|creators\|featured\|last-traded\|last-traded-unique), `count` (1-20) |
 | GET /api/leaderboard | Weekly trader rankings | `count` (1-50) |
 | GET /api/agents/<address> | Agent profile (balances, coins, volume) | — |
 

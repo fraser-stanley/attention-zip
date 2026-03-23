@@ -17,7 +17,7 @@
     "@react-three/fiber": "^9.5.0",
     "@react-three/postprocessing": "^3.0.4",
     "@tanstack/react-query": "^5.90.21",
-    "@zoralabs/coins-sdk": "^0.4.7",
+    "@zoralabs/coins-sdk": "^0.5.1",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",

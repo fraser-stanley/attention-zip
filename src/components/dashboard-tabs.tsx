@@ -29,6 +29,8 @@ const ICON_COMPONENTS: Record<SortOption, React.ComponentType<{ size?: number; r
   gainers: TrendingUpIcon,
   creators: UserIcon,
   featured: SparklesIcon,
+  "last-traded": FlameIcon,
+  "last-traded-unique": FlameIcon,
 };
 
 export function DashboardTabs({

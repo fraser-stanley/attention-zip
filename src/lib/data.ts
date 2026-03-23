@@ -16,6 +16,8 @@ const EXPLORE_REVALIDATE_SECONDS: Record<SortOption, number> = {
   gainers: 30,
   creators: 60,
   featured: 60,
+  "last-traded": 30,
+  "last-traded-unique": 30,
 };
 
 const LEADERBOARD_REVALIDATE_SECONDS = 300;

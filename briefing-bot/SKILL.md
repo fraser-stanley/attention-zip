@@ -43,13 +43,13 @@ zora explore --sort volume --limit 5 --json        # volume leaders
 zora explore --sort new --limit 5 --json           # new launches
 zora explore --sort gainers --limit 5 --json       # top gainers
 zora explore --type creator-coin --limit 5 --json  # creator coin activity
-zora balances --json                               # current holdings (if wallet configured)
+zora balance --json                               # current holdings (if wallet configured)
 ```
 
 ## How It Works
 
 1. Run all 5 explore commands to gather data across market dimensions
-2. If a wallet is configured, run `zora balances --json` to get current holdings
+2. If a wallet is configured, run `zora balance --json` to get current holdings
 3. Combine the results into a single briefing with these sections:
    - **Trending** — top coin by market cap, notable movers
    - **New launches** — count of new coins, largest by market cap
@@ -95,5 +95,5 @@ Nothing unusual detected. Market is moderately active.
 - The CLI has no streaming mode. Each call is a single request-response.
 - Do not return raw JSON to the user. Synthesize into prose.
 - End every briefing with a plain-language assessment: "Market is [quiet/active/volatile]. [Notable signal or 'Nothing unusual.']"
-- `zora balances` is wallet-only (no address argument). If no wallet is configured, skip the holdings section silently.
+- `zora balance` is wallet-only (no address argument). If no wallet is configured, skip the holdings section silently.
 - Flag held coins that also appear in trending or gainers lists — this is the most actionable signal in a briefing.

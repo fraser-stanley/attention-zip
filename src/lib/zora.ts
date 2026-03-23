@@ -8,6 +8,8 @@ import {
   getFeaturedCreators,
   getTrendingAll,
   getTraderLeaderboard,
+  getCoinsLastTraded,
+  getCoinsLastTradedUnique,
 } from "@zoralabs/coins-sdk";
 
 const apiKey = process.env.ZORA_API_KEY;
@@ -22,7 +24,9 @@ export type SortOption =
   | "volume"
   | "gainers"
   | "creators"
-  | "featured";
+  | "featured"
+  | "last-traded"
+  | "last-traded-unique";
 
 export interface CoinNode {
   name?: string;
@@ -79,6 +83,8 @@ const QUERY_MAP: Record<SortOption, (count: number) => Promise<ExploreResponse>>
   gainers: (count) => getCoinsTopGainers({ count }) as Promise<ExploreResponse>,
   creators: (count) => getCreatorCoins({ count }) as Promise<ExploreResponse>,
   featured: (count) => getFeaturedCreators({ first: count }) as Promise<ExploreResponse>,
+  "last-traded": (count) => getCoinsLastTraded({ count }) as Promise<ExploreResponse>,
+  "last-traded-unique": (count) => getCoinsLastTradedUnique({ count }) as Promise<ExploreResponse>,
 };
 
 export async function fetchCoins(

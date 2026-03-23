@@ -35,14 +35,14 @@ Use when the user says:
 ## Commands
 
 ```bash
-zora balances --json                  # all coin holdings
-zora balances --sort usd-value --json     # sorted by USD value (highest first)
-zora balances --sort price-change --json  # sorted by 24h price change
+zora balance --json                  # all coin holdings
+zora balance --sort usd-value --json     # sorted by USD value (highest first)
+zora balance --sort price-change --json  # sorted by 24h price change
 ```
 
 ## How It Works
 
-1. Run `zora balances --json` to fetch all coin holdings from the local wallet
+1. Run `zora balance --json` to fetch all coin holdings from the local wallet
 2. Parse each holding: coin name, symbol, type, balance, USD value, market cap, 24h volume
 3. Present holdings with name, type, token balance, USD value, and 24h change
 4. Show total portfolio value as a sum of all holdings
@@ -71,10 +71,10 @@ Coins held: 3
 - Run `zora setup` to create a new wallet or import an existing private key.
 
 **"Balance shows nothing but I have tokens"**
-- `zora balances` shows **Zora coin holdings only** — NOT native ETH, USDC, or ZORA token balances. If the user asks about native tokens, explain this limitation.
+- `zora balance` shows **Zora coin holdings only** — NOT native ETH, USDC, or ZORA token balances. If the user asks about native tokens, explain this limitation.
 
 **"Can I check another wallet?"**
-- `zora balances` has no address argument. It reads from the local wallet at `~/.config/zora/wallet.json` only. For arbitrary address lookups, use the API route: `GET /api/agents/<address>`.
+- `zora balance` has no address argument. It reads from the local wallet at `~/.config/zora/wallet.json` only. For arbitrary address lookups, use the API route: `GET /api/agents/<address>`.
 
 ## Important Notes
 

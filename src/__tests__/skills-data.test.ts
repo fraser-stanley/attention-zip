@@ -86,7 +86,7 @@ describe("wraps CLI flag correctness", () => {
       );
       const getWraps = skill.wraps.filter((w) => w.includes("zora get"));
       const balancesWraps = skill.wraps.filter((w) =>
-        w.includes("zora balances")
+        w.includes("zora balance")
       );
       const buyWraps = skill.wraps.filter((w) => w.includes("zora buy"));
       const sellWraps = skill.wraps.filter((w) => w.includes("zora sell"));

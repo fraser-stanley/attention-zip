@@ -13,7 +13,7 @@ VALID_COMMANDS = {
     "zora get",
     "zora buy",
     "zora sell",
-    "zora balances",
+    "zora balance",
     "zora setup",
     "zora wallet",
 }
@@ -46,7 +46,7 @@ def assert_no_hallucinated_commands(output: str) -> bool:
     """Only references documented CLI commands."""
     # Extract all zora commands mentioned
     zora_commands = re.findall(r'zora\s+(\w+)', output.lower())
-    valid_subcommands = {"auth", "explore", "get", "buy", "sell", "balances", "setup", "wallet"}
+    valid_subcommands = {"auth", "explore", "get", "buy", "sell", "balance", "setup", "wallet"}
     
     for cmd in zora_commands:
         if cmd not in valid_subcommands:

@@ -4,6 +4,7 @@ import { type ExploreApiResponse, type SortOption } from "@/lib/zora";
 
 const VALID_SORTS: SortOption[] = [
   "trending", "mcap", "new", "volume", "gainers", "creators", "featured",
+  "last-traded", "last-traded-unique",
 ];
 const CACHE_CONTROL = "public, s-maxage=15, stale-while-revalidate=30";
 

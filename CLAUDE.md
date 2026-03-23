@@ -299,22 +299,22 @@ Run `pnpm test` to validate all skills against the AgentSkills spec. Tests cover
 - SKILL.md frontmatter fields and format
 - Required body sections present
 - Word count 300–800 per skill
-- CLI flag correctness (`--json` for explore/get/balances, `-o json` for buy/sell)
+- CLI flag correctness (`--json` for explore/get/balance, `-o json` for buy/sell)
 - clawhub.json schema validation
 - Cross-file sync (skills.ts IDs match SKILL.md names and directory names)
 - Execution skill safety (risk levels, buy/sell wraps, env requirements)
 
 ### CLI commands
 
-The Zora CLI has 8 commands: `auth`, `explore`, `get`, `buy`, `sell`, `balances`, `setup`, `wallet`.
+The Zora CLI has 8 commands: `auth`, `explore`, `get`, `buy`, `sell`, `balance`, `setup`, `wallet`.
 
 | Command | Syntax | Notes |
 |---------|--------|-------|
 | `zora explore` | `--sort <sort> --type <type> --limit <n> --json` | Sorts: mcap, volume, new, gainers, trending, featured, last-traded, last-traded-unique. Types: all, trend, creator-coin, post |
 | `zora get` | `zora get <identifier> [--type <type>] --json` | Identifier = 0x address or creator name. NOT ENS. Types: creator-coin, post, trend |
-| `zora buy` | `zora buy <address> --eth <amount> -o json` | Uses `-o json` (local flag), NOT `--json`. Also: --percent, --all, --quote (preview only), --yes (skip confirm) |
-| `zora sell` | `zora sell <address> --amount <tokens> -o json` | Uses `-o json` (local flag), NOT `--json`. Also: --percent, --all, --to <ETH\|USDC\|ZORA>, --quote, --yes |
-| `zora balances` | `zora balances --json` | **Local wallet only** — no address argument. Returns coin holdings (not native ETH/USDC/ZORA) |
+| `zora buy` | `zora buy <address> --eth <amount> -o json` | Uses `-o json` (local flag), NOT `--json`. Also: --usd, --token (eth/usdc/zora), --percent, --all, --quote (preview only), --yes (skip confirm), --slippage, --debug |
+| `zora sell` | `zora sell <address> --amount <tokens> -o json` | Uses `-o json` (local flag), NOT `--json`. Also: --usd, --token (alias for --to), --percent, --all, --to <ETH\|USDC\|ZORA>, --quote, --yes, --slippage, --debug |
+| `zora balance` | `zora balance [spendable\|coins] --json` | Subcommands: (none) = wallet + coins, `spendable` = ETH/USDC/ZORA only, `coins` = coin holdings with --sort |
 | `zora setup` | `zora setup [--create] [--force]` | Creates/imports wallet at ~/.config/zora/wallet.json |
 | `zora wallet` | `wallet info`, `wallet export`, `wallet backup` | Keychain-protected backup on macOS |
 | `zora auth` | `auth configure`, `auth status` | API key management |
@@ -328,16 +328,19 @@ The Zora CLI has 8 commands: `auth`, `explore`, `get`, `buy`, `sell`, `balances`
 - No watch/streaming mode. Single request, single response, exit.
 
 **CLI JSON output shapes:**
-- `explore --json`: `[{ name, address, coinType, marketCap, volume24h, marketCapDelta24h }]`
+- `explore --json`: `{ coins: [{ name, address, coinType, marketCap, volume24h, marketCapDelta24h }], pageInfo: { endCursor, hasNextPage } }`
 - `get --json`: `{ name, address, coinType, marketCap, volume24h, uniqueHolders, createdAt, creatorAddress, creatorHandle }`
-- `balances --json`: `[{ name, symbol, coinType, address, balance, usdValue, priceUsd, marketCap, volume24h }]`
-- `buy/sell --json`: `{ action, coin, address, spent/received, tx }` — `--quote` adds `estimated` and `slippage` instead of `tx`
+- `balance --json`: `{ wallet: [{ symbol, balance, usdValue, priceUsd }], coins: [{ rank, name, symbol, balance, usdValue, priceUsd, marketCap, marketCapChange24h, volume24h }] }`
+- `buy -o json`: `{ action, coin, address, spent: { amount, raw, symbol }, received: { amount, raw, symbol }, tx }` — `--quote` returns `estimated` and `slippage` instead of `received`/`tx`
+- `sell -o json`: `{ action, coin, address, sold: { amount, raw, symbol }, received: { amount, raw, symbol, source }, tx }` — `--quote` returns `estimated` and `slippage` instead
 
-**`zora balances` limitations:**
-- Returns **coin holdings only** — balance, USD value, market cap, volume per coin. No native ETH/USDC/ZORA.
+**`zora balance` subcommands:**
+- `zora balance` — returns both wallet tokens (ETH/USDC/ZORA) and coin positions
+- `zora balance spendable` — ETH/USDC/ZORA balances only
+- `zora balance coins` — coin holdings with sorting (--sort usd-value, balance, market-cap, price-change)
 - **Local wallet only** — reads from configured private key, no address argument.
 - For arbitrary wallet lookups, use SDK (`getProfileBalances`, `getProfileCoins`).
-- Portfolio Scout wraps both: `zora balances` for the local wallet, SDK for any address.
+- Portfolio Scout wraps `zora balance` for the local wallet, SDK for any address.
 
 ### Wallet setup
 

@@ -1,6 +1,6 @@
 # Zora Agent Skills
 
-Agent skills for the Zora attention market. Open source, no custody.
+Managed agent skills for the Zora attention market. Open source, no custody.
 
 ## Quick start
 
@@ -15,31 +15,36 @@ Open http://localhost:3000.
 
 ## Skills
 
-Five published skills. Each skill directory contains a `SKILL.md` (agent instructions, OpenClaw format) and `clawhub.json` (runtime config).
+Five managed skills. Each skill directory contains:
 
-| Skill | Description | Type |
-|-------|-------------|------|
-| [trend-scout](trend-scout/) | Trending topic coins, new trend launches, volume and mcap leaders | Read-only |
-| [creator-pulse](creator-pulse/) | Creator coin ecosystems, featured creators, watchlists | Read-only |
-| [briefing-bot](briefing-bot/) | Structured morning/evening market digest | Read-only |
-| [portfolio-scout](portfolio-scout/) | Coin holdings and portfolio value (local wallet or any address via SDK) | Read-only |
-| [momentum-trader](momentum-trader/) | Auto-buys trending Zora coins on momentum signals via Zora CLI | Execution |
+- `SKILL.md` for agent-facing instructions
+- `clawhub.json` for runtime metadata, cron, env, and tunables
+- `scripts/run.mjs` as the managed entrypoint
+- `scripts/validate.sh` for local validation
 
-Read-only skills need no wallet. Momentum Trader requires a dedicated trader wallet created with `zora setup`.
+| Skill                               | Description                                                             | Type      |
+| ----------------------------------- | ----------------------------------------------------------------------- | --------- |
+| [trend-scout](trend-scout/)         | Scheduled trend scan with snapshot diffing and watchlist alerts         | Read-only |
+| [creator-pulse](creator-pulse/)     | Featured creator scan with watchlist and holder-change alerts           | Read-only |
+| [briefing-bot](briefing-bot/)       | Scheduled market digest with optional portfolio overlap                 | Read-only |
+| [portfolio-scout](portfolio-scout/) | Wallet-backed portfolio monitor with concentration and drawdown checks  | Read-only |
+| [momentum-trader](momentum-trader/) | Dry-run-first momentum loop with quotes, daily caps, and trailing exits | Execution |
+
+Trend Scout, Creator Pulse, and Briefing Bot do not need a wallet. Portfolio Scout and Momentum Trader need a dedicated wallet configured through `zora setup` or `ZORA_PRIVATE_KEY`.
 
 ## API
 
 Agent-facing endpoints. All responses include cache headers.
 
-| Endpoint | Description |
-|----------|-------------|
-| `GET /api` | Discovery document |
-| `GET /api/skills` | Skill catalog (`?id=<skill-id>` for single lookup) |
-| `GET /api/explore` | Live coin data (`?sort=trending\|mcap\|new\|volume\|gainers\|creators\|featured`, `?count=1-20`) |
-| `GET /api/leaderboard` | Weekly trader rankings (`?count=1-50`) |
-| `GET /api/agents/<address>` | Agent profile (balances, coins, volume, rank) |
-| `GET /skills/<id>/skill-md` | Raw SKILL.md content for agent consumption |
-| `GET /.well-known/ai.json` | Agent discovery metadata |
+| Endpoint                    | Description                                                                                      |
+| --------------------------- | ------------------------------------------------------------------------------------------------ |
+| `GET /api`                  | Discovery document                                                                               |
+| `GET /api/skills`           | Skill catalog (`?id=<skill-id>` for single lookup)                                               |
+| `GET /api/explore`          | Live coin data (`?sort=trending\|mcap\|new\|volume\|gainers\|creators\|featured`, `?count=1-20`) |
+| `GET /api/leaderboard`      | Weekly trader rankings (`?count=1-50`)                                                           |
+| `GET /api/agents/<address>` | Agent profile (balances, coins, volume, rank)                                                    |
+| `GET /skills/<id>/skill-md` | Raw SKILL.md content for agent consumption                                                       |
+| `GET /.well-known/ai.json`  | Agent discovery metadata                                                                         |
 
 ## Project structure
 
@@ -65,20 +70,24 @@ src/
 
 ```bash
 pnpm dev          # dev server at localhost:3000
-pnpm build        # production build (TypeScript + Next.js compilation)
-pnpm test         # vitest (skill structure, data integrity, cross-file sync)
+pnpm typecheck    # direct TypeScript check (tsc --noEmit)
 pnpm lint         # eslint
+pnpm test         # vitest, including managed skill entrypoint integration
+pnpm build        # production build (TypeScript + Next.js compilation)
 ```
 
-`pnpm build` is the primary verification gate.
+Merge gate: `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm build`.
+
+`pnpm build` remains the primary production verification gate, while `src/__tests__/skill-entrypoints.test.ts` covers the managed `scripts/run.mjs` workers with a stubbed `zora` binary, isolated `HOME`, and state/journal assertions. The per-skill `scripts/validate.sh` checks still require the installed `zora` CLI to be on your shell `PATH`, meaning `command -v zora` and `zora --help` should work, and wallet-backed skills also require a configured wallet.
 
 ## Environment
 
-| Variable | Required | Description |
-|----------|----------|-------------|
-| `ZORA_API_KEY` | No | Higher rate limits. Get one at https://zora.co/settings/developer |
+| Variable           | Required        | Description                                                       |
+| ------------------ | --------------- | ----------------------------------------------------------------- |
+| `ZORA_API_KEY`     | No              | Higher rate limits. Get one at https://zora.co/settings/developer |
+| `ZORA_PRIVATE_KEY` | Skill-dependent | Needed for wallet-backed skills and live trading                  |
 
-Execution skills need `ZORA_API_KEY` and `ZORA_PRIVATE_KEY`. See each skill's `clawhub.json` for required env vars.
+Skill-specific env vars and tunables live in each `clawhub.json`. Momentum Trader is dry-run by default and only goes live when `ZORA_MOMENTUM_LIVE=true`.
 
 ## Deploy
 
@@ -90,13 +99,13 @@ Set `ZORA_API_KEY` in Vercel environment variables.
 
 ## Documentation
 
-| File | Purpose |
-|------|---------|
-| [CLAUDE.md](CLAUDE.md) | Full project reference: architecture, SDK details, CLI commands, key decisions |
-| [AGENTS.md](AGENTS.md) | Agent contributor guide: SDK queries, pitfalls, how to add skills/pages |
-| [TONE.md](TONE.md) | Copy guidelines and Zora brand principles |
-| [LEARNINGS.md](LEARNINGS.md) | Architectural decisions and trade-offs |
-| [CHANGELOG.md](CHANGELOG.md) | Release history |
+| File                         | Purpose                                                                        |
+| ---------------------------- | ------------------------------------------------------------------------------ |
+| [CLAUDE.md](CLAUDE.md)       | Full project reference: architecture, SDK details, CLI commands, key decisions |
+| [AGENTS.md](AGENTS.md)       | Agent contributor guide: SDK queries, pitfalls, how to add skills/pages        |
+| [TONE.md](TONE.md)           | Copy guidelines and Zora brand principles                                      |
+| [LEARNINGS.md](LEARNINGS.md) | Architectural decisions and trade-offs                                         |
+| [CHANGELOG.md](CHANGELOG.md) | Release history                                                                |
 
 ## Tech stack
 

@@ -1,12 +1,36 @@
 {
   "emoji": "📡",
   "requires": {
-    "bins": ["zora"]
+    "bins": ["zora", "node"]
   },
-  "cron": null,
+  "cron": "*/30 * * * *",
   "autostart": false,
   "automaton": {
-    "managed": false,
-    "entrypoint": null
-  }
+    "managed": true,
+    "entrypoint": "scripts/run.mjs"
+  },
+  "tunables": [
+    {
+      "env": "ZORA_TREND_LIMIT",
+      "type": "number",
+      "default": 8,
+      "range": [3, 20],
+      "step": 1,
+      "label": "Results per scan"
+    },
+    {
+      "env": "ZORA_TREND_MIN_VOLUME_USD",
+      "type": "number",
+      "default": 0,
+      "range": [0, 1000000],
+      "step": 5000,
+      "label": "Minimum 24h volume"
+    },
+    {
+      "env": "ZORA_TREND_WATCHLIST",
+      "type": "string",
+      "default": "",
+      "label": "Comma-separated watchlist"
+    }
+  ]
 }

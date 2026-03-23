@@ -3,24 +3,26 @@ set -euo pipefail
 
 echo "Validating momentum-trader..."
 
-if ! command -v zora &>/dev/null; then
-  echo "FAIL: zora CLI not found. Install with: npm install -g @zoralabs/cli"
+command -v zora >/dev/null || {
+  echo "FAIL: zora CLI not found."
+  exit 1
+}
+echo "  ok zora CLI installed"
+
+command -v node >/dev/null || {
+  echo "FAIL: node not found."
+  exit 1
+}
+echo "  ok node installed"
+
+node --check scripts/run.mjs >/dev/null
+echo "  ok entrypoint parses"
+
+if ! zora wallet info >/dev/null 2>&1; then
+  echo "FAIL: no wallet configured. Run 'zora setup --create' or set ZORA_PRIVATE_KEY."
   exit 1
 fi
-echo "  ✓ zora CLI installed"
+echo "  ok wallet available"
 
-if ! zora auth status &>/dev/null; then
-  echo "FAIL: API key not configured. Required for trading. Run: zora auth configure"
-  exit 1
-fi
-echo "  ✓ API key configured"
-
-if ! zora wallet info &>/dev/null; then
-  echo "FAIL: No wallet configured. Create a dedicated trader wallet: zora setup --create"
-  exit 1
-fi
-echo "  ✓ Wallet configured"
-
-echo ""
 echo "PASS: momentum-trader ready"
-echo "  ⚠ This skill executes real trades with real ETH. Use --quote for dry-runs."
+echo "  note live trading stays off until ZORA_MOMENTUM_LIVE=true"

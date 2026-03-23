@@ -16,11 +16,17 @@ function serializeSkill(skill: Skill) {
     name: skill.name,
     description: skill.description,
     longDescription: skill.longDescription,
+    category: skill.category,
+    difficulty: skill.difficulty,
     risk: skill.risk,
     riskLabel: skill.riskLabel,
+    bestWhen: skill.bestWhen,
+    tags: skill.tags,
+    requires: skill.requires,
+    automation: skill.automation,
     install: getSkillRuntimeCommands(skill, baseUrl),
     monitors: skill.monitors,
-    wraps: skill.wraps,
+    commands: skill.commands,
     actionPrompt: skill.actionPrompt,
     samplePrompt: skill.samplePrompt,
     sampleOutput: skill.sampleOutput,
@@ -44,7 +50,7 @@ export async function GET(request: NextRequest) {
           headers: {
             "Cache-Control": CACHE_CONTROL,
           },
-        }
+        },
       );
     }
 
@@ -54,7 +60,7 @@ export async function GET(request: NextRequest) {
         headers: {
           "Cache-Control": CACHE_CONTROL,
         },
-      }
+      },
     );
   }
 
@@ -64,6 +70,6 @@ export async function GET(request: NextRequest) {
       headers: {
         "Cache-Control": CACHE_CONTROL,
       },
-    }
+    },
   );
 }

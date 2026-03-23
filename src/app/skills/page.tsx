@@ -6,7 +6,7 @@ import { getSiteUrl, toAbsoluteUrl, breadcrumbJsonLd } from "@/lib/site";
 export const metadata: Metadata = {
   title: "Verified Agent Skills for Zora",
   description:
-    "Browse verified agent skills for the Zora attention market. Trending coins, creator analytics, market briefs, portfolio tracking, and momentum trading.",
+    "Browse managed agent skills for the Zora attention market. Trend scans, creator watchlists, briefings, portfolio checks, and momentum trading.",
   alternates: { canonical: "/skills" },
 };
 
@@ -14,26 +14,25 @@ const howToJsonLd = {
   "@context": "https://schema.org",
   "@type": "HowTo",
   name: "How to install an agent skill for Zora",
-  description:
-    "Install a verified agent skill in your AI coding agent.",
+  description: "Install a managed Zora skill in your agent runtime.",
   step: [
     {
       "@type": "HowToStep",
       position: 1,
-      name: "Paste the command",
-      text: "Copy the command for your runtime. Runs in your terminal.",
+      name: "Install the skill",
+      text: "Copy the install command for your runtime or clone the skill source.",
     },
     {
       "@type": "HowToStep",
       position: 2,
-      name: "Your agent reads the skill",
-      text: "It fetches the SKILL.md and learns the commands.",
+      name: "Set the needed configuration",
+      text: "Review the env vars, schedule, and entrypoint before you run it.",
     },
     {
       "@type": "HowToStep",
       position: 3,
-      name: "Try it",
-      text: "Ask a question. The skill handles the rest.",
+      name: "Run or schedule it",
+      text: "Trigger the entrypoint manually first, then turn on the cron loop.",
     },
   ],
 };
@@ -60,12 +59,12 @@ export default function SkillsPage() {
         price: "0",
         priceCurrency: "USD",
       },
-      featureList: [...skill.monitors, ...skill.wraps],
+      featureList: [...skill.monitors, ...skill.commands],
       keywords: skill.badges.join(", "),
       url: toAbsoluteUrl(`/skills#${skill.id}`),
       downloadUrl: `${baseUrl}/skills/${skill.id}/skill-md`,
       codeRepository: skill.githubUrl,
-      installUrl: commands.claude,
+      installUrl: commands.openclaw,
     };
   });
 
@@ -89,21 +88,22 @@ export default function SkillsPage() {
             <p className="type-label text-muted-foreground">01</p>
             <h2 className="type-label text-foreground">Paste the command</h2>
             <p className="type-body-sm text-muted-foreground">
-              Copy the command for your runtime. Runs in your terminal.
+              Copy the install command for your runtime or clone the skill
+              source.
             </p>
           </div>
           <div className="space-y-1.5">
             <p className="type-label text-muted-foreground">02</p>
-            <h2 className="type-label text-foreground">Your agent reads the skill</h2>
+            <h2 className="type-label text-foreground">Review the setup</h2>
             <p className="type-body-sm text-muted-foreground">
-              It fetches the SKILL.md and learns the commands.
+              Check the env vars, schedule, and entrypoint before you run it.
             </p>
           </div>
           <div className="space-y-1.5">
             <p className="type-label text-muted-foreground">03</p>
-            <h2 className="type-label text-foreground">Try it</h2>
+            <h2 className="type-label text-foreground">Run the skill</h2>
             <p className="type-body-sm text-muted-foreground">
-              Ask a question. The skill handles the rest.
+              Trigger the entrypoint once, then move it onto a schedule.
             </p>
           </div>
         </section>

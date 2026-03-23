@@ -17,7 +17,12 @@ import { useToast } from "@/components/toast";
 import { useExpandableMemory } from "@/hooks/use-expandable-memory";
 import { useSessionStorageState } from "@/hooks/use-session-storage-state";
 import { useInstalledSkills } from "@/lib/installed-skills-context";
-import { getInstallAllCommands, getSkillRuntimeCommands, type Runtime, type Skill } from "@/lib/skills";
+import {
+  getInstallAllCommands,
+  getSkillRuntimeCommands,
+  type Runtime,
+  type Skill,
+} from "@/lib/skills";
 import { getSiteUrl } from "@/lib/site";
 import { cn } from "@/lib/utils";
 
@@ -58,7 +63,14 @@ function useTypewriter(text: string, active: boolean, speed = 12) {
 
 const RUNTIME_STORAGE_KEY = "zora:skills-runtime";
 
-const RUNTIMES: Runtime[] = ["openclaw", "claude", "amp", "codex", "opencode", "cursor"];
+const RUNTIMES: Runtime[] = [
+  "openclaw",
+  "claude",
+  "amp",
+  "codex",
+  "opencode",
+  "cursor",
+];
 
 const RUNTIME_LABELS: Record<Runtime, string> = {
   openclaw: "OpenClaw",
@@ -77,6 +89,11 @@ function isRuntime(value: string | null): value is Runtime {
 
 const PRE_BLOCK_CLASS =
   "border border-border bg-foreground/5 px-4 py-3 font-mono text-sm text-foreground/80 whitespace-pre-wrap break-all";
+
+function formatRequirementList(skill: Skill) {
+  const values = [...skill.requires.bins, ...skill.requires.env];
+  return values.length > 0 ? values.join(", ") : "None";
+}
 
 function TerminalOutput({
   id,
@@ -102,9 +119,7 @@ function TerminalOutput({
       className={`h-64 overflow-y-auto ${PRE_BLOCK_CLASS}`}
     >
       {displayed}
-      {!typingDone && (
-        <span className="animate-blink">&#9608;</span>
-      )}
+      {!typingDone && <span className="animate-blink">&#9608;</span>}
     </pre>
   );
 }
@@ -186,19 +201,17 @@ function RuntimeInstallCard({
 
 type InstallState = "idle" | "installing" | "installed";
 
-function InstallButton({
-  skill,
-  command,
-}: {
-  skill: Skill;
-  command: string;
-}) {
+function InstallButton({ skill, command }: { skill: Skill; command: string }) {
   const { isInstalled, install, uninstall, hydrated } = useInstalledSkills();
   const { toast } = useToast();
   const [installing, setInstalling] = useState(false);
   const timerRef = useRef<number | null>(null);
   const installed = hydrated && isInstalled(skill.id);
-  const state: InstallState = installing ? "installing" : installed ? "installed" : "idle";
+  const state: InstallState = installing
+    ? "installing"
+    : installed
+      ? "installed"
+      : "idle";
 
   useEffect(() => {
     return () => {
@@ -224,7 +237,9 @@ function InstallButton({
   }
 
   if (!hydrated) {
-    return <div className="h-[44px] w-full max-w-40 border border-border bg-muted/50 animate-pulse" />;
+    return (
+      <div className="h-[44px] w-full max-w-40 border border-border bg-muted/50 animate-pulse" />
+    );
   }
 
   if (state === "installed") {
@@ -238,7 +253,7 @@ function InstallButton({
           type="button"
           className={cn(
             buttonVariants({ variant: "outline" }),
-            "border-red-500/20 text-red-500 hover:border-red-500/30 hover:bg-red-500/10 hover:text-red-500"
+            "border-red-500/20 text-red-500 hover:border-red-500/30 hover:bg-red-500/10 hover:text-red-500",
           )}
           onClick={handleUninstall}
         >
@@ -260,7 +275,9 @@ function InstallButton({
       ) : (
         <PlusIcon size={14} />
       )}
-      <TextMorph>{state === "installing" ? "Installing..." : "Install"}</TextMorph>
+      <TextMorph>
+        {state === "installing" ? "Installing..." : "Install"}
+      </TextMorph>
     </AnimatedButton>
   );
 }
@@ -277,31 +294,36 @@ function SkillRow({
   const outputId = useId();
   const commands = getSkillRuntimeCommands(skill, getSiteUrl());
   const command = commands[runtime];
+  const manualCommand = commands.manual;
   const { expanded: expandedOutput, toggleExpanded: toggleOutput } =
     useExpandableMemory(`zora:skill-output:${skill.id}`);
-  const isExecution = skill.risk !== "none";
   const { displayed, done: typingDone } = useTypewriter(
     skill.sampleOutput ?? "",
     expandedOutput,
   );
 
   return (
-    <section
-      className="scroll-mt-32 py-10 sm:py-14"
-      id={skill.id}
-    >
+    <section className="scroll-mt-32 py-10 sm:py-14" id={skill.id}>
       {index !== 0 && (
-        <p aria-hidden="true" className="type-caption -mt-10 mb-10 select-none text-border tracking-[0.35em] sm:-mt-14 sm:mb-14">
+        <p
+          aria-hidden="true"
+          className="type-caption -mt-10 mb-10 select-none text-border tracking-[0.35em] sm:-mt-14 sm:mb-14"
+        >
           {"- ".repeat(40).trim()}
         </p>
       )}
       <div className="max-w-3xl space-y-4">
         {/* Name + description */}
         <h2 className="type-title">{skill.name}</h2>
-        <p className="type-body text-muted-foreground">{skill.longDescription}</p>
+        <p className="type-body text-muted-foreground">
+          {skill.longDescription}
+        </p>
+        <p className="type-caption font-mono text-muted-foreground">
+          Best when: {skill.bestWhen}
+        </p>
 
-        {/* Badges — execution skills only */}
-        {isExecution && (
+        {/* Badges */}
+        {skill.badges.length > 0 && (
           <div className="flex flex-wrap items-center gap-1.5">
             {skill.badges.map((badge) => (
               <Badge
@@ -311,7 +333,7 @@ function SkillRow({
                   "type-caption font-normal",
                   badge === "Execution"
                     ? "border-transparent bg-[#FF00F0] text-black"
-                    : ""
+                    : "",
                 )}
               >
                 {badge}
@@ -323,16 +345,52 @@ function SkillRow({
         {/* Install command */}
         <CopyableCodeBlock command={command} />
         <p className="type-caption font-mono text-muted-foreground/60">
-          Or download manually:{" "}
-          <code className="select-all">{commands.curl}</code>
+          Or clone the source:{" "}
+          <code className="select-all">{manualCommand}</code>
         </p>
+
+        <div className="grid gap-3 sm:grid-cols-2">
+          <div className="border border-border bg-foreground/[0.03] px-4 py-3">
+            <p className="type-label mb-1 text-muted-foreground">Automation</p>
+            <p className="type-body-sm text-foreground">
+              {skill.automation.managed ? "Managed entrypoint" : "Manual skill"}
+            </p>
+            <p className="type-caption font-mono text-muted-foreground">
+              {skill.automation.entrypoint ?? "No entrypoint"}
+            </p>
+          </div>
+          <div className="border border-border bg-foreground/[0.03] px-4 py-3">
+            <p className="type-label mb-1 text-muted-foreground">Schedule</p>
+            <p className="type-body-sm text-foreground">
+              {skill.automation.cron ?? "Run on demand"}
+            </p>
+            <p className="type-caption text-muted-foreground">
+              {skill.automation.dryRunByDefault
+                ? "Dry-run by default"
+                : "Live reads only"}
+            </p>
+          </div>
+          <div className="border border-border bg-foreground/[0.03] px-4 py-3">
+            <p className="type-label mb-1 text-muted-foreground">Needs</p>
+            <p className="type-caption font-mono text-muted-foreground">
+              {formatRequirementList(skill)}
+            </p>
+          </div>
+          <div className="border border-border bg-foreground/[0.03] px-4 py-3">
+            <p className="type-label mb-1 text-muted-foreground">Category</p>
+            <p className="type-body-sm text-foreground">
+              {skill.category} / {skill.difficulty}
+            </p>
+            <p className="type-caption text-muted-foreground">
+              {skill.riskLabel}
+            </p>
+          </div>
+        </div>
 
         {/* Commands — always visible */}
         <div>
           <p className="type-label mb-2 text-muted-foreground">Commands</p>
-          <pre className={PRE_BLOCK_CLASS}>
-            {skill.wraps.join("\n")}
-          </pre>
+          <pre className={PRE_BLOCK_CLASS}>{skill.commands.join("\n")}</pre>
         </div>
 
         {/* Actions: buttons */}
@@ -343,7 +401,7 @@ function SkillRow({
             className={cn(
               buttonVariants({ variant: "outline" }),
               "w-[7.5rem]",
-              "aria-expanded:bg-background aria-expanded:text-foreground aria-expanded:border-foreground"
+              "aria-expanded:bg-background aria-expanded:text-foreground aria-expanded:border-foreground",
             )}
             aria-expanded={expandedOutput}
             aria-controls={outputId}
@@ -377,7 +435,11 @@ function SkillRow({
 
         {/* Expandable sample output — fixed-height terminal with auto-scroll */}
         {expandedOutput ? (
-          <TerminalOutput id={outputId} displayed={displayed} typingDone={typingDone} />
+          <TerminalOutput
+            id={outputId}
+            displayed={displayed}
+            typingDone={typingDone}
+          />
         ) : null}
       </div>
     </section>
@@ -417,7 +479,12 @@ export function SkillsInstallList({
 
       <div>
         {skills.map((skill, index) => (
-          <SkillRow key={skill.id} skill={skill} runtime={runtime} index={index} />
+          <SkillRow
+            key={skill.id}
+            skill={skill}
+            runtime={runtime}
+            index={index}
+          />
         ))}
       </div>
     </div>

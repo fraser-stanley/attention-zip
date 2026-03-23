@@ -1,84 +1,88 @@
 ---
 name: creator-pulse
-description: Track creator coin ecosystems and featured creators on Zora. Use when your human asks about specific creators, creator coins, or wants a watchlist.
+description: Run a managed creator-coin watchlist on Zora. Use when your human wants recurring updates on featured creators, creator-coin momentum, or watchlist changes without trading.
 metadata:
   author: "Zora Agent Skills"
-  version: "1.0.0"
+  version: "2.0.0"
   displayName: "Creator Pulse"
-  difficulty: "beginner"
+  difficulty: "intermediate"
 ---
 
 # Creator Pulse
 
-Track creator coin ecosystems and featured creators on Zora. Monitor volume spikes and holdings changes for specific creators.
+Creator Pulse is a managed creator-coin watcher. It scans featured, trending, and top-volume creator coins, then checks named creators or addresses against the previous run.
 
 ## When to Use This Skill
 
-Use when the user asks about:
-- A specific creator or their coin
-- Featured or top creators on Zora
-- Creator coin rankings by market cap or volume
-- Watchlist tracking for creators they follow
+Use this skill when the user asks for:
+
+- Featured creator updates
+- A recurring creator-coin watchlist
+- Alerts on volume or holder-count changes
+- A short report on which creators are gaining traction
+- A read-only creator workflow before doing trades or research
 
 ## Setup
 
-1. Install the Zora CLI: `npm install -g @zoralabs/cli`
-2. (Optional) Configure an API key to reduce rate limiting: `zora auth configure`
-3. No wallet needed. This skill is read-only.
+1. Install the Zora CLI and make sure `node` is available.
+2. Run `./scripts/validate.sh` in this folder.
+3. Set `ZORA_CREATOR_WATCHLIST` if you want per-creator alerts.
+4. An API key is optional. It helps if you run the skill on a tight cron.
 
 ## Configuration
 
-| Setting | Flag | Default | Description |
-|---------|------|---------|-------------|
-| Limit | `--limit` | `10` | Results per query (1-20) |
-| Type | `--type` | `creator-coin` | Filter to creator coins |
-| Sort | `--sort` | `mcap` | One of: `mcap`, `volume`, `featured` |
+| Env                           | Default | Description                                  |
+| ----------------------------- | ------- | -------------------------------------------- |
+| `ZORA_CREATOR_LIMIT`          | `8`     | Number of rows fetched per creator view      |
+| `ZORA_CREATOR_MIN_VOLUME_USD` | `0`     | Filters thin rows out of the report          |
+| `ZORA_CREATOR_WATCHLIST`      | empty   | Comma-separated creator handles or addresses |
+
+The manifest schedules the skill every 30 minutes. Leave `autostart` off until the watchlist looks right.
 
 ## Commands
 
 ```bash
-zora explore --type creator-coin --json                          # all creator coins by market cap
-zora explore --sort featured --type creator-coin --json          # Zora-curated featured creators
-zora explore --sort volume --type creator-coin --limit 5 --json  # top volume creator coins
-zora get <creator-name> --json                                   # lookup by creator name
-zora get <address> --type creator-coin --json                    # lookup by contract address
+node scripts/run.mjs
+zora explore --sort featured --type creator-coin --limit 8 --json
+zora explore --sort trending --type creator-coin --limit 8 --json
+zora explore --sort volume --type creator-coin --limit 8 --json
+zora get <handle-or-address> --type creator-coin --json
 ```
 
 ## How It Works
 
-1. Fetch creator coins using the appropriate sort and type filter
-2. Present each creator coin with name, market cap, holder count, 24h volume, and 24h change
-3. For watchlist alerts, compare `marketCapDelta24h` and `volume24h` between checks to detect spikes
-4. Drill into a specific creator with `zora get` for detailed stats
+The entrypoint pulls three creator views through the CLI, filters the rows, and stores the featured creator ids plus the latest watchlist metrics in `~/.config/zora-agent-skills/creator-pulse/state.json`.
+
+When a watchlist is configured, it resolves each handle or address through `zora get --type creator-coin --json`. The runtime compares the new values against the saved state and alerts when volume moves by at least 10% or holder count moves by at least 25 accounts. It also flags creators that enter the featured view between runs.
+
+This is a template. The default thresholds are conservative so the report stays readable. Remix it by changing the watchlist, the alert thresholds inside `scripts/run.mjs`, or the output format that gets handed to the human.
 
 ## Example Output
 
-```
-Featured creators update:
+```text
+Creator Pulse
+Run at 2026-03-23T13:30:00Z
 
-1. jacob (creator-coin) — $8.1M mcap, -3.4% 24h
-   Holders: 2,341 | Volume: $1.2M
+Featured creators:
+1. jacob, $8.1M, $1.2M volume, 2,341 holders
+2. alysaliu, $4.2M, $890.3K volume, 1,890 holders
 
-2. alysaliu (creator-coin) — $4.2M mcap, +5.7% 24h
-   Holders: 1,890 | Volume: $890.3K
-
-Watchlist alert:
-⚠ jacob saw a 15% volume increase in the last hour.
+Watchlist alerts:
+- jacob volume moved +14.8% since the last run
+- alysaliu holder count moved +67
 ```
 
 ## Troubleshooting
 
-**No results for a creator name**
-- `zora get` accepts creator names or 0x addresses. ENS names are not supported.
+If a handle lookup fails, try the coin contract address. Address lookups are stricter and avoid ambiguity.
 
-**Missing holder or swap data**
-- `zora get` returns `uniqueHolders` and `volume24h` but NOT a swap list or holder breakdown. Do not promise detailed holder analytics.
+If the report is too noisy, raise the volume floor or shorten the watchlist. Creator Pulse works best when it tracks a small set of creators with real intent.
 
-**`--sort featured` returns error with certain types**
-- `--sort featured` supports `--type creator-coin` and `--type post` only.
+If the CLI starts returning rate-limit errors, slow the cron or add an API key.
 
 ## Important Notes
 
-- To build a watchlist, fetch the full list periodically and compare `volume24h` and `marketCapDelta24h` across checks.
-- Compute percentage change: `marketCapDelta24h / (marketCap - marketCapDelta24h) * 100`
-- All data is public on-chain data. No wallet or keys needed.
+- This skill is read-only. It never calls `buy` or `sell`.
+- Watchlist alerts depend on local state. Clearing the state file resets the baseline.
+- Creator Pulse focuses on creator coins. It does not try to monitor trend or post coins.
+- Use a short watchlist. The best output is a handful of creators, not a directory.

@@ -11,7 +11,7 @@ function getSteps() {
       number: "01",
       title: "Paste the command",
       description:
-        "Run this in your terminal. Then review the entrypoint and env vars.",
+        "Run this in your terminal. Then check the entrypoint and env vars.",
       command: commands.claude,
       prefix: "$",
     },

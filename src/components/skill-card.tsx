@@ -49,10 +49,7 @@ export function SkillCard({ skill, href }: SkillCardProps) {
           <p className="text-sm text-muted-foreground peer-hover/link:text-background/70">
             {skill.description}
           </p>
-          <div className="flex items-center justify-between pt-1">
-            <span className="type-caption text-muted-foreground font-mono peer-hover/link:text-background/50">
-              {skill.installs.toLocaleString()} installs
-            </span>
+          <div className="flex items-center justify-end pt-1">
             <div className="relative z-10">
               {installed ? (
                 <button

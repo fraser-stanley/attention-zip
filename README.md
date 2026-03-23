@@ -5,7 +5,7 @@ Managed agent skills for the Zora attention market. Open source, no custody.
 ## Quick start
 
 ```bash
-git clone git@github.com:fraserstanley/zora-agent-skills.git
+git clone git@github.com:fraser-stanley/zora-agent-skills.git
 cd zora-agent-skills
 pnpm install
 pnpm dev
@@ -86,6 +86,7 @@ Merge gate: `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm build`.
 | ------------------ | --------------- | ----------------------------------------------------------------- |
 | `ZORA_API_KEY`     | No              | Higher rate limits. Get one at https://zora.co/settings/developer |
 | `ZORA_PRIVATE_KEY` | Skill-dependent | Needed for wallet-backed skills and live trading                  |
+| `NEXT_PUBLIC_SITE_URL` | No          | Canonical site URL outside Vercel                                 |
 
 Skill-specific env vars and tunables live in each `clawhub.json`. Momentum Trader is dry-run by default and only goes live when `ZORA_MOMENTUM_LIVE=true`.
 
@@ -95,7 +96,12 @@ Skill-specific env vars and tunables live in each `clawhub.json`. Momentum Trade
 vercel
 ```
 
-Set `ZORA_API_KEY` in Vercel environment variables.
+For a stakeholder build on Vercel:
+
+- Set `ZORA_API_KEY` for better rate limits. The app still builds and falls back safely without it.
+- You do not need `ZORA_PRIVATE_KEY` unless you are testing wallet-backed skills outside the mocked portfolio flow.
+- `/dashboard` and `/leaderboard` use live SDK data with mock fallback if upstream data is empty or unavailable.
+- The wallet connect flow, portfolio experience, and activity ticker are still mocked intentionally for demo use.
 
 ## Documentation
 

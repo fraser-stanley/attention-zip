@@ -2,13 +2,21 @@
 
 Decisions, trade-offs, and context that aren't obvious from the code.
 
+## 2026-03-23 — Stakeholder-ready install surface
+
+### Default to a runtime that actually works
+The top-level install surface should default to an executable path, not a placeholder. Claude Code is the best current default because the `claude -p "Read <url>..."` commands are usable today. OpenClaw can stay as a forward-looking runtime tab, but it should not be the first command stakeholders see.
+
+### Skill rows scan better when supporting detail is hidden
+The automation/schedule/needs/category grid added too much visual bookkeeping. The stronger hierarchy is: what the skill does, when to use it, how to install it, then an optional `More info` disclosure for commands and sample output. This keeps the page readable without removing depth entirely.
+
 ## 2026-03-19 — Unified install card + runtime tabs
 
 ### TabsList base class override
 The shadcn/ui `TabsList` component applies `gap-1 bg-muted p-1` in its base className. When overriding with `bg-transparent p-0`, the `gap-1` still applies unless explicitly zeroed with `gap-0`. This created a visible gap on the left side of the first tab in the `RuntimeInstallCard`. Always override all three properties (`gap-0 bg-transparent p-0`) when restyling `TabsList` as a flush container.
 
 ### Install commands are agent prompts, not shell commands
-The Zora CLI has no `install` or `skills` subcommand. What we call "install" is actually a prompt instruction: `claude -p "Read <url> and <action>"`. The SKILL.md is served from the domain at `/skills/[id]/skill-md` so URLs work in all environments. OpenClaw is the exception — it has a real `clawhub install <skill-id>` command.
+The Zora CLI has no `install` or `skills` subcommand. What we call "install" is actually a prompt instruction: `claude -p "Read <url> and <action>"`. The SKILL.md is served from the domain at `/skills/[id]/skill-md` so URLs work in all environments. OpenClaw can remain as a runtime tab, but it should be treated as a forward-looking path rather than the default install surface.
 
 ### Activity ticker belongs in root layout
 The ticker was originally homepage-only, then moved to `HeroSection`. It makes more sense in the root layout directly under the nav so it appears on every page without each page importing it. Borders were removed since the nav already provides a visual boundary above.
@@ -27,7 +35,7 @@ If a modal backdrop is `absolute` or `fixed`, make the panel container positione
 ## 2026-03-17 — Zora CLI integration + Momentum Trader
 
 ### Install commands are CLI-first now
-We moved from per-skill install commands (`claude skill add <github-url>`) to a single `npx zora-cli install` for all skills. The CLI is the execution layer — skills are capabilities within it, not standalone packages. OpenClaw tab uses `npx skills add zora-cli`. Manual tab keeps `curl -O` for the raw SKILL.md.
+We moved away from fake package-install syntax to runtime-specific prompt helpers that point to hosted SKILL.md files and source-backed entrypoints. The install surface is about giving each agent runtime enough context to mirror the skill locally, not pretending these skills are published packages.
 
 ### Momentum Trader is the first execution skill
 All prior skills were `risk: "none"` / read-only. Momentum Trader is `risk: "medium"` and wraps `zora buy` / `zora sell`. The trust page's "Trader" wallet preset already covers the safety model (bounded funds, dedicated wallet). The skill references `zora setup` for wallet creation — the CLI creates its own EOA, not a Bankr or Privy wallet.
@@ -41,5 +49,5 @@ The install button's "Installed" → "Remove" label swap originally only trigger
 ### Bankr vs Zora CLI wallet
 Initially designed Momentum Trader around Bankr's swap primitives. Updated to reference the Zora CLI's native wallet and buy/sell commands since the CLI creates its own EOA during setup. Bankr remains relevant as an alternative execution backend but isn't the primary path.
 
-### SkillInstallCommands key rename
-Renamed `claude` → `cli` in the `SkillInstallCommands` interface and all consumers (`skill-card-client.tsx` Method type, skills page JSON-LD). This touched the API response shape at `/api/skills` — any external agents consuming the old `install.claude` key will need to update to `install.cli`.
+### Runtime command maps should stay stable
+The `/api/skills` response and UI both read from the same runtime command helpers in `src/lib/skills.ts`. When install behavior changes, update the shared command map first so the site, metadata, and agent-facing API stay aligned.

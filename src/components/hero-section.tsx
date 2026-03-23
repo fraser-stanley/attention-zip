@@ -27,7 +27,7 @@ export function HeroSection() {
               to execution. One command to install, read-only by default.
             </p>
             <CopyableCodeBlock
-              command={getInstallAllCommands(getSiteUrl()).openclaw}
+              command={getInstallAllCommands(getSiteUrl()).claude}
               className="max-w-lg"
             />
             <div className="flex items-center gap-3">

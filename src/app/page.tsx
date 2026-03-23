@@ -38,7 +38,7 @@ const faqJsonLd = {
       name: "What are agent skills?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Agent skills are managed Zora workflows. Each one ships with a SKILL.md, a ClawHub manifest, and an entrypoint script that runs the workflow through the Zora CLI.",
+        text: "Agent skills are managed Zora workflows. Each one ships with a SKILL.md, a clawhub.json manifest, and an entrypoint script that runs the workflow through the Zora CLI.",
       },
     },
     {

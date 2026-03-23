@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { SkillsInstallList } from "@/components/skill-card-client";
-import { getSkillRuntimeCommands, skills } from "@/lib/skills";
+import { skills } from "@/lib/skills";
 import { getSiteUrl, toAbsoluteUrl, breadcrumbJsonLd } from "@/lib/site";
 
 export const metadata: Metadata = {
@@ -44,8 +44,6 @@ export default function SkillsPage() {
     { name: "Skills", url: `${baseUrl}/skills` },
   ]);
   const skillJsonLd = skills.map((skill) => {
-    const commands = getSkillRuntimeCommands(skill, baseUrl);
-
     return {
       "@context": "https://schema.org",
       "@type": "SoftwareApplication",
@@ -64,7 +62,6 @@ export default function SkillsPage() {
       url: toAbsoluteUrl(`/skills#${skill.id}`),
       downloadUrl: `${baseUrl}/skills/${skill.id}/skill-md`,
       codeRepository: skill.githubUrl,
-      installUrl: commands.openclaw,
     };
   });
 

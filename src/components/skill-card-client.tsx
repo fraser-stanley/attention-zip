@@ -61,11 +61,11 @@ function useTypewriter(text: string, active: boolean, speed = 12) {
   return { displayed, done };
 }
 
-const RUNTIME_STORAGE_KEY = "zora:skills-runtime";
+const RUNTIME_STORAGE_KEY = "zora:skills-runtime:v2";
 
 const RUNTIMES: Runtime[] = [
-  "openclaw",
   "claude",
+  "openclaw",
   "amp",
   "codex",
   "opencode",
@@ -89,11 +89,6 @@ function isRuntime(value: string | null): value is Runtime {
 
 const PRE_BLOCK_CLASS =
   "border border-border bg-foreground/5 px-4 py-3 font-mono text-sm text-foreground/80 whitespace-pre-wrap break-all";
-
-function formatRequirementList(skill: Skill) {
-  const values = [...skill.requires.bins, ...skill.requires.env];
-  return values.length > 0 ? values.join(", ") : "None";
-}
 
 function TerminalOutput({
   id,
@@ -291,15 +286,14 @@ function SkillRow({
   runtime: Runtime;
   index: number;
 }) {
-  const outputId = useId();
+  const detailsId = useId();
   const commands = getSkillRuntimeCommands(skill, getSiteUrl());
   const command = commands[runtime];
-  const manualCommand = commands.manual;
-  const { expanded: expandedOutput, toggleExpanded: toggleOutput } =
+  const { expanded: expandedDetails, toggleExpanded: toggleDetails } =
     useExpandableMemory(`zora:skill-output:${skill.id}`);
   const { displayed, done: typingDone } = useTypewriter(
     skill.sampleOutput ?? "",
-    expandedOutput,
+    expandedDetails,
   );
 
   return (
@@ -344,54 +338,6 @@ function SkillRow({
 
         {/* Install command */}
         <CopyableCodeBlock command={command} />
-        <p className="type-caption font-mono text-muted-foreground/60">
-          Or clone the source:{" "}
-          <code className="select-all">{manualCommand}</code>
-        </p>
-
-        <div className="grid gap-3 sm:grid-cols-2">
-          <div className="border border-border bg-foreground/[0.03] px-4 py-3">
-            <p className="type-label mb-1 text-muted-foreground">Automation</p>
-            <p className="type-body-sm text-foreground">
-              {skill.automation.managed ? "Managed entrypoint" : "Manual skill"}
-            </p>
-            <p className="type-caption font-mono text-muted-foreground">
-              {skill.automation.entrypoint ?? "No entrypoint"}
-            </p>
-          </div>
-          <div className="border border-border bg-foreground/[0.03] px-4 py-3">
-            <p className="type-label mb-1 text-muted-foreground">Schedule</p>
-            <p className="type-body-sm text-foreground">
-              {skill.automation.cron ?? "Run on demand"}
-            </p>
-            <p className="type-caption text-muted-foreground">
-              {skill.automation.dryRunByDefault
-                ? "Dry-run by default"
-                : "Live reads only"}
-            </p>
-          </div>
-          <div className="border border-border bg-foreground/[0.03] px-4 py-3">
-            <p className="type-label mb-1 text-muted-foreground">Needs</p>
-            <p className="type-caption font-mono text-muted-foreground">
-              {formatRequirementList(skill)}
-            </p>
-          </div>
-          <div className="border border-border bg-foreground/[0.03] px-4 py-3">
-            <p className="type-label mb-1 text-muted-foreground">Category</p>
-            <p className="type-body-sm text-foreground">
-              {skill.category} / {skill.difficulty}
-            </p>
-            <p className="type-caption text-muted-foreground">
-              {skill.riskLabel}
-            </p>
-          </div>
-        </div>
-
-        {/* Commands — always visible */}
-        <div>
-          <p className="type-label mb-2 text-muted-foreground">Commands</p>
-          <pre className={PRE_BLOCK_CLASS}>{skill.commands.join("\n")}</pre>
-        </div>
 
         {/* Actions: buttons */}
         <div className="flex flex-wrap items-center gap-3">
@@ -403,11 +349,11 @@ function SkillRow({
               "w-[7.5rem]",
               "aria-expanded:bg-background aria-expanded:text-foreground aria-expanded:border-foreground",
             )}
-            aria-expanded={expandedOutput}
-            aria-controls={outputId}
-            onClick={toggleOutput}
+            aria-expanded={expandedDetails}
+            aria-controls={detailsId}
+            onClick={toggleDetails}
           >
-            {expandedOutput ? "Hide example" : "See example"}
+            {expandedDetails ? "Less info" : "More info"}
           </button>
         </div>
 
@@ -433,13 +379,23 @@ function SkillRow({
           </a>
         </div>
 
-        {/* Expandable sample output — fixed-height terminal with auto-scroll */}
-        {expandedOutput ? (
-          <TerminalOutput
-            id={outputId}
-            displayed={displayed}
-            typingDone={typingDone}
-          />
+        {expandedDetails ? (
+          <div id={detailsId} className="space-y-4">
+            <div>
+              <p className="type-label mb-2 text-muted-foreground">Commands</p>
+              <pre className={PRE_BLOCK_CLASS}>{skill.commands.join("\n")}</pre>
+            </div>
+            <div>
+              <p className="type-label mb-2 text-muted-foreground">
+                Example output
+              </p>
+              <TerminalOutput
+                id={`${detailsId}-output`}
+                displayed={displayed}
+                typingDone={typingDone}
+              />
+            </div>
+          </div>
         ) : null}
       </div>
     </section>
@@ -455,8 +411,8 @@ export function SkillsInstallList({
 }) {
   const [runtime, setRuntime] = useSessionStorageState<Runtime>({
     key: RUNTIME_STORAGE_KEY,
-    initialValue: "openclaw",
-    parse: (stored) => (isRuntime(stored) ? stored : "openclaw"),
+    initialValue: "claude",
+    parse: (stored) => (isRuntime(stored) ? stored : "claude"),
     serialize: (value) => value,
   });
 

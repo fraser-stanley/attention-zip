@@ -28,7 +28,6 @@ export interface Skill {
   badges: string[];
   githubUrl: string;
   skillMdUrl: string;
-  installs: number;
 }
 
 export type Runtime =
@@ -115,7 +114,6 @@ Saved snapshot to ~/.config/zora-agent-skills/trend-scout/state.json`,
       "https://github.com/fraser-stanley/zora-agent-skills/tree/main/trend-scout",
     skillMdUrl:
       "https://raw.githubusercontent.com/fraser-stanley/zora-agent-skills/main/trend-scout/SKILL.md",
-    installs: 1247,
   },
   {
     id: "creator-pulse",
@@ -129,7 +127,7 @@ Saved snapshot to ~/.config/zora-agent-skills/trend-scout/state.json`,
     risk: "none",
     riskLabel: "Read-only, no wallet needed",
     bestWhen:
-      "Use it when you follow specific creators and want alerts instead of manually checking creator coins.",
+      "Use it when you follow creators and want alerts instead of manually checking creator coins.",
     tags: ["creators", "watchlists", "featured", "volume"],
     monitors: [
       "Featured creators",
@@ -176,7 +174,6 @@ Saved snapshot to ~/.config/zora-agent-skills/creator-pulse/state.json`,
       "https://github.com/fraser-stanley/zora-agent-skills/tree/main/creator-pulse",
     skillMdUrl:
       "https://raw.githubusercontent.com/fraser-stanley/zora-agent-skills/main/creator-pulse/SKILL.md",
-    installs: 892,
   },
   {
     id: "briefing-bot",
@@ -238,7 +235,6 @@ Assessment: Active tape. Trend flow is stronger than creator flow today.`,
       "https://github.com/fraser-stanley/zora-agent-skills/tree/main/briefing-bot",
     skillMdUrl:
       "https://raw.githubusercontent.com/fraser-stanley/zora-agent-skills/main/briefing-bot/SKILL.md",
-    installs: 2103,
   },
   {
     id: "portfolio-scout",
@@ -304,7 +300,6 @@ Tracked coin value: $6,050.00`,
       "https://github.com/fraser-stanley/zora-agent-skills/tree/main/portfolio-scout",
     skillMdUrl:
       "https://raw.githubusercontent.com/fraser-stanley/zora-agent-skills/main/portfolio-scout/SKILL.md",
-    installs: 634,
   },
   {
     id: "momentum-trader",
@@ -370,7 +365,6 @@ State saved to ~/.config/zora-agent-skills/momentum-trader/state.json`,
       "https://github.com/fraser-stanley/zora-agent-skills/tree/main/momentum-trader",
     skillMdUrl:
       "https://raw.githubusercontent.com/fraser-stanley/zora-agent-skills/main/momentum-trader/SKILL.md",
-    installs: 312,
   },
 ];
 

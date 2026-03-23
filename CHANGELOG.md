@@ -1,5 +1,20 @@
 # Changelog
 
+## 2026-03-23 (Stakeholder-ready install flow + skills page simplification)
+
+### Added
+- **Stakeholder deploy guidance** — README now documents the Vercel handoff, mock/live split, and an `.env.example` file for local setup.
+
+### Changed
+- **Claude Code is the default install surface** — homepage and skills page now default to a working `claude -p "..."` command instead of a non-functional OpenClaw install path.
+- **Skills page detail density reduced** — fabricated install counts are gone, skill detail rows no longer show the automation/schedule/needs/category grid, and commands plus sample output now live behind a single `More info` disclosure.
+- **Docs alignment** — CLAUDE.md, LEARNINGS.md, and README now describe the current runtime defaults, deploy expectations, and demo-ready mocked surfaces.
+
+### Fixed
+- **Broken repo URLs** — corrected `fraserstanley` to `fraser-stanley` in site metadata and setup docs.
+- **Invalid skills JSON-LD** — removed the shell-command `installUrl` field from the skills page metadata.
+- **Stakeholder copy issues** — FAQ and setup copy now match the actual `clawhub.json` filename and use more direct wording.
+
 ## 2026-03-23 (Managed skill runtime hardening)
 
 ### Added

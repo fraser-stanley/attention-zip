@@ -52,6 +52,12 @@ SDK responses are typed as `Record<string, unknown>`. You must narrow before usi
 - API routes in `src/app/api/` are server-side (access SDK directly, read env vars)
 - The root layout (`layout.tsx`) wraps everything in `<Providers>` which sets up React Query
 
+### Tests stub the Zora CLI
+
+`pnpm test` does not require the real Zora CLI. The managed entrypoint tests inject a stub `zora` command into `PATH` so they can validate worker behavior without the actual binary installed.
+
+When docs say a skill requires a "real `zora` binary on `PATH`", that means the installed CLI must be discoverable by your shell. `command -v zora` and `zora --help` should both succeed before you rely on `scripts/validate.sh` or any live wallet-backed flow.
+
 ## How to add a skill
 
 1. Create a skill directory at the project root: `<skill-slug>/SKILL.md`, `<skill-slug>/clawhub.json`, `<skill-slug>/scripts/run.mjs`, `<skill-slug>/scripts/validate.sh`
@@ -85,7 +91,7 @@ pnpm test        # vitest — structure, metadata, and managed entrypoint integr
 pnpm build       # TypeScript + Next.js compilation
 ```
 
-Tests validate SKILL.md frontmatter, required body sections, word count (300-800), CLI flag correctness in commands, managed entrypoint metadata in `clawhub.json`, process-level `scripts/run.mjs` behavior through `src/__tests__/skill-entrypoints.test.ts`, and cross-file sync between skills.ts IDs and skill directories. `scripts/validate.sh` is still useful, but it is a host-readiness check and requires a real `zora` binary on `PATH`, plus a wallet for wallet-backed skills.
+Tests validate SKILL.md frontmatter, required body sections, word count (300-800), CLI flag correctness in commands, managed entrypoint metadata in `clawhub.json`, process-level `scripts/run.mjs` behavior through `src/__tests__/skill-entrypoints.test.ts`, and cross-file sync between skills.ts IDs and skill directories. `scripts/validate.sh` is still useful, but it is a host-readiness check and requires the installed `zora` CLI to be on your shell `PATH`, plus a wallet for wallet-backed skills.
 
 ## Formatting helpers
 

@@ -317,7 +317,7 @@ Run `pnpm lint`, `pnpm typecheck`, `pnpm test`, and `pnpm build` before merge. `
 - Process-level managed entrypoint behavior via `src/__tests__/skill-entrypoints.test.ts` with a stubbed `zora` binary, isolated `HOME`, and state/journal assertions
 - Execution skill safety (dry-run journal writes, no accidental `--yes`, live exit path, env requirements)
 
-`scripts/validate.sh` remains a separate host-readiness check. It requires a real `zora` binary on `PATH`, and wallet-backed skills also require a configured wallet.
+`scripts/validate.sh` remains a separate host-readiness check. It requires the installed `zora` CLI to be on your shell `PATH`, which means `command -v zora` and `zora --help` should both succeed. The managed tests do not prove that, because `pnpm test` injects a stub `zora` command for integration coverage. Wallet-backed skills also require a configured wallet.
 
 ### CLI commands
 

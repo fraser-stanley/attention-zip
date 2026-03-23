@@ -78,7 +78,7 @@ pnpm build        # production build (TypeScript + Next.js compilation)
 
 Merge gate: `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm build`.
 
-`pnpm build` remains the primary production verification gate, while `src/__tests__/skill-entrypoints.test.ts` covers the managed `scripts/run.mjs` workers with a stubbed `zora` binary, isolated `HOME`, and state/journal assertions. The per-skill `scripts/validate.sh` checks still require a real `zora` install on `PATH`, and wallet-backed skills also require a configured wallet.
+`pnpm build` remains the primary production verification gate, while `src/__tests__/skill-entrypoints.test.ts` covers the managed `scripts/run.mjs` workers with a stubbed `zora` binary, isolated `HOME`, and state/journal assertions. The per-skill `scripts/validate.sh` checks still require the installed `zora` CLI to be on your shell `PATH`, meaning `command -v zora` and `zora --help` should work, and wallet-backed skills also require a configured wallet.
 
 ## Environment
 

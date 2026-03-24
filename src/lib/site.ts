@@ -1,6 +1,6 @@
 export const SITE_NAME = "Attention Index";
 export const SITE_DESCRIPTION =
-  "Agent skills for the Zora attention market. Open source, no custody.";
+  "Agent skills and live market data for the Zora attention market. Scan trends, check portfolios, build briefings, and trade momentum.";
 export const SITE_REPO_URL =
   "https://github.com/fraser-stanley/zora-agent-skills";
 export const API_VERSION = "0.1.0";

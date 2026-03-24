@@ -14,15 +14,15 @@ export function HeroSection() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
         <div className="contents lg:block lg:space-y-5">
           <h1 id="hero-heading" className="type-display order-1 lg:order-none">
-            <HighlighterStroke>Attention moves fast.</HighlighterStroke>
+            <HighlighterStroke>Install Zora market skills.</HighlighterStroke>
             <br />
-            Your agent keeps up.
+            Run them with your agent.
           </h1>
           {/* On mobile, orb slot is order-2 (injected below) */}
           <div className="order-3 space-y-5 lg:order-none">
             <p className="type-body-sm max-w-md text-muted-foreground">
-              Open-source skills for the Zora attention market, from trend scans
-              to dry-run-first execution. One command to install.
+              Trend scans, briefings, portfolio checks, and momentum trading
+              for the Zora attention market.
             </p>
             <CopyableCodeBlock
               command={getInstallAllCommands(getSiteUrl()).claude}
@@ -34,13 +34,13 @@ export function HeroSection() {
                 variant="default"
                 className="flex-1 px-8 sm:flex-initial"
               >
-                Install skills
+                Browse skills
               </AnimatedArrowLink>
               <AnimatedArrowLink
                 href="/dashboard"
                 className="flex-1 sm:flex-initial"
               >
-                See the market
+                View market data
               </AnimatedArrowLink>
             </div>
           </div>

@@ -16,7 +16,8 @@ export default function HomeLoading() {
             <div>
               <h2 className="text-sm font-medium text-muted-foreground">Skills</h2>
               <p className="text-xs text-muted-foreground mt-1">
-                We wrote and reviewed every one. Published source, one-command install.
+                Trend scans, briefings, portfolio checks, and trading loops.
+                Pick one and install it.
               </p>
             </div>
           </div>

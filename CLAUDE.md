@@ -1,6 +1,6 @@
 # Zora Agent Skills
 
-Agent skills for the Zora attention market. Skill gallery, live market data, leaderboards, and machine-readable API docs.
+Agent skills and live market data for the Zora attention market. Attention Index helps agents use the Zora market, it is not Zora itself.
 
 **Not** an execution platform, custody layer, or marketplace. Execution is local to the user's agent runtime. We don't hold keys, submit transactions, or enforce guardrails server-side.
 
@@ -42,7 +42,7 @@ trend-scout/                        # Skill: trending topic coins, new trends, m
 creator-pulse/                      # Skill: creator coin ecosystems
 briefing-bot/                       # Skill: structured market digest
 portfolio-scout/                    # Skill: coin holdings (read-only)
-momentum-trader/                    # Skill: execution-capable momentum trading
+momentum-trader/                    # Skill: momentum trading
 src/
 ├── __tests__/
 │   ├── skills-structure.test.ts    # SKILL.md + clawhub.json structural validation
@@ -124,7 +124,7 @@ src/
 - **Client components still refresh through API routes** (`/api/explore`, `/api/leaderboard`) using React Query. The API remains the public integration surface for external agents and local tooling.
 - **Agent discovery is explicit** via `/api`, `/api/skills`, JSON-LD, and `/.well-known/ai.json`.
 - **Skills are static data** in `src/lib/skills.ts`. No database, no CMS. The homepage grid and skills gallery both render from this array — add a skill to the array and both pages update automatically.
-- **Skills are managed templates**, not prompt-only wrappers. Each public skill now has a real `scripts/run.mjs` entrypoint, `clawhub.json` cron metadata, and source-backed manual install path.
+- **Skills are managed runtimes behind the scenes**. Each public skill has a real `scripts/run.mjs`, `clawhub.json`, and source-backed manual install path. Those implementation details belong in internal docs, not primary marketing copy.
 - **Install commands are shared** from `src/lib/skills.ts` (`getSkillRuntimeCommands()`, `getInstallAllCommands()`) so the UI and `/api/skills` stay in sync. Claude Code is the default visible runtime because its prompt-based install helper works today. OpenClaw remains as a forward-looking tab, and the generated command map still includes a manual `git clone` fallback.
 - **SKILL.md is served from the domain** at `/skills/[id]/skill-md` (`src/app/skills/[id]/skill-md/route.ts`). This gives agent commands clean URLs that work in any environment.
 - **The skills page has a unified install card** — `RuntimeInstallCard` in `src/components/skill-card-client.tsx` combines 6 runtime tabs (OpenClaw, Claude Code, Amp, Codex CLI, OpenCode, Cursor) with a copyable code snippet in one bordered card. Claude Code is the default runtime. Per-skill rows use standalone `CopyableCodeBlock` components.
@@ -152,13 +152,16 @@ src/
 All user-facing copy follows the guidelines in `TONE.md`. Key rules:
 
 - Zora is an "attention market". Use this phrase as the definitive description.
+- Attention Index helps agents use the Zora market. Do not imply the site is Zora, a hosted wallet, or a hosted execution layer.
 - Short, direct sentences. Lead with the fact, not the framing.
-- Trend-focused: trending coins, momentum, volume. Creator coins exist but are not the primary lens.
+- Market-first: trends, market scans, briefings, portfolios, momentum trading. Creator coins exist but are not the primary lens except on creator-specific surfaces.
 - No promotional adjectives ("fast-moving", "powerful", "seamless").
 - No forced rule-of-three lists. Use the natural number of items.
 - No em dashes in marketing copy. Use commas or periods.
 - No developer jargon in user-facing text ("execution-capable flows", "install surface").
+- In public copy, avoid implementation words like `entrypoint`, `clawhub.json`, `manifest`, `cron loop`, and `env vars` unless the page is explicitly technical documentation.
 - "Execution skills" not "execution-capable skills". "Points to" not "resolves to".
+- Trust language must stay literal: "open source", "no custody", "some skills need a wallet", "trading is opt-in", "dry run by default".
 - Speculation should be tasteful and optimistic, never overpromise.
 
 ## Animated buttons with icons
@@ -255,9 +258,9 @@ All SDK responses return `{ error, data }`. Always check `response.error` before
 2. **Creator Pulse** — creator coin ecosystems, featured creators, watchlists
 3. **Briefing Bot** — structured morning/evening market digest
 4. **Portfolio Scout** — coin holdings via CLI (local wallet) or SDK (any address). Bankr-ready bridge skill
-5. **Momentum Trader** — auto-buys trending Zora coins on momentum signals via Zora CLI. Execution-capable — requires dedicated trader wallet created with `zora setup`.
+5. **Momentum Trader** — quotes and manages momentum trades via the Zora CLI. Dry run by default, requires a dedicated trader wallet created with `zora setup`.
 
-Skills 1–4 are read-only (no wallet needed). Skill 5 is execution-capable via the Zora CLI's native wallet and buy/sell commands. All use OpenClaw SKILL.md format. The CLI has no SKILL.md parsing — it's purely an agent-runtime convention.
+Skills 1–4 are read-only. Skills 1–3 do not need a wallet. Portfolio Scout and Momentum Trader do. Skill 5 is the only trading skill and stays dry-run by default until explicitly enabled. All use OpenClaw SKILL.md format. The CLI has no SKILL.md parsing, it's purely an agent-runtime convention.
 
 ### Skill directory structure
 
@@ -389,4 +392,4 @@ The Zora CLI has 8 commands: `auth`, `explore`, `get`, `buy`, `sell`, `balance`,
 - No server-side enforcement or guardrails
 - No third-party skill submissions
 - No paid features or tokens
-- Verification = we reviewed published source. Does not mean we control local runtime.
+- Verification = we reviewed the source. Does not mean we control local runtime.

@@ -79,7 +79,7 @@ export function Footer() {
               Legal
             </h2>
             <p className="type-caption font-mono text-background/70">
-              Open source. No custody. No keys.
+              Open source. No custody. Some skills need a wallet.
             </p>
           </div>
         </div>
@@ -89,7 +89,7 @@ export function Footer() {
             &copy; {new Date().getFullYear()} Attention Index
           </p>
           <p className="type-caption font-mono text-background/50">
-            Read-only by default
+            Trading is opt-in.
           </p>
         </div>
       </div>

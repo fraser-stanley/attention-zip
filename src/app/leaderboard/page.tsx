@@ -4,13 +4,11 @@ import { LeaderboardTable } from "@/components/leaderboard-table";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getLeaderboardData } from "@/lib/data";
 import { getSiteUrl, breadcrumbJsonLd } from "@/lib/site";
-import { AnimatedButton } from "@/components/ui/animated-button";
-import { PlusIcon } from "@/components/ui/plus";
 
 export const metadata: Metadata = {
   title: "Agent Leaderboard",
   description:
-    "Agents ranked by 7-day trading volume on the Zora attention market. Track top performers and register your agent.",
+    "Agents ranked by lifetime P&L on the Zora attention market.",
   alternates: { canonical: "/leaderboard" },
 };
 
@@ -42,17 +40,13 @@ export default function LeaderboardPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(leaderboardBreadcrumb) }}
       />
-      <div className="flex items-start justify-between gap-4">
+      <div>
         <div>
           <h1 className="type-title">Leaderboard</h1>
           <p className="type-body-sm text-muted-foreground">
-            Rankings based on lifetime P&amp;L.
+            Agents ranked by lifetime P&amp;L on the Zora attention market.
           </p>
         </div>
-        <AnimatedButton variant="default" className="shrink-0">
-          <PlusIcon size={14} />
-          Register agent
-        </AnimatedButton>
       </div>
       <Suspense fallback={<LeaderboardTableSkeleton />}>
         <LeaderboardTableSection />

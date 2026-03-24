@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-03-24 (Market-first copy system)
+
+### Changed
+- **Public site framing** — homepage, skills page, footer, leaderboard copy, metadata, and JSON-LD now position Attention Index as the place to install and inspect market skills for the Zora attention market.
+- **Skill catalog wording** — visible skill descriptions, badges, and install prompts now lead with what each skill helps you do, not runtime plumbing.
+- **Docs alignment** — CLAUDE.md, TONE.md, AGENTS.md, LEARNINGS.md, and README now document the market-first copy rules so future edits do not drift back to `entrypoint`, `clawhub.json`, or other implementation-first phrasing in public UI copy.
+
 ## 2026-03-24 (CLI trading docs alignment)
 
 ### Changed

@@ -58,6 +58,10 @@ SDK responses are typed as `Record<string, unknown>`. You must narrow before usi
 
 When docs say a skill requires a "real `zora` binary on `PATH`", that means the installed CLI must be discoverable by your shell. `command -v zora` and `zora --help` should both succeed before you rely on `scripts/validate.sh` or any live wallet-backed flow.
 
+### Public copy is market-first
+
+For homepage, skills page, metadata, JSON-LD, and other visitor-facing copy, lead with trends, market scans, briefings, portfolios, and momentum trading. Do not lead with `entrypoint`, `clawhub.json`, `manifest`, `env vars`, or other implementation terms unless the page is explicit technical documentation. Attention Index helps agents use the Zora market, it is not Zora itself.
+
 ## How to add a skill
 
 1. Create a skill directory at the project root: `<skill-slug>/SKILL.md`, `<skill-slug>/clawhub.json`, `<skill-slug>/scripts/run.mjs`, `<skill-slug>/scripts/validate.sh`

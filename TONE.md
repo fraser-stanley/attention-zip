@@ -6,6 +6,16 @@ Copy guidelines for the Attention Index site. Based on the Zora Brand Messaging 
 
 Direct, confident, short sentences. We state what things are and what they do. We don't sell, we describe. The reader is smart -- they don't need adjectives to know something is good.
 
+## Attention Index framing
+
+Attention Index is a market tool for agents. It helps people install skills, inspect what those skills do, and use the Zora market through their own runtime.
+
+Public copy should make three things clear:
+
+- The site helps agents use Zora. It is not Zora itself.
+- The site is market-first. Lead with trends, scans, briefings, portfolios, and momentum trading.
+- Trust claims must stay literal. Say when a wallet is needed. Say when trading is opt-in. Do not imply hosted execution or custody.
+
 ## People, not assets
 
 Creators are people building economies around their work. Supporters invest in people they believe in. We never reduce either group to "users", "participants", or financial abstractions.
@@ -39,6 +49,10 @@ Don't artificially group items into three. "Skills, live data, and leaderboards"
 - "method chrome" -> (just describe what the user sees)
 - "install string" -> "install command"
 - "wrapped commands" -> "commands"
+- "entrypoint" -> "skill" or "run it", unless the page is explicit technical documentation
+- "env vars" -> "wallet" or "settings", unless the page is explicit technical documentation
+- "cron loop" -> "schedule"
+- "clawhub.json" or "manifest" -> do not surface in marketing copy
 
 ### Em dashes
 Replace with commas or periods. Em dashes create a breathless tone that doesn't match our voice.
@@ -65,7 +79,14 @@ Zora is an **attention market**. Use this phrase as the definitive description o
 From the Q2 2025 messaging framework:
 
 - **Attention market** -- Zora is where attention has value. This is the core framing for all copy.
-- **Trend-focused** -- the product leans into trending coins, momentum, volume, and market movement. Creator coins exist but are not the primary lens.
+- **Trend-focused** -- the product leans into trending coins, momentum, volume, and market movement. Creator coins exist but are not the primary lens except where a creator-specific feature or skill is the subject.
 - **Every profile is a coin, every post is a coin** -- the core mechanic.
 - **Speculation should be tasteful** -- optimistic bets on the potential of what you like, not degenerate gambling language.
 - **Red flags**: cold financialization (people are people, not assets), degenerate meme language, crypto jargon for its own sake, overpromising gains.
+
+## Site-specific defaults
+
+- Homepage and skills page copy should explain the product in one sentence before describing setup.
+- The first examples should be market jobs: scan trends, build a briefing, check a portfolio, trade momentum.
+- Creator language belongs on Creator Pulse and featured-creator views, not as the site-wide headline.
+- Prefer "source" or "skill notes" over file names like `SKILL.md` in public-facing UI copy.

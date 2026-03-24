@@ -1,6 +1,6 @@
 # Zora Agent Skills
 
-Managed agent skills for the Zora attention market. Open source, no custody.
+Agent skills and live market data for the Zora attention market. Scan trends, check portfolios, build briefings, and trade momentum.
 
 ## Quick start
 
@@ -15,7 +15,7 @@ Open http://localhost:3000.
 
 ## Skills
 
-Five managed skills. Each skill directory contains:
+Five skills for the Zora market. Each skill directory contains:
 
 - `SKILL.md` for agent-facing instructions
 - `clawhub.json` for runtime metadata, cron, env, and tunables
@@ -24,11 +24,11 @@ Five managed skills. Each skill directory contains:
 
 | Skill                               | Description                                                             | Type      |
 | ----------------------------------- | ----------------------------------------------------------------------- | --------- |
-| [trend-scout](trend-scout/)         | Scheduled trend scan with snapshot diffing and watchlist alerts         | Read-only |
-| [creator-pulse](creator-pulse/)     | Featured creator scan with watchlist and holder-change alerts           | Read-only |
-| [briefing-bot](briefing-bot/)       | Scheduled market digest with optional portfolio overlap                 | Read-only |
-| [portfolio-scout](portfolio-scout/) | Wallet-backed portfolio monitor with concentration and drawdown checks  | Read-only |
-| [momentum-trader](momentum-trader/) | Dry-run-first momentum loop with quotes, daily caps, and trailing exits | Execution |
+| [trend-scout](trend-scout/)         | Tracks trend leaders, new entrants, and volume shifts                   | Read-only |
+| [creator-pulse](creator-pulse/)     | Tracks creator-coin leaders and watchlist moves                         | Read-only |
+| [briefing-bot](briefing-bot/)       | Turns the market into a short briefing                                  | Read-only |
+| [portfolio-scout](portfolio-scout/) | Checks balances, position changes, and concentration                    | Read-only |
+| [momentum-trader](momentum-trader/) | Quotes and manages momentum trades. Dry run by default                  | Execution |
 
 Trend Scout, Creator Pulse, and Briefing Bot do not need a wallet. Portfolio Scout and Momentum Trader need a dedicated wallet configured through `zora setup` or `ZORA_PRIVATE_KEY`. If you create that wallet locally on macOS, run `zora wallet backup` after setup.
 
@@ -109,7 +109,7 @@ For a stakeholder build on Vercel:
 | ---------------------------- | ------------------------------------------------------------------------------ |
 | [CLAUDE.md](CLAUDE.md)       | Full project reference: architecture, SDK details, CLI commands, key decisions |
 | [AGENTS.md](AGENTS.md)       | Agent contributor guide: SDK queries, pitfalls, how to add skills/pages        |
-| [TONE.md](TONE.md)           | Copy guidelines and Zora brand principles                                      |
+| [TONE.md](TONE.md)           | Copy guidelines, market-first framing, and Zora brand principles               |
 | [LEARNINGS.md](LEARNINGS.md) | Architectural decisions and trade-offs                                         |
 | [CHANGELOG.md](CHANGELOG.md) | Release history                                                                |
 

@@ -4,9 +4,9 @@ import { skills } from "@/lib/skills";
 import { getSiteUrl, toAbsoluteUrl, breadcrumbJsonLd } from "@/lib/site";
 
 export const metadata: Metadata = {
-  title: "Verified Agent Skills for Zora",
+  title: "Install Zora Market Skills",
   description:
-    "Browse managed agent skills for the Zora attention market. Trend scans, creator watchlists, briefings, portfolio checks, and momentum trading.",
+    "Install agent skills for the Zora attention market. Scan trends, track creator-coin moves, check portfolios, and trade momentum.",
   alternates: { canonical: "/skills" },
 };
 
@@ -14,25 +14,25 @@ const howToJsonLd = {
   "@context": "https://schema.org",
   "@type": "HowTo",
   name: "How to install an agent skill for Zora",
-  description: "Install a managed Zora skill in your agent runtime.",
+  description: "Install a Zora market skill in your agent runtime.",
   step: [
     {
       "@type": "HowToStep",
       position: 1,
-      name: "Install the skill",
-      text: "Copy the install command for your runtime or clone the skill source.",
+      name: "Install",
+      text: "Copy the command for your agent runtime.",
     },
     {
       "@type": "HowToStep",
       position: 2,
-      name: "Set the needed configuration",
-      text: "Review the env vars, schedule, and entrypoint before you run it.",
+      name: "Set up",
+      text: "Read the skill notes. Add a wallet only if the skill needs one.",
     },
     {
       "@type": "HowToStep",
       position: 3,
-      name: "Run or schedule it",
-      text: "Trigger the entrypoint manually first, then turn on the cron loop.",
+      name: "Run",
+      text: "Run it once. Put it on a schedule later if you want.",
     },
   ],
 };
@@ -83,24 +83,23 @@ export default function SkillsPage() {
         <section className="grid max-w-5xl gap-6 sm:grid-cols-3 mb-12">
           <div className="space-y-1.5">
             <p className="type-label text-muted-foreground">01</p>
-            <h2 className="type-label text-foreground">Paste the command</h2>
+            <h2 className="type-label text-foreground">Install</h2>
             <p className="type-body-sm text-muted-foreground">
-              Copy the install command for your runtime or clone the skill
-              source.
+              Copy the command for your agent runtime.
             </p>
           </div>
           <div className="space-y-1.5">
             <p className="type-label text-muted-foreground">02</p>
-            <h2 className="type-label text-foreground">Review the setup</h2>
+            <h2 className="type-label text-foreground">Set up</h2>
             <p className="type-body-sm text-muted-foreground">
-              Check the env vars, schedule, and entrypoint before you run it.
+              Read the skill notes. Add a wallet only if the skill needs one.
             </p>
           </div>
           <div className="space-y-1.5">
             <p className="type-label text-muted-foreground">03</p>
-            <h2 className="type-label text-foreground">Run the skill</h2>
+            <h2 className="type-label text-foreground">Run</h2>
             <p className="type-body-sm text-muted-foreground">
-              Trigger the entrypoint once, then move it onto a schedule.
+              Run it once. Put it on a schedule later if you want.
             </p>
           </div>
         </section>

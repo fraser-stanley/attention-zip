@@ -17,7 +17,7 @@ export const metadata: Metadata = {
     absolute: "Attention Index | Agent Skills for the Zora Attention Market",
   },
   description:
-    "Managed agent skills for the Zora attention market. Trend scans, creator analytics, market digests, portfolio checks, and momentum trading.",
+    "Agent skills and live market data for the Zora attention market. Scan trends, check portfolios, build briefings, and trade momentum.",
   alternates: { canonical: "/" },
 };
 
@@ -30,7 +30,7 @@ const faqJsonLd = {
       name: "What is the Zora attention market?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Zora is an attention market where anyone can create and trade coins around content, trends, and creators on Base.",
+        text: "Zora is an attention market on Base where profiles, posts, and trends can trade as coins.",
       },
     },
     {
@@ -38,7 +38,7 @@ const faqJsonLd = {
       name: "What are agent skills?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Agent skills are managed Zora workflows. Each one ships with a SKILL.md, a clawhub.json manifest, and an entrypoint script that runs the workflow through the Zora CLI.",
+        text: "Skills your agent can install to scan, track, or trade the Zora market. Each one includes readable instructions and source.",
       },
     },
     {
@@ -46,7 +46,7 @@ const faqJsonLd = {
       name: "How do I install a skill?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Copy the install command for your runtime from the skills page, then review the env vars and run the entrypoint once before you schedule it.",
+        text: "Copy the install command from the skills page, run it in your agent runtime, then follow the skill notes.",
       },
     },
     {
@@ -54,7 +54,7 @@ const faqJsonLd = {
       name: "Do I need a wallet?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Trend Scout, Creator Pulse, and Briefing Bot work without a wallet. Portfolio Scout and Momentum Trader use a dedicated wallet created with zora setup or ZORA_PRIVATE_KEY. On macOS, zora wallet backup adds a Keychain-backed recovery path for local wallets.",
+        text: "Trend Scout, Creator Pulse, and Briefing Bot do not need a wallet. Portfolio Scout and Momentum Trader do. Use a dedicated wallet for trading skills.",
       },
     },
     {
@@ -62,7 +62,7 @@ const faqJsonLd = {
       name: "Is this open source?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Yes. All skills are published source. They run through the Zora CLI and store their own local state. No custody or hosted execution layer is built into this site.",
+        text: "Yes. Every skill links to source and readable instructions. This site does not hold keys or run trades for you.",
       },
     },
   ],
@@ -108,8 +108,8 @@ export default function Home() {
             <div>
               <h2 className="type-label text-muted-foreground">Skills</h2>
               <p className="text-xs text-muted-foreground mt-1">
-                Managed templates with real entrypoints, published source, and
-                one-command install.
+                Trend scans, briefings, portfolio checks, and trading loops.
+                Pick one and install it.
               </p>
             </div>
             <Link

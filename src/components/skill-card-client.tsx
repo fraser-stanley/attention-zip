@@ -418,7 +418,7 @@ export function SkillsInstallList({
       {/* Hero: heading + unified install card */}
       <section className="space-y-6 mb-12">
         <h1 className="type-display max-w-5xl pt-[0.06em] leading-[0.94]">
-          Send your agent to Zora.
+          Install Zora market skills.
         </h1>
         <RuntimeInstallCard
           runtime={runtime}

@@ -54,13 +54,13 @@ export const skills: Skill[] = [
     id: "trend-scout",
     name: "Trend Scout",
     description:
-      "Scans trend coins, ranks the leaders, and alerts on new entrants.",
+      "Tracks trend leaders, new entrants, and volume shifts.",
     longDescription:
-      "Scans trending, new, volume, and market cap views on a schedule and flags what changed.",
+      "Watches trending, new, volume, and market cap tables and tells you what changed.",
     category: "attention",
     difficulty: "beginner",
     risk: "none",
-    riskLabel: "Read-only, no wallet needed",
+    riskLabel: "Read-only, no wallet",
     tags: ["trends", "alerts", "volume", "watchlists"],
     monitors: [
       "Trending trend coins",
@@ -88,7 +88,7 @@ export const skills: Skill[] = [
       dryRunByDefault: false,
     },
     actionPrompt:
-      "install or mirror the Trend Scout skill and explain how to run its scheduled trend scan",
+      "Install Trend Scout and explain what it tracks and how to run it on a schedule.",
     samplePrompt:
       "Install Trend Scout and tell me what it reports every 30 minutes.",
     sampleOutput: `Trend Scout
@@ -106,7 +106,7 @@ Watchlist:
 - 0x1234...5678 is live in the trending table
 
 Saved snapshot to ~/.config/zora-agent-skills/trend-scout/state.json`,
-    badges: ["Managed skill", "CLI native", "Read-only"],
+    badges: ["Trend scan", "Read-only", "No wallet"],
     githubUrl:
       "https://github.com/fraser-stanley/zora-agent-skills/tree/main/trend-scout",
     skillMdUrl:
@@ -116,13 +116,13 @@ Saved snapshot to ~/.config/zora-agent-skills/trend-scout/state.json`,
     id: "creator-pulse",
     name: "Creator Pulse",
     description:
-      "Tracks featured creators, creator-coin momentum, and watchlist changes.",
+      "Tracks creator-coin leaders and watchlist moves.",
     longDescription:
-      "Tracks creator coins across featured, trending, and volume lists and alerts on watchlist changes.",
+      "Watches featured creators and creator-coin momentum across trending and volume tables.",
     category: "analytics",
     difficulty: "intermediate",
     risk: "none",
-    riskLabel: "Read-only, no wallet needed",
+    riskLabel: "Read-only, no wallet",
     tags: ["creators", "watchlists", "featured", "volume"],
     monitors: [
       "Featured creators",
@@ -149,7 +149,7 @@ Saved snapshot to ~/.config/zora-agent-skills/trend-scout/state.json`,
       dryRunByDefault: false,
     },
     actionPrompt:
-      "install or mirror the Creator Pulse skill and explain its creator watchlist alerts",
+      "Install Creator Pulse and explain the watchlist alerts it produces.",
     samplePrompt:
       "Install Creator Pulse and summarize what it would alert me on.",
     sampleOutput: `Creator Pulse
@@ -164,7 +164,7 @@ Watchlist alerts:
 - alysaliu gained 67 holders since the last run
 
 Saved snapshot to ~/.config/zora-agent-skills/creator-pulse/state.json`,
-    badges: ["Managed skill", "Watchlists", "Read-only"],
+    badges: ["Creator coins", "Read-only", "No wallet"],
     githubUrl:
       "https://github.com/fraser-stanley/zora-agent-skills/tree/main/creator-pulse",
     skillMdUrl:
@@ -173,9 +173,9 @@ Saved snapshot to ~/.config/zora-agent-skills/creator-pulse/state.json`,
   {
     id: "briefing-bot",
     name: "Briefing Bot",
-    description: "Builds a scheduled Zora market briefing from live CLI scans.",
+    description: "Turns the market into a short briefing.",
     longDescription:
-      "Merges five market scans into one briefing and diffs it against the previous run.",
+      "Combines trends, volume, new launches, gainers, and portfolio overlap in one report.",
     category: "utility",
     difficulty: "intermediate",
     risk: "none",
@@ -207,7 +207,7 @@ Saved snapshot to ~/.config/zora-agent-skills/creator-pulse/state.json`,
       dryRunByDefault: false,
     },
     actionPrompt:
-      "install or mirror the Briefing Bot skill and explain its daily briefing schedule",
+      "Install Briefing Bot and explain when it runs and what it reports.",
     samplePrompt:
       "Install Briefing Bot and show me the kind of briefing it emits.",
     sampleOutput: `Zora Briefing
@@ -223,7 +223,7 @@ Portfolio overlap:
 - jacob is both held and a creator leader
 
 Assessment: Active tape. Trend flow is stronger than creator flow today.`,
-    badges: ["Managed skill", "Briefings", "Read-only"],
+    badges: ["Briefing", "Read-only", "Wallet optional"],
     githubUrl:
       "https://github.com/fraser-stanley/zora-agent-skills/tree/main/briefing-bot",
     skillMdUrl:
@@ -233,9 +233,9 @@ Assessment: Active tape. Trend flow is stronger than creator flow today.`,
     id: "portfolio-scout",
     name: "Portfolio Scout",
     description:
-      "Tracks wallet balances, position changes, and portfolio concentration.",
+      "Checks balances, position changes, and concentration.",
     longDescription:
-      "Snapshots wallet positions on a schedule and flags concentration, new entries, and exits.",
+      "Snapshots wallet positions and flags new entries, exits, and concentration risk.",
     category: "analytics",
     difficulty: "intermediate",
     risk: "none",
@@ -266,7 +266,7 @@ Assessment: Active tape. Trend flow is stronger than creator flow today.`,
       dryRunByDefault: false,
     },
     actionPrompt:
-      "install or mirror the Portfolio Scout skill and explain its portfolio risk checks",
+      "Install Portfolio Scout and explain the portfolio checks it runs.",
     samplePrompt:
       "Install Portfolio Scout and show me the report it produces every few hours.",
     sampleOutput: `Portfolio Scout
@@ -286,7 +286,7 @@ Alerts:
 - based penguin is no longer held
 
 Tracked coin value: $6,050.00`,
-    badges: ["Managed skill", "Risk checks", "Wallet required"],
+    badges: ["Portfolio", "Read-only", "Wallet needed"],
     githubUrl:
       "https://github.com/fraser-stanley/zora-agent-skills/tree/main/portfolio-scout",
     skillMdUrl:
@@ -296,13 +296,13 @@ Tracked coin value: $6,050.00`,
     id: "momentum-trader",
     name: "Momentum Trader",
     description:
-      "Runs a repeatable momentum loop with dry-run mode, quotes, and trailing exits.",
+      "Quotes and manages momentum trades. Dry run by default.",
     longDescription:
       "Scans gainers and trending coins, quotes entries, and manages exits from a local position state.",
     category: "trading",
     difficulty: "advanced",
     risk: "medium",
-    riskLabel: "Execution skill, dedicated wallet required",
+    riskLabel: "Trading skill, dedicated wallet needed",
     tags: ["trading", "momentum", "quotes", "trailing-stops"],
     monitors: [
       "Momentum candidates",
@@ -332,7 +332,7 @@ Tracked coin value: $6,050.00`,
       dryRunByDefault: true,
     },
     actionPrompt:
-      "install or mirror the Momentum Trader skill and explain how its dry-run mode and trailing exits work",
+      "Install Momentum Trader and explain dry-run mode and trailing exits.",
     samplePrompt:
       "Install Momentum Trader and show me a dry-run cycle before I turn it live.",
     sampleOutput: `Momentum Trader
@@ -349,7 +349,7 @@ Candidates:
 
 No exits fired.
 State saved to ~/.config/zora-agent-skills/momentum-trader/state.json`,
-    badges: ["Managed skill", "Dry-run by default", "Execution"],
+    badges: ["Momentum", "Dry run default", "Execution"],
     githubUrl:
       "https://github.com/fraser-stanley/zora-agent-skills/tree/main/momentum-trader",
     skillMdUrl:
@@ -363,7 +363,7 @@ export function getSkillById(id: string) {
 
 export function getInstallAllCommands(baseUrl: string): SkillRuntimeCommands {
   const skillsUrl = `${baseUrl}/api/skills`;
-  const prompt = `Read ${skillsUrl}. Install or mirror the Zora skills that fit this runtime. Use ${REPO_URL} for the entrypoint files.`;
+  const prompt = `Read ${skillsUrl}. Install the Zora market skills that fit this runtime. Use ${REPO_URL} for the source files.`;
 
   return {
     openclaw: skills.map((skill) => `clawhub install ${skill.id}`).join(" && "),
@@ -381,7 +381,7 @@ export function getSkillRuntimeCommands(
   baseUrl: string,
 ): SkillRuntimeCommands {
   const skillMdUrl = `${baseUrl}/skills/${skill.id}/skill-md`;
-  const prompt = `Read ${skillMdUrl}. Use ${skill.githubUrl} for the entrypoint files. ${skill.actionPrompt}.`;
+  const prompt = `Read ${skillMdUrl}. Use ${skill.githubUrl} for the source files. ${skill.actionPrompt}`;
 
   return {
     openclaw: `clawhub install ${skill.id}`,

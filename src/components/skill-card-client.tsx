@@ -12,6 +12,7 @@ import { CheckIcon } from "@/components/ui/check";
 import { CopyIcon } from "@/components/ui/copy";
 import { PlusIcon } from "@/components/ui/plus";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { CopyableCodeBlock } from "@/components/copyable-code-block";
 import { useToast } from "@/components/toast";
 import { useExpandableMemory } from "@/hooks/use-expandable-memory";
 import { useSessionStorageState } from "@/hooks/use-session-storage-state";
@@ -87,125 +88,7 @@ function isRuntime(value: string | null): value is Runtime {
 }
 
 const PRE_BLOCK_CLASS =
-  "max-h-80 overflow-auto px-4 py-4 font-mono text-[0.82rem] leading-6 text-foreground whitespace-pre-wrap [overflow-wrap:anywhere] sm:px-5";
-const PANEL_CLASS = "overflow-hidden border border-border bg-background";
-const PANEL_HEADER_CLASS =
-  "flex items-start justify-between gap-4 border-b border-border bg-muted/[0.35] px-4 py-3 sm:px-5";
-const PANEL_BODY_CLASS =
-  "grid grid-cols-[auto_1fr] gap-x-3 px-4 py-4 sm:px-5";
-
-function useCopyFeedback() {
-  const [copied, setCopied] = useState(false);
-  const timeoutRef = useRef<number | null>(null);
-
-  useEffect(() => {
-    return () => {
-      if (timeoutRef.current !== null) {
-        window.clearTimeout(timeoutRef.current);
-      }
-    };
-  }, []);
-
-  async function copy(value: string) {
-    try {
-      await navigator.clipboard.writeText(value);
-      setCopied(true);
-    } catch {
-      return;
-    }
-
-    if (timeoutRef.current !== null) {
-      window.clearTimeout(timeoutRef.current);
-    }
-
-    timeoutRef.current = window.setTimeout(() => {
-      setCopied(false);
-    }, 2000);
-  }
-
-  return { copied, copy };
-}
-
-function CommandCopyButton({
-  copied,
-  onClick,
-}: {
-  copied: boolean;
-  onClick: () => void;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className="type-caption inline-flex min-h-9 shrink-0 items-center gap-1.5 border border-border bg-background px-3 text-foreground transition-colors hover:border-foreground/15 hover:bg-foreground/[0.04] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
-      aria-live="polite"
-      aria-label={copied ? "Copied" : "Copy command"}
-    >
-      {copied ? <CheckIcon size={14} /> : <CopyIcon size={14} />}
-      <span>{copied ? "Copied" : "Copy"}</span>
-    </button>
-  );
-}
-
-function CommandPanel({
-  label,
-  description,
-  command,
-  prefix = "$",
-  className,
-}: {
-  label: string;
-  description?: string;
-  command: string;
-  prefix?: string;
-  className?: string;
-}) {
-  const { copied, copy } = useCopyFeedback();
-
-  return (
-    <div className={cn(PANEL_CLASS, className)}>
-      <div className={PANEL_HEADER_CLASS}>
-        <div className="min-w-0 space-y-1">
-          <p className="type-label text-muted-foreground">{label}</p>
-          {description ? (
-            <p className="type-body-sm text-muted-foreground">{description}</p>
-          ) : null}
-        </div>
-        <CommandCopyButton copied={copied} onClick={() => copy(command)} />
-      </div>
-      <div className={PANEL_BODY_CLASS}>
-        <span className="pt-0.5 font-mono text-sm text-muted-foreground/75">
-          {prefix}
-        </span>
-        <code className="block font-mono text-[0.82rem] leading-6 text-foreground whitespace-pre-wrap [overflow-wrap:anywhere]">
-          {command}
-        </code>
-      </div>
-    </div>
-  );
-}
-
-function DetailPanel({
-  label,
-  description,
-  children,
-}: {
-  label: string;
-  description?: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <div className={PANEL_CLASS}>
-      <div className="space-y-1 border-b border-border bg-muted/[0.35] px-4 py-3 sm:px-5">
-        <p className="type-label text-muted-foreground">{label}</p>
-        {description ? (
-          <p className="type-body-sm text-muted-foreground">{description}</p>
-        ) : null}
-      </div>
-      {children}
-    </div>
-  );
-}
+  "border border-border bg-foreground/5 px-4 py-3 font-mono text-sm text-foreground/80 whitespace-pre-wrap break-all";
 
 function TerminalOutput({
   id,
@@ -245,29 +128,43 @@ function RuntimeInstallCard({
   onChange: (runtime: Runtime) => void;
   command: string;
 }) {
+  const [copied, setCopied] = useState(false);
+  const timeoutRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current !== null) window.clearTimeout(timeoutRef.current);
+    };
+  }, []);
+
+  async function handleCopy() {
+    try {
+      await navigator.clipboard.writeText(command);
+      setCopied(true);
+    } catch {
+      return;
+    }
+    if (timeoutRef.current !== null) window.clearTimeout(timeoutRef.current);
+    timeoutRef.current = window.setTimeout(() => setCopied(false), 2000);
+  }
+
   return (
-    <div className="max-w-3xl overflow-hidden border border-border bg-background">
+    <div className="max-w-2xl border border-border">
       <Tabs
         value={runtime}
         onValueChange={(value) => onChange(value as Runtime)}
         className="w-full gap-0"
       >
-        <div className="space-y-4 border-b border-border bg-muted/[0.3] px-4 py-4 sm:px-5">
-          <div className="space-y-1">
-            <p className="type-label text-muted-foreground">Install all</p>
-            <p className="type-body-sm max-w-xl text-muted-foreground">
-              Choose your agent runtime, then copy the install command.
-            </p>
-          </div>
+        <div className="border-b border-border bg-muted p-1">
           <TabsList
             aria-label="Agent runtime"
-            className="flex w-full flex-wrap justify-start gap-1 bg-transparent p-0"
+            className="flex w-full flex-wrap justify-start bg-transparent p-0"
           >
             {RUNTIMES.map((item) => (
               <TabsTrigger
                 key={item}
                 value={item}
-                className="type-caption min-h-9 border border-transparent bg-background/0 px-3 py-1 text-muted-foreground hover:border-border hover:bg-background/80 hover:text-foreground data-active:border-border data-active:bg-background data-active:text-foreground sm:min-h-9"
+                className="type-caption sm:min-h-[32px] gap-1.5 px-2.5 py-1"
               >
                 <span>{RUNTIME_LABELS[item]}</span>
               </TabsTrigger>
@@ -275,12 +172,21 @@ function RuntimeInstallCard({
           </TabsList>
         </div>
       </Tabs>
-      <CommandPanel
-        label={`Install in ${RUNTIME_LABELS[runtime]}`}
-        description="Copy and paste this into your agent runtime."
-        command={command}
-        className="border-0"
-      />
+      <button
+        type="button"
+        onClick={handleCopy}
+        className="group flex w-full items-center gap-3 bg-foreground/5 px-4 py-3.5 font-mono text-sm transition-colors hover:bg-foreground/[0.07]"
+        title={copied ? "Copied" : "Copy command"}
+        aria-live="polite"
+      >
+        <span className="text-foreground/40">$</span>
+        <span className="flex-1 truncate text-left text-foreground/80">
+          {command}
+        </span>
+        <span className="shrink-0 text-muted-foreground/60 transition-colors group-hover:text-foreground/60">
+          {copied ? <CheckIcon size={16} /> : <CopyIcon size={16} />}
+        </span>
+      </button>
     </div>
   );
 }
@@ -424,11 +330,7 @@ function SkillRow({
           </div>
         )}
 
-        <CommandPanel
-          label={`Install in ${RUNTIME_LABELS[runtime]}`}
-          description="Copy and paste this into your agent runtime."
-          command={command}
-        />
+        <CopyableCodeBlock command={command} />
 
         {/* Actions: buttons */}
         <div className="flex flex-wrap items-center gap-3">
@@ -472,22 +374,20 @@ function SkillRow({
 
         {expandedDetails ? (
           <div id={detailsId} className="space-y-4">
-            <DetailPanel
-              label="Commands"
-              description="Wrapped Zora CLI calls used by this skill."
-            >
+            <div>
+              <p className="type-label mb-2 text-muted-foreground">Commands</p>
               <pre className={PRE_BLOCK_CLASS}>{skill.commands.join("\n")}</pre>
-            </DetailPanel>
-            <DetailPanel
-              label="Example output"
-              description="Sample report format from a real run."
-            >
+            </div>
+            <div>
+              <p className="type-label mb-2 text-muted-foreground">
+                Example output
+              </p>
               <TerminalOutput
                 id={`${detailsId}-output`}
                 displayed={displayed}
                 typingDone={typingDone}
               />
-            </DetailPanel>
+            </div>
           </div>
         ) : null}
       </div>

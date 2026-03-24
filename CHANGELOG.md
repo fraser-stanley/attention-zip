@@ -1,5 +1,15 @@
 # Changelog
 
+## 2026-03-24 (CLI trading docs alignment)
+
+### Changed
+- **Shared identifier wording** — skill docs, catalog metadata, and agent docs now describe `zora get`, `zora buy`, and `zora sell` with `<identifier>` instead of address-only wording where the CLI now supports shared coin resolution.
+- **Wallet-backed setup docs** — README, CLAUDE.md, SKILL.md files, and FAQ copy now mention `zora wallet backup` as the macOS recovery path for locally created wallets.
+- **Host-readiness checks** — every `scripts/validate.sh` now checks `zora --help` in addition to `command -v zora`, and wallet-backed skills surface the Keychain backup reminder on macOS.
+
+### Fixed
+- **Stale CLI syntax references** — repo docs no longer imply that `zora buy` or `zora sell` use `--json`.
+
 ## 2026-03-23 (Stakeholder-ready install flow + skills page simplification)
 
 ### Added
@@ -50,9 +60,9 @@
 ## 2026-03-19 (CLI syntax update)
 
 ### Changed
-- **CLI flag update** — all skill `wraps` arrays now use `--json` instead of the old `-o json` syntax.
-- **Momentum Trader buy/sell syntax** — `zora buy <address> --eth <amount> --json` (was `--amount <eth>`), `zora sell` now includes `--json`.
-- **Creator Pulse** — added `zora get <address> --json` to wraps (command now exists in CLI).
+- **CLI flag update** — `explore`, `get`, and `balance` use `--json`. `buy` and `sell` use `-o json`.
+- **Momentum Trader buy/sell syntax** — `zora buy <identifier> --eth <amount> -o json`, `zora sell <identifier> --amount <tokens> -o json`.
+- **Creator Pulse** — added `zora get <identifier> --json` to wraps once the command landed in the CLI.
 - **Portfolio Scout** — `zora balance --json` for local wallet coin holdings + SDK `getProfileBalances()` for any-wallet lookups. Removed incorrect "ETH balance" references — `zora balance` returns coin holdings only, not native tokens. Updated SKILL.md with CLI + SDK dual-path documentation.
 - **CLAUDE.md** — replaced "CLI command reality check" with full CLI command reference table (8 commands), JSON output schemas, behavioral notes (exit codes, `--yes` scope, sort/type combos), and corrected `zora balance` documentation.
 

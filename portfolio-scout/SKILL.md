@@ -3,7 +3,7 @@ name: portfolio-scout
 description: Run a managed wallet check on Zora. Use when your human wants recurring portfolio snapshots, concentration alerts, or position-change reports from a dedicated wallet.
 metadata:
   author: "Zora Agent Skills"
-  version: "2.0.0"
+  version: "2.0.1"
   displayName: "Portfolio Scout"
   difficulty: "intermediate"
 ---
@@ -24,7 +24,7 @@ Use this skill when the user asks for:
 ## Setup
 
 1. Install the Zora CLI and make sure `node` is available.
-2. Configure a wallet with `zora setup` or set `ZORA_PRIVATE_KEY`.
+2. Configure a wallet with `zora setup` or set `ZORA_PRIVATE_KEY`. If you create a local wallet on macOS, run `zora wallet backup` after setup.
 3. Run `./scripts/validate.sh`.
 4. Trigger the entrypoint manually before you put it on a schedule.
 
@@ -77,7 +77,7 @@ Alerts:
 
 ## Troubleshooting
 
-If the skill says no wallet is configured, run `zora setup` or export `ZORA_PRIVATE_KEY`. This skill is wallet-backed and cannot run in a fully anonymous mode.
+If the skill says no wallet is configured, run `zora setup` or export `ZORA_PRIVATE_KEY`. If you create a local wallet on macOS, follow setup with `zora wallet backup`. This skill is wallet-backed and cannot run in a fully anonymous mode.
 
 If the concentration warning feels too sensitive, raise `ZORA_PORTFOLIO_CONCENTRATION_ALERT_PCT`.
 
@@ -88,6 +88,7 @@ If the user wants an arbitrary address lookup, use the API or SDK instead. `zora
 ## Important Notes
 
 - Portfolio Scout is read-only. It does not place or cancel orders.
+- On macOS, `zora wallet backup` is the safest way to keep a local wallet recoverable.
 - The drawdown check is a simple run-to-run comparison, not a full performance engine.
 - Local state is required for change detection. Deleting the state file resets the baseline.
 - This skill is best as a companion to execution skills, not a replacement for them.

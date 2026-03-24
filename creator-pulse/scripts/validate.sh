@@ -9,6 +9,12 @@ command -v zora >/dev/null || {
 }
 echo "  ok zora CLI installed"
 
+zora --help >/dev/null 2>&1 || {
+  echo "FAIL: zora CLI is installed but not runnable."
+  exit 1
+}
+echo "  ok zora CLI responds"
+
 command -v node >/dev/null || {
   echo "FAIL: node not found."
   exit 1

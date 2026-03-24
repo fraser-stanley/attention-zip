@@ -3,7 +3,7 @@ name: momentum-trader
 description: Run a managed momentum loop on Zora. Use when your human wants a dry-run-first execution skill that scans gainers, quotes entries, and manages trailing-stop exits from a dedicated wallet.
 metadata:
   author: "Zora Agent Skills"
-  version: "2.0.0"
+  version: "2.0.1"
   displayName: "Momentum Trader"
   difficulty: "advanced"
 ---
@@ -24,7 +24,7 @@ Use this skill when the user asks for:
 ## Setup
 
 1. Install the Zora CLI and make sure `node` is available.
-2. Use a dedicated wallet. Run `zora setup --create` or set `ZORA_PRIVATE_KEY`.
+2. Use a dedicated wallet. Run `zora setup --create` or set `ZORA_PRIVATE_KEY`. If you create a local wallet on macOS, run `zora wallet backup` before you enable live mode.
 3. Run `./scripts/validate.sh`.
 4. Leave `ZORA_MOMENTUM_LIVE=false` for the first manual run. This skill starts in dry-run mode by design.
 
@@ -50,11 +50,11 @@ The default cron is every 10 minutes. Keep `autostart` off until the dry-run out
 node scripts/run.mjs
 zora explore --sort gainers --limit 12 --json
 zora explore --sort trending --limit 12 --json
-zora get <address> --json
+zora get <identifier> --json
 zora balance coins --sort usd-value --limit 20 --json
-zora buy <address> --eth 0.01 --quote --slippage 3 -o json
-zora buy <address> --eth 0.01 --token eth --slippage 3 -o json --yes
-zora sell <address> --percent 100 --to eth --slippage 3 -o json --yes
+zora buy <identifier> --eth 0.01 --quote --slippage 3 -o json
+zora buy <identifier> --eth 0.01 --token eth --slippage 3 -o json --yes
+zora sell <identifier> --percent 100 --to eth --slippage 3 -o json --yes
 ```
 
 ## How It Works
@@ -89,9 +89,12 @@ If quotes fail, the coin is often too illiquid for the requested size. Reduce `Z
 
 If live trading is on and the wallet is wrong, stop immediately. Unset `ZORA_MOMENTUM_LIVE` or remove the private key and rerun in dry-run mode.
 
+If you created the wallet locally on macOS, run `zora wallet backup` before you trust this skill with live funds.
+
 ## Important Notes
 
 - This skill can place real trades. Treat every live run as production.
 - Dry-run is the default and should stay the default for new installs.
+- On macOS, back up any locally created trader wallet with `zora wallet backup`.
 - The local journal is part of the safety model. Do not remove it if you want auditability.
 - Use a dedicated wallet. Do not point this skill at a wallet that other tools trade from casually.

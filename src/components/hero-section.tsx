@@ -21,8 +21,8 @@ export function HeroSection() {
           {/* On mobile, orb slot is order-2 (injected below) */}
           <div className="order-3 space-y-5 lg:order-none">
             <p className="type-body-sm max-w-md text-muted-foreground">
-              Open-source skills for the Zora attention market, from trending coins
-              to execution. One command to install, read-only by default.
+              Open-source skills for the Zora attention market, from trend scans
+              to dry-run-first execution. One command to install.
             </p>
             <CopyableCodeBlock
               command={getInstallAllCommands(getSiteUrl()).claude}

@@ -275,6 +275,27 @@ describe("env requirements", () => {
   });
 });
 
+describe.each(SKILL_DIRS)("%s/scripts/validate.sh", (skill) => {
+  const content = fs.readFileSync(
+    path.join(ROOT, skill, "scripts", "validate.sh"),
+    "utf8",
+  );
+
+  it("checks that the zora CLI responds to --help", () => {
+    expect(content).toContain("zora --help");
+  });
+});
+
+describe("wallet-backed setup guidance", () => {
+  it.each(["portfolio-scout", "momentum-trader"])(
+    "%s mentions zora wallet backup",
+    (skill) => {
+      const content = readSkillMd(skill);
+      expect(content).toContain("zora wallet backup");
+    },
+  );
+});
+
 describe.each(SKILL_DIRS)("%s/scripts assets", (skill) => {
   const validatePath = path.join(ROOT, skill, "scripts", "validate.sh");
   const entrypointPath = path.join(ROOT, skill, "scripts", "run.mjs");

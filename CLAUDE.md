@@ -327,12 +327,12 @@ The Zora CLI has 8 commands: `auth`, `explore`, `get`, `buy`, `sell`, `balance`,
 | Command        | Syntax                                           | Notes                                                                                                                                                                |
 | -------------- | ------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `zora explore` | `--sort <sort> --type <type> --limit <n> --json` | Sorts: mcap, volume, new, gainers, trending, featured, last-traded, last-traded-unique. Types: all, trend, creator-coin, post                                        |
-| `zora get`     | `zora get <identifier> [--type <type>] --json`   | Identifier = 0x address or creator name. NOT ENS. Types: creator-coin, post, trend                                                                                   |
-| `zora buy`     | `zora buy <address> --eth <amount> -o json`      | Uses `-o json` (local flag), NOT `--json`. Also: --usd, --token (eth/usdc/zora), --percent, --all, --quote (preview only), --yes (skip confirm), --slippage, --debug |
-| `zora sell`    | `zora sell <address> --amount <tokens> -o json`  | Uses `-o json` (local flag), NOT `--json`. Also: --usd, --token (alias for --to), --percent, --all, --to <ETH\|USDC\|ZORA>, --quote, --yes, --slippage, --debug      |
+| `zora get`     | `zora get <identifier> [--type <type>] --json`   | Identifier = 0x address or supported coin or creator name. NOT ENS. Types: creator-coin, post, trend                                                                  |
+| `zora buy`     | `zora buy <identifier> --eth <amount> -o json`   | Uses `-o json` (local flag), NOT `--json`. Also: --usd, --token (eth/usdc/zora), --percent, --all, --quote (preview only), --yes (skip confirm), --slippage, --debug |
+| `zora sell`    | `zora sell <identifier> --amount <tokens> -o json` | Uses `-o json` (local flag), NOT `--json`. Also: --usd, --token (alias for --to), --percent, --all, --to <ETH\|USDC\|ZORA>, --quote, --yes, --slippage, --debug    |
 | `zora balance` | `zora balance [spendable\|coins] --json`         | Subcommands: (none) = wallet + coins, `spendable` = ETH/USDC/ZORA only, `coins` = coin holdings with --sort                                                          |
 | `zora setup`   | `zora setup [--create] [--force]`                | Creates/imports wallet at ~/.config/zora/wallet.json                                                                                                                 |
-| `zora wallet`  | `wallet info`, `wallet export`                   | Wallet inspection and export                                                                                                                                         |
+| `zora wallet`  | `wallet info`, `wallet export`, `wallet backup`  | Wallet inspection, export, and Keychain backup on macOS                                                                                                              |
 | `zora auth`    | `auth configure`, `auth status`                  | API key management                                                                                                                                                   |
 
 **CLI behavioral notes:**
@@ -341,6 +341,7 @@ The Zora CLI has 8 commands: `auth`, `explore`, `get`, `buy`, `sell`, `balance`,
 - Exit codes: 0 = success (including user abort), 1 = all errors.
 - `--yes` skips the trade confirmation prompt only. Validation (API key, wallet, balance checks) still runs.
 - `--sort` and `--type` combine (e.g., `--sort trending --type creator-coin`). Invalid combos return a clear error. Some sorts (`gainers`, `last-traded`, `last-traded-unique`) only support `--type post`.
+- `buy` and `sell` reuse the same identifier resolution path as `get`, so manual spot checks can use a name or a 0x address.
 - `zora get` returns `uniqueHolders` and `volume24h` but NOT swaps or detailed holder list. Use SDK `getCoinHolders`/`getCoinSwaps` for those.
 - No watch/streaming mode. Single request, single response, exit.
 
@@ -366,6 +367,7 @@ The Zora CLI has 8 commands: `auth`, `explore`, `get`, `buy`, `sell`, `balance`,
 - `zora setup` creates a new EOA keypair or imports an existing private key
 - Keys stored at `~/.config/zora/wallet.json` (mode 0600)
 - `ZORA_PRIVATE_KEY` env var takes precedence over stored wallet
+- On macOS, `zora wallet backup` stores a recoverable backup in Keychain
 - `--create` skips interactive prompt, `--force` overwrites existing wallet
 - **No spending limits or scope restrictions** — it's a raw private key
 

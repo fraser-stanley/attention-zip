@@ -3,7 +3,7 @@ name: creator-pulse
 description: Run a managed creator-coin watchlist on Zora. Use when your human wants recurring updates on featured creators, creator-coin momentum, or watchlist changes without trading.
 metadata:
   author: "Zora Agent Skills"
-  version: "2.0.0"
+  version: "2.0.1"
   displayName: "Creator Pulse"
   difficulty: "intermediate"
 ---
@@ -46,14 +46,14 @@ node scripts/run.mjs
 zora explore --sort featured --type creator-coin --limit 8 --json
 zora explore --sort trending --type creator-coin --limit 8 --json
 zora explore --sort volume --type creator-coin --limit 8 --json
-zora get <handle-or-address> --type creator-coin --json
+zora get <identifier> --type creator-coin --json
 ```
 
 ## How It Works
 
 The entrypoint pulls three creator views through the CLI, filters the rows, and stores the featured creator ids plus the latest watchlist metrics in `~/.config/zora-agent-skills/creator-pulse/state.json`.
 
-When a watchlist is configured, it resolves each handle or address through `zora get --type creator-coin --json`. The runtime compares the new values against the saved state and alerts when volume moves by at least 10% or holder count moves by at least 25 accounts. It also flags creators that enter the featured view between runs.
+When a watchlist is configured, it resolves each identifier through `zora get --type creator-coin --json`. The runtime compares the new values against the saved state and alerts when volume moves by at least 10% or holder count moves by at least 25 accounts. It also flags creators that enter the featured view between runs.
 
 This is a template. The default thresholds are conservative so the report stays readable. Remix it by changing the watchlist, the alert thresholds inside `scripts/run.mjs`, or the output format that gets handed to the human.
 
@@ -74,7 +74,7 @@ Watchlist alerts:
 
 ## Troubleshooting
 
-If a handle lookup fails, try the coin contract address. Address lookups are stricter and avoid ambiguity.
+If an identifier lookup fails or resolves ambiguously, try the coin contract address. Shared lookup handles names well, but addresses are still the clean fallback.
 
 If the report is too noisy, raise the volume floor or shorten the watchlist. Creator Pulse works best when it tracks a small set of creators with real intent.
 

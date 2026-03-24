@@ -17,7 +17,7 @@ export const metadata: Metadata = {
     absolute: "Attention Index | Agent Skills for the Zora Attention Market",
   },
   description:
-    "Agent skills and live market data for the Zora attention market. Scan trends, check portfolios, build briefings, and trade momentum.",
+    "Install agent skills for the Zora attention market. Scan trends, build briefings, check portfolios, and trade momentum.",
   alternates: { canonical: "/" },
 };
 
@@ -25,6 +25,14 @@ const faqJsonLd = {
   "@context": "https://schema.org",
   "@type": "FAQPage",
   mainEntity: [
+    {
+      "@type": "Question",
+      name: "What is Attention Index?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Attention Index is a skill gallery and live market board for the Zora attention market.",
+      },
+    },
     {
       "@type": "Question",
       name: "What is the Zora attention market?",
@@ -38,7 +46,7 @@ const faqJsonLd = {
       name: "What are agent skills?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Skills your agent can install to scan, track, or trade the Zora market. Each one includes readable instructions and source.",
+        text: "Skills your agent can install to scan, track, or trade the Zora attention market. Each one includes source and readable instructions.",
       },
     },
     {
@@ -46,7 +54,7 @@ const faqJsonLd = {
       name: "How do I install a skill?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Copy the install command from the skills page, run it in your agent runtime, then follow the skill notes.",
+        text: "Copy the install command, run it in your agent runtime, then follow the skill notes.",
       },
     },
     {
@@ -108,7 +116,7 @@ export default function Home() {
             <div>
               <h2 className="type-label text-muted-foreground">Skills</h2>
               <p className="text-xs text-muted-foreground mt-1">
-                Trend scans, briefings, portfolio checks, and trading loops.
+                Trend scans, briefings, portfolio checks, and momentum trades.
                 Pick one and install it.
               </p>
             </div>

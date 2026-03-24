@@ -16,7 +16,7 @@ export default function HomeLoading() {
             <div>
               <h2 className="text-sm font-medium text-muted-foreground">Skills</h2>
               <p className="text-xs text-muted-foreground mt-1">
-                Trend scans, briefings, portfolio checks, and trading loops.
+                Trend scans, briefings, portfolio checks, and momentum trades.
                 Pick one and install it.
               </p>
             </div>

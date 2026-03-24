@@ -13,6 +13,17 @@ The site should be framed as the place to install and inspect market skills for 
 ### Trust copy must stay literal
 The strongest trust claims here are plain ones: open source, no custody, some skills need a wallet, trading is opt-in, dry run by default. Broader statements like "No keys" or vague safety language create drift because they stop being true as soon as a trading skill or wallet-backed skill is in view.
 
+## 2026-03-24 — Custom staging auth gate
+
+### The gate has to live in the app
+This Vercel project cannot rely on native Vercel password protection, so the staging gate has to be enforced in the Next.js app itself. `STAGING_PASSWORD` turns on a redirect to `/login` for visitor-facing pages.
+
+### Agent surfaces stay public on purpose
+The gate should not block `/api`, `/api/*`, `/skills/[id]/skill-md`, `/.well-known/ai.json`, or static public files. Those routes are part of agent install and discovery flows. The goal is to protect the human-facing site shell, not to break skill consumption.
+
+### The cookie should not store the raw password
+The initial login loop came from a fragile client redirect flow. The safer model is: hash the configured password into a stable token, set that token in an HTTP-only cookie, then do a full page navigation after successful login so the next request is evaluated server-side with the cookie in place.
+
 ## 2026-03-23 — Stakeholder-ready install surface
 
 ### Default to a runtime that actually works

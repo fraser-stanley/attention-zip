@@ -13,6 +13,8 @@ pnpm dev
 
 Open http://localhost:3000.
 
+If `STAGING_PASSWORD` is set, the app redirects visitor-facing pages to `/login` first.
+
 ## Skills
 
 Five skills for the Zora market. Each skill directory contains:
@@ -86,6 +88,7 @@ Merge gate: `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm build`.
 | ------------------ | --------------- | ----------------------------------------------------------------- |
 | `ZORA_API_KEY`     | No              | Higher rate limits. Get one at https://zora.co/settings/developer |
 | `ZORA_PRIVATE_KEY` | Skill-dependent | Needed for wallet-backed skills and live trading                  |
+| `STAGING_PASSWORD` | No              | Enables the custom app-level password gate for visitor pages      |
 | `NEXT_PUBLIC_SITE_URL` | No          | Canonical site URL outside Vercel                                 |
 
 Skill-specific env vars and tunables live in each `clawhub.json`. Momentum Trader is dry-run by default and only goes live when `ZORA_MOMENTUM_LIVE=true`.
@@ -99,9 +102,11 @@ vercel
 For a stakeholder build on Vercel:
 
 - Set `ZORA_API_KEY` for better rate limits. The app still builds and falls back safely without it.
+- Set `STAGING_PASSWORD` if the deployment should stay behind the repo's custom password gate. This protects visitor-facing pages at `/login` because the project cannot use Vercel's native password protection on the current plan.
 - You do not need `ZORA_PRIVATE_KEY` unless you are testing wallet-backed skills outside the mocked portfolio flow.
 - `/dashboard` and `/leaderboard` use live SDK data with mock fallback if upstream data is empty or unavailable.
 - The wallet connect flow, portfolio experience, and activity ticker are still mocked intentionally for demo use.
+- Agent-facing routes stay public when the gate is on: `/api`, `/api/*`, `/skills/<id>/skill-md`, `/.well-known/ai.json`, and static public files.
 
 ## Documentation
 

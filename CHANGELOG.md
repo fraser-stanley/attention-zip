@@ -7,6 +7,17 @@
 - **Skill catalog wording** — visible skill descriptions, badges, and install prompts now lead with what each skill helps you do, not runtime plumbing.
 - **Docs alignment** — CLAUDE.md, TONE.md, AGENTS.md, LEARNINGS.md, and README now document the market-first copy rules so future edits do not drift back to `entrypoint`, `clawhub.json`, or other implementation-first phrasing in public UI copy.
 
+## 2026-03-24 (Custom staging auth gate)
+
+### Added
+- **App-level password gate** — `STAGING_PASSWORD` now enables a custom `/login` flow for visitor-facing pages so the Vercel hobby deployment can stay protected without Vercel's native auth.
+- **Shared auth helpers** — `src/lib/staging-auth.ts` centralizes the cookie name, password-token hashing, and safe `next` path handling.
+- **Auth regression coverage** — `src/__tests__/staging-auth.test.ts` covers token generation and redirect sanitization.
+
+### Changed
+- **Proxy behavior** — `src/proxy.ts` now gates visitor-facing pages, preserves the intended destination in the `next` query param, and leaves `/api`, `/api/*`, `/skills/[id]/skill-md`, `/.well-known/ai.json`, and static public files accessible.
+- **Login flow** — successful login now lands with a full page navigation after the cookie is set, which avoids the client-side loop that previously left users stuck on the password screen.
+
 ## 2026-03-24 (CLI trading docs alignment)
 
 ### Changed

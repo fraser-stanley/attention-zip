@@ -62,6 +62,10 @@ When docs say a skill requires a "real `zora` binary on `PATH`", that means the 
 
 For homepage, skills page, metadata, JSON-LD, and other visitor-facing copy, lead with trends, market scans, briefings, portfolios, and momentum trading. Do not lead with `entrypoint`, `clawhub.json`, `manifest`, `env vars`, or other implementation terms unless the page is explicit technical documentation. Attention Index helps agents use the Zora market, it is not Zora itself.
 
+### Custom staging auth only gates pages
+
+If `STAGING_PASSWORD` is set, `src/proxy.ts` redirects visitor-facing pages to `/login` and expects the `staging_auth` cookie. Do not remove this as "redundant" auth. It exists because the Vercel project cannot use native password protection. Keep `/api`, `/api/*`, `/skills/[id]/skill-md`, `/.well-known/ai.json`, and static public files accessible so agent installs and discovery still work.
+
 ## How to add a skill
 
 1. Create a skill directory at the project root: `<skill-slug>/SKILL.md`, `<skill-slug>/clawhub.json`, `<skill-slug>/scripts/run.mjs`, `<skill-slug>/scripts/validate.sh`

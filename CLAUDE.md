@@ -35,6 +35,8 @@ ZORA_API_KEY=your_key_here
 
 The API key is **optional**. The SDK works without it (uses registered queries), but requests are rate-limited. Get a key from https://zora.co/settings/developer.
 
+If you set `STAGING_PASSWORD`, visitor-facing pages are gated behind `/login`. This is the repo's custom staging gate for Vercel hobby deployments. `GET /api`, `GET /api/*`, `GET /skills/[id]/skill-md`, `GET /.well-known/ai.json`, and static public files stay public so agent installs and discovery still work.
+
 ## Project structure
 
 ```
@@ -62,6 +64,7 @@ src/
 │   ├── robots.ts                   # robots.txt via Next.js metadata API
 │   ├── sitemap.ts                  # sitemap.xml with all public routes
 │   ├── manifest.ts                 # PWA manifest (icons, theme, display)
+│   ├── login/page.tsx              # Custom staging password screen when STAGING_PASSWORD is set
 │   ├── agents/page.tsx             # Agent list (trader leaderboard with portfolio links)
 │   ├── agents/[address]/page.tsx   # Agent profile (PnL, sparkline, positions, holdings)
 │   └── api/
@@ -69,6 +72,7 @@ src/
 │       ├── skills/route.ts         # Skill catalog for agents
 │       ├── explore/route.ts        # Explore queries + cache headers
 │       ├── leaderboard/route.ts    # Trader leaderboard
+│       ├── staging-auth/route.ts   # Password check, sets the staging auth cookie
 │       └── agents/[address]/route.ts # Agent profile data
 ├── components/
 │   ├── nav.tsx                     # Navigation bar (6 sections incl. Portfolio + wallet menu toggle)
@@ -105,6 +109,7 @@ src/
     ├── site.ts                     # Site metadata and URL helpers
     ├── zora.ts                     # SDK wrapper: all query functions + formatting helpers
     ├── skills.ts                   # Static skill definitions (5 skills)
+    ├── staging-auth.ts             # Shared staging auth token + redirect sanitization helpers
     ├── providers.tsx               # React Query provider (30s staleTime)
     ├── wallet-context.tsx           # Mock wallet state (localStorage, useSyncExternalStore, skill seeding)
     ├── installed-skills-context.tsx # Installed skills store (localStorage, seed/clear on connect/disconnect)
@@ -115,12 +120,13 @@ src/
     ├── activity-mock-data.ts       # Mock agent trade entries for ticker marquee
     └── shaders/
         └── dither-effect.ts        # 4x4 Bayer matrix dithering post-process (binary output)
-├── proxy.ts                        # CORS headers for /api/*
+├── proxy.ts                        # Custom staging auth gate for pages + CORS headers for /api/*
 ```
 
 ## Key decisions
 
 - **Server components fetch initial data directly** through `src/lib/data.ts`, which wraps the SDK with `unstable_cache` and mock-data fallbacks. This keeps the first paint server-rendered without duplicating fetch logic.
+- **Staging auth is app-level, not Vercel-native** — when `STAGING_PASSWORD` is set, `src/proxy.ts` redirects visitor-facing pages to `/login`. The cookie stores a SHA-256 token of the password, not the raw password. Agent-facing routes (`/api`, `/api/*`, `/skills/[id]/skill-md`, `/.well-known/ai.json`) and static public files stay accessible.
 - **Client components still refresh through API routes** (`/api/explore`, `/api/leaderboard`) using React Query. The API remains the public integration surface for external agents and local tooling.
 - **Agent discovery is explicit** via `/api`, `/api/skills`, JSON-LD, and `/.well-known/ai.json`.
 - **Skills are static data** in `src/lib/skills.ts`. No database, no CMS. The homepage grid and skills gallery both render from this array — add a skill to the array and both pages update automatically.

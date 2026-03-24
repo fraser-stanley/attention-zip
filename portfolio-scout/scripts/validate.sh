@@ -9,6 +9,12 @@ command -v zora >/dev/null || {
 }
 echo "  ok zora CLI installed"
 
+zora --help >/dev/null 2>&1 || {
+  echo "FAIL: zora CLI is installed but not runnable."
+  exit 1
+}
+echo "  ok zora CLI responds"
+
 command -v node >/dev/null || {
   echo "FAIL: node not found."
   exit 1
@@ -23,5 +29,9 @@ if ! zora wallet info >/dev/null 2>&1; then
   exit 1
 fi
 echo "  ok wallet available"
+
+if [[ "${OSTYPE:-}" == darwin* ]]; then
+  echo "  note run 'zora wallet backup' to save a Keychain backup"
+fi
 
 echo "PASS: portfolio-scout ready"

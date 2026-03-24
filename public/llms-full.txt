@@ -13,9 +13,9 @@ The Zora CLI has 8 commands. All data is public on-chain data on Base.
 | Command | Syntax | JSON flag | Notes |
 |---------|--------|-----------|-------|
 | `zora explore` | `--sort <sort> --type <type> --limit <n>` | `--json` | Sorts: mcap, volume, new, gainers, trending, featured, last-traded, last-traded-unique. Types: all, trend, creator-coin, post |
-| `zora get` | `<identifier> [--type <type>]` | `--json` | Identifier = 0x address or creator name. NOT ENS. Returns uniqueHolders + volume24h |
-| `zora buy` | `<address> --eth <amount>` | `-o json` | Also: --usd, --token (eth/usdc/zora), --percent, --all, --quote (preview), --yes (skip confirm), --slippage, --debug |
-| `zora sell` | `<address> --amount <tokens>` | `-o json` | Also: --usd, --token (alias for --to), --percent, --all, --to ETH|USDC|ZORA, --quote, --yes, --slippage, --debug |
+| `zora get` | `<identifier> [--type <type>]` | `--json` | Identifier = 0x address or supported coin or creator name. NOT ENS. Shared resolver is reused by get, buy, and sell |
+| `zora buy` | `<identifier> --eth <amount>` | `-o json` | Also: --usd, --token (eth/usdc/zora), --percent, --all, --quote (preview), --yes (skip confirm), --slippage, --debug |
+| `zora sell` | `<identifier> --amount <tokens>` | `-o json` | Also: --usd, --token (alias for --to), --percent, --all, --to ETH|USDC|ZORA, --quote, --yes, --slippage, --debug |
 | `zora balance` | `[spendable\|coins]` | `--json` | Subcommands: (none) = wallet + coins, `spendable` = ETH/USDC/ZORA only, `coins` = coin holdings with --sort |
 | `zora setup` | `[--create] [--force]` | n/a | Creates/imports wallet at ~/.config/zora/wallet.json |
 | `zora wallet` | `info`, `export`, `backup` | n/a | Keychain-protected backup on macOS |
@@ -44,6 +44,7 @@ The Zora CLI has 8 commands. All data is public on-chain data on Base.
 - `zora setup` creates a new EOA keypair or imports an existing private key
 - Keys stored at `~/.config/zora/wallet.json` (mode 0600)
 - `ZORA_PRIVATE_KEY` env var takes precedence over stored wallet
+- On macOS, `zora wallet backup` stores a recoverable backup in Keychain
 - No spending limits or scope restrictions — raw private key
 - Kill switch: remove the env var or delete the wallet file
 
@@ -63,12 +64,13 @@ zora explore --sort trending --type trend --json
 zora explore --sort new --type trend --json
 zora explore --sort volume --type trend --json
 zora explore --sort mcap --type trend --json
-zora get <address> --json
+zora get <identifier> --type trend --json
 ```
 
 **Notes:**
 - Always use `--type trend` to filter for topic coins
 - `--sort gainers` does NOT work with `--type trend` — use `--sort volume` instead
+- Shared identifier resolution can handle trend names, but 0x addresses are still the safest fallback if a name is ambiguous
 - Compute % change: `marketCapDelta24h / (marketCap - marketCapDelta24h) * 100`
 - No wallet needed
 
@@ -82,8 +84,7 @@ Track creator coin ecosystems and featured creators.
 ```
 zora explore --type creator-coin --json
 zora explore --sort featured --type creator-coin --json
-zora get <creator-name> --json
-zora get <address> --type creator-coin --json
+zora get <identifier> --type creator-coin --json
 ```
 
 **Notes:**
@@ -140,6 +141,7 @@ Sort options: `usd-value` (default), `balance`, `market-cap`, `price-change`.
 - Wallet-only — no address argument. Reads from ~/.config/zora/wallet.json
 - Shows Zora coin holdings only — NOT native ETH, USDC, or ZORA token balances
 - Requires `zora setup` first
+- On macOS, run `zora wallet backup` after setup if you want a recoverable local wallet
 - For arbitrary address lookups, use the API: GET /api/agents/<address>
 
 ### 5. Momentum Trader (execution, advanced)
@@ -151,11 +153,11 @@ Auto-buy trending coins with safety rails. Executes real trades with real ETH.
 **Commands:**
 ```
 zora explore --sort gainers --json           # find candidates
-zora get <address> --json                    # validate (volume, holders)
-zora buy <address> --quote -o json           # dry-run ALWAYS first
-zora buy <address> --eth 0.01 -o json --yes  # execute buy
-zora sell <address> --all -o json --yes      # exit position
-zora sell <address> --amount 100 --to USDC -o json --yes  # partial exit
+zora get <identifier> --json                 # validate (volume, holders)
+zora buy <identifier> --quote -o json        # dry-run ALWAYS first
+zora buy <identifier> --eth 0.01 -o json --yes  # execute buy
+zora sell <identifier> --all -o json --yes  # exit position
+zora sell <identifier> --amount 100 --to USDC -o json --yes  # partial exit
 zora balance --json                         # check positions
 ```
 
@@ -182,8 +184,10 @@ zora balance --json                         # check positions
 
 **Notes:**
 - buy/sell use `-o json`, not `--json`
+- buy/sell accept the same shared identifier resolution as `zora get`
 - `--yes` skips confirmation only — validation still runs
 - Requires dedicated trader wallet: `zora setup --create`
+- On macOS, run `zora wallet backup` before live trading if the wallet lives on disk
 - Kill switch: remove ZORA_PRIVATE_KEY or delete ~/.config/zora/wallet.json
 - No server-side guardrails. The agent enforces limits from these instructions.
 

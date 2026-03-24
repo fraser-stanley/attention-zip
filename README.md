@@ -30,7 +30,7 @@ Five managed skills. Each skill directory contains:
 | [portfolio-scout](portfolio-scout/) | Wallet-backed portfolio monitor with concentration and drawdown checks  | Read-only |
 | [momentum-trader](momentum-trader/) | Dry-run-first momentum loop with quotes, daily caps, and trailing exits | Execution |
 
-Trend Scout, Creator Pulse, and Briefing Bot do not need a wallet. Portfolio Scout and Momentum Trader need a dedicated wallet configured through `zora setup` or `ZORA_PRIVATE_KEY`.
+Trend Scout, Creator Pulse, and Briefing Bot do not need a wallet. Portfolio Scout and Momentum Trader need a dedicated wallet configured through `zora setup` or `ZORA_PRIVATE_KEY`. If you create that wallet locally on macOS, run `zora wallet backup` after setup.
 
 ## API
 

@@ -54,7 +54,7 @@ const faqJsonLd = {
       name: "Do I need a wallet?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Trend Scout, Creator Pulse, and Briefing Bot work without a wallet. Portfolio Scout and Momentum Trader use a dedicated wallet created with zora setup or ZORA_PRIVATE_KEY.",
+        text: "Trend Scout, Creator Pulse, and Briefing Bot work without a wallet. Portfolio Scout and Momentum Trader use a dedicated wallet created with zora setup or ZORA_PRIVATE_KEY. On macOS, zora wallet backup adds a Keychain-backed recovery path for local wallets.",
       },
     },
     {

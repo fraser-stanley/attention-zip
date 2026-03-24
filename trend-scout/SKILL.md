@@ -3,7 +3,7 @@ name: trend-scout
 description: Run a managed trend scan on Zora. Use when your human wants recurring coverage of trend coins, new entrants, volume leaders, or a small watchlist without placing trades.
 metadata:
   author: "Zora Agent Skills"
-  version: "2.0.0"
+  version: "2.0.1"
   displayName: "Trend Scout"
   difficulty: "beginner"
 ---
@@ -49,7 +49,7 @@ zora explore --sort trending --type trend --limit 8 --json
 zora explore --sort new --type trend --limit 8 --json
 zora explore --sort volume --type trend --limit 8 --json
 zora explore --sort mcap --type trend --limit 8 --json
-zora get <address> --type trend --json
+zora get <identifier> --type trend --json
 ```
 
 ## How It Works
@@ -82,7 +82,7 @@ Watchlist:
 
 If you see empty sections, lower `ZORA_TREND_MIN_VOLUME_USD`. The filter is applied after the CLI response, so an aggressive floor can remove every row.
 
-If the watchlist misses a named trend, switch that entry to an address. `zora get --type trend` is address-first today, so the runtime is most reliable when the watchlist uses 0x identifiers.
+If the watchlist misses a named trend, switch that entry to an address. Shared identifier resolution is broader now, but 0x identifiers still avoid name collisions.
 
 If the CLI returns a rate-limit error, add an API key or widen the cron interval.
 

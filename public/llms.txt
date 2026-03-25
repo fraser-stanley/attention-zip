@@ -11,8 +11,8 @@
 
 ## Skills
 
-- [Trend Scout](https://raw.githubusercontent.com/fraser-stanley/zora-agent-skills/main/trend-scout/SKILL.md): Trending topic coins, new launches, volume leaders
-- [Creator Pulse](https://raw.githubusercontent.com/fraser-stanley/zora-agent-skills/main/creator-pulse/SKILL.md): Creator coin ecosystems, featured creators, watchlists
-- [Briefing Bot](https://raw.githubusercontent.com/fraser-stanley/zora-agent-skills/main/briefing-bot/SKILL.md): Structured market digest with portfolio awareness
-- [Portfolio Scout](https://raw.githubusercontent.com/fraser-stanley/zora-agent-skills/main/portfolio-scout/SKILL.md): Local wallet coin holdings
-- [Momentum Trader](https://raw.githubusercontent.com/fraser-stanley/zora-agent-skills/main/momentum-trader/SKILL.md): Auto-buy trending coins with safety rails
+- [Trend Scout](/skills/trend-scout/skill-md): Trending topic coins, new launches, volume leaders
+- [Creator Pulse](/skills/creator-pulse/skill-md): Creator coin ecosystems, featured creators, watchlists
+- [Briefing Bot](/skills/briefing-bot/skill-md): Structured market digest with portfolio awareness
+- [Portfolio Scout](/skills/portfolio-scout/skill-md): Local wallet coin holdings
+- [Momentum Trader](/skills/momentum-trader/skill-md): Auto-buy trending coins with safety rails

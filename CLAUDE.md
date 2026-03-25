@@ -48,7 +48,10 @@ momentum-trader/                    # Skill: momentum trading
 src/
 ├── __tests__/
 │   ├── skills-structure.test.ts    # SKILL.md + clawhub.json structural validation
-│   └── skills-data.test.ts         # skills.ts array integrity + cross-file sync
+│   ├── skills-data.test.ts         # skills.ts array integrity + cross-file sync
+│   ├── wallet-auth.test.ts         # SIWE auth logic (nonce, replay, expiry, signature)
+│   ├── wallet-routes.test.ts       # /api/wallet/challenge + /api/wallet/verify integration
+│   └── wallet-session.test.ts      # WalletSession type guard validation
 ├── app/
 │   ├── page.tsx                    # Homepage (hero, terminal market board, skills preview, waitlist)
 │   ├── loading.tsx                 # Homepage loading skeleton (instant nav)
@@ -73,6 +76,8 @@ src/
 │       ├── explore/route.ts        # Explore queries + cache headers
 │       ├── leaderboard/route.ts    # Trader leaderboard
 │       ├── staging-auth/route.ts   # Password check, sets the staging auth cookie
+│       ├── wallet/challenge/route.ts # SIWE challenge nonce issuance
+│       ├── wallet/verify/route.ts   # SIWE token verification + session creation
 │       └── agents/[address]/route.ts # Agent profile data
 ├── components/
 │   ├── nav.tsx                     # Navigation bar (6 sections incl. Portfolio + wallet menu toggle)
@@ -95,7 +100,7 @@ src/
 │   ├── skill-card.tsx               # Unified skill card with install/remove states and peer-hover link
 │   ├── portfolio-auth-gate.tsx     # Client redirect gate — sends disconnected users to /
 │   ├── wallet-menu.tsx             # Brutalist wallet dropdown (QR code, balance, copy address, disconnect)
-│   ├── wallet-connect-modal.tsx     # Mock wallet connect flow (MetaMask/Coinbase/WalletConnect)
+│   ├── wallet-connect-modal.tsx     # SIWE wallet connect via Zora CLI (challenge, paste token, verify)
 │   ├── hover-media-overlay.tsx      # Viewport-centered token image overlay on table row hover (desktop only)
 │   ├── activity-ticker.tsx         # Agent trade feed marquee (Simmer-style, mock data)
 │   ├── activity-ticker-section.tsx # Activity ticker wrapper (imports mock trade data)
@@ -111,7 +116,9 @@ src/
     ├── skills.ts                   # Static skill definitions (5 skills)
     ├── staging-auth.ts             # Shared staging auth token + redirect sanitization helpers
     ├── providers.tsx               # React Query provider (30s staleTime)
-    ├── wallet-context.tsx           # Mock wallet state (localStorage, useSyncExternalStore, skill seeding)
+    ├── wallet-auth.ts               # SIWE challenge/verify logic (nonce store, replay protection, viem)
+    ├── wallet-session.ts            # WalletSession type + isWalletSession guard
+    ├── wallet-context.tsx           # Verified wallet session state (localStorage, useSyncExternalStore, skill seeding)
     ├── installed-skills-context.tsx # Installed skills store (localStorage, seed/clear on connect/disconnect)
     ├── utils.ts                    # cn() helper for className merging
     ├── pnl-utils.ts                # Shared PnL formatting (pnlColor, formatPnl, formatPct)
@@ -144,6 +151,7 @@ src/
 - **Activity ticker shows mock agent trades** — Simmer-style marquee (`@AgentName bought $12 Higher 3m ago`), rendered from the root layout so it appears directly below the nav across the site. Mock data in `src/lib/activity-mock-data.ts` with `TradeActivityItem` interface. Green for buys, magenta for sells. Will swap to real trade data when tracking is available.
 - **Leaderboard mock traders share ticker agent names** — `MOCK_TRADERS` in `src/lib/mock-data.ts` uses `displayName` (optional on `TraderNode`) for ~10 of 20 entries, matching the ticker marquee agents (`$TrendClaw`, `$MomentumBot`, etc.). The rest show as truncated 0x addresses. Ranked by lifetime P&L.
 - **Portfolio page is mock data only** — `src/lib/portfolio-mock-data.ts` provides all positions, trades, PnL stats, and sparkline data. No real wallet connection. Will be replaced with live data when trade history indexing ships.
+- **Wallet connect uses SIWE via the Zora CLI** — the modal at `src/components/wallet-connect-modal.tsx` fetches a challenge nonce from `POST /api/wallet/challenge`, shows a `zora auth connect` command for the user to run in their terminal, and verifies the signed SIWE token via `POST /api/wallet/verify`. The auth logic in `src/lib/wallet-auth.ts` enforces nonce TTL (5 min), replay protection, origin binding, Base chain (8453), statement matching, and signature verification via viem. Verified sessions are stored in localStorage as `WalletSession` objects (address + connectedAt). No private keys touch the browser.
 - **Wallet connect gates the portfolio** — `PortfolioAuthGate` redirects disconnected users to `/`. The nav conditionally shows the Portfolio link based on `isConnected`. Connecting a wallet seeds default skills (`trend-scout`, `portfolio-scout`); disconnecting clears them.
 - **Wallet menu uses the same overlay pattern as the Index** — `fixed inset-0 z-[100]`, split backdrop/content transitions (200ms blur, 100ms content snap), rendered outside the `<header>` to avoid `inert` conflicts. Brutalist design: `gap-px` grid cells, QR code spanning rows, condensed bold `font-display` for balance.
 - **Skill cards use `peer/link` for hover isolation** — `SkillCard` places an absolute `<Link>` as `peer/link` at z-0 and buttons at z-10. The card inverts on `peer-hover/link:` but button hover/click does not trigger the card's hover state.

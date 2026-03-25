@@ -2,6 +2,20 @@
 
 Decisions, trade-offs, and context that aren't obvious from the code.
 
+## 2026-03-25 — SIWE wallet connect via Zora CLI
+
+### Browser stays read-only, CLI owns the key
+The wallet connect flow uses SIWE (Sign-In with Ethereum) signed in the terminal via `zora auth connect`, not a browser extension. The browser never sees the private key. This matches the project's "no custody" principle and works for CLI-native wallets created with `zora setup`.
+
+### Site-issued nonce, not CLI-issued timestamp
+The challenge nonce is generated server-side per `POST /api/wallet/challenge` with a 5-minute TTL. This gives clean replay protection and makes a future server-backed session (e.g. httpOnly cookie) straightforward. A CLI-issued timestamp would be harder to verify and easier to replay.
+
+### Nonce replay protection uses an in-memory store
+The current nonce store is a `Map<string, NonceRecord>` in `wallet-auth.ts`. This works for single-instance Vercel deployments but won't survive across serverless invocations at scale. When that matters, swap to a KV store (Vercel KV, Upstash Redis). The interface is already isolated.
+
+### viem is a direct dependency now
+Added `viem@^2.22.12` as a direct dependency to match the Zora SDK peer expectation. This gives us `verifyMessage`, `createPublicClient`, and the SIWE message parsing we need for signature verification without pulling in a separate SIWE library.
+
 ## 2026-03-24 — Market-first copy system
 
 ### Public copy should lead with jobs, not internals

@@ -1,5 +1,21 @@
 # Changelog
 
+## 2026-03-25 (SIWE wallet connect)
+
+### Added
+- **Real wallet connect flow** — replaced the mock MetaMask/Coinbase/WalletConnect modal with a SIWE-based Zora CLI connect flow. The site issues a per-origin challenge nonce, the user runs `zora auth connect` in their terminal, and pastes the signed token back to verify wallet ownership.
+- **`/api/wallet/challenge`** — issues a SIWE challenge with nonce, expiry, and a ready-to-copy CLI command.
+- **`/api/wallet/verify`** — verifies the signed SIWE token with nonce TTL, replay protection, origin binding, Base chain (8453), statement matching, and signature verification via viem.
+- **Auth core** — `src/lib/wallet-auth.ts` handles nonce generation, storage, replay protection, and SIWE message verification. `src/lib/wallet-session.ts` defines the `WalletSession` type and type guard.
+- **Test coverage** — `wallet-auth.test.ts` (auth logic), `wallet-routes.test.ts` (route integration with real SIWE signing), `wallet-session.test.ts` (type guard validation).
+- **`viem` direct dependency** — `^2.22.12`, matching the Zora SDK peer expectation.
+
+### Changed
+- **Wallet context stores verified sessions** — `src/lib/wallet-context.tsx` now persists `WalletSession` objects (address + connectedAt) instead of raw address strings.
+- **Connect modal redesign** — single CLI flow with copy command, token paste textarea, `Cmd/Ctrl+Enter` submit, expiry refresh, and inline error states.
+- **Mock trader data randomized** — addresses and volumes in `src/lib/mock-data.ts` no longer use sequential hex patterns or round numbers.
+- **`llms.txt` skill URLs** — now use domain-relative paths (`/skills/<id>/skill-md`) instead of raw GitHub URLs.
+
 ## 2026-03-24 (Market-first copy system)
 
 ### Changed

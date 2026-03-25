@@ -8,19 +8,22 @@ import {
   type ReactNode,
 } from "react";
 import { seedDefaultSkills, clearInstalledSkills } from "@/lib/installed-skills-context";
+import { isWalletSession, type WalletSession } from "@/lib/wallet-session";
 
 const STORAGE_KEY = "zora:wallet";
-type WalletSnapshot = string | null | undefined;
+type WalletSnapshot = WalletSession | null | undefined;
 
 interface WalletContextValue {
+  session: WalletSession | null;
   address: string | null;
   isConnected: boolean;
   hydrated: boolean;
-  connect: (address: string) => void;
+  connect: (session: WalletSession) => void;
   disconnect: () => void;
 }
 
 const WalletContext = createContext<WalletContextValue>({
+  session: null,
   address: null,
   isConnected: false,
   hydrated: false,
@@ -31,10 +34,21 @@ const WalletContext = createContext<WalletContextValue>({
 let listeners: Array<() => void> = [];
 let snapshot: WalletSnapshot = undefined;
 
-function getSnapshot(): string | null {
+function parseStoredSession(raw: string | null): WalletSession | null {
+  if (!raw) return null;
+
+  try {
+    const parsed: unknown = JSON.parse(raw);
+    return isWalletSession(parsed) ? parsed : null;
+  } catch {
+    return null;
+  }
+}
+
+function getSnapshot(): WalletSession | null {
   if (snapshot !== undefined) return snapshot;
   try {
-    snapshot = localStorage.getItem(STORAGE_KEY);
+    snapshot = parseStoredSession(localStorage.getItem(STORAGE_KEY));
   } catch {
     snapshot = null;
   }
@@ -52,13 +66,13 @@ function subscribe(listener: () => void) {
   };
 }
 
-function emit(next: string | null) {
+function emit(next: WalletSession | null) {
   snapshot = next;
   try {
     if (next === null) {
       localStorage.removeItem(STORAGE_KEY);
     } else {
-      localStorage.setItem(STORAGE_KEY, next);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
     }
   } catch {
     // localStorage unavailable
@@ -77,10 +91,11 @@ export function WalletProvider({ children }: { children: ReactNode }) {
     getServerSnapshot,
   );
   const hydrated = storedAddress !== undefined;
-  const address = storedAddress ?? null;
+  const session = storedAddress ?? null;
+  const address = session?.address ?? null;
 
-  const connect = useCallback((addr: string) => {
-    emit(addr);
+  const connect = useCallback((nextSession: WalletSession) => {
+    emit(nextSession);
     seedDefaultSkills();
   }, []);
 
@@ -91,7 +106,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
 
   return (
     <WalletContext
-      value={{ address, isConnected: typeof storedAddress === "string", hydrated, connect, disconnect }}
+      value={{ session, address, isConnected: session !== null, hydrated, connect, disconnect }}
     >
       {children}
     </WalletContext>

@@ -4,7 +4,6 @@ import { Suspense } from "react";
 import { CopyableCodeBlock } from "@/components/copyable-code-block";
 import { getInstallAllCommands } from "@/lib/skills";
 import { getSiteUrl } from "@/lib/site";
-import { HighlighterStroke } from "@/components/highlighter-stroke";
 import { HeroOrbGlassLoader } from "@/components/hero-orb-glass-loader";
 import { AnimatedArrowLink } from "@/components/animated-arrow-link";
 
@@ -14,7 +13,7 @@ export function HeroSection() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
         <div className="contents lg:block lg:space-y-5">
           <h1 id="hero-heading" className="type-display order-1 lg:order-none">
-            <HighlighterStroke>Attention moves fast.</HighlighterStroke>
+            Attention moves fast.
             <br />
             Your agent keeps up.
           </h1>

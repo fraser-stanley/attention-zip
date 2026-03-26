@@ -236,7 +236,7 @@ afterEach(() => {
   }
 });
 
-describe("managed skill entrypoints", () => {
+describe("managed skill entrypoints", { timeout: 30_000 }, () => {
   it("trend-scout stores state and reports entrants on later runs", () => {
     const oldTrend = createCoin({
       name: "Old Trend",

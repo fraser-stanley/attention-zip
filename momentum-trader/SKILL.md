@@ -52,16 +52,16 @@ zora explore --sort gainers --limit 12 --json
 zora explore --sort trending --limit 12 --json
 zora get <identifier> --json
 zora balance coins --sort usd-value --limit 20 --json
-zora buy <identifier> --eth 0.01 --quote --slippage 3 -o json
-zora buy <identifier> --eth 0.01 --token eth --slippage 3 -o json --yes
-zora sell <identifier> --percent 100 --to eth --slippage 3 -o json --yes
+zora buy <address> --eth 0.01 --quote --slippage 3 -o json
+zora buy <address> --eth 0.01 --token eth --slippage 3 -o json --yes
+zora sell <address> --percent 100 --to eth --slippage 3 -o json --yes
 ```
 
 ## How It Works
 
 Each run loads `~/.config/zora-agent-skills/momentum-trader/state.json`, refreshes tracked positions from `zora balance coins`, and updates entry, peak, and current prices. If a tracked coin falls through the trailing-stop rule, the entrypoint quotes or executes a full exit depending on `ZORA_MOMENTUM_LIVE`.
 
-If cooldown, max-position, and daily-cap checks all pass, the skill scans gainers and trending tables, filters for minimum gain and volume, validates the first passing coin with `zora get`, and then asks the CLI for a buy quote. Dry-run mode stops there. Live mode sends the real `buy` call and appends the result to `journal.jsonl`.
+If cooldown, max-position, and daily-cap checks all pass, the skill scans gainers and trending tables, filters for minimum gain and volume, and validates the first passing coin with `zora get`. That step also resolves the coin's contract address, which `buy` and `sell` require. The CLI does not resolve names for trade commands, so the entrypoint always passes a 0x address. It then asks the CLI for a buy quote. Dry-run mode stops there. Live mode sends the real `buy` call and appends the result to `journal.jsonl`.
 
 This is a template. The default alpha is intentionally simple. Swap in a different candidate filter, add a watchlist, or tighten exit logic, but keep the dry-run-first discipline and the journal.
 
@@ -84,6 +84,8 @@ Candidates:
 ## Troubleshooting
 
 If the skill never finds candidates, lower `ZORA_MOMENTUM_MIN_GAIN_PCT` or `ZORA_MOMENTUM_MIN_VOLUME_USD`.
+
+If `buy` or `sell` returns "Invalid address", the command received a name instead of a 0x contract address. Use `zora get <name> --json` to resolve the address first, then pass it to the trade command.
 
 If quotes fail, the coin is often too illiquid for the requested size. Reduce `ZORA_MOMENTUM_MAX_ETH` before you loosen slippage.
 

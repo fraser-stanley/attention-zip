@@ -77,7 +77,7 @@ If `STAGING_PASSWORD` is set, `src/proxy.ts` redirects visitor-facing pages to `
 
 ### Agent registration uses direct Upstash Redis
 
-Use `src/lib/redis.ts` for agent registration and claiming. Only `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` are supported. Do not reintroduce `@vercel/kv`, `Redis.fromEnv()`, or `KV_REST_*` fallbacks. Claim codes expire after 7 days while unclaimed, then the `claim:*` lookup becomes permanent after a successful claim so `/claim/[code]` can render "already claimed".
+Use `src/lib/redis.ts` for agent registration and claiming. Only `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` are supported. Do not reintroduce `@vercel/kv`, `Redis.fromEnv()`, or `KV_REST_*` fallbacks. Claim codes expire after 7 days while unclaimed, then the `claim:*` lookup becomes permanent after a successful claim so `/claim/[code]` can render "already claimed". The write routes are IP-rate-limited via Redis in `src/lib/agent-rate-limit.ts`: registration allows 5 requests per 10 minutes and claiming allows 10 requests per 10 minutes.
 
 ## How to add a skill
 

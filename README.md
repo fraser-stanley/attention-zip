@@ -56,6 +56,8 @@ Agent-facing endpoints. All responses include cache headers.
 | `GET /llms-full.txt`        | Full agent-readable docs                                                                         |
 | `GET /.well-known/ai.json`  | Agent discovery metadata                                                                         |
 
+`POST /api/agents/register` is IP-rate-limited to 5 requests per 10 minutes. `POST /api/agents/claim` is IP-rate-limited to 10 requests per 10 minutes. Both return `429` with `Retry-After` and `X-RateLimit-*` headers when exceeded.
+
 ### Install prompts
 
 All skills:

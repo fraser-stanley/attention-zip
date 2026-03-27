@@ -1,4 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
+import {
+  AGENT_REGISTER_RATE_LIMIT,
+  enforceAgentRateLimit,
+} from "@/lib/agent-rate-limit";
 import { AgentInputError, createAgentRegistration } from "@/lib/agents";
 import { isRedisConfigured } from "@/lib/redis";
 import { getSiteUrl } from "@/lib/site";
@@ -22,6 +26,17 @@ export async function POST(request: NextRequest) {
     return serviceUnavailable();
   }
 
+  const rateLimit = await enforceAgentRateLimit(request, AGENT_REGISTER_RATE_LIMIT);
+
+  if (rateLimit.response) {
+    return rateLimit.response;
+  }
+
+  const responseHeaders = {
+    ...NO_STORE_HEADERS,
+    ...rateLimit.headers,
+  };
+
   let body: unknown;
 
   try {
@@ -31,7 +46,7 @@ export async function POST(request: NextRequest) {
       { error: "Request body must be valid JSON." },
       {
         status: 400,
-        headers: NO_STORE_HEADERS,
+        headers: responseHeaders,
       },
     );
   }
@@ -41,7 +56,7 @@ export async function POST(request: NextRequest) {
       { error: "Request body must be a JSON object." },
       {
         status: 400,
-        headers: NO_STORE_HEADERS,
+        headers: responseHeaders,
       },
     );
   }
@@ -66,7 +81,7 @@ export async function POST(request: NextRequest) {
         status: agent.status,
       },
       {
-        headers: NO_STORE_HEADERS,
+        headers: responseHeaders,
       },
     );
   } catch (error) {
@@ -75,7 +90,7 @@ export async function POST(request: NextRequest) {
         { error: error.message },
         {
           status: 400,
-          headers: NO_STORE_HEADERS,
+          headers: responseHeaders,
         },
       );
     }
@@ -84,7 +99,7 @@ export async function POST(request: NextRequest) {
       { error: "Failed to register agent." },
       {
         status: 500,
-        headers: NO_STORE_HEADERS,
+        headers: responseHeaders,
       },
     );
   }

@@ -1,5 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import {
+  AGENT_CLAIM_RATE_LIMIT,
+  enforceAgentRateLimit,
+} from "@/lib/agent-rate-limit";
+import {
   AgentInputError,
   claimAgent,
   getAgentClaimLookup,
@@ -27,6 +31,17 @@ export async function POST(request: NextRequest) {
     return serviceUnavailable();
   }
 
+  const rateLimit = await enforceAgentRateLimit(request, AGENT_CLAIM_RATE_LIMIT);
+
+  if (rateLimit.response) {
+    return rateLimit.response;
+  }
+
+  const responseHeaders = {
+    ...NO_STORE_HEADERS,
+    ...rateLimit.headers,
+  };
+
   let body: unknown;
 
   try {
@@ -36,7 +51,7 @@ export async function POST(request: NextRequest) {
       { error: "Request body must be valid JSON." },
       {
         status: 400,
-        headers: NO_STORE_HEADERS,
+        headers: responseHeaders,
       },
     );
   }
@@ -46,7 +61,7 @@ export async function POST(request: NextRequest) {
       { error: "Request body must be a JSON object." },
       {
         status: 400,
-        headers: NO_STORE_HEADERS,
+        headers: responseHeaders,
       },
     );
   }
@@ -62,7 +77,7 @@ export async function POST(request: NextRequest) {
       { error: "claim_code must match word-AB12." },
       {
         status: 400,
-        headers: NO_STORE_HEADERS,
+        headers: responseHeaders,
       },
     );
   }
@@ -72,7 +87,7 @@ export async function POST(request: NextRequest) {
       { error: "wallet must be a valid 0x address." },
       {
         status: 400,
-        headers: NO_STORE_HEADERS,
+        headers: responseHeaders,
       },
     );
   }
@@ -84,7 +99,7 @@ export async function POST(request: NextRequest) {
       { error: "Invalid or expired claim link." },
       {
         status: 404,
-        headers: NO_STORE_HEADERS,
+        headers: responseHeaders,
       },
     );
   }
@@ -94,7 +109,7 @@ export async function POST(request: NextRequest) {
       { error: "This agent has already been claimed." },
       {
         status: 409,
-        headers: NO_STORE_HEADERS,
+        headers: responseHeaders,
       },
     );
   }
@@ -104,7 +119,7 @@ export async function POST(request: NextRequest) {
       { error: "This agent is unavailable." },
       {
         status: 409,
-        headers: NO_STORE_HEADERS,
+        headers: responseHeaders,
       },
     );
   }
@@ -117,7 +132,7 @@ export async function POST(request: NextRequest) {
         { error: "Invalid or expired claim link." },
         {
           status: 404,
-          headers: NO_STORE_HEADERS,
+          headers: responseHeaders,
         },
       );
     }
@@ -129,7 +144,7 @@ export async function POST(request: NextRequest) {
         wallet: agent.wallet,
       },
       {
-        headers: NO_STORE_HEADERS,
+        headers: responseHeaders,
       },
     );
   } catch (error) {
@@ -138,7 +153,7 @@ export async function POST(request: NextRequest) {
         { error: error.message },
         {
           status: 400,
-          headers: NO_STORE_HEADERS,
+          headers: responseHeaders,
         },
       );
     }
@@ -147,7 +162,7 @@ export async function POST(request: NextRequest) {
       { error: "Failed to claim agent." },
       {
         status: 500,
-        headers: NO_STORE_HEADERS,
+        headers: responseHeaders,
       },
     );
   }

@@ -46,6 +46,8 @@ If you set `STAGING_PASSWORD`, visitor-facing pages are gated behind `/login`. T
 
 Agent registration and claiming require direct Upstash Redis credentials. This repo uses only `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN`. Do not use `Redis.fromEnv()` or reintroduce `KV_REST_*` fallback handling.
 
+The two mutation routes are IP-rate-limited in Redis: `POST /api/agents/register` allows 5 requests per 10 minutes, and `POST /api/agents/claim` allows 10 requests per 10 minutes. Over-limit responses return `429` with `Retry-After` and `X-RateLimit-*` headers.
+
 ## Project structure
 
 ```

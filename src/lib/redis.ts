@@ -1,6 +1,6 @@
 import { Redis } from "@upstash/redis";
 
-export type RedisClient = Pick<Redis, "get" | "set" | "del">;
+export type RedisClient = Pick<Redis, "del" | "expire" | "get" | "incr" | "set">;
 
 let redis: RedisClient | null = null;
 

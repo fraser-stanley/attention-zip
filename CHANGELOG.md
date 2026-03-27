@@ -11,6 +11,7 @@
 - **Discovery docs now publish the live Phase 2 contract** — `/.well-known/ai.json`, `/api`, and `llms-full.txt` now advertise the register, me, and claim endpoints plus the public claim page format.
 - **Claim links stay public behind staging auth** — `src/proxy.ts` now keeps `/claim` and `/claim/*` accessible when `STAGING_PASSWORD` is enabled.
 - **Docs and env examples now use direct Upstash config** — README, CLAUDE.md, AGENTS.md, LEARNINGS.md, and `.env.example` now document `UPSTASH_REDIS_REST_URL` / `UPSTASH_REDIS_REST_TOKEN` and the live claim flow.
+- **Agent writes now have Redis-backed IP throttles** — `POST /api/agents/register` is capped at 5 requests per 10 minutes per IP, and `POST /api/agents/claim` is capped at 10 requests per 10 minutes per IP, with `429` + `Retry-After` / `X-RateLimit-*` headers on overflow.
 
 ### Removed
 - **Legacy KV dependency path** — the agent registration work now uses `@upstash/redis` directly and no longer depends on `@vercel/kv` or `KV_REST_*` fallback handling.

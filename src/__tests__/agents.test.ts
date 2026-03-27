@@ -18,6 +18,17 @@ const fakeRedis = {
   async get<T>(key: string) {
     return (store.get(key)?.value as T | undefined) ?? null;
   },
+  async incr(key: string) {
+    const currentValue = store.get(key)?.value;
+    const nextValue = typeof currentValue === "number" ? currentValue + 1 : 1;
+
+    store.set(key, {
+      ex: store.get(key)?.ex,
+      value: nextValue,
+    });
+
+    return nextValue;
+  },
   async set(key: string, value: unknown, options?: { ex?: number }) {
     if (nextSetError) {
       const error = nextSetError;
@@ -31,6 +42,20 @@ const fakeRedis = {
     });
     return "OK";
   },
+  async expire(key: string, seconds: number) {
+    const current = store.get(key);
+
+    if (!current) {
+      return 0;
+    }
+
+    store.set(key, {
+      ...current,
+      ex: seconds,
+    });
+
+    return 1;
+  },
   async del(key: string) {
     const existed = store.delete(key);
     return existed ? 1 : 0;
@@ -43,6 +68,10 @@ vi.mock("@/lib/redis", () => ({
 }));
 
 import { validateAgentKey } from "@/lib/agent-auth";
+import {
+  AGENT_CLAIM_RATE_LIMIT,
+  AGENT_REGISTER_RATE_LIMIT,
+} from "@/lib/agent-rate-limit";
 import {
   claimAgent,
   createAgentRegistration,
@@ -162,6 +191,56 @@ describe("agents", () => {
     expect(response.status).toBe(500);
     await expect(response.json()).resolves.toMatchObject({
       error: "Failed to register agent.",
+    });
+  });
+
+  it("returns 429 from register after repeated requests from the same IP", async () => {
+    let lastResponse = await postAgentsRegister(
+      new NextRequest(`${TEST_BASE_URL}/api/agents/register`, {
+        method: "POST",
+        body: JSON.stringify({ name: "seed-register" }),
+        headers: {
+          "Content-Type": "application/json",
+          "x-forwarded-for": "203.0.113.10",
+        },
+      }),
+    );
+
+    expect(lastResponse.status).toBe(200);
+
+    for (let attempt = 1; attempt < AGENT_REGISTER_RATE_LIMIT.limit; attempt += 1) {
+      lastResponse = await postAgentsRegister(
+        new NextRequest(`${TEST_BASE_URL}/api/agents/register`, {
+          method: "POST",
+          body: JSON.stringify({ name: `seed-register-${attempt}` }),
+          headers: {
+            "Content-Type": "application/json",
+            "x-forwarded-for": "203.0.113.10",
+          },
+        }),
+      );
+    }
+
+    expect(lastResponse.status).toBe(200);
+
+    const rateLimitedResponse = await postAgentsRegister(
+      new NextRequest(`${TEST_BASE_URL}/api/agents/register`, {
+        method: "POST",
+        body: JSON.stringify({ name: "seed-register-blocked" }),
+        headers: {
+          "Content-Type": "application/json",
+          "x-forwarded-for": "203.0.113.10",
+        },
+      }),
+    );
+
+    expect(rateLimitedResponse.status).toBe(429);
+    expect(rateLimitedResponse.headers.get("Retry-After")).toBeTruthy();
+    expect(rateLimitedResponse.headers.get("X-RateLimit-Limit")).toBe(
+      String(AGENT_REGISTER_RATE_LIMIT.limit),
+    );
+    await expect(rateLimitedResponse.json()).resolves.toMatchObject({
+      error: AGENT_REGISTER_RATE_LIMIT.errorMessage,
     });
   });
 
@@ -431,6 +510,65 @@ describe("agents", () => {
     expect(response.status).toBe(409);
     await expect(response.json()).resolves.toMatchObject({
       error: "This agent is unavailable.",
+    });
+  });
+
+  it("returns 429 from claim after repeated attempts from the same IP", async () => {
+    let lastResponse = await postAgentsClaim(
+      new NextRequest(`${TEST_BASE_URL}/api/agents/claim`, {
+        method: "POST",
+        body: JSON.stringify({
+          claim_code: "reef-X4B2",
+          wallet: TEST_WALLET,
+        }),
+        headers: {
+          "Content-Type": "application/json",
+          "x-forwarded-for": "203.0.113.11",
+        },
+      }),
+    );
+
+    expect(lastResponse.status).toBe(404);
+
+    for (let attempt = 1; attempt < AGENT_CLAIM_RATE_LIMIT.limit; attempt += 1) {
+      lastResponse = await postAgentsClaim(
+        new NextRequest(`${TEST_BASE_URL}/api/agents/claim`, {
+          method: "POST",
+          body: JSON.stringify({
+            claim_code: "reef-X4B2",
+            wallet: TEST_WALLET,
+          }),
+          headers: {
+            "Content-Type": "application/json",
+            "x-forwarded-for": "203.0.113.11",
+          },
+        }),
+      );
+    }
+
+    expect(lastResponse.status).toBe(404);
+
+    const rateLimitedResponse = await postAgentsClaim(
+      new NextRequest(`${TEST_BASE_URL}/api/agents/claim`, {
+        method: "POST",
+        body: JSON.stringify({
+          claim_code: "reef-X4B2",
+          wallet: TEST_WALLET,
+        }),
+        headers: {
+          "Content-Type": "application/json",
+          "x-forwarded-for": "203.0.113.11",
+        },
+      }),
+    );
+
+    expect(rateLimitedResponse.status).toBe(429);
+    expect(rateLimitedResponse.headers.get("Retry-After")).toBeTruthy();
+    expect(rateLimitedResponse.headers.get("X-RateLimit-Limit")).toBe(
+      String(AGENT_CLAIM_RATE_LIMIT.limit),
+    );
+    await expect(rateLimitedResponse.json()).resolves.toMatchObject({
+      error: AGENT_CLAIM_RATE_LIMIT.errorMessage,
     });
   });
 

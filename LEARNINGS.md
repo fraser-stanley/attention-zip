@@ -2,6 +2,20 @@
 
 Decisions, trade-offs, and context that aren't obvious from the code.
 
+## 2026-03-27 — Production hardening + truthful discovery
+
+### Discovery docs should come from routes, not `public/`
+Static `public/llms.txt`, `public/llms-full.txt`, and `public/.well-known/ai.json` drift as soon as the hostname changes. Generating them from App Router handlers keeps discovery tied to the current request host and lets the site survive a future custom domain without another code edit.
+
+### Production should not silently fall back to fabricated market data
+Mock data is useful for local design work and SDK outages during development, but it is misleading in a production surface that claims to show live market state. The safer rule is: allow mock fallbacks only outside production, or behind an explicit `ALLOW_MOCK_MARKET_DATA=true` flag.
+
+### The leaderboard response shape is not the one the old wrapper assumed
+`getTraderLeaderboard()` currently returns `data.exploreTraderLeaderboard` with weekly fields like `weekVolumeUsd`, `weekTradesCount`, and `traderProfile.handle`. Treat `src/lib/zora.ts` as the canonical normalization layer, because the raw SDK shape can change underneath the UI.
+
+### `scripts/validate.sh` assumes the skill directory as the working directory
+Each per-skill validator checks `scripts/run.mjs` using a relative path. Running `./trend-scout/scripts/validate.sh` from the repo root will fail even though the skill is fine. Run `./scripts/validate.sh` from inside the skill directory, or change the script to resolve relative to its own location if we ever want root-level orchestration.
+
 ## 2026-03-27 — Address-based portfolio (SIWE removed)
 
 ### Portfolio data is public, no signature needed

@@ -21,6 +21,9 @@ const EXPLORE_REVALIDATE_SECONDS: Record<SortOption, number> = {
 };
 
 const LEADERBOARD_REVALIDATE_SECONDS = 300;
+const ALLOW_MOCK_MARKET_DATA =
+  process.env.ALLOW_MOCK_MARKET_DATA === "true" ||
+  process.env.NODE_ENV !== "production";
 
 // Cache wrappers hoisted to module scope so Next.js can reuse them across requests.
 
@@ -35,8 +38,16 @@ function getExploreFetcher(sort: SortOption, count: number) {
   if (!fetcher) {
     fetcher = unstable_cache(
       async () => {
-        const coins = await fetchCoins(sort, count);
-        return coins.length > 0 ? coins : MOCK_COINS.slice(0, count);
+        try {
+          const coins = await fetchCoins(sort, count);
+          if (coins.length > 0) {
+            return coins;
+          }
+        } catch {
+          // Empty-state UI is safer than silently shipping fabricated market data.
+        }
+
+        return ALLOW_MOCK_MARKET_DATA ? MOCK_COINS.slice(0, count) : [];
       },
       ["explore-data", sort, String(count)],
       { revalidate: EXPLORE_REVALIDATE_SECONDS[sort] }
@@ -56,8 +67,16 @@ function getLeaderboardFetcher(count: number) {
   if (!fetcher) {
     fetcher = unstable_cache(
       async () => {
-        const traders = await fetchLeaderboard(count);
-        return traders.length > 0 ? traders : MOCK_TRADERS.slice(0, count);
+        try {
+          const traders = await fetchLeaderboard(count);
+          if (traders.length > 0) {
+            return traders;
+          }
+        } catch {
+          // Empty-state UI is safer than silently shipping fabricated market data.
+        }
+
+        return ALLOW_MOCK_MARKET_DATA ? MOCK_TRADERS.slice(0, count) : [];
       },
       ["leaderboard-data", String(count)],
       { revalidate: LEADERBOARD_REVALIDATE_SECONDS }
@@ -79,4 +98,3 @@ export async function getLeaderboardData(
 ): Promise<TraderNode[]> {
   return getLeaderboardFetcher(count)();
 }
-

@@ -50,7 +50,10 @@ export interface CoinNode {
 export interface TraderNode {
   address?: string;
   displayName?: string;
-  volume?: string;
+  volume?: string | number;
+  tradesCount?: number;
+  score?: number;
+  profileId?: string;
 }
 
 export interface ExploreApiResponse {
@@ -120,6 +123,38 @@ interface ProfileBalancesResponse {
   };
 }
 
+interface LeaderboardProfile {
+  handle?: string;
+  id?: string;
+}
+
+interface CurrentLeaderboardEdge {
+  node?: {
+    score?: number;
+    weekVolumeUsd?: number;
+    weekTradesCount?: number;
+    traderProfile?: LeaderboardProfile;
+  };
+}
+
+interface CurrentLeaderboardResponse {
+  error?: unknown;
+  data?: {
+    exploreTraderLeaderboard?: {
+      edges?: CurrentLeaderboardEdge[];
+    };
+  };
+}
+
+interface LegacyLeaderboardResponse {
+  error?: unknown;
+  data?: {
+    traderLeaderboard?: {
+      edges?: Array<{ node: TraderNode }>;
+    };
+  };
+}
+
 const QUERY_MAP: Record<SortOption, (count: number) => Promise<ExploreResponse>> = {
   trending: (count) => getTrendingAll({ count }) as Promise<ExploreResponse>,
   mcap: (count) => getCoinsMostValuable({ count }) as Promise<ExploreResponse>,
@@ -152,12 +187,41 @@ export async function fetchLeaderboard(
   count: number = 20
 ): Promise<TraderNode[]> {
   const response = await getTraderLeaderboard({ first: count });
-  if ((response as { error?: unknown }).error) return [];
-  const data = response.data as Record<string, unknown> | undefined;
-  const leaderboard = data?.traderLeaderboard as
-    | { edges?: Array<{ node: TraderNode }> }
-    | undefined;
-  return leaderboard?.edges?.map((e) => e.node) ?? [];
+  return extractLeaderboardTraders(response);
+}
+
+export function extractLeaderboardTraders(response: unknown): TraderNode[] {
+  const result = response as CurrentLeaderboardResponse & LegacyLeaderboardResponse;
+  if (result.error) return [];
+
+  const currentEdges = result.data?.exploreTraderLeaderboard?.edges;
+  if (currentEdges) {
+    return currentEdges
+      .map((edge) => {
+        const handle = edge.node?.traderProfile?.handle;
+        const normalizedAddress =
+          typeof handle === "string" && /^0x[a-fA-F0-9]{40}$/.test(handle)
+            ? handle
+            : undefined;
+
+        return {
+          address: normalizedAddress,
+          displayName: handle,
+          volume: edge.node?.weekVolumeUsd,
+          tradesCount: edge.node?.weekTradesCount,
+          score: edge.node?.score,
+          profileId: edge.node?.traderProfile?.id,
+        };
+      })
+      .filter(
+        (trader) =>
+          typeof trader.displayName === "string" ||
+          typeof trader.address === "string" ||
+          trader.volume !== undefined,
+      );
+  }
+
+  return result.data?.traderLeaderboard?.edges?.map((edge) => edge.node) ?? [];
 }
 
 export async function fetchProfileBalances(

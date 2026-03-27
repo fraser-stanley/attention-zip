@@ -33,6 +33,10 @@ All queries are wrapped in `src/lib/zora.ts`. Client pages never call the SDK di
 
 Most explore functions use `{ count }` but `getFeaturedCreators` and `getTraderLeaderboard` use `{ first }`. `getCoinHolders` uses `chainId` (number) while `getCoinSwaps` uses `chain` (number). Always check the type definitions before adding a new query.
 
+### Leaderboard responses changed shape
+
+`getTraderLeaderboard()` currently returns `data.exploreTraderLeaderboard`, not `data.traderLeaderboard`, with nested fields like `weekVolumeUsd`, `weekTradesCount`, and `traderProfile.handle`. Treat `src/lib/zora.ts` as the normalization layer and do not bind UI code directly to the raw SDK response.
+
 ### shadcn/ui v2 has no `asChild`
 
 The Button component uses `@base-ui/react`, not Radix. `asChild` does not exist. Use `buttonVariants()` with `<Link>` instead. See `CLAUDE.md` for the correct pattern.
@@ -104,7 +108,7 @@ pnpm test        # vitest — structure, metadata, and managed entrypoint integr
 pnpm build       # TypeScript + Next.js compilation
 ```
 
-Tests validate SKILL.md frontmatter, required body sections, word count (300-800), CLI flag correctness in commands, managed entrypoint metadata in `clawhub.json`, process-level `scripts/run.mjs` behavior through `src/__tests__/skill-entrypoints.test.ts`, and cross-file sync between skills.ts IDs and skill directories. `scripts/validate.sh` is still useful, but it is a host-readiness check and requires the installed `zora` CLI to be on your shell `PATH`, plus a wallet for wallet-backed skills.
+Tests validate SKILL.md frontmatter, required body sections, word count (300-800), CLI flag correctness in commands, managed entrypoint metadata in `clawhub.json`, process-level `scripts/run.mjs` behavior through `src/__tests__/skill-entrypoints.test.ts`, and cross-file sync between skills.ts IDs and skill directories. `scripts/validate.sh` is still useful, but it is a host-readiness check. Run it from inside the skill directory, make sure the installed `zora` CLI is on your shell `PATH`, and expect wallet-backed skills to require a configured wallet.
 
 ## Formatting helpers
 

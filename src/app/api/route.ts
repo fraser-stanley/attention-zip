@@ -1,15 +1,22 @@
-import { NextResponse } from "next/server";
-import { API_VERSION, SITE_DESCRIPTION, SITE_NAME, SITE_REPO_URL } from "@/lib/site";
+import { NextRequest, NextResponse } from "next/server";
+import {
+  API_VERSION,
+  SITE_DESCRIPTION,
+  SITE_NAME,
+  getDocumentationUrl,
+  getSiteRepoUrl,
+} from "@/lib/site";
 
 const CACHE_CONTROL = "public, s-maxage=3600, stale-while-revalidate=86400";
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   return NextResponse.json(
     {
       name: `${SITE_NAME} API`,
       version: API_VERSION,
       description: SITE_DESCRIPTION,
-      documentation: SITE_REPO_URL,
+      documentation: getDocumentationUrl(request.url),
+      sourceRepository: getSiteRepoUrl(),
       endpoints: {
         index: {
           url: "/api",
@@ -32,7 +39,7 @@ export async function GET() {
         },
         leaderboard: {
           url: "/api/leaderboard",
-          description: "Weekly trader rankings.",
+          description: "Weekly trader rankings by Zora volume.",
           params: {
             count: "1-50",
           },

@@ -9,8 +9,7 @@ import { getSiteUrl } from "@/lib/site";
 
 const CACHE_CONTROL = "public, s-maxage=3600, stale-while-revalidate=86400";
 
-function serializeSkill(skill: Skill) {
-  const baseUrl = getSiteUrl();
+function serializeSkill(skill: Skill, baseUrl: string) {
   return {
     id: skill.id,
     name: skill.name,
@@ -36,6 +35,7 @@ function serializeSkill(skill: Skill) {
 }
 
 export async function GET(request: NextRequest) {
+  const baseUrl = getSiteUrl(request.url);
   const id = request.nextUrl.searchParams.get("id");
 
   if (id) {
@@ -54,7 +54,11 @@ export async function GET(request: NextRequest) {
     }
 
     return NextResponse.json(
-      { skill: serializeSkill(skill) },
+      {
+        skill: {
+          ...serializeSkill(skill, baseUrl),
+        },
+      },
       {
         headers: {
           "Cache-Control": CACHE_CONTROL,
@@ -64,7 +68,11 @@ export async function GET(request: NextRequest) {
   }
 
   return NextResponse.json(
-    { skills: skills.map(serializeSkill) },
+    {
+      skills: skills.map((skill) => ({
+        ...serializeSkill(skill, baseUrl),
+      })),
+    },
     {
       headers: {
         "Cache-Control": CACHE_CONTROL,

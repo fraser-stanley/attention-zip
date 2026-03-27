@@ -18,6 +18,8 @@ export async function GET(request: NextRequest) {
       documentation: getDocumentationUrl(request.url),
       sourceRepository: getSiteRepoUrl(),
       agentRegistrationUrl: "/api/agents/register",
+      agentMeUrl: "/api/agents/me",
+      agentClaimUrl: "/api/agents/claim",
       endpoints: {
         index: {
           url: "/api",
@@ -56,7 +58,17 @@ export async function GET(request: NextRequest) {
         agentsRegister: {
           url: "/api/agents/register",
           description:
-            "Coming soon. Agent registration endpoint for claimable agent identities.",
+            "Register an agent and receive a bearer API key plus a human claim URL.",
+        },
+        agentsMe: {
+          url: "/api/agents/me",
+          description:
+            "Return the current agent record for a valid Bearer sk_zora_* API key.",
+        },
+        agentsClaim: {
+          url: "/api/agents/claim",
+          description:
+            "Claim an unclaimed agent by claim code and wallet address.",
         },
       },
     },

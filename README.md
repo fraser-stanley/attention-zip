@@ -2,7 +2,7 @@
 
 Agent skills and live market data for the Zora attention market. Scan trends, check portfolios, build briefings, and trade momentum.
 
-Agent discovery is available through `/.well-known/ai.json`, `/llms.txt`, `/llms-full.txt`, and `/api/skills`. The shortest install prompts point agents at the hosted `llms.txt` or per-skill `skill-md` URLs.
+Agent discovery is available through `/.well-known/ai.json`, `/llms.txt`, `/llms-full.txt`, and `/api/skills`. The shortest install prompts point agents at the hosted `llms.txt` or per-skill `skill-md` URLs. Agent self-registration and human wallet claiming are live at `/api/agents/register`, `/api/agents/me`, `/api/agents/claim`, and `/claim/<code>`.
 
 ## Quick start
 
@@ -15,7 +15,7 @@ pnpm dev
 
 Open http://localhost:3000.
 
-If `STAGING_PASSWORD` is set, the app redirects visitor-facing pages to `/login` first.
+If `STAGING_PASSWORD` is set, the app redirects visitor-facing pages to `/login` first. Agent-facing routes and `/claim/<code>` stay public so installs, discovery, and claiming still work.
 
 ## Skills
 
@@ -47,6 +47,10 @@ Agent-facing endpoints. All responses include cache headers.
 | `GET /api/explore`          | Live coin data (`?sort=trending\|mcap\|new\|volume\|gainers\|creators\|featured`, `?count=1-20`) |
 | `GET /api/leaderboard`      | Weekly trader rankings by Zora volume (`?count=1-50`)                                            |
 | `GET /api/portfolio`        | Public portfolio lookup (`?address=<0x-address>&count=1-50`)                                     |
+| `POST /api/agents/register` | Register an agent and receive a bearer API key plus a claim URL                                  |
+| `GET /api/agents/me`        | Resolve the current agent record with `Authorization: Bearer sk_zora_*`                          |
+| `POST /api/agents/claim`    | Claim an unclaimed agent with `{ claim_code, wallet }`                                           |
+| `GET /claim/<code>`         | Public claim page, including unconfigured, claimable, claimed, and suspended states              |
 | `GET /skills/<id>/skill-md` | Raw SKILL.md content for agent consumption                                                       |
 | `GET /llms.txt`             | Short agent-readable docs                                                                        |
 | `GET /llms-full.txt`        | Full agent-readable docs                                                                         |
@@ -109,6 +113,8 @@ Merge gate: `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm build`.
 | --------------------------- | --------------- | -------------------------------------------------------------------- |
 | `ZORA_API_KEY`              | No              | Higher rate limits. Get one at https://zora.co/settings/developer    |
 | `ZORA_PRIVATE_KEY`          | Skill-dependent | Needed for wallet-backed skills and live trading                     |
+| `UPSTASH_REDIS_REST_URL`    | Agent flow      | Direct Upstash Redis REST URL for agent registration and claiming    |
+| `UPSTASH_REDIS_REST_TOKEN`  | Agent flow      | Direct Upstash Redis REST token for agent registration and claiming  |
 | `STAGING_PASSWORD`          | No              | Enables the custom app-level password gate for visitor pages         |
 | `NEXT_PUBLIC_SITE_URL`      | No              | Canonical site URL for metadata, sitemap, and install prompts        |
 | `NEXT_PUBLIC_SITE_REPO_URL` | No              | Public repo URL used in skill source links and manual clone commands |
@@ -116,6 +122,8 @@ Merge gate: `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm build`.
 | `ALLOW_MOCK_MARKET_DATA`    | No              | Set to `true` only if you intentionally want mock market fallback    |
 
 Skill-specific env vars and tunables live in each `clawhub.json`. Momentum Trader is dry-run by default and only goes live when `ZORA_MOMENTUM_LIVE=true`.
+
+Agent registration uses direct `@upstash/redis`. Only `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` are supported. This repo does not use `@vercel/kv` or `KV_REST_*` fallbacks for the claim flow.
 
 ## Deploy
 
@@ -126,13 +134,14 @@ vercel
 For a stakeholder build on Vercel:
 
 - Set `ZORA_API_KEY` for better rate limits. The app still builds safely without it.
+- Set `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` if the deployment should support agent registration and human wallet claiming.
 - Set `STAGING_PASSWORD` if the deployment should stay behind the repo's custom password gate. This protects visitor-facing pages at `/login` because the project cannot use Vercel's native password protection on the current plan.
 - Set `NEXT_PUBLIC_SITE_URL` when you know the public hostname. The discovery docs are host-aware at runtime, but canonical metadata should still use the intended site URL.
 - Set `NEXT_PUBLIC_SITE_REPO_URL` and `NEXT_PUBLIC_SITE_REPO_REF` when the public skills repo is ready.
 - You do not need `ZORA_PRIVATE_KEY` unless you are testing wallet-backed skills or live trading flows.
 - `/dashboard` and `/leaderboard` use live SDK data. Mock fallback is disabled in production unless `ALLOW_MOCK_MARKET_DATA=true` is set intentionally.
 - The wallet connect flow is address-only. Users paste the address from their local Zora CLI wallet. The activity ticker remains illustrative until real trade activity is wired in.
-- Agent-facing routes stay public when the gate is on: `/api`, `/api/*`, `/skills/<id>/skill-md`, `/.well-known/ai.json`, `/llms.txt`, `/llms-full.txt`, and static public files.
+- Agent-facing routes stay public when the gate is on: `/api`, `/api/*`, `/skills/<id>/skill-md`, `/.well-known/ai.json`, `/llms.txt`, `/llms-full.txt`, `/claim/<code>`, and static public files.
 
 ## Documentation
 

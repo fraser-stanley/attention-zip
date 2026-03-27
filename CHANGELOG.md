@@ -1,5 +1,20 @@
 # Changelog
 
+## 2026-03-27 (Direct Upstash agent registration + wallet claiming)
+
+### Added
+- **Direct Upstash-backed agent lifecycle** — `/api/agents/register`, `/api/agents/me`, and `/api/agents/claim` now support agent self-registration, bearer-authenticated lookup, and human wallet claiming.
+- **Public claim page** — `/claim/[code]` renders unconfigured, invalid, claimable, already-claimed, and suspended states, with a dedicated `ClaimForm` that mirrors the site's address-only wallet UX.
+- **Agent contract coverage** — `src/__tests__/agents.test.ts` now locks in claim code normalization, bearer auth, duplicate-claim rejection, missing-Redis handling, and the "claim link still resolves after success" behavior.
+
+### Changed
+- **Discovery docs now publish the live Phase 2 contract** — `/.well-known/ai.json`, `/api`, and `llms-full.txt` now advertise the register, me, and claim endpoints plus the public claim page format.
+- **Claim links stay public behind staging auth** — `src/proxy.ts` now keeps `/claim` and `/claim/*` accessible when `STAGING_PASSWORD` is enabled.
+- **Docs and env examples now use direct Upstash config** — README, CLAUDE.md, AGENTS.md, LEARNINGS.md, and `.env.example` now document `UPSTASH_REDIS_REST_URL` / `UPSTASH_REDIS_REST_TOKEN` and the live claim flow.
+
+### Removed
+- **Legacy KV dependency path** — the agent registration work now uses `@upstash/redis` directly and no longer depends on `@vercel/kv` or `KV_REST_*` fallback handling.
+
 ## 2026-03-27 (Agent-native discovery polish)
 
 ### Added

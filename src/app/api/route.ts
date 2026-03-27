@@ -37,6 +37,14 @@ export async function GET() {
             count: "1-50",
           },
         },
+        portfolio: {
+          url: "/api/portfolio",
+          description: "Public Zora coin balances for a wallet address.",
+          params: {
+            address: "0x wallet address",
+            count: "1-50",
+          },
+        },
       },
     },
     {

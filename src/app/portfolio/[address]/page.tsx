@@ -1,20 +1,52 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { PortfolioPageClient } from "@/components/portfolio-page-client";
+import { notFound } from "next/navigation";
+import { PortfolioView } from "@/components/portfolio-view";
 import { breadcrumbJsonLd, getSiteUrl } from "@/lib/site";
+import { isWalletAddress } from "@/lib/wallet-address";
+import { truncateAddress } from "@/lib/zora";
 
-export const metadata: Metadata = {
-  title: "Portfolio",
-  description:
-    "Track your Zora coin positions by address. View current holdings, total value, and installed skills.",
-  alternates: { canonical: "/portfolio" },
-};
+interface PortfolioAddressPageProps {
+  params: Promise<{
+    address: string;
+  }>;
+}
 
-export default function PortfolioPage() {
+export async function generateMetadata({
+  params,
+}: PortfolioAddressPageProps): Promise<Metadata> {
+  const { address } = await params;
+
+  if (!isWalletAddress(address)) {
+    return {
+      title: "Portfolio",
+      description: "Track Zora coin positions by wallet address.",
+    };
+  }
+
+  return {
+    title: `Portfolio ${truncateAddress(address)}`,
+    description: `Track Zora coin positions for ${address}.`,
+    alternates: {
+      canonical: `/portfolio/${address}`,
+    },
+  };
+}
+
+export default async function PortfolioAddressPage({
+  params,
+}: PortfolioAddressPageProps) {
+  const { address } = await params;
+
+  if (!isWalletAddress(address)) {
+    notFound();
+  }
+
   const baseUrl = getSiteUrl();
   const portfolioBreadcrumb = breadcrumbJsonLd([
     { name: "Home", url: baseUrl },
     { name: "Portfolio", url: `${baseUrl}/portfolio` },
+    { name: truncateAddress(address), url: `${baseUrl}/portfolio/${address}` },
   ]);
 
   return (
@@ -26,8 +58,8 @@ export default function PortfolioPage() {
 
       <div className="space-y-6">
         <Link
-          href="/"
-          aria-label="Back to home"
+          href="/portfolio"
+          aria-label="Back to portfolio"
           className="type-label inline-flex items-center gap-2 text-muted-foreground transition-colors hover:text-foreground"
         >
           <svg
@@ -50,8 +82,8 @@ export default function PortfolioPage() {
           Back
         </Link>
 
-        <h1 className="sr-only">Portfolio</h1>
-        <PortfolioPageClient />
+        <h1 className="sr-only">Portfolio for {address}</h1>
+        <PortfolioView address={address} />
       </div>
     </>
   );

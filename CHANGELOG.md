@@ -1,5 +1,20 @@
 # Changelog
 
+## 2026-03-27 (Address-based portfolio)
+
+### Added
+- **`/api/portfolio`** — public portfolio lookup endpoint backed by `getProfileBalances()`.
+- **Shareable portfolio routes** — `/portfolio/[address]` now renders any valid wallet address directly.
+- **Address validation coverage** — `wallet-address.test.ts` covers the new 0x address helpers.
+
+### Changed
+- **SIWE removed from wallet connect** — the connect modal now accepts a wallet address directly, and `src/lib/wallet-context.tsx` stores only that address in localStorage.
+- **Portfolio uses live SDK balances** — `src/components/portfolio-view.tsx` now shows real positions, total value, and 24h change from public data instead of mock portfolio PnL.
+- **Portfolio navigation is always visible** — the nav keeps the Portfolio link available before a wallet is connected, and the wallet menu now shows a live portfolio summary.
+
+### Removed
+- **Challenge/verify auth flow** — deleted the `/api/wallet/challenge` and `/api/wallet/verify` routes, SIWE helpers, wallet session types, and the old portfolio auth gate.
+
 ## 2026-03-25 (SIWE wallet connect)
 
 ### Added

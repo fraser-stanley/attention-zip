@@ -10,6 +10,7 @@ import {
   getTraderLeaderboard,
   getCoinsLastTraded,
   getCoinsLastTradedUnique,
+  getProfileBalances,
 } from "@zoralabs/coins-sdk";
 
 const apiKey = process.env.ZORA_API_KEY;
@@ -63,6 +64,34 @@ export interface LeaderboardApiResponse {
   count: number;
 }
 
+export interface ProfileBalance {
+  balance?: string;
+  balanceUsd?: string;
+  coin?: {
+    address?: string;
+    coinType?: string;
+    marketCap?: string;
+    marketCapDelta24h?: string;
+    mediaContent?: {
+      previewImage?: {
+        medium?: string;
+      };
+    };
+    name?: string;
+    symbol?: string;
+    tokenPrice?: {
+      priceInUsdc?: string;
+    };
+    totalSupply?: string;
+  };
+}
+
+export interface PortfolioApiResponse {
+  address: string;
+  balances: ProfileBalance[];
+  count: number;
+}
+
 interface ExploreEdge {
   node: CoinNode;
 }
@@ -72,6 +101,21 @@ interface ExploreResponse {
   data?: {
     exploreList?: {
       edges: ExploreEdge[];
+    };
+  };
+}
+
+interface ProfileBalanceEdge {
+  node: ProfileBalance;
+}
+
+interface ProfileBalancesResponse {
+  error?: unknown;
+  data?: {
+    profile?: {
+      coinBalances?: {
+        edges?: ProfileBalanceEdge[];
+      };
     };
   };
 }
@@ -114,6 +158,25 @@ export async function fetchLeaderboard(
     | { edges?: Array<{ node: TraderNode }> }
     | undefined;
   return leaderboard?.edges?.map((e) => e.node) ?? [];
+}
+
+export async function fetchProfileBalances(
+  address: string,
+  count: number = 20
+): Promise<ProfileBalance[]> {
+  const response = (await getProfileBalances({
+    identifier: address,
+    count,
+    sortOption: "MARKET_VALUE_USD",
+    excludeHidden: true,
+    chainIds: [8453],
+  })) as ProfileBalancesResponse;
+
+  if (response.error) {
+    throw new Error("Failed to fetch profile balances.");
+  }
+
+  return response.data?.profile?.coinBalances?.edges?.map((edge) => edge.node) ?? [];
 }
 
 export function formatCompactCurrency(value: string | number | undefined): string {
@@ -160,4 +223,3 @@ export function coinTypeLabel(coinType: string | undefined): string {
     default: return coinType?.toLowerCase() ?? "unknown";
   }
 }
-

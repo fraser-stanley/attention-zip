@@ -42,9 +42,6 @@ export function Nav() {
   const [walletModalOpen, setWalletModalOpen] = useState(false);
   const [walletMenuOpen, setWalletMenuOpen] = useState(false);
   const { address, isConnected } = useWallet();
-  const sections = isConnected
-    ? allSections
-    : allSections.filter((s) => s.id !== "portfolio");
   const router = useRouter();
   const close = useCallback(() => {
     setOpen(false);
@@ -183,7 +180,7 @@ export function Nav() {
           <div className="flex-1 overflow-y-auto">
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12">
               <div className="grid gap-px sm:grid-cols-2 lg:grid-cols-3">
-                {sections.map((section) => (
+                {allSections.map((section) => (
                   <Link
                     key={section.id}
                     href={section.href}

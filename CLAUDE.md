@@ -49,9 +49,8 @@ src/
 ├── __tests__/
 │   ├── skills-structure.test.ts    # SKILL.md + clawhub.json structural validation
 │   ├── skills-data.test.ts         # skills.ts array integrity + cross-file sync
-│   ├── wallet-auth.test.ts         # SIWE auth logic (nonce, replay, expiry, signature)
-│   ├── wallet-routes.test.ts       # /api/wallet/challenge + /api/wallet/verify integration
-│   └── wallet-session.test.ts      # WalletSession type guard validation
+│   ├── staging-auth.test.ts        # Staging auth token + redirect sanitization
+│   └── wallet-address.test.ts      # Address validation helpers
 ├── app/
 │   ├── page.tsx                    # Homepage (hero, terminal market board, skills preview, waitlist)
 │   ├── loading.tsx                 # Homepage loading skeleton (instant nav)
@@ -63,7 +62,8 @@ src/
 │   ├── skills/[id]/skill-md/route.ts # Raw SKILL.md serving for agent consumption
 │   ├── leaderboard/page.tsx        # Weekly trader rankings with server-fetched initial data
 │   ├── leaderboard/loading.tsx     # Leaderboard loading skeleton
-│   ├── portfolio/page.tsx          # Mock logged-in portfolio (Simmer-style PnL, positions, skills)
+│   ├── portfolio/page.tsx          # Address-aware portfolio shell for the connected wallet
+│   ├── portfolio/[address]/page.tsx # Shareable portfolio route for any valid wallet address
 │   ├── robots.ts                   # robots.txt via Next.js metadata API
 │   ├── sitemap.ts                  # sitemap.xml with all public routes
 │   ├── manifest.ts                 # PWA manifest (icons, theme, display)
@@ -75,9 +75,8 @@ src/
 │       ├── skills/route.ts         # Skill catalog for agents
 │       ├── explore/route.ts        # Explore queries + cache headers
 │       ├── leaderboard/route.ts    # Trader leaderboard
+│       ├── portfolio/route.ts      # Address-based Zora portfolio balances
 │       ├── staging-auth/route.ts   # Password check, sets the staging auth cookie
-│       ├── wallet/challenge/route.ts # SIWE challenge nonce issuance
-│       ├── wallet/verify/route.ts   # SIWE token verification + session creation
 │       └── agents/[address]/route.ts # Agent profile data
 ├── components/
 │   ├── nav.tsx                     # Navigation bar (6 sections incl. Portfolio + wallet menu toggle)
@@ -94,13 +93,14 @@ src/
 │   ├── leaderboard-table.tsx       # Client leaderboard refresh wrapper
 │   ├── skill-card-client.tsx       # Shared runtime picker + command blocks + typewriter example output
 │   ├── coin-table.tsx              # Reusable coin data table
-│   ├── portfolio-view.tsx          # Simmer-style portfolio (stats, sparkline, positions, skills)
+│   ├── portfolio-view.tsx          # Live portfolio balances, value stats, and installed skills
+│   ├── portfolio-page-client.tsx   # Client wallet-aware portfolio entry state
 │   ├── agent-profile-detail.tsx    # Agent profile with PnL, positions, sparkline, holdings
 │   ├── pnl-sparkline.tsx           # SVG sparkline for cumulative PnL charts
 │   ├── skill-card.tsx               # Unified skill card with install/remove states and peer-hover link
-│   ├── portfolio-auth-gate.tsx     # Client redirect gate — sends disconnected users to /
 │   ├── wallet-menu.tsx             # Brutalist wallet dropdown (QR code, balance, copy address, disconnect)
-│   ├── wallet-connect-modal.tsx     # SIWE wallet connect via Zora CLI (challenge, paste token, verify)
+│   ├── wallet-connect-modal.tsx     # Address entry modal for local Zora CLI wallets
+│   ├── address-connect-form.tsx    # Reusable address input form for modal + portfolio page
 │   ├── hover-media-overlay.tsx      # Viewport-centered token image overlay on table row hover (desktop only)
 │   ├── activity-ticker.tsx         # Agent trade feed marquee (Simmer-style, mock data)
 │   ├── activity-ticker-section.tsx # Activity ticker wrapper (imports mock trade data)
@@ -116,9 +116,8 @@ src/
     ├── skills.ts                   # Static skill definitions (5 skills)
     ├── staging-auth.ts             # Shared staging auth token + redirect sanitization helpers
     ├── providers.tsx               # React Query provider (30s staleTime)
-    ├── wallet-auth.ts               # SIWE challenge/verify logic (nonce store, replay protection, viem)
-    ├── wallet-session.ts            # WalletSession type + isWalletSession guard
-    ├── wallet-context.tsx           # Verified wallet session state (localStorage, useSyncExternalStore, skill seeding)
+    ├── wallet-address.ts           # Shared 0x address validation helpers
+    ├── wallet-context.tsx          # Address store (localStorage, useSyncExternalStore, skill seeding)
     ├── installed-skills-context.tsx # Installed skills store (localStorage, seed/clear on connect/disconnect)
     ├── utils.ts                    # cn() helper for className merging
     ├── pnl-utils.ts                # Shared PnL formatting (pnlColor, formatPnl, formatPct)
@@ -150,9 +149,9 @@ src/
 - **Homepage "Agent activity" is a terminal board**, not a 4-card grid. It preloads 8 rows per tab, refreshes through `/api/explore` and `/api/leaderboard`, and uses a subtle CRT-style loading sweep plus simulated preview motion between fetches.
 - **Activity ticker shows mock agent trades** — Simmer-style marquee (`@AgentName bought $12 Higher 3m ago`), rendered from the root layout so it appears directly below the nav across the site. Mock data in `src/lib/activity-mock-data.ts` with `TradeActivityItem` interface. Green for buys, magenta for sells. Will swap to real trade data when tracking is available.
 - **Leaderboard mock traders share ticker agent names** — `MOCK_TRADERS` in `src/lib/mock-data.ts` uses `displayName` (optional on `TraderNode`) for ~10 of 20 entries, matching the ticker marquee agents (`$TrendClaw`, `$MomentumBot`, etc.). The rest show as truncated 0x addresses. Ranked by lifetime P&L.
-- **Portfolio page is mock data only** — `src/lib/portfolio-mock-data.ts` provides all positions, trades, PnL stats, and sparkline data. No real wallet connection. Will be replaced with live data when trade history indexing ships.
-- **Wallet connect uses SIWE via the Zora CLI** — the modal at `src/components/wallet-connect-modal.tsx` fetches a challenge nonce from `POST /api/wallet/challenge`, shows a `zora auth connect` command for the user to run in their terminal, and verifies the signed SIWE token via `POST /api/wallet/verify`. The auth logic in `src/lib/wallet-auth.ts` enforces nonce TTL (5 min), replay protection, origin binding, Base chain (8453), statement matching, and signature verification via viem. Verified sessions are stored in localStorage as `WalletSession` objects (address + connectedAt). No private keys touch the browser.
-- **Wallet connect gates the portfolio** — `PortfolioAuthGate` redirects disconnected users to `/`. The nav conditionally shows the Portfolio link based on `isConnected`. Connecting a wallet seeds default skills (`trend-scout`, `portfolio-scout`); disconnecting clears them.
+- **Portfolio page uses live address-based balances** — `src/app/api/portfolio/route.ts` proxies the SDK `getProfileBalances()` query, `src/hooks/use-portfolio-data.ts` hydrates React Query clients, and `src/components/portfolio-view.tsx` renders current positions, total value, and 24h change from public on-chain data.
+- **Wallet connect is address-only** — the modal at `src/components/wallet-connect-modal.tsx` accepts a wallet address from `zora wallet`, stores it locally, and seeds default skills. No signatures, nonces, or browser-side verification flow are involved because portfolio data is public.
+- **Portfolio is always reachable** — the nav always shows the Portfolio link. `/portfolio` uses the locally stored wallet address when present, and `/portfolio/[address]` renders any valid address directly for shareable lookups.
 - **Wallet menu uses the same overlay pattern as the Index** — `fixed inset-0 z-[100]`, split backdrop/content transitions (200ms blur, 100ms content snap), rendered outside the `<header>` to avoid `inert` conflicts. Brutalist design: `gap-px` grid cells, QR code spanning rows, condensed bold `font-display` for balance.
 - **Skill cards use `peer/link` for hover isolation** — `SkillCard` places an absolute `<Link>` as `peer/link` at z-0 and buttons at z-10. The card inverts on `peer-hover/link:` but button hover/click does not trigger the card's hover state.
 - **Agent profiles use mock PnL data** — `src/lib/agent-mock-data.ts` provides mock positions, trades, and sparkline for agent profile pages. Real profile data (holdings, created coins) comes from the SDK.

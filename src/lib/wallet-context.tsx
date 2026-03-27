@@ -8,47 +8,59 @@ import {
   type ReactNode,
 } from "react";
 import { seedDefaultSkills, clearInstalledSkills } from "@/lib/installed-skills-context";
-import { isWalletSession, type WalletSession } from "@/lib/wallet-session";
+import { normalizeWalletAddress } from "@/lib/wallet-address";
 
 const STORAGE_KEY = "zora:wallet";
-type WalletSnapshot = WalletSession | null | undefined;
+type WalletSnapshot = string | null | undefined;
 
 interface WalletContextValue {
-  session: WalletSession | null;
   address: string | null;
   isConnected: boolean;
   hydrated: boolean;
-  connect: (session: WalletSession) => void;
+  setAddress: (address: string) => void;
   disconnect: () => void;
 }
 
 const WalletContext = createContext<WalletContextValue>({
-  session: null,
   address: null,
   isConnected: false,
   hydrated: false,
-  connect: () => {},
+  setAddress: () => {},
   disconnect: () => {},
 });
 
 let listeners: Array<() => void> = [];
 let snapshot: WalletSnapshot = undefined;
 
-function parseStoredSession(raw: string | null): WalletSession | null {
+function parseStoredAddress(raw: string | null): string | null {
   if (!raw) return null;
 
   try {
     const parsed: unknown = JSON.parse(raw);
-    return isWalletSession(parsed) ? parsed : null;
-  } catch {
+
+    if (typeof parsed === "string") {
+      return normalizeWalletAddress(parsed);
+    }
+
+    if (
+      typeof parsed === "object" &&
+      parsed !== null &&
+      "address" in parsed &&
+      typeof parsed.address === "string"
+    ) {
+      return normalizeWalletAddress(parsed.address);
+    }
+
     return null;
+  } catch {
+    return normalizeWalletAddress(raw);
   }
 }
 
-function getSnapshot(): WalletSession | null {
+function getSnapshot(): string | null {
   if (snapshot !== undefined) return snapshot;
   try {
-    snapshot = parseStoredSession(localStorage.getItem(STORAGE_KEY));
+    snapshot = parseStoredAddress(localStorage.getItem(STORAGE_KEY));
   } catch {
     snapshot = null;
   }
@@ -66,7 +78,7 @@ function subscribe(listener: () => void) {
   };
 }
 
-function emit(next: WalletSession | null) {
+function emit(next: string | null) {
   snapshot = next;
   try {
     if (next === null) {
@@ -91,11 +103,13 @@ export function WalletProvider({ children }: { children: ReactNode }) {
     getServerSnapshot,
   );
   const hydrated = storedAddress !== undefined;
-  const session = storedAddress ?? null;
-  const address = session?.address ?? null;
+  const address = storedAddress ?? null;
 
-  const connect = useCallback((nextSession: WalletSession) => {
-    emit(nextSession);
+  const setAddress = useCallback((nextAddress: string) => {
+    const normalizedAddress = normalizeWalletAddress(nextAddress);
+    if (!normalizedAddress) return;
+
+    emit(normalizedAddress);
     seedDefaultSkills();
   }, []);
 
@@ -105,9 +119,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <WalletContext
-      value={{ session, address, isConnected: session !== null, hydrated, connect, disconnect }}
-    >
+    <WalletContext value={{ address, isConnected: address !== null, hydrated, setAddress, disconnect }}>
       {children}
     </WalletContext>
   );

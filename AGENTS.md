@@ -15,12 +15,17 @@ All queries are wrapped in `src/lib/zora.ts`. Client pages never call the SDK di
 | `fetchCoins("gainers", n)`      | `getCoinsTopGainers`   | `{ count }`                         | `CoinNode[]`     | 30s       |
 | `fetchCoins("creators", n)`     | `getCreatorCoins`      | `{ count }`                         | `CoinNode[]`     | 60s       |
 | `fetchCoins("featured", n)`     | `getFeaturedCreators`  | `{ first }`                         | `CoinNode[]`     | 60s       |
-| `fetchLeaderboard(n)`           | `getTraderLeaderboard` | `{ first }`                         | `Record[]`       | 5min      |
-| `fetchCoinDetail(addr)`         | `getCoin`              | `{ address, chain: 8453 }`          | `Record \| null` | on-demand |
-| `fetchCoinSwapsData(addr, n)`   | `getCoinSwaps`         | `{ address, chain: 8453, first }`   | `Record[]`       | on-demand |
-| `fetchCoinHoldersData(addr, n)` | `getCoinHolders`       | `{ chainId: 8453, address, count }` | `Record[]`       | on-demand |
-| `fetchProfileBalances(id, n)`   | `getProfileBalances`   | `{ identifier, count }`             | `Record[]`       | on-demand |
-| `fetchProfileCoins(id, n)`      | `getProfileCoins`      | `{ identifier, count }`             | `Record[]`       | on-demand |
+| `fetchLeaderboard(n)`           | `getTraderLeaderboard` | `{ first }`                         | `TraderNode[]`   | 5min      |
+| `fetchProfileBalances(addr, n)` | `getProfileBalances`   | `{ identifier, count, sortOption, excludeHidden, chainIds }` | `ProfileBalance[]` | on-demand |
+
+**Not yet implemented** (SDK functions exist but no wrapper in `zora.ts`):
+
+| SDK function         | Params                              | Notes                                   |
+| -------------------- | ----------------------------------- | --------------------------------------- |
+| `getCoin`            | `{ address, chain: 8453 }`          | Single coin detail                      |
+| `getCoinSwaps`       | `{ address, chain: 8453, first }`   | Trade history for a specific coin       |
+| `getCoinHolders`     | `{ chainId: 8453, address, count }` | Holder list for a specific coin         |
+| `getProfileCoins`    | `{ identifier, count }`             | Created coins for a wallet              |
 
 ## Common pitfalls
 

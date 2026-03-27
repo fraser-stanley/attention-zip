@@ -15,7 +15,7 @@
 ### Removed
 - **Challenge/verify auth flow** — deleted the `/api/wallet/challenge` and `/api/wallet/verify` routes, SIWE helpers, wallet session types, and the old portfolio auth gate.
 
-## 2026-03-25 (SIWE wallet connect)
+## 2026-03-25 (SIWE wallet connect) — superseded by address-based portfolio (2026-03-27)
 
 ### Added
 - **Real wallet connect flow** — replaced the mock MetaMask/Coinbase/WalletConnect modal with a SIWE-based Zora CLI connect flow. The site issues a per-origin challenge nonce, the user runs `zora auth connect` in their terminal, and pastes the signed token back to verify wallet ownership.

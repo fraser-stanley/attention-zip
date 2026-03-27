@@ -68,16 +68,13 @@ src/
 │   ├── sitemap.ts                  # sitemap.xml with all public routes
 │   ├── manifest.ts                 # PWA manifest (icons, theme, display)
 │   ├── login/page.tsx              # Custom staging password screen when STAGING_PASSWORD is set
-│   ├── agents/page.tsx             # Agent list (trader leaderboard with portfolio links)
-│   ├── agents/[address]/page.tsx   # Agent profile (PnL, sparkline, positions, holdings)
 │   └── api/
 │       ├── route.ts                # API discovery document
 │       ├── skills/route.ts         # Skill catalog for agents
 │       ├── explore/route.ts        # Explore queries + cache headers
 │       ├── leaderboard/route.ts    # Trader leaderboard
 │       ├── portfolio/route.ts      # Address-based Zora portfolio balances
-│       ├── staging-auth/route.ts   # Password check, sets the staging auth cookie
-│       └── agents/[address]/route.ts # Agent profile data
+│       └── staging-auth/route.ts   # Password check, sets the staging auth cookie
 ├── components/
 │   ├── nav.tsx                     # Navigation bar (6 sections incl. Portfolio + wallet menu toggle)
 │   ├── hero-section.tsx            # Hero layout with orb + CTA (animated highlighter headings)
@@ -95,8 +92,6 @@ src/
 │   ├── coin-table.tsx              # Reusable coin data table
 │   ├── portfolio-view.tsx          # Live portfolio balances, value stats, and installed skills
 │   ├── portfolio-page-client.tsx   # Client wallet-aware portfolio entry state
-│   ├── agent-profile-detail.tsx    # Agent profile with PnL, positions, sparkline, holdings
-│   ├── pnl-sparkline.tsx           # SVG sparkline for cumulative PnL charts
 │   ├── skill-card.tsx               # Unified skill card with install/remove states and peer-hover link
 │   ├── wallet-menu.tsx             # Brutalist wallet dropdown (QR code, balance, copy address, disconnect)
 │   ├── wallet-connect-modal.tsx     # Address entry modal for local Zora CLI wallets
@@ -121,11 +116,15 @@ src/
     ├── installed-skills-context.tsx # Installed skills store (localStorage, seed/clear on connect/disconnect)
     ├── utils.ts                    # cn() helper for className merging
     ├── pnl-utils.ts                # Shared PnL formatting (pnlColor, formatPnl, formatPct)
-    ├── portfolio-mock-data.ts      # Mock portfolio data (positions, trades, sparkline)
-    ├── agent-mock-data.ts          # Mock agent PnL data (positions, trades, sparkline)
+    ├── portfolio-mock-data.ts      # Mock portfolio data (positions, trades, sparkline) — used by agent ticker, not portfolio page
     ├── activity-mock-data.ts       # Mock agent trade entries for ticker marquee
     └── shaders/
         └── dither-effect.ts        # 4x4 Bayer matrix dithering post-process (binary output)
+├── hooks/
+│   ├── use-portfolio-data.ts       # React Query hook for SDK getProfileBalances
+│   ├── use-has-hover.ts            # SSR-safe (pointer: fine) media query hook
+│   ├── use-expandable-memory.ts    # Persist expand/collapse state across navigations
+│   └── use-session-storage-state.ts # Generic session storage hook
 ├── proxy.ts                        # Custom staging auth gate for pages + CORS headers for /api/*
 ```
 
@@ -154,8 +153,7 @@ src/
 - **Portfolio is always reachable** — the nav always shows the Portfolio link. `/portfolio` uses the locally stored wallet address when present, and `/portfolio/[address]` renders any valid address directly for shareable lookups.
 - **Wallet menu uses the same overlay pattern as the Index** — `fixed inset-0 z-[100]`, split backdrop/content transitions (200ms blur, 100ms content snap), rendered outside the `<header>` to avoid `inert` conflicts. Brutalist design: `gap-px` grid cells, QR code spanning rows, condensed bold `font-display` for balance.
 - **Skill cards use `peer/link` for hover isolation** — `SkillCard` places an absolute `<Link>` as `peer/link` at z-0 and buttons at z-10. The card inverts on `peer-hover/link:` but button hover/click does not trigger the card's hover state.
-- **Agent profiles use mock PnL data** — `src/lib/agent-mock-data.ts` provides mock positions, trades, and sparkline for agent profile pages. Real profile data (holdings, created coins) comes from the SDK.
-- **PnL utilities are shared** — `src/lib/pnl-utils.ts` exports `pnlColor()`, `formatPnl()`, `formatPct()` used by both portfolio and agent profile pages. Gains = `#3FFF00`, losses = `#FF00F0`.
+- **PnL utilities are shared** — `src/lib/pnl-utils.ts` exports `pnlColor()`, `formatPnl()`, `formatPct()`. Gains = `#3FFF00`, losses = `#FF00F0`.
 - **Market colors stay full-strength** — use `#3FFF00`, `#FF00F0`, or no market color at all. Only neutral grays should be faded with opacity.
 - **Hover media overlay** — Inspired by hausotto.com. When hovering a coin row in `CoinTable` or `HomeLiveCards`, the token's `mediaContent.previewImage.medium` is shown as a large image centered on the viewport (`fixed inset-0 z-50`). Uses `pointer-events: none` so hover detection stays on the table rows. Disabled on touch devices via `(pointer: fine)` media query check in `useHasPointer()` hook (`useSyncExternalStore`-based, SSR-safe). The overlay fades in after the image loads (`loadedUrl === imageUrl` check prevents stale flashes). Mock data in `src/lib/mock-data.ts` includes picsum.photos URLs for dev testing.
 - **Animated highlighter stroke** — `HighlighterStroke` component (`src/components/highlighter-stroke.tsx`) animates a `#3FFF00` background sweep left-to-right using motion/react `backgroundSize` with `ease-out-quint` easing, subtle `scaleY` press from bottom-left, and `-1.5deg` skew for a hand-drawn feel. Used on hero headings. The `.highlight-block` CSS class provides the static base styles (color, padding, `box-decoration-break: clone`); the component overrides `background-color` to transparent and drives the background via inline `backgroundImage` + animated `backgroundSize`. A `prefers-reduced-motion` CSS exemption in `globals.css` prevents the blanket `transition-duration: 0.01ms !important` rule from killing the motion/react animation. Portfolio stat numbers still use the static `.highlight-block` class directly.
@@ -258,7 +256,7 @@ The `@zoralabs/coins-sdk` functions use different parameter names. These are doc
 | `getCoin`              | `{ address, chain }`          | chain is number (8453 for Base)        |
 | `getCoinSwaps`         | `{ address, chain, first }`   | `chain` is number, `first` not `count` |
 | `getCoinHolders`       | `{ chainId, address, count }` | `chainId` not `chain`                  |
-| `getProfileBalances`   | `{ identifier, count }`       | `identifier` is wallet address         |
+| `getProfileBalances`   | `{ identifier, count, sortOption?, excludeHidden?, chainIds? }` | `identifier` is wallet address. We pass `sortOption: "MARKET_VALUE_USD"`, `excludeHidden: true`, `chainIds: [8453]` |
 | `getProfileCoins`      | `{ identifier, count }`       | `identifier` is wallet address         |
 
 All SDK responses return `{ error, data }`. Always check `response.error` before accessing data.
@@ -394,7 +392,7 @@ The Zora CLI has 8 commands: `auth`, `explore`, `get`, `buy`, `sell`, `balance`,
 - `/api/skills?id=<skill-id>` — single skill lookup
 - `/api/explore` — live explore data with cache headers
 - `/api/leaderboard` — leaderboard data with cache headers
-- `/api/agents/<address>` — agent profile data (balances, coins, volume, rank)
+- `/api/portfolio?address=0x...` — public coin balances for any wallet address (SDK `getProfileBalances`)
 - `/skills/<id>/skill-md` — raw SKILL.md content (`text/markdown`, 1h cache)
 - `/.well-known/ai.json` — simple discovery document for crawlers and agents
 

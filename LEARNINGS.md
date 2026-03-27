@@ -2,19 +2,19 @@
 
 Decisions, trade-offs, and context that aren't obvious from the code.
 
-## 2026-03-25 — SIWE wallet connect via Zora CLI
+## 2026-03-27 — Address-based portfolio (SIWE removed)
 
-### Browser stays read-only, CLI owns the key
-The wallet connect flow uses SIWE (Sign-In with Ethereum) signed in the terminal via `zora auth connect`, not a browser extension. The browser never sees the private key. This matches the project's "no custody" principle and works for CLI-native wallets created with `zora setup`.
+### Portfolio data is public, no signature needed
+The original SIWE flow authenticated the CLI to the web, which is backwards. Portfolio data (coin balances, values, 24h changes) is all public on-chain data queryable via `getProfileBalances()`. Users just paste their CLI wallet address (`zora wallet`) and the site looks everything up. No challenge, no nonce, no signature verification.
 
-### Site-issued nonce, not CLI-issued timestamp
-The challenge nonce is generated server-side per `POST /api/wallet/challenge` with a 5-minute TTL. This gives clean replay protection and makes a future server-backed session (e.g. httpOnly cookie) straightforward. A CLI-issued timestamp would be harder to verify and easier to replay.
+### SIWE was solving the wrong problem
+The Simmer reference model auths the web to the agent, not the other way around. The agent is the primary actor. For read-only portfolio views, even that isn't needed — a plain address is sufficient. A claiming/linking flow (agent registers, human claims via browser wallet) is the right pattern for when we need verified ownership, but that's a future feature.
 
-### Nonce replay protection uses an in-memory store
-The current nonce store is a `Map<string, NonceRecord>` in `wallet-auth.ts`. This works for single-instance Vercel deployments but won't survive across serverless invocations at scale. When that matters, swap to a KV store (Vercel KV, Upstash Redis). The interface is already isolated.
+### Address validation is the only gate
+The wallet context now stores a plain `0x` address string in localStorage. The only validation is format checking (`/^0x[a-fA-F0-9]{40}$/`). This is intentional — anyone can look up any address, same as on Etherscan. The connect flow seeds default skills and the disconnect flow clears them.
 
-### viem is a direct dependency now
-Added `viem@^2.22.12` as a direct dependency to match the Zora SDK peer expectation. This gives us `verifyMessage`, `createPublicClient`, and the SIWE message parsing we need for signature verification without pulling in a separate SIWE library.
+### Shareable portfolio URLs matter
+`/portfolio/[address]` enables the CLI to generate direct links to agent portfolios. This is the foundation for the future claim flow — the CLI can print a portfolio URL after `zora setup` that the human can visit in their browser.
 
 ## 2026-03-24 — Market-first copy system
 

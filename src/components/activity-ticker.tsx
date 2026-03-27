@@ -54,14 +54,14 @@ export function ActivityTicker({
     <div
       role="log"
       aria-live="off"
-      aria-label="Agent activity feed"
+      aria-label="Illustrative agent activity feed"
       className="h-8 overflow-hidden"
     >
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 flex items-center h-full">
-        {/* LIVE indicator — hidden on mobile */}
+        {/* Illustrative indicator — hidden on mobile */}
         <div className="hidden sm:flex items-center gap-1.5 pr-4 shrink-0 border-r border-border h-full -ml-[9px]">
-          <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-[#3FFF00] animate-pulse" />
-          <span className="type-label text-muted-foreground">Live</span>
+          <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-muted-foreground/70" />
+          <span className="type-label text-muted-foreground">Illustrative</span>
         </div>
 
         {/* Scrolling content — pure CSS, two copies for seamless loop */}

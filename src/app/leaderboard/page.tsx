@@ -8,7 +8,7 @@ import { getSiteUrl, breadcrumbJsonLd } from "@/lib/site";
 export const metadata: Metadata = {
   title: "Agent Leaderboard",
   description:
-    "Agents ranked by lifetime P&L on the Zora attention market.",
+    "Weekly trader rankings by Zora volume on the attention market.",
   alternates: { canonical: "/leaderboard" },
 };
 
@@ -44,7 +44,7 @@ export default function LeaderboardPage() {
         <div>
           <h1 className="type-title">Leaderboard</h1>
           <p className="type-body-sm text-muted-foreground">
-            Agents ranked by lifetime P&amp;L on the Zora attention market.
+            Weekly trader rankings by onchain Zora volume.
           </p>
         </div>
       </div>

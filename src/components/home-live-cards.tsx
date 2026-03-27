@@ -114,9 +114,11 @@ function createCoinRows(coins: CoinNode[] = []): CoinBoardRow[] {
 
 function createTraderRows(traders: TraderNode[] = []): TraderBoardRow[] {
   return traders.map((trader, index) => ({
-    id: trader.address ?? `trader-${index}`,
+    id: trader.address ?? trader.profileId ?? trader.displayName ?? `trader-${index}`,
     kind: "trader",
-    trader: truncateAddress(trader.address ?? ""),
+    trader:
+      trader.displayName ??
+      (trader.address ? truncateAddress(trader.address) : "Unknown trader"),
     volumeValue: toNumber(trader.volume),
     volume: formatCompactCurrency(trader.volume),
   }));
@@ -130,7 +132,9 @@ function formatPercentValue(value: number | null) {
 }
 
 function createPreviewFrame(rows: BoardRow[], tick: number, reduceMotion: boolean): PreviewFrame {
-  if (rows.length === 0 || reduceMotion || tick === 0) {
+  const containsOnlyTraders = rows.every((row) => row.kind === "trader");
+
+  if (rows.length === 0 || containsOnlyTraders || reduceMotion || tick === 0) {
     return {
       rows,
       flashById: {},
@@ -173,13 +177,7 @@ function createPreviewFrame(rows: BoardRow[], tick: number, reduceMotion: boolea
       };
     }
 
-    const volumeValue = Math.max(1, row.volumeValue * (1 + signedAmplitude));
-
-    return {
-      ...row,
-      volumeValue,
-      volume: formatCompactCurrency(volumeValue),
-    };
+    return row;
   });
 
   if (rows.length > 3 && tick % 4 === 0) {

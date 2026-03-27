@@ -1,3 +1,9 @@
+import {
+  SITE_REPO_REF,
+  getSiteRepoName,
+  getSiteRepoUrl,
+} from "@/lib/site";
+
 export interface Skill {
   id: string;
   name: string;
@@ -47,7 +53,16 @@ export interface SkillRuntimeCommands {
   manual: string;
 }
 
-const REPO_URL = "https://github.com/fraser-stanley/zora-agent-skills";
+const REPO_URL = getSiteRepoUrl();
+const REPO_NAME = getSiteRepoName();
+
+function buildSkillGithubUrl(skillId: string) {
+  return `${REPO_URL}/tree/${SITE_REPO_REF}/${skillId}`;
+}
+
+function buildSkillMdUrl(skillId: string) {
+  return `/skills/${skillId}/skill-md`;
+}
 
 export const skills: Skill[] = [
   {
@@ -107,10 +122,8 @@ Watchlist:
 
 Saved snapshot to ~/.config/zora-agent-skills/trend-scout/state.json`,
     badges: ["Trend scan", "Read-only", "No wallet"],
-    githubUrl:
-      "https://github.com/fraser-stanley/zora-agent-skills/tree/main/trend-scout",
-    skillMdUrl:
-      "https://raw.githubusercontent.com/fraser-stanley/zora-agent-skills/main/trend-scout/SKILL.md",
+    githubUrl: buildSkillGithubUrl("trend-scout"),
+    skillMdUrl: buildSkillMdUrl("trend-scout"),
   },
   {
     id: "creator-pulse",
@@ -165,10 +178,8 @@ Watchlist alerts:
 
 Saved snapshot to ~/.config/zora-agent-skills/creator-pulse/state.json`,
     badges: ["Creator coins", "Read-only", "No wallet"],
-    githubUrl:
-      "https://github.com/fraser-stanley/zora-agent-skills/tree/main/creator-pulse",
-    skillMdUrl:
-      "https://raw.githubusercontent.com/fraser-stanley/zora-agent-skills/main/creator-pulse/SKILL.md",
+    githubUrl: buildSkillGithubUrl("creator-pulse"),
+    skillMdUrl: buildSkillMdUrl("creator-pulse"),
   },
   {
     id: "briefing-bot",
@@ -224,10 +235,8 @@ Portfolio overlap:
 
 Assessment: Active tape. Trend flow is stronger than creator flow today.`,
     badges: ["Briefing", "Read-only", "Wallet optional"],
-    githubUrl:
-      "https://github.com/fraser-stanley/zora-agent-skills/tree/main/briefing-bot",
-    skillMdUrl:
-      "https://raw.githubusercontent.com/fraser-stanley/zora-agent-skills/main/briefing-bot/SKILL.md",
+    githubUrl: buildSkillGithubUrl("briefing-bot"),
+    skillMdUrl: buildSkillMdUrl("briefing-bot"),
   },
   {
     id: "portfolio-scout",
@@ -287,10 +296,8 @@ Alerts:
 
 Tracked coin value: $6,050.00`,
     badges: ["Portfolio", "Read-only", "Wallet needed"],
-    githubUrl:
-      "https://github.com/fraser-stanley/zora-agent-skills/tree/main/portfolio-scout",
-    skillMdUrl:
-      "https://raw.githubusercontent.com/fraser-stanley/zora-agent-skills/main/portfolio-scout/SKILL.md",
+    githubUrl: buildSkillGithubUrl("portfolio-scout"),
+    skillMdUrl: buildSkillMdUrl("portfolio-scout"),
   },
   {
     id: "momentum-trader",
@@ -350,10 +357,8 @@ Candidates:
 No exits fired.
 State saved to ~/.config/zora-agent-skills/momentum-trader/state.json`,
     badges: ["Momentum", "Dry run default", "Execution"],
-    githubUrl:
-      "https://github.com/fraser-stanley/zora-agent-skills/tree/main/momentum-trader",
-    skillMdUrl:
-      "https://raw.githubusercontent.com/fraser-stanley/zora-agent-skills/main/momentum-trader/SKILL.md",
+    githubUrl: buildSkillGithubUrl("momentum-trader"),
+    skillMdUrl: buildSkillMdUrl("momentum-trader"),
   },
 ];
 
@@ -390,6 +395,6 @@ export function getSkillRuntimeCommands(
     codex: `codex "${prompt}"`,
     opencode: `opencode run "${prompt}"`,
     cursor: `cursor "${prompt}"`,
-    manual: `git clone --depth 1 ${REPO_URL} && cd zora-agent-skills/${skill.id}`,
+    manual: `git clone --depth 1 ${REPO_URL} && cd ${REPO_NAME}/${skill.id}`,
   };
 }

@@ -133,7 +133,7 @@ export function Nav() {
                   onClick={() => { setOpen(false); setWalletModalOpen(true); }}
                   className="type-label text-muted-foreground hover:text-foreground transition-colors py-3"
                 >
-                  <TextMorph>Login</TextMorph>
+                  <TextMorph>Connect</TextMorph>
                 </button>
               )}
               <button

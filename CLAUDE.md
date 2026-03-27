@@ -31,9 +31,14 @@ Create `.env.local`:
 
 ```
 ZORA_API_KEY=your_key_here
+NEXT_PUBLIC_SITE_URL=http://localhost:3000
+NEXT_PUBLIC_SITE_REPO_URL=https://github.com/fraser-stanley/zora-agent-skills
+NEXT_PUBLIC_SITE_REPO_REF=main
 ```
 
 The API key is **optional**. The SDK works without it (uses registered queries), but requests are rate-limited. Get a key from https://zora.co/settings/developer.
+
+`NEXT_PUBLIC_SITE_URL` sets canonical metadata and install prompts outside Vercel. `NEXT_PUBLIC_SITE_REPO_URL` and `NEXT_PUBLIC_SITE_REPO_REF` control the public source links shown in the UI and discovery docs. `ALLOW_MOCK_MARKET_DATA=true` opts back into mock market fallbacks if you need them for local design work, but production defaults to empty states instead of fabricated live data.
 
 If you set `STAGING_PASSWORD`, visitor-facing pages are gated behind `/login`. This is the repo's custom staging gate for Vercel hobby deployments. `GET /api`, `GET /api/*`, `GET /skills/[id]/skill-md`, `GET /.well-known/ai.json`, and static public files stay public so agent installs and discovery still work.
 
@@ -62,12 +67,15 @@ src/
 │   ├── skills/[id]/skill-md/route.ts # Raw SKILL.md serving for agent consumption
 │   ├── leaderboard/page.tsx        # Weekly trader rankings with server-fetched initial data
 │   ├── leaderboard/loading.tsx     # Leaderboard loading skeleton
+│   ├── llms.txt/route.ts           # Short agent-readable docs
+│   ├── llms-full.txt/route.ts      # Full agent-readable docs
 │   ├── portfolio/page.tsx          # Address-aware portfolio shell for the connected wallet
 │   ├── portfolio/[address]/page.tsx # Shareable portfolio route for any valid wallet address
 │   ├── robots.ts                   # robots.txt via Next.js metadata API
 │   ├── sitemap.ts                  # sitemap.xml with all public routes
 │   ├── manifest.ts                 # PWA manifest (icons, theme, display)
 │   ├── login/page.tsx              # Custom staging password screen when STAGING_PASSWORD is set
+│   ├── .well-known/ai.json/route.ts # Machine-readable discovery metadata
 │   └── api/
 │       ├── route.ts                # API discovery document
 │       ├── skills/route.ts         # Skill catalog for agents
@@ -106,6 +114,7 @@ src/
 │   └── textures/                   # PBR texture maps (concrete diffuse/normal/roughness, env map)
 └── lib/
     ├── data.ts                     # Cached server data helpers for pages and routes
+    ├── discovery.ts                # Generated ai.json + llms docs
     ├── site.ts                     # Site metadata and URL helpers
     ├── zora.ts                     # SDK wrapper: all query functions + formatting helpers
     ├── skills.ts                   # Static skill definitions (5 skills)
@@ -130,10 +139,10 @@ src/
 
 ## Key decisions
 
-- **Server components fetch initial data directly** through `src/lib/data.ts`, which wraps the SDK with `unstable_cache` and mock-data fallbacks. This keeps the first paint server-rendered without duplicating fetch logic.
+- **Server components fetch initial data directly** through `src/lib/data.ts`, which wraps the SDK with `unstable_cache`. Mock fallbacks are allowed in non-production or when `ALLOW_MOCK_MARKET_DATA=true`, but production defaults to empty states instead of fabricated market data.
 - **Staging auth is app-level, not Vercel-native** — when `STAGING_PASSWORD` is set, `src/proxy.ts` redirects visitor-facing pages to `/login`. The cookie stores a SHA-256 token of the password, not the raw password. Agent-facing routes (`/api`, `/api/*`, `/skills/[id]/skill-md`, `/.well-known/ai.json`) and static public files stay accessible.
 - **Client components still refresh through API routes** (`/api/explore`, `/api/leaderboard`) using React Query. The API remains the public integration surface for external agents and local tooling.
-- **Agent discovery is explicit** via `/api`, `/api/skills`, JSON-LD, and `/.well-known/ai.json`.
+- **Agent discovery is explicit and host-aware** via `/api`, `/api/skills`, `/.well-known/ai.json`, `/llms.txt`, and `/llms-full.txt`. These are generated from App Router routes so they follow the current deployment host.
 - **Skills are static data** in `src/lib/skills.ts`. No database, no CMS. The homepage grid and skills gallery both render from this array — add a skill to the array and both pages update automatically.
 - **Skills are managed runtimes behind the scenes**. Each public skill has a real `scripts/run.mjs`, `clawhub.json`, and source-backed manual install path. Those implementation details belong in internal docs, not primary marketing copy.
 - **Install commands are shared** from `src/lib/skills.ts` (`getSkillRuntimeCommands()`, `getInstallAllCommands()`) so the UI and `/api/skills` stay in sync. Claude Code is the default visible runtime because its prompt-based install helper works today. OpenClaw remains as a forward-looking tab, and the generated command map still includes a manual `git clone` fallback.
@@ -146,8 +155,8 @@ src/
 - **Command menu is lazy-loaded** through `src/components/command-menu-loader.tsx` so it does not affect the initial page payload.
 - **React Query** handles live refresh after hydration. Initial render is server-owned for `/`, `/dashboard`, and `/leaderboard`.
 - **Homepage "Agent activity" is a terminal board**, not a 4-card grid. It preloads 8 rows per tab, refreshes through `/api/explore` and `/api/leaderboard`, and uses a subtle CRT-style loading sweep plus simulated preview motion between fetches.
-- **Activity ticker shows mock agent trades** — Simmer-style marquee (`@AgentName bought $12 Higher 3m ago`), rendered from the root layout so it appears directly below the nav across the site. Mock data in `src/lib/activity-mock-data.ts` with `TradeActivityItem` interface. Green for buys, magenta for sells. Will swap to real trade data when tracking is available.
-- **Leaderboard mock traders share ticker agent names** — `MOCK_TRADERS` in `src/lib/mock-data.ts` uses `displayName` (optional on `TraderNode`) for ~10 of 20 entries, matching the ticker marquee agents (`$TrendClaw`, `$MomentumBot`, etc.). The rest show as truncated 0x addresses. Ranked by lifetime P&L.
+- **Activity ticker is illustrative** — the marquee uses mock trade entries from `src/lib/activity-mock-data.ts` and is labeled that way in the UI. It is a presentation surface, not a live trade feed yet.
+- **Leaderboard uses the current SDK weekly shape** — `getTraderLeaderboard()` currently resolves to `data.exploreTraderLeaderboard`, with `weekVolumeUsd`, `weekTradesCount`, and `traderProfile.handle`. `src/lib/zora.ts` normalizes this into `TraderNode`.
 - **Portfolio page uses live address-based balances** — `src/app/api/portfolio/route.ts` proxies the SDK `getProfileBalances()` query, `src/hooks/use-portfolio-data.ts` hydrates React Query clients, and `src/components/portfolio-view.tsx` renders current positions, total value, and 24h change from public on-chain data.
 - **Wallet connect is address-only** — the modal at `src/components/wallet-connect-modal.tsx` accepts a wallet address from `zora wallet`, stores it locally, and seeds default skills. No signatures, nonces, or browser-side verification flow are involved because portfolio data is public.
 - **Portfolio is always reachable** — the nav always shows the Portfolio link. `/portfolio` uses the locally stored wallet address when present, and `/portfolio/[address]` renders any valid address directly for shareable lookups.
@@ -282,7 +291,8 @@ Each skill follows the AgentSkills/ClawHub directory convention:
 ├── SKILL.md          # AgentSkills-compliant metadata + agent instructions
 ├── clawhub.json      # ClawHub registry config (requires, tunables, cron)
 └── scripts/
-    └── validate.sh   # Structural validation script
+    ├── run.mjs       # Managed runtime entrypoint
+    └── validate.sh   # Host-readiness validation script
 ```
 
 **SKILL.md frontmatter** uses the AgentSkills format — flat `metadata` strings only:
@@ -332,7 +342,7 @@ Run `pnpm lint`, `pnpm typecheck`, `pnpm test`, and `pnpm build` before merge. `
 - Process-level managed entrypoint behavior via `src/__tests__/skill-entrypoints.test.ts` with a stubbed `zora` binary, isolated `HOME`, and state/journal assertions
 - Execution skill safety (dry-run journal writes, no accidental `--yes`, live exit path, env requirements)
 
-`scripts/validate.sh` remains a separate host-readiness check. It requires the installed `zora` CLI to be on your shell `PATH`, which means `command -v zora` and `zora --help` should both succeed. The managed tests do not prove that, because `pnpm test` injects a stub `zora` command for integration coverage. Wallet-backed skills also require a configured wallet.
+`scripts/validate.sh` remains a separate host-readiness check. Run it from inside the skill directory so its relative `scripts/run.mjs` path resolves correctly. It requires the installed `zora` CLI to be on your shell `PATH`, which means `command -v zora` and `zora --help` should both succeed. The managed tests do not prove that, because `pnpm test` injects a stub `zora` command for integration coverage. Wallet-backed skills also require a configured wallet.
 
 ### CLI commands
 

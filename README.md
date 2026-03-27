@@ -22,7 +22,7 @@ Five skills for the Zora market. Each skill directory contains:
 - `SKILL.md` for agent-facing instructions
 - `clawhub.json` for runtime metadata, cron, env, and tunables
 - `scripts/run.mjs` as the managed entrypoint
-- `scripts/validate.sh` for local validation
+- `scripts/validate.sh` for host-readiness validation
 
 | Skill                               | Description                                                             | Type      |
 | ----------------------------------- | ----------------------------------------------------------------------- | --------- |
@@ -43,11 +43,11 @@ Agent-facing endpoints. All responses include cache headers.
 | `GET /api`                  | Discovery document                                                                               |
 | `GET /api/skills`           | Skill catalog (`?id=<skill-id>` for single lookup)                                               |
 | `GET /api/explore`          | Live coin data (`?sort=trending\|mcap\|new\|volume\|gainers\|creators\|featured`, `?count=1-20`) |
-| `GET /api/leaderboard`      | Weekly trader rankings (`?count=1-50`)                                                           |
-| `GET /api/agents/<address>` | Agent profile (balances, coins, volume, rank)                                                    |
+| `GET /api/leaderboard`      | Weekly trader rankings by Zora volume (`?count=1-50`)                                            |
+| `GET /api/portfolio`        | Public portfolio lookup (`?address=<0x-address>&count=1-50`)                                     |
 | `GET /skills/<id>/skill-md` | Raw SKILL.md content for agent consumption                                                       |
-| `POST /api/wallet/challenge`| Issue a SIWE challenge nonce for wallet connect                                                  |
-| `POST /api/wallet/verify`   | Verify a signed SIWE token and return a wallet session                                           |
+| `GET /llms.txt`             | Short agent-readable docs                                                                        |
+| `GET /llms-full.txt`        | Full agent-readable docs                                                                         |
 | `GET /.well-known/ai.json`  | Agent discovery metadata                                                                         |
 
 ## Project structure
@@ -61,13 +61,16 @@ momentum-trader/
 src/
 ├── app/               Pages and API routes
 │   ├── api/           Agent-facing endpoints
+│   ├── .well-known/   Dynamic discovery route
 │   ├── dashboard/     Tabbed explore view
 │   ├── skills/        Skill gallery
 │   ├── leaderboard/   Weekly trader rankings
+│   ├── llms.txt/      Short discovery docs
+│   ├── llms-full.txt/ Full discovery docs
 │   ├── portfolio/     Portfolio view
-│   └── agents/        Agent list and profile pages
+│   └── login/         Staging password gate
 ├── components/        UI components (nav, tables, skill cards, shadcn/ui)
-└── lib/               SDK wrapper, skill data, utilities
+└── lib/               SDK wrapper, discovery builders, skill data, utilities
 ```
 
 ## Development
@@ -82,16 +85,19 @@ pnpm build        # production build (TypeScript + Next.js compilation)
 
 Merge gate: `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm build`.
 
-`pnpm build` remains the primary production verification gate, while `src/__tests__/skill-entrypoints.test.ts` covers the managed `scripts/run.mjs` workers with a stubbed `zora` binary, isolated `HOME`, and state/journal assertions. The per-skill `scripts/validate.sh` checks still require the installed `zora` CLI to be on your shell `PATH`, meaning `command -v zora` and `zora --help` should work, and wallet-backed skills also require a configured wallet.
+`pnpm build` remains the primary production verification gate, while `src/__tests__/skill-entrypoints.test.ts` covers the managed `scripts/run.mjs` workers with a stubbed `zora` binary, isolated `HOME`, and state/journal assertions. Run each skill's `./scripts/validate.sh` from inside that skill directory. Those checks still require the installed `zora` CLI to be on your shell `PATH`, and wallet-backed skills also require a configured wallet.
 
 ## Environment
 
-| Variable           | Required        | Description                                                       |
-| ------------------ | --------------- | ----------------------------------------------------------------- |
-| `ZORA_API_KEY`     | No              | Higher rate limits. Get one at https://zora.co/settings/developer |
-| `ZORA_PRIVATE_KEY` | Skill-dependent | Needed for wallet-backed skills and live trading                  |
-| `STAGING_PASSWORD` | No              | Enables the custom app-level password gate for visitor pages      |
-| `NEXT_PUBLIC_SITE_URL` | No          | Canonical site URL outside Vercel                                 |
+| Variable                    | Required        | Description                                                          |
+| --------------------------- | --------------- | -------------------------------------------------------------------- |
+| `ZORA_API_KEY`              | No              | Higher rate limits. Get one at https://zora.co/settings/developer    |
+| `ZORA_PRIVATE_KEY`          | Skill-dependent | Needed for wallet-backed skills and live trading                     |
+| `STAGING_PASSWORD`          | No              | Enables the custom app-level password gate for visitor pages         |
+| `NEXT_PUBLIC_SITE_URL`      | No              | Canonical site URL for metadata, sitemap, and install prompts        |
+| `NEXT_PUBLIC_SITE_REPO_URL` | No              | Public repo URL used in skill source links and manual clone commands |
+| `NEXT_PUBLIC_SITE_REPO_REF` | No              | Repo ref used for source links, defaults to `main`                   |
+| `ALLOW_MOCK_MARKET_DATA`    | No              | Set to `true` only if you intentionally want mock market fallback    |
 
 Skill-specific env vars and tunables live in each `clawhub.json`. Momentum Trader is dry-run by default and only goes live when `ZORA_MOMENTUM_LIVE=true`.
 
@@ -103,11 +109,13 @@ vercel
 
 For a stakeholder build on Vercel:
 
-- Set `ZORA_API_KEY` for better rate limits. The app still builds and falls back safely without it.
+- Set `ZORA_API_KEY` for better rate limits. The app still builds safely without it.
 - Set `STAGING_PASSWORD` if the deployment should stay behind the repo's custom password gate. This protects visitor-facing pages at `/login` because the project cannot use Vercel's native password protection on the current plan.
-- You do not need `ZORA_PRIVATE_KEY` unless you are testing wallet-backed skills outside the mocked portfolio flow.
-- `/dashboard` and `/leaderboard` use live SDK data with mock fallback if upstream data is empty or unavailable.
-- The wallet connect flow uses real SIWE verification via the Zora CLI (`zora auth connect`). Portfolio PnL and the activity ticker remain mocked until trade history indexing ships.
+- Set `NEXT_PUBLIC_SITE_URL` when you know the public hostname. The discovery docs are host-aware at runtime, but canonical metadata should still use the intended site URL.
+- Set `NEXT_PUBLIC_SITE_REPO_URL` and `NEXT_PUBLIC_SITE_REPO_REF` when the public skills repo is ready.
+- You do not need `ZORA_PRIVATE_KEY` unless you are testing wallet-backed skills or live trading flows.
+- `/dashboard` and `/leaderboard` use live SDK data. Mock fallback is disabled in production unless `ALLOW_MOCK_MARKET_DATA=true` is set intentionally.
+- The wallet connect flow is address-only. Users paste the address from their local Zora CLI wallet. The activity ticker remains illustrative until real trade activity is wired in.
 - Agent-facing routes stay public when the gate is on: `/api`, `/api/*`, `/skills/<id>/skill-md`, `/.well-known/ai.json`, and static public files.
 
 ## Documentation

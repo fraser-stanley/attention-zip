@@ -1,5 +1,19 @@
 # Changelog
 
+## 2026-03-27 (Production hardening + truthful discovery)
+
+### Added
+- **Dynamic discovery routes** — `/.well-known/ai.json`, `/llms.txt`, and `/llms-full.txt` now come from App Router handlers instead of static `public/` files, so they resolve against the current host.
+- **Leaderboard parser coverage** — `src/__tests__/zora.test.ts` locks in both the current SDK response shape and the legacy fallback shape for `getTraderLeaderboard()`.
+- **Repo/domain config knobs** — `.env.example` now documents `NEXT_PUBLIC_SITE_REPO_URL`, `NEXT_PUBLIC_SITE_REPO_REF`, and `ALLOW_MOCK_MARKET_DATA`.
+
+### Changed
+- **Leaderboard uses the real weekly SDK shape** — `src/lib/zora.ts` now reads `data.exploreTraderLeaderboard`, surfaces weekly volume + trade count, and no longer depends on the stale `traderLeaderboard` path.
+- **Production no longer fabricates market data by default** — `src/lib/data.ts` only falls back to `MOCK_COINS` / `MOCK_TRADERS` outside production, or when `ALLOW_MOCK_MARKET_DATA=true` is set intentionally.
+- **Discovery and install URLs are host-aware** — `src/lib/site.ts`, `src/lib/discovery.ts`, and `src/lib/skills.ts` now derive docs/install URLs from the current host and configurable repo settings instead of hardcoded Vercel or raw GitHub links.
+- **Leaderboard copy is now truthful** — the page and table now describe weekly trader rankings by Zora volume, with stable values instead of simulated drift.
+- **Mock activity is disclosed** — the top ticker is labeled "Illustrative", and the nav wallet CTA now says "Connect" instead of "Login".
+
 ## 2026-03-27 (Address-based portfolio)
 
 ### Added

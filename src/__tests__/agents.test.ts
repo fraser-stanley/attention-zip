@@ -235,6 +235,7 @@ describe("agents", () => {
     );
 
     expect(rateLimitedResponse.status).toBe(429);
+    expect(rateLimitedResponse.headers.get("Cache-Control")).toBe("no-store");
     expect(rateLimitedResponse.headers.get("Retry-After")).toBeTruthy();
     expect(rateLimitedResponse.headers.get("X-RateLimit-Limit")).toBe(
       String(AGENT_REGISTER_RATE_LIMIT.limit),
@@ -563,6 +564,7 @@ describe("agents", () => {
     );
 
     expect(rateLimitedResponse.status).toBe(429);
+    expect(rateLimitedResponse.headers.get("Cache-Control")).toBe("no-store");
     expect(rateLimitedResponse.headers.get("Retry-After")).toBeTruthy();
     expect(rateLimitedResponse.headers.get("X-RateLimit-Limit")).toBe(
       String(AGENT_CLAIM_RATE_LIMIT.limit),

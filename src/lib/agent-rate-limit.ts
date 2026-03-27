@@ -58,6 +58,7 @@ function buildHeaders({
   retryAfterSeconds: number;
 }) {
   return {
+    "Cache-Control": "no-store",
     "Retry-After": String(retryAfterSeconds),
     "X-RateLimit-Limit": String(limit),
     "X-RateLimit-Remaining": String(remaining),

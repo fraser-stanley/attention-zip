@@ -114,14 +114,14 @@ describe("CLI flag correctness in commands", () => {
       }
 
       if (buyCommands.length > 0) {
-        it.each(buyCommands)("buy command %s uses -o json", (command) => {
-          expect(command).toMatch(/-o\s+json/);
+        it.each(buyCommands)("buy command %s uses --json", (command) => {
+          expect(command).toContain("--json");
         });
       }
 
       if (sellCommands.length > 0) {
-        it.each(sellCommands)("sell command %s uses -o json", (command) => {
-          expect(command).toMatch(/-o\s+json/);
+        it.each(sellCommands)("sell command %s uses --json", (command) => {
+          expect(command).toContain("--json");
         });
       }
     });

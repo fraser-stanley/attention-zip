@@ -94,8 +94,8 @@
 ## 2026-03-19 (CLI syntax update)
 
 ### Changed
-- **CLI flag update** — `explore`, `get`, and `balance` use `--json`. `buy` and `sell` use `-o json`.
-- **Momentum Trader buy/sell syntax** — `zora buy <identifier> --eth <amount> -o json`, `zora sell <identifier> --amount <tokens> -o json`.
+- **CLI flag update** — All commands now use `--json` for structured output (the old `-o json` local flag on buy/sell was unified upstream).
+- **Momentum Trader buy/sell syntax** — `zora buy <identifier> --eth <amount> --json`, `zora sell <identifier> --amount <tokens> --json`.
 - **Creator Pulse** — added `zora get <identifier> --json` to wraps once the command landed in the CLI.
 - **Portfolio Scout** — `zora balance --json` for local wallet coin holdings + SDK `getProfileBalances()` for any-wallet lookups. Removed incorrect "ETH balance" references — `zora balance` returns coin holdings only, not native tokens. Updated SKILL.md with CLI + SDK dual-path documentation.
 - **CLAUDE.md** — replaced "CLI command reality check" with full CLI command reference table (8 commands), JSON output schemas, behavioral notes (exit codes, `--yes` scope, sort/type combos), and corrected `zora balance` documentation.

@@ -329,7 +329,7 @@ Run `pnpm lint`, `pnpm typecheck`, `pnpm test`, and `pnpm build` before merge. `
 - SKILL.md frontmatter fields and format
 - Required body sections present
 - Word count 300–800 per skill
-- CLI flag correctness (`--json` for explore/get/balance, `-o json` for buy/sell)
+- CLI flag correctness (all commands use `--json`)
 - Managed `clawhub.json` metadata (`automaton`, cron, tunables, env requirements)
 - Cross-file sync (skills.ts IDs match SKILL.md names and directory names)
 - Process-level managed entrypoint behavior via `src/__tests__/skill-entrypoints.test.ts` with a stubbed `zora` binary, isolated `HOME`, and state/journal assertions
@@ -345,8 +345,8 @@ The Zora CLI has 8 commands: `auth`, `explore`, `get`, `buy`, `sell`, `balance`,
 | -------------- | ------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `zora explore` | `--sort <sort> --type <type> --limit <n> --json` | Sorts: mcap, volume, new, gainers, trending, featured, last-traded, last-traded-unique. Types: all, trend, creator-coin, post                                        |
 | `zora get`     | `zora get <identifier> [--type <type>] --json`   | Identifier = 0x address or supported coin or creator name. NOT ENS. Types: creator-coin, post, trend                                                                  |
-| `zora buy`     | `zora buy <address> --eth <amount> -o json`   | Requires 0x address, does not resolve names. Uses `-o json` (local flag), NOT `--json`. Also: --usd, --token (eth/usdc/zora), --percent, --all, --quote (preview only), --yes (skip confirm), --slippage, --debug |
-| `zora sell`    | `zora sell <address> --amount <tokens> -o json` | Requires 0x address, does not resolve names. Uses `-o json` (local flag), NOT `--json`. Also: --usd, --token (alias for --to), --percent, --all, --to <ETH\|USDC\|ZORA>, --quote, --yes, --slippage, --debug    |
+| `zora buy`     | `zora buy <address> --eth <amount> --json`   | Requires 0x address, does not resolve names. Also: --usd, --token (eth/usdc/zora), --percent, --all, --quote (preview only), --yes (skip confirm), --slippage, --debug |
+| `zora sell`    | `zora sell <address> --amount <tokens> --json` | Requires 0x address, does not resolve names. Also: --usd, --token (alias for --to), --percent, --all, --to <ETH\|USDC\|ZORA>, --quote, --yes, --slippage, --debug    |
 | `zora balance` | `zora balance [spendable\|coins] --json`         | Subcommands: (none) = wallet + coins, `spendable` = ETH/USDC/ZORA only, `coins` = coin holdings with --sort                                                          |
 | `zora setup`   | `zora setup [--create] [--force]`                | Creates/imports wallet at ~/.config/zora/wallet.json                                                                                                                 |
 | `zora wallet`  | `wallet info`, `wallet export`, `wallet backup`  | Wallet inspection, export, and Keychain backup on macOS                                                                                                              |
@@ -367,8 +367,8 @@ The Zora CLI has 8 commands: `auth`, `explore`, `get`, `buy`, `sell`, `balance`,
 - `explore --json`: `{ coins: [{ name, address, coinType, marketCap, volume24h, marketCapDelta24h }], pageInfo: { endCursor, hasNextPage } }`
 - `get --json`: `{ name, address, coinType, marketCap, volume24h, uniqueHolders, createdAt, creatorAddress, creatorHandle }`
 - `balance --json`: `{ wallet: [{ symbol, balance, usdValue, priceUsd }], coins: [{ rank, name, symbol, balance, usdValue, priceUsd, marketCap, marketCapChange24h, volume24h }] }`
-- `buy -o json`: `{ action, coin, address, spent: { amount, raw, symbol }, received: { amount, raw, symbol }, tx }` — `--quote` returns `estimated` and `slippage` instead of `received`/`tx`
-- `sell -o json`: `{ action, coin, address, sold: { amount, raw, symbol }, received: { amount, raw, symbol, source }, tx }` — `--quote` returns `estimated` and `slippage` instead
+- `buy --json`: `{ action, coin, address, spent: { amount, raw, symbol }, received: { amount, raw, symbol }, tx }` — `--quote` returns `estimated` and `slippage` instead of `received`/`tx`
+- `sell --json`: `{ action, coin, address, sold: { amount, raw, symbol }, received: { amount, raw, symbol, source }, tx }` — `--quote` returns `estimated` and `slippage` instead
 
 **`zora balance` subcommands:**
 

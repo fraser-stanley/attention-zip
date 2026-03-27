@@ -14,22 +14,22 @@ The Zora CLI has 8 commands. All data is public on-chain data on Base.
 |---------|--------|-----------|-------|
 | `zora explore` | `--sort <sort> --type <type> --limit <n>` | `--json` | Sorts: mcap, volume, new, gainers, trending, featured, last-traded, last-traded-unique. Types: all, trend, creator-coin, post |
 | `zora get` | `<identifier> [--type <type>]` | `--json` | Identifier = 0x address or supported coin or creator name. NOT ENS. Shared resolver is reused by get, buy, and sell |
-| `zora buy` | `<identifier> --eth <amount>` | `-o json` | Also: --usd, --token (eth/usdc/zora), --percent, --all, --quote (preview), --yes (skip confirm), --slippage, --debug |
-| `zora sell` | `<identifier> --amount <tokens>` | `-o json` | Also: --usd, --token (alias for --to), --percent, --all, --to ETH|USDC|ZORA, --quote, --yes, --slippage, --debug |
+| `zora buy` | `<identifier> --eth <amount>` | `--json` | Also: --usd, --token (eth/usdc/zora), --percent, --all, --quote (preview), --yes (skip confirm), --slippage, --debug |
+| `zora sell` | `<identifier> --amount <tokens>` | `--json` | Also: --usd, --token (alias for --to), --percent, --all, --to ETH|USDC|ZORA, --quote, --yes, --slippage, --debug |
 | `zora balance` | `[spendable\|coins]` | `--json` | Subcommands: (none) = wallet + coins, `spendable` = ETH/USDC/ZORA only, `coins` = coin holdings with --sort |
 | `zora setup` | `[--create] [--force]` | n/a | Creates/imports wallet at ~/.config/zora/wallet.json |
 | `zora wallet` | `info`, `export`, `backup` | n/a | Keychain-protected backup on macOS |
 | `zora auth` | `configure`, `status` | n/a | API key at ~/.config/zora/config.json |
 
-**Critical:** buy/sell use `-o json` (local flag). All other commands use `--json` (global flag).
+**All commands use `--json` for structured output.**
 
 ### JSON output shapes
 
 - `explore --json`: `{ coins: [{ name, address, coinType, marketCap, volume24h, marketCapDelta24h }], pageInfo: { endCursor, hasNextPage } }`
 - `get --json`: `{ name, address, coinType, marketCap, volume24h, uniqueHolders, createdAt, creatorAddress, creatorHandle }`
 - `balance --json`: `{ wallet: [{ symbol, balance, usdValue, priceUsd }], coins: [{ rank, name, symbol, balance, usdValue, priceUsd, marketCap, marketCapChange24h, volume24h }] }`
-- `buy -o json`: `{ action, coin, address, spent: { amount, raw, symbol }, received: { amount, raw, symbol }, tx }` — `--quote` returns `estimated` and `slippage` instead of `received`/`tx`
-- `sell -o json`: `{ action, coin, address, sold: { amount, raw, symbol }, received: { amount, raw, symbol, source }, tx }` — `--quote` returns `estimated` and `slippage` instead
+- `buy --json`: `{ action, coin, address, spent: { amount, raw, symbol }, received: { amount, raw, symbol }, tx }` — `--quote` returns `estimated` and `slippage` instead of `received`/`tx`
+- `sell --json`: `{ action, coin, address, sold: { amount, raw, symbol }, received: { amount, raw, symbol, source }, tx }` — `--quote` returns `estimated` and `slippage` instead
 
 ### Sort/type compatibility
 
@@ -154,10 +154,10 @@ Auto-buy trending coins with safety rails. Executes real trades with real ETH.
 ```
 zora explore --sort gainers --json           # find candidates
 zora get <identifier> --json                 # validate (volume, holders)
-zora buy <identifier> --quote -o json        # dry-run ALWAYS first
-zora buy <identifier> --eth 0.01 -o json --yes  # execute buy
-zora sell <identifier> --all -o json --yes  # exit position
-zora sell <identifier> --amount 100 --to USDC -o json --yes  # partial exit
+zora buy <identifier> --quote --json        # dry-run ALWAYS first
+zora buy <identifier> --eth 0.01 --json --yes  # execute buy
+zora sell <identifier> --all --json --yes  # exit position
+zora sell <identifier> --amount 100 --to USDC --json --yes  # partial exit
 zora balance --json                         # check positions
 ```
 
@@ -183,7 +183,7 @@ zora balance --json                         # check positions
 8. Wait cooldown before next scan
 
 **Notes:**
-- buy/sell use `-o json`, not `--json`
+- All commands use `--json` for structured output
 - buy/sell accept the same shared identifier resolution as `zora get`
 - `--yes` skips confirmation only — validation still runs
 - Requires dedicated trader wallet: `zora setup --create`

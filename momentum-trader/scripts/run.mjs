@@ -207,8 +207,7 @@ async function quoteExit(position) {
     "--quote",
     "--slippage",
     String(MAX_SLIPPAGE_PCT),
-    "-o",
-    "json",
+    "--json",
   ]);
 }
 
@@ -222,8 +221,7 @@ async function executeExit(position) {
     "eth",
     "--slippage",
     String(MAX_SLIPPAGE_PCT),
-    "-o",
-    "json",
+    "--json",
     "--yes",
   ]);
 }
@@ -272,8 +270,7 @@ async function discoverCandidate(heldIds) {
       "--quote",
       "--slippage",
       String(MAX_SLIPPAGE_PCT),
-      "-o",
-      "json",
+      "--json",
     ]);
 
     return { coin, detail, quote };
@@ -290,8 +287,7 @@ async function executeEntry(candidate) {
     String(MAX_ETH),
     "--slippage",
     String(MAX_SLIPPAGE_PCT),
-    "-o",
-    "json",
+    "--json",
     "--yes",
   ]);
 }

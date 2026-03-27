@@ -567,8 +567,7 @@ describe("managed skill entrypoints", { timeout: 30_000 }, () => {
         "--quote",
         "--slippage",
         "3",
-        "-o",
-        "json",
+        "--json",
       ])]: {
         action: "quote",
         coin: "HYPER",
@@ -626,8 +625,7 @@ describe("managed skill entrypoints", { timeout: 30_000 }, () => {
         "eth",
         "--slippage",
         "3",
-        "-o",
-        "json",
+        "--json",
         "--yes",
       ])]: {
         action: "sell",

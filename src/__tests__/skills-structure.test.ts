@@ -144,21 +144,21 @@ describe.each(SKILL_DIRS)("%s/SKILL.md", (skill) => {
       }
     });
 
-    it("buy commands use -o json", () => {
+    it("buy commands use --json", () => {
       const lines = codeContent
         .split("\n")
         .filter((line) => line.includes("zora buy"));
       for (const line of lines) {
-        expect(line).toMatch(/-o\s+json/);
+        expect(line).toContain("--json");
       }
     });
 
-    it("sell commands use -o json", () => {
+    it("sell commands use --json", () => {
       const lines = codeContent
         .split("\n")
         .filter((line) => line.includes("zora sell"));
       for (const line of lines) {
-        expect(line).toMatch(/-o\s+json/);
+        expect(line).toContain("--json");
       }
     });
   });

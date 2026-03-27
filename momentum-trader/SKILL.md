@@ -52,9 +52,9 @@ zora explore --sort gainers --limit 12 --json
 zora explore --sort trending --limit 12 --json
 zora get <identifier> --json
 zora balance coins --sort usd-value --limit 20 --json
-zora buy <address> --eth 0.01 --quote --slippage 3 -o json
-zora buy <address> --eth 0.01 --token eth --slippage 3 -o json --yes
-zora sell <address> --percent 100 --to eth --slippage 3 -o json --yes
+zora buy <address> --eth 0.01 --quote --slippage 3 --json
+zora buy <address> --eth 0.01 --token eth --slippage 3 --json --yes
+zora sell <address> --percent 100 --to eth --slippage 3 --json --yes
 ```
 
 ## How It Works

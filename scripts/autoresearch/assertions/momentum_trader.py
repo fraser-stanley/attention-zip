@@ -84,12 +84,10 @@ def assert_mentions_exit_strategy(output: str) -> bool:
 
 
 def assert_correct_flag_syntax(output: str) -> bool:
-    """Uses correct flag syntax (-o json for buy/sell, --json for explore)."""
+    """All commands use --json for structured output."""
     # Check for incorrect patterns
     incorrect_patterns = [
-        r'zora\s+buy.*--json',  # Should be -o json
-        r'zora\s+sell.*--json',  # Should be -o json
-        r'zora\s+explore.*-o\s+json',  # Should be --json
+        r'zora\s+\w+.*-o\s+json',  # -o json is deprecated, all commands use --json
     ]
     for pattern in incorrect_patterns:
         if re.search(pattern, output, re.IGNORECASE):

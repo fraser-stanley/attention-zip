@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { NextRequest } from "next/server";
+import { GET as getApiRoute } from "@/app/api/route";
 import { GET as getSkillsRoute } from "@/app/api/skills/route";
 import {
   buildAiDiscovery,
@@ -11,11 +12,13 @@ import { skills } from "@/lib/skills";
 const TEST_BASE_URL = "https://example.com";
 
 describe("buildAiDiscovery", () => {
-  it("includes llms and agent registration endpoints", () => {
+  it("includes llms and agent lifecycle endpoints", () => {
     expect(buildAiDiscovery(TEST_BASE_URL)).toMatchObject({
       llms_txt: "/llms.txt",
       llms_full_txt: "/llms-full.txt",
       agent_registration_url: "/api/agents/register",
+      agent_me_url: "/api/agents/me",
+      agent_claim_url: "/api/agents/claim",
     });
   });
 });
@@ -39,19 +42,38 @@ describe("buildLlmsTxt", () => {
 });
 
 describe("buildLlmsFullTxt", () => {
-  it("includes install commands, skill command lists, CLI reference, and registration note", () => {
+  it("includes install commands, skill command lists, CLI reference, and live registration docs", () => {
     const llmsFullTxt = buildLlmsFullTxt(TEST_BASE_URL);
 
     expect(llmsFullTxt).toContain("## Install All Skills");
     expect(llmsFullTxt).toContain("## Zora CLI Reference");
     expect(llmsFullTxt).toContain("zora explore --sort <sort>");
-    expect(llmsFullTxt).toContain("Coming soon: agent registration");
+    expect(llmsFullTxt).toContain("POST https://example.com/api/agents/register");
+    expect(llmsFullTxt).toContain("GET https://example.com/api/agents/me");
+    expect(llmsFullTxt).toContain("POST https://example.com/api/agents/claim");
+    expect(llmsFullTxt).toContain("https://example.com/claim/{claim_code}");
     expect(llmsFullTxt).toContain("## Trend Scout");
     expect(llmsFullTxt).toContain(
       "zora explore --sort trending --type trend --limit 8 --json",
     );
     expect(llmsFullTxt).toContain("Sample output");
     expect(llmsFullTxt).toContain("Trend Scout");
+  });
+});
+
+describe("/api", () => {
+  it("includes all three agent lifecycle endpoints", async () => {
+    const response = await getApiRoute(
+      new NextRequest("https://example.com/api"),
+    );
+    const data = await response.json();
+
+    expect(data.agentRegistrationUrl).toBe("/api/agents/register");
+    expect(data.agentMeUrl).toBe("/api/agents/me");
+    expect(data.agentClaimUrl).toBe("/api/agents/claim");
+    expect(data.endpoints.agentsRegister.url).toBe("/api/agents/register");
+    expect(data.endpoints.agentsMe.url).toBe("/api/agents/me");
+    expect(data.endpoints.agentsClaim.url).toBe("/api/agents/claim");
   });
 });
 

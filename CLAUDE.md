@@ -34,13 +34,17 @@ ZORA_API_KEY=your_key_here
 NEXT_PUBLIC_SITE_URL=http://localhost:3000
 NEXT_PUBLIC_SITE_REPO_URL=https://github.com/fraser-stanley/zora-agent-skills
 NEXT_PUBLIC_SITE_REPO_REF=main
+UPSTASH_REDIS_REST_URL=your_upstash_rest_url
+UPSTASH_REDIS_REST_TOKEN=your_upstash_rest_token
 ```
 
 The API key is **optional**. The SDK works without it (uses registered queries), but requests are rate-limited. Get a key from https://zora.co/settings/developer.
 
 `NEXT_PUBLIC_SITE_URL` sets canonical metadata and install prompts outside Vercel. `NEXT_PUBLIC_SITE_REPO_URL` and `NEXT_PUBLIC_SITE_REPO_REF` control the public source links shown in the UI and discovery docs. `ALLOW_MOCK_MARKET_DATA=true` opts back into mock market fallbacks if you need them for local design work, but production defaults to empty states instead of fabricated live data.
 
-If you set `STAGING_PASSWORD`, visitor-facing pages are gated behind `/login`. This is the repo's custom staging gate for Vercel hobby deployments. `GET /api`, `GET /api/*`, `GET /skills/[id]/skill-md`, `GET /.well-known/ai.json`, `GET /llms.txt`, `GET /llms-full.txt`, and static public files stay public so agent installs and discovery still work.
+If you set `STAGING_PASSWORD`, visitor-facing pages are gated behind `/login`. This is the repo's custom staging gate for Vercel hobby deployments. `GET /api`, `GET /api/*`, `GET /skills/[id]/skill-md`, `GET /.well-known/ai.json`, `GET /llms.txt`, `GET /llms-full.txt`, `GET /claim/[code]`, and static public files stay public so agent installs, discovery, and wallet claiming still work.
+
+Agent registration and claiming require direct Upstash Redis credentials. This repo uses only `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN`. Do not use `Redis.fromEnv()` or reintroduce `KV_REST_*` fallback handling.
 
 ## Project structure
 
@@ -70,6 +74,7 @@ src/
 │   ├── leaderboard/loading.tsx     # Leaderboard loading skeleton
 │   ├── llms.txt/route.ts           # Short agent-readable docs
 │   ├── llms-full.txt/route.ts      # Full agent-readable docs
+│   ├── claim/[code]/page.tsx       # Public agent claim page
 │   ├── portfolio/page.tsx          # Address-aware portfolio shell for the connected wallet
 │   ├── portfolio/[address]/page.tsx # Shareable portfolio route for any valid wallet address
 │   ├── robots.ts                   # robots.txt via Next.js metadata API
@@ -79,6 +84,9 @@ src/
 │   ├── .well-known/ai.json/route.ts # Machine-readable discovery metadata
 │   └── api/
 │       ├── route.ts                # API discovery document
+│       ├── agents/register/route.ts # Agent registration
+│       ├── agents/me/route.ts      # Bearer-authenticated agent lookup
+│       ├── agents/claim/route.ts   # Human wallet claim endpoint
 │       ├── skills/route.ts         # Skill catalog for agents
 │       ├── explore/route.ts        # Explore queries + cache headers
 │       ├── leaderboard/route.ts    # Trader leaderboard
@@ -101,6 +109,7 @@ src/
 │   ├── coin-table.tsx              # Reusable coin data table
 │   ├── portfolio-view.tsx          # Live portfolio balances, value stats, and installed skills
 │   ├── portfolio-page-client.tsx   # Client wallet-aware portfolio entry state
+│   ├── claim-form.tsx              # Dedicated agent-claim wallet form
 │   ├── skill-card.tsx               # Unified skill card with install/remove states and peer-hover link
 │   ├── wallet-menu.tsx             # Brutalist wallet dropdown (QR code, balance, copy address, disconnect)
 │   ├── wallet-connect-modal.tsx     # Address entry modal for local Zora CLI wallets
@@ -114,6 +123,9 @@ src/
 └── lib/
     ├── data.ts                     # Cached server data helpers for pages and routes
     ├── discovery.ts                # Generated ai.json + llms docs
+    ├── redis.ts                    # Direct Upstash Redis client wrapper
+    ├── agents.ts                   # Agent record storage, key auth, and claim helpers
+    ├── agent-auth.ts               # Bearer API key validation
     ├── site.ts                     # Site metadata and URL helpers
     ├── zora.ts                     # SDK wrapper: all query functions + formatting helpers
     ├── skills.ts                   # Static skill definitions (5 skills)
@@ -139,9 +151,11 @@ src/
 ## Key decisions
 
 - **Server components fetch initial data directly** through `src/lib/data.ts`, which wraps the SDK with `unstable_cache`. Mock fallbacks are allowed in non-production or when `ALLOW_MOCK_MARKET_DATA=true`, but production defaults to empty states instead of fabricated market data.
-- **Staging auth is app-level, not Vercel-native** — when `STAGING_PASSWORD` is set, `src/proxy.ts` redirects visitor-facing pages to `/login`. The cookie stores a SHA-256 token of the password, not the raw password. Agent-facing routes (`/api`, `/api/*`, `/skills/[id]/skill-md`, `/.well-known/ai.json`, `/llms.txt`, `/llms-full.txt`) and static public files stay accessible.
+- **Staging auth is app-level, not Vercel-native** — when `STAGING_PASSWORD` is set, `src/proxy.ts` redirects visitor-facing pages to `/login`. The cookie stores a SHA-256 token of the password, not the raw password. Agent-facing routes (`/api`, `/api/*`, `/skills/[id]/skill-md`, `/.well-known/ai.json`, `/llms.txt`, `/llms-full.txt`), public claim links (`/claim/[code]`), and static public files stay accessible.
 - **Client components still refresh through API routes** (`/api/explore`, `/api/leaderboard`) using React Query. The API remains the public integration surface for external agents and local tooling.
-- **Agent discovery is explicit and host-aware** via `/api`, `/api/skills`, `/.well-known/ai.json`, `/llms.txt`, and `/llms-full.txt`. These are generated from App Router routes so they follow the current deployment host. `/.well-known/ai.json` advertises the `agent_registration_url` convention ahead of the Phase 2 endpoint implementation.
+- **Agent discovery is explicit and host-aware** via `/api`, `/api/skills`, `/.well-known/ai.json`, `/llms.txt`, and `/llms-full.txt`. These are generated from App Router routes so they follow the current deployment host. `/.well-known/ai.json` now publishes the live `agent_registration_url`, `agent_me_url`, and `agent_claim_url` endpoints.
+- **Agent registration uses direct Upstash Redis** — `src/lib/redis.ts` creates `new Redis({ url, token })` from `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN`. The repo does not use `@vercel/kv` or `Redis.fromEnv()` fallbacks. Agent records live under `agent:*`, bearer key lookups under `apikey:*`, and claim lookups under `claim:*`.
+- **Claim URLs remain resolvable after success** — claim codes expire after 7 days while an agent is unclaimed. Once a wallet claims the agent, the `claim:*` lookup is rewritten without TTL so `/claim/[code]` can render an "already claimed" state. One-time claiming is enforced through `agent.status`, not by deleting the claim lookup.
 - **Skills are static data** in `src/lib/skills.ts`. No database, no CMS. The homepage grid and skills gallery both render from this array — add a skill to the array and both pages update automatically.
 - **Skills are managed runtimes behind the scenes**. Each public skill has a real `scripts/run.mjs`, `clawhub.json`, and source-backed manual install path. Those implementation details belong in internal docs, not primary marketing copy.
 - **Install commands are shared** from `src/lib/skills.ts` (`getSkillRuntimeCommands()`, `getSkillQuickInstallCommands()`, `getInstallAllCommands()`) so the UI, `/api/skills`, and discovery docs stay in sync. `/api/skills` exposes both the full `install` map and the prompt-only `quickInstall` map. Claude Code is the default visible runtime because its prompt-based install helper works today. OpenClaw remains as a forward-looking tab, and the generated command map still includes a manual `git clone` fallback.
@@ -157,7 +171,7 @@ src/
 - **Activity ticker is illustrative** — the marquee uses mock trade entries from `src/lib/activity-mock-data.ts` and is labeled that way in the UI. It is a presentation surface, not a live trade feed yet.
 - **Leaderboard uses the current SDK weekly shape** — `getTraderLeaderboard()` currently resolves to `data.exploreTraderLeaderboard`, with `weekVolumeUsd`, `weekTradesCount`, and `traderProfile.handle`. `src/lib/zora.ts` normalizes this into `TraderNode`.
 - **Portfolio page uses live address-based balances** — `src/app/api/portfolio/route.ts` proxies the SDK `getProfileBalances()` query, `src/hooks/use-portfolio-data.ts` hydrates React Query clients, and `src/components/portfolio-view.tsx` renders current positions, total value, and 24h change from public on-chain data.
-- **Wallet connect is address-only** — the modal at `src/components/wallet-connect-modal.tsx` accepts a wallet address from `zora wallet`, stores it locally, and seeds default skills. No signatures, nonces, or browser-side verification flow are involved because portfolio data is public.
+- **Wallet connect is address-only** — the modal at `src/components/wallet-connect-modal.tsx` accepts a wallet address from `zora wallet`, stores it locally, and seeds default skills. The `/claim/[code]` flow uses the same address-only model through `src/components/claim-form.tsx`. No signatures, nonces, or browser-side verification flow are involved because portfolio data is public and the agent ownership link is established server-side.
 - **Portfolio is always reachable** — the nav always shows the Portfolio link. `/portfolio` uses the locally stored wallet address when present, and `/portfolio/[address]` renders any valid address directly for shareable lookups.
 - **Wallet menu uses the same overlay pattern as the Index** — `fixed inset-0 z-[100]`, split backdrop/content transitions (200ms blur, 100ms content snap), rendered outside the `<header>` to avoid `inert` conflicts. Brutalist design: `gap-px` grid cells, QR code spanning rows, condensed bold `font-display` for balance.
 - **Skill cards use `peer/link` for hover isolation** — `SkillCard` places an absolute `<Link>` as `peer/link` at z-0 and buttons at z-10. The card inverts on `peer-hover/link:` but button hover/click does not trigger the card's hover state.

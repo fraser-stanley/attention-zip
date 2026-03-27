@@ -16,6 +16,8 @@ import {
 } from "@/lib/site";
 
 const AGENT_REGISTRATION_PATH = "/api/agents/register";
+const AGENT_ME_PATH = "/api/agents/me";
+const AGENT_CLAIM_PATH = "/api/agents/claim";
 
 const CLI_REFERENCE = [
   {
@@ -144,6 +146,8 @@ export function buildAiDiscovery(siteUrl: string) {
     llms_txt: "/llms.txt",
     llms_full_txt: "/llms-full.txt",
     agent_registration_url: AGENT_REGISTRATION_PATH,
+    agent_me_url: AGENT_ME_PATH,
+    agent_claim_url: AGENT_CLAIM_PATH,
     documentation: getDocumentationUrl(siteUrl),
     source_repository: getSiteRepoUrl(),
   };
@@ -167,6 +171,10 @@ ${buildSkillSummaryLines(siteUrl)}
 
 export function buildLlmsFullTxt(siteUrl: string) {
   const installAllCommands = getInstallAllCommands(siteUrl);
+  const claimPageExampleUrl = toAbsoluteUrl("/claim/CLAIM_CODE", siteUrl).replace(
+    "CLAIM_CODE",
+    "{claim_code}",
+  );
 
   return `# ${SITE_NAME}
 
@@ -198,13 +206,16 @@ ${CLI_REFERENCE.map(
 
 ## Agent Registration
 
-Coming soon: agent registration and human wallet claiming will publish at ${toAbsoluteUrl(
-    AGENT_REGISTRATION_PATH,
-    siteUrl,
-  )}.
-Watch ${toAbsoluteUrl("/api", siteUrl)} and ${toAbsoluteUrl(
-    "/.well-known/ai.json",
-    siteUrl,
-  )} for the published contract.
+- Register agent: POST ${toAbsoluteUrl(AGENT_REGISTRATION_PATH, siteUrl)}
+  Body: {"name":"agent-name","description":"optional","runtime":"optional"}
+  Returns: agent_id, api_key, key_prefix, claim_url, claim_code, status
+- Agent lookup: GET ${toAbsoluteUrl(AGENT_ME_PATH, siteUrl)}
+  Header: Authorization: Bearer sk_zora_xxx
+  Returns: agent_id, name, status, wallet, claim_url, created_at
+- Human claim: POST ${toAbsoluteUrl(AGENT_CLAIM_PATH, siteUrl)}
+  Body: {"claim_code":"reef-X4B2","wallet":"0x..."}
+  Returns: ok, agent_id, wallet
+- Public claim page: ${claimPageExampleUrl}
+- Claim links stay resolvable after a successful claim and render the current ownership state.
 `;
 }

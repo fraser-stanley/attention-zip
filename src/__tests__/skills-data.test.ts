@@ -2,7 +2,13 @@ import { describe, it, expect } from "vitest";
 import fs from "fs";
 import path from "path";
 import yaml from "yaml";
-import { skills, getSkillById, getSkillRuntimeCommands } from "@/lib/skills";
+import {
+  skills,
+  getInstallAllCommands,
+  getSkillById,
+  getSkillQuickInstallCommands,
+  getSkillRuntimeCommands,
+} from "@/lib/skills";
 
 const ROOT = path.resolve(__dirname, "../..");
 
@@ -200,6 +206,13 @@ describe("getSkillRuntimeCommands", () => {
     expect(commands.claude).toContain(TEST_BASE_URL);
   });
 
+  it("uses the shorter install prompt format", () => {
+    const commands = getSkillRuntimeCommands(skills[0], TEST_BASE_URL);
+    expect(commands.claude).toBe(
+      'claude -p "Install Trend Scout from https://example.com/skills/trend-scout/skill-md"',
+    );
+  });
+
   it("openclaw uses clawhub install", () => {
     const commands = getSkillRuntimeCommands(skills[0], TEST_BASE_URL);
     expect(commands.openclaw).toMatch(/^clawhub install /);
@@ -211,11 +224,31 @@ describe("getSkillRuntimeCommands", () => {
     expect(commands.manual).toContain("zora-agent-skills");
   });
 
-  it("commands include the action prompt", () => {
+  it("manual install stays as the extra fallback", () => {
     for (const skill of skills) {
       const commands = getSkillRuntimeCommands(skill, TEST_BASE_URL);
-      expect(commands.claude).toContain(skill.actionPrompt);
+      const quickInstall = getSkillQuickInstallCommands(skill, TEST_BASE_URL);
+
+      expect(commands.openclaw).toBe(quickInstall.openclaw);
+      expect(commands.claude).toBe(quickInstall.claude);
+      expect(commands.manual).toContain(`cd zora-agent-skills/${skill.id}`);
     }
+  });
+});
+
+describe("getInstallAllCommands", () => {
+  it("points runtimes at llms.txt for the all-skills install flow", () => {
+    const commands = getInstallAllCommands(TEST_BASE_URL);
+
+    expect(commands.claude).toBe(
+      'claude -p "Install skills from https://example.com/llms.txt"',
+    );
+    expect(commands.amp).toBe(
+      'amp "Install skills from https://example.com/llms.txt"',
+    );
+    expect(commands.codex).toBe(
+      'codex "Install skills from https://example.com/llms.txt"',
+    );
   });
 });
 

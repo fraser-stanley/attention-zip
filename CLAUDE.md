@@ -40,7 +40,7 @@ The API key is **optional**. The SDK works without it (uses registered queries),
 
 `NEXT_PUBLIC_SITE_URL` sets canonical metadata and install prompts outside Vercel. `NEXT_PUBLIC_SITE_REPO_URL` and `NEXT_PUBLIC_SITE_REPO_REF` control the public source links shown in the UI and discovery docs. `ALLOW_MOCK_MARKET_DATA=true` opts back into mock market fallbacks if you need them for local design work, but production defaults to empty states instead of fabricated live data.
 
-If you set `STAGING_PASSWORD`, visitor-facing pages are gated behind `/login`. This is the repo's custom staging gate for Vercel hobby deployments. `GET /api`, `GET /api/*`, `GET /skills/[id]/skill-md`, `GET /.well-known/ai.json`, and static public files stay public so agent installs and discovery still work.
+If you set `STAGING_PASSWORD`, visitor-facing pages are gated behind `/login`. This is the repo's custom staging gate for Vercel hobby deployments. `GET /api`, `GET /api/*`, `GET /skills/[id]/skill-md`, `GET /.well-known/ai.json`, `GET /llms.txt`, `GET /llms-full.txt`, and static public files stay public so agent installs and discovery still work.
 
 ## Project structure
 
@@ -54,6 +54,7 @@ src/
 ├── __tests__/
 │   ├── skills-structure.test.ts    # SKILL.md + clawhub.json structural validation
 │   ├── skills-data.test.ts         # skills.ts array integrity + cross-file sync
+│   ├── discovery.test.ts           # ai.json, llms docs, and API discovery contract
 │   ├── staging-auth.test.ts        # Staging auth token + redirect sanitization
 │   └── wallet-address.test.ts      # Address validation helpers
 ├── app/
@@ -109,8 +110,6 @@ src/
 │   ├── activity-ticker-section.tsx # Activity ticker wrapper (imports mock trade data)
 │   └── ui/                         # shadcn/ui components (button, card, badge, table, tabs, etc.)
 ├── public/
-│   └── .well-known/ai.json         # Agent discovery metadata
-├── public/
 │   └── textures/                   # PBR texture maps (concrete diffuse/normal/roughness, env map)
 └── lib/
     ├── data.ts                     # Cached server data helpers for pages and routes
@@ -140,12 +139,12 @@ src/
 ## Key decisions
 
 - **Server components fetch initial data directly** through `src/lib/data.ts`, which wraps the SDK with `unstable_cache`. Mock fallbacks are allowed in non-production or when `ALLOW_MOCK_MARKET_DATA=true`, but production defaults to empty states instead of fabricated market data.
-- **Staging auth is app-level, not Vercel-native** — when `STAGING_PASSWORD` is set, `src/proxy.ts` redirects visitor-facing pages to `/login`. The cookie stores a SHA-256 token of the password, not the raw password. Agent-facing routes (`/api`, `/api/*`, `/skills/[id]/skill-md`, `/.well-known/ai.json`) and static public files stay accessible.
+- **Staging auth is app-level, not Vercel-native** — when `STAGING_PASSWORD` is set, `src/proxy.ts` redirects visitor-facing pages to `/login`. The cookie stores a SHA-256 token of the password, not the raw password. Agent-facing routes (`/api`, `/api/*`, `/skills/[id]/skill-md`, `/.well-known/ai.json`, `/llms.txt`, `/llms-full.txt`) and static public files stay accessible.
 - **Client components still refresh through API routes** (`/api/explore`, `/api/leaderboard`) using React Query. The API remains the public integration surface for external agents and local tooling.
-- **Agent discovery is explicit and host-aware** via `/api`, `/api/skills`, `/.well-known/ai.json`, `/llms.txt`, and `/llms-full.txt`. These are generated from App Router routes so they follow the current deployment host.
+- **Agent discovery is explicit and host-aware** via `/api`, `/api/skills`, `/.well-known/ai.json`, `/llms.txt`, and `/llms-full.txt`. These are generated from App Router routes so they follow the current deployment host. `/.well-known/ai.json` advertises the `agent_registration_url` convention ahead of the Phase 2 endpoint implementation.
 - **Skills are static data** in `src/lib/skills.ts`. No database, no CMS. The homepage grid and skills gallery both render from this array — add a skill to the array and both pages update automatically.
 - **Skills are managed runtimes behind the scenes**. Each public skill has a real `scripts/run.mjs`, `clawhub.json`, and source-backed manual install path. Those implementation details belong in internal docs, not primary marketing copy.
-- **Install commands are shared** from `src/lib/skills.ts` (`getSkillRuntimeCommands()`, `getInstallAllCommands()`) so the UI and `/api/skills` stay in sync. Claude Code is the default visible runtime because its prompt-based install helper works today. OpenClaw remains as a forward-looking tab, and the generated command map still includes a manual `git clone` fallback.
+- **Install commands are shared** from `src/lib/skills.ts` (`getSkillRuntimeCommands()`, `getSkillQuickInstallCommands()`, `getInstallAllCommands()`) so the UI, `/api/skills`, and discovery docs stay in sync. `/api/skills` exposes both the full `install` map and the prompt-only `quickInstall` map. Claude Code is the default visible runtime because its prompt-based install helper works today. OpenClaw remains as a forward-looking tab, and the generated command map still includes a manual `git clone` fallback.
 - **SKILL.md is served from the domain** at `/skills/[id]/skill-md` (`src/app/skills/[id]/skill-md/route.ts`). This gives agent commands clean URLs that work in any environment.
 - **The skills page has a unified install card** — `RuntimeInstallCard` in `src/components/skill-card-client.tsx` combines 6 runtime tabs (OpenClaw, Claude Code, Amp, Codex CLI, OpenCode, Cursor) with a copyable code snippet in one bordered card. Claude Code is the default runtime. Per-skill rows use standalone `CopyableCodeBlock` components.
 - **The skills page stays intentionally flat** — one shared runtime picker updates every command block. Supporting details are hidden behind a single `More info` disclosure that reveals commands and sample output together. No nested accordions.

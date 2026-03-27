@@ -43,15 +43,20 @@ export type Runtime =
   | "opencode"
   | "cursor";
 
-export interface SkillRuntimeCommands {
+export interface RuntimeCommands {
   openclaw: string;
   claude: string;
   amp: string;
   codex: string;
   opencode: string;
   cursor: string;
+}
+
+export interface SkillRuntimeCommands extends RuntimeCommands {
   manual: string;
 }
+
+type PromptRuntimeCommands = Omit<RuntimeCommands, "openclaw">;
 
 const REPO_URL = getSiteRepoUrl();
 const REPO_NAME = getSiteRepoName();
@@ -366,18 +371,45 @@ export function getSkillById(id: string) {
   return skills.find((skill) => skill.id === id) ?? null;
 }
 
-export function getInstallAllCommands(baseUrl: string): SkillRuntimeCommands {
-  const skillsUrl = `${baseUrl}/api/skills`;
-  const prompt = `Read ${skillsUrl}. Install the Zora market skills that fit this runtime. Use ${REPO_URL} for the source files.`;
-
+function buildRuntimeCommands(prompt: string): PromptRuntimeCommands {
   return {
-    openclaw: skills.map((skill) => `clawhub install ${skill.id}`).join(" && "),
     claude: `claude -p "${prompt}"`,
     amp: `amp "${prompt}"`,
     codex: `codex "${prompt}"`,
     opencode: `opencode run "${prompt}"`,
     cursor: `cursor "${prompt}"`,
+  };
+}
+
+function buildInstallAllPrompt(baseUrl: string) {
+  return `Install skills from ${baseUrl}/llms.txt`;
+}
+
+function buildSkillInstallPrompt(skill: Skill, baseUrl: string) {
+  return `Install ${skill.name} from ${baseUrl}/skills/${skill.id}/skill-md`;
+}
+
+export function getInstallAllQuickCommands(baseUrl: string): RuntimeCommands {
+  return {
+    openclaw: skills.map((skill) => `clawhub install ${skill.id}`).join(" && "),
+    ...buildRuntimeCommands(buildInstallAllPrompt(baseUrl)),
+  };
+}
+
+export function getInstallAllCommands(baseUrl: string): SkillRuntimeCommands {
+  return {
+    ...getInstallAllQuickCommands(baseUrl),
     manual: `git clone --depth 1 ${REPO_URL}`,
+  };
+}
+
+export function getSkillQuickInstallCommands(
+  skill: Skill,
+  baseUrl: string,
+): RuntimeCommands {
+  return {
+    openclaw: `clawhub install ${skill.id}`,
+    ...buildRuntimeCommands(buildSkillInstallPrompt(skill, baseUrl)),
   };
 }
 
@@ -385,16 +417,8 @@ export function getSkillRuntimeCommands(
   skill: Skill,
   baseUrl: string,
 ): SkillRuntimeCommands {
-  const skillMdUrl = `${baseUrl}/skills/${skill.id}/skill-md`;
-  const prompt = `Read ${skillMdUrl}. Use ${skill.githubUrl} for the source files. ${skill.actionPrompt}`;
-
   return {
-    openclaw: `clawhub install ${skill.id}`,
-    claude: `claude -p "${prompt}"`,
-    amp: `amp "${prompt}"`,
-    codex: `codex "${prompt}"`,
-    opencode: `opencode run "${prompt}"`,
-    cursor: `cursor "${prompt}"`,
+    ...getSkillQuickInstallCommands(skill, baseUrl),
     manual: `git clone --depth 1 ${REPO_URL} && cd ${REPO_NAME}/${skill.id}`,
   };
 }

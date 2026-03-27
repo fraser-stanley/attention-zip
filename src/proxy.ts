@@ -8,6 +8,7 @@ const CORS_HEADERS = {
   "Access-Control-Max-Age": "86400",
 };
 const PUBLIC_FILE_PATH = /\.[^/]+$/;
+const PUBLIC_DISCOVERY_PATHS = new Set(["/llms.txt", "/llms-full.txt"]);
 
 async function checkAuth(request: NextRequest): Promise<NextResponse | null> {
   const password = process.env.STAGING_PASSWORD;
@@ -20,6 +21,7 @@ async function checkAuth(request: NextRequest): Promise<NextResponse | null> {
 
   // Agent-facing endpoints are public
   if (path === "/api" || path.startsWith("/api/")) return null;
+  if (PUBLIC_DISCOVERY_PATHS.has(path)) return null;
   if (path.endsWith("/skill-md")) return null;
   if (path.startsWith("/.well-known/")) return null;
   if (PUBLIC_FILE_PATH.test(path)) return null;

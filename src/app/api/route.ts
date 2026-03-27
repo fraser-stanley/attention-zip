@@ -17,6 +17,7 @@ export async function GET(request: NextRequest) {
       description: SITE_DESCRIPTION,
       documentation: getDocumentationUrl(request.url),
       sourceRepository: getSiteRepoUrl(),
+      agentRegistrationUrl: "/api/agents/register",
       endpoints: {
         index: {
           url: "/api",
@@ -51,6 +52,11 @@ export async function GET(request: NextRequest) {
             address: "0x wallet address",
             count: "1-50",
           },
+        },
+        agentsRegister: {
+          url: "/api/agents/register",
+          description:
+            "Coming soon. Agent registration endpoint for claimable agent identities.",
         },
       },
     },

@@ -1,5 +1,18 @@
 # Changelog
 
+## 2026-03-27 (Agent-native discovery polish)
+
+### Added
+- **`quickInstall` in `/api/skills`** — the skill catalog now exposes a shortest-possible prompt per runtime alongside the full install map.
+- **Discovery contract tests** — `src/__tests__/discovery.test.ts` now locks in `/.well-known/ai.json`, `llms.txt`, `llms-full.txt`, and the `quickInstall` API shape.
+
+### Changed
+- **`llms.txt` is now install-oriented** — the short doc now includes the skill catalog link, one-line per skill, and the default Claude Code all-skills install prompt.
+- **`llms-full.txt` is now a full agent reference** — it includes per-skill install commands, requirements, wrapped commands, sample output, the Zora CLI reference, and a coming-soon agent registration section.
+- **Prompt-based install commands are shorter** — all-skills installs now point runtimes at `/llms.txt`, and per-skill installs point directly at `/skills/<id>/skill-md`.
+- **Discovery metadata advertises the registration convention** — `/.well-known/ai.json` and `/api` now include `/api/agents/register` as the future agent registration URL.
+- **Staging auth explicitly allowlists the `llms` routes** — `/llms.txt` and `/llms-full.txt` stay public when `STAGING_PASSWORD` is enabled.
+
 ## 2026-03-27 (Production hardening + truthful discovery)
 
 ### Added

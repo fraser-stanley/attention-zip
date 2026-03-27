@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import {
   getSkillById,
+  getSkillQuickInstallCommands,
   getSkillRuntimeCommands,
   skills,
   type Skill,
@@ -10,6 +11,8 @@ import { getSiteUrl } from "@/lib/site";
 const CACHE_CONTROL = "public, s-maxage=3600, stale-while-revalidate=86400";
 
 function serializeSkill(skill: Skill, baseUrl: string) {
+  const install = getSkillRuntimeCommands(skill, baseUrl);
+
   return {
     id: skill.id,
     name: skill.name,
@@ -22,7 +25,8 @@ function serializeSkill(skill: Skill, baseUrl: string) {
     tags: skill.tags,
     requires: skill.requires,
     automation: skill.automation,
-    install: getSkillRuntimeCommands(skill, baseUrl),
+    install,
+    quickInstall: getSkillQuickInstallCommands(skill, baseUrl),
     monitors: skill.monitors,
     commands: skill.commands,
     actionPrompt: skill.actionPrompt,

@@ -2,6 +2,8 @@
 
 Agent skills and live market data for the Zora attention market. Scan trends, check portfolios, build briefings, and trade momentum.
 
+Agent discovery is available through `/.well-known/ai.json`, `/llms.txt`, `/llms-full.txt`, and `/api/skills`. The shortest install prompts point agents at the hosted `llms.txt` or per-skill `skill-md` URLs.
+
 ## Quick start
 
 ```bash
@@ -41,7 +43,7 @@ Agent-facing endpoints. All responses include cache headers.
 | Endpoint                    | Description                                                                                      |
 | --------------------------- | ------------------------------------------------------------------------------------------------ |
 | `GET /api`                  | Discovery document                                                                               |
-| `GET /api/skills`           | Skill catalog (`?id=<skill-id>` for single lookup)                                               |
+| `GET /api/skills`           | Skill catalog (`?id=<skill-id>` for single lookup), including `install` and `quickInstall` maps |
 | `GET /api/explore`          | Live coin data (`?sort=trending\|mcap\|new\|volume\|gainers\|creators\|featured`, `?count=1-20`) |
 | `GET /api/leaderboard`      | Weekly trader rankings by Zora volume (`?count=1-50`)                                            |
 | `GET /api/portfolio`        | Public portfolio lookup (`?address=<0x-address>&count=1-50`)                                     |
@@ -49,6 +51,20 @@ Agent-facing endpoints. All responses include cache headers.
 | `GET /llms.txt`             | Short agent-readable docs                                                                        |
 | `GET /llms-full.txt`        | Full agent-readable docs                                                                         |
 | `GET /.well-known/ai.json`  | Agent discovery metadata                                                                         |
+
+### Install prompts
+
+All skills:
+
+```bash
+claude -p "Install skills from https://<host>/llms.txt"
+```
+
+Single skill:
+
+```bash
+claude -p "Install Trend Scout from https://<host>/skills/trend-scout/skill-md"
+```
 
 ## Project structure
 
@@ -116,7 +132,7 @@ For a stakeholder build on Vercel:
 - You do not need `ZORA_PRIVATE_KEY` unless you are testing wallet-backed skills or live trading flows.
 - `/dashboard` and `/leaderboard` use live SDK data. Mock fallback is disabled in production unless `ALLOW_MOCK_MARKET_DATA=true` is set intentionally.
 - The wallet connect flow is address-only. Users paste the address from their local Zora CLI wallet. The activity ticker remains illustrative until real trade activity is wired in.
-- Agent-facing routes stay public when the gate is on: `/api`, `/api/*`, `/skills/<id>/skill-md`, `/.well-known/ai.json`, and static public files.
+- Agent-facing routes stay public when the gate is on: `/api`, `/api/*`, `/skills/<id>/skill-md`, `/.well-known/ai.json`, `/llms.txt`, `/llms-full.txt`, and static public files.
 
 ## Documentation
 

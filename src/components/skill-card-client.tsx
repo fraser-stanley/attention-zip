@@ -367,7 +367,7 @@ function SkillRow({
             rel="noopener noreferrer"
             className="inline-flex items-center gap-1 transition-colors hover:text-foreground"
           >
-            SKILL.md
+            Skill notes
             <ArrowUpRightIcon size={12} />
           </a>
         </div>

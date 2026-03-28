@@ -75,9 +75,9 @@ export const skills: Skill[] = [
     id: "trend-scout",
     name: "Trend Scout",
     description:
-      "Tracks trend leaders, new entrants, and volume shifts.",
+      "Scans trending coins, new launches, and volume leaders.",
     longDescription:
-      "Watches trending, new, volume, and market cap tables and tells you what changed.",
+      "Runs four market scans every 30 minutes and tells you what changed since the last run.",
     category: "attention",
     difficulty: "beginner",
     risk: "none",
@@ -109,9 +109,9 @@ export const skills: Skill[] = [
       dryRunByDefault: false,
     },
     actionPrompt:
-      "Install Trend Scout and explain what it tracks and how to run it on a schedule.",
+      "Install Trend Scout and show what it reports on a schedule.",
     samplePrompt:
-      "Install Trend Scout and tell me what it reports every 30 minutes.",
+      "What's trending on Zora right now?",
     sampleOutput: `Trend Scout
 Run at 2026-03-23T13:30:00Z
 
@@ -135,9 +135,9 @@ Saved snapshot to ~/.config/zora-agent-skills/trend-scout/state.json`,
     id: "creator-pulse",
     name: "Creator Pulse",
     description:
-      "Tracks creator-coin leaders and watchlist moves.",
+      "Watches featured creators and creator-coin momentum.",
     longDescription:
-      "Watches featured creators and creator-coin momentum across trending and volume tables.",
+      "Tracks featured, trending, and top-volume creator coins. Alerts when your watchlist moves.",
     category: "analytics",
     difficulty: "intermediate",
     risk: "none",
@@ -168,9 +168,9 @@ Saved snapshot to ~/.config/zora-agent-skills/trend-scout/state.json`,
       dryRunByDefault: false,
     },
     actionPrompt:
-      "Install Creator Pulse and explain the watchlist alerts it produces.",
+      "Install Creator Pulse and show watchlist alerts.",
     samplePrompt:
-      "Install Creator Pulse and summarize what it would alert me on.",
+      "Which creators are moving today?",
     sampleOutput: `Creator Pulse
 Run at 2026-03-23T13:30:00Z
 
@@ -192,7 +192,7 @@ Saved snapshot to ~/.config/zora-agent-skills/creator-pulse/state.json`,
     name: "Briefing Bot",
     description: "Turns the market into a short briefing.",
     longDescription:
-      "Combines trends, volume, new launches, gainers, and portfolio overlap in one report.",
+      "Rolls trending, volume, new launches, gainers, and portfolio overlap into one report.",
     category: "utility",
     difficulty: "intermediate",
     risk: "none",
@@ -224,9 +224,9 @@ Saved snapshot to ~/.config/zora-agent-skills/creator-pulse/state.json`,
       dryRunByDefault: false,
     },
     actionPrompt:
-      "Install Briefing Bot and explain when it runs and what it reports.",
+      "Install Briefing Bot and show a sample briefing.",
     samplePrompt:
-      "Install Briefing Bot and show me the kind of briefing it emits.",
+      "Give me a morning market briefing.",
     sampleOutput: `Zora Briefing
 Run at 2026-03-23T09:00:00Z
 
@@ -248,9 +248,9 @@ Assessment: Active tape. Trend flow is stronger than creator flow today.`,
     id: "portfolio-scout",
     name: "Portfolio Scout",
     description:
-      "Checks balances, position changes, and concentration.",
+      "Snapshots wallet positions and flags concentration risk.",
     longDescription:
-      "Snapshots wallet positions and flags new entries, exits, and concentration risk.",
+      "Reads wallet balances and coin positions. Flags new entries, exits, and concentration risk.",
     category: "analytics",
     difficulty: "intermediate",
     risk: "none",
@@ -281,9 +281,9 @@ Assessment: Active tape. Trend flow is stronger than creator flow today.`,
       dryRunByDefault: false,
     },
     actionPrompt:
-      "Install Portfolio Scout and explain the portfolio checks it runs.",
+      "Install Portfolio Scout and show a portfolio report.",
     samplePrompt:
-      "Install Portfolio Scout and show me the report it produces every few hours.",
+      "How does my wallet look?",
     sampleOutput: `Portfolio Scout
 Run at 2026-03-23T12:00:00Z
 
@@ -309,9 +309,9 @@ Tracked coin value: $6,050.00`,
     id: "copy-trader",
     name: "Copy Trader",
     description:
-      "Mirrors public Zora wallet moves with freshness gates. Dry run by default.",
+      "Follows public wallets and mirrors their trades. Dry run by default.",
     longDescription:
-      "Follows selected wallets and optional leaderboard traders, confirms swaps, then mirrors buys, trims, and exits with freshness, price-drift, and reconciliation guardrails.",
+      "Picks up buys, trims, and exits from source wallets. Confirms each swap before copying.",
     category: "trading",
     difficulty: "advanced",
     risk: "medium",
@@ -324,14 +324,11 @@ Tracked coin value: $6,050.00`,
       "risk-controls",
     ],
     monitors: [
-      "Source-wallet entries",
-      "Source-wallet adds",
-      "Source-wallet trims",
-      "Source-wallet exits",
-      "Stale live-copy skips",
-      "Price-drift guards",
-      "Copied-position concentration",
-      "Duplicate action suppression",
+      "Source wallet moves",
+      "Stale copy skips",
+      "Price-drift checks",
+      "Position concentration",
+      "Duplicate suppression",
       "State reconciliation",
     ],
     commands: [
@@ -355,9 +352,9 @@ Tracked coin value: $6,050.00`,
       dryRunByDefault: true,
     },
     actionPrompt:
-      "Install Copy Trader and explain how dry-run mode, freshness gates, and source wallets work.",
+      "Install Copy Trader and show a dry-run cycle.",
     samplePrompt:
-      "Install Copy Trader and show me a dry-run cycle with freshness and price-drift checks before I turn copied trades live.",
+      "Show me what jacob's wallet has been doing and dry-run a copy.",
     sampleOutput: `Copy Trader
 Run at 2026-03-27T13:40:00Z
 Mode: dry-run
@@ -380,9 +377,9 @@ Confirmed source actions:
     id: "momentum-trader",
     name: "Momentum Trader",
     description:
-      "Scores and manages momentum trades. Dry run by default.",
+      "Scans gainers, scores entries, manages exits. Dry run by default.",
     longDescription:
-      "Scans gainers and trending coins, scores candidates by edge, and manages stop-loss, take-profit, and trailing-stop exits.",
+      "Finds momentum candidates, quotes entries, and manages stop-loss, take-profit, and trailing-stop exits.",
     category: "trading",
     difficulty: "advanced",
     risk: "medium",
@@ -416,9 +413,9 @@ Confirmed source actions:
       dryRunByDefault: true,
     },
     actionPrompt:
-      "Install Momentum Trader and explain dry-run mode and trailing exits.",
+      "Install Momentum Trader and show a dry-run cycle.",
     samplePrompt:
-      "Install Momentum Trader and show me a dry-run cycle before I turn it live.",
+      "Scan for momentum and show me what you'd buy.",
     sampleOutput: `Momentum Trader
 Run at 2026-03-23T13:40:00Z
 Mode: dry-run

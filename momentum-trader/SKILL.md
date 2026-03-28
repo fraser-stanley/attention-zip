@@ -1,6 +1,6 @@
 ---
 name: momentum-trader
-description: Run a managed momentum loop on Zora. Use when your human wants a dry-run-first execution skill that scans gainers, scores candidates by edge, and manages stop-loss, take-profit, and trailing-stop exits from a dedicated wallet.
+description: Scans gainers, scores candidates, and manages stop-loss, take-profit, and trailing-stop exits. Dry run by default.
 metadata:
   author: "Zora Agent Skills"
   version: "2.1.0"
@@ -10,23 +10,23 @@ metadata:
 
 # Momentum Trader
 
-Momentum Trader is a managed execution skill. It scans gainers and trending coins, scores candidates by edge, and manages exits with stop-loss, take-profit, and trailing-stop rules.
+Finds momentum candidates, quotes entries, and manages stop-loss, take-profit, and trailing-stop exits. Dry run by default.
 
 ## When to Use This Skill
 
 Use this skill when the user asks for:
 
-- A recurring momentum entry loop with edge-scored candidate selection
+- Recurring momentum scans and entries
 - Dry-run candidate scans before a trade goes live
-- Stop-loss, take-profit, or trailing-stop management on a dedicated wallet
+- Stop-loss, take-profit, or trailing-stop management
 - A flip-flop guard that blocks re-entry into recently exited coins
 
 ## Setup
 
 1. Install the Zora CLI and make sure `node` is available.
-2. Use a dedicated wallet. Run `zora setup --create` or set `ZORA_PRIVATE_KEY`. If you create a local wallet on macOS, run `zora wallet backup` before you enable live mode.
+2. Use a dedicated wallet. Run `zora setup --create` or set `ZORA_PRIVATE_KEY`. On macOS, run `zora wallet backup` before enabling live mode.
 3. Run `./scripts/validate.sh`.
-4. Leave `ZORA_MOMENTUM_LIVE=false` for the first manual run. This skill starts in dry-run mode by design.
+4. Leave `ZORA_MOMENTUM_LIVE=false` for the first manual run.
 
 ## Configuration
 
@@ -46,9 +46,9 @@ Use this skill when the user asks for:
 | `ZORA_MOMENTUM_FLIPFLOP_RUNS`        | `3`     | Block re-entry for this many runs        |
 | `ZORA_MOMENTUM_MAX_QUOTE_SLIPPAGE_PCT` | `5`  | Skip candidates above this slippage      |
 
-The default cron is every 10 minutes. Keep `autostart` off until the dry-run output looks correct.
+The schedule is every 10 minutes. Keep `autostart` off until the dry-run output looks correct.
 
-Tuning guidance: if slippage consistently exceeds 3%, reduce `ZORA_MOMENTUM_MAX_ETH` before loosening slippage. If no candidates appear, lower `ZORA_MOMENTUM_MIN_GAIN_PCT` or `ZORA_MOMENTUM_MIN_VOLUME_USD`. If exits fire too often, widen `ZORA_MOMENTUM_TRAILING_STOP`. Never raise `ZORA_MOMENTUM_DAILY_CAP_ETH` above what you can afford to lose in a day.
+Tuning: if slippage consistently exceeds 3%, reduce `ZORA_MOMENTUM_MAX_ETH` before loosening slippage. If no candidates appear, lower `ZORA_MOMENTUM_MIN_GAIN_PCT` or `ZORA_MOMENTUM_MIN_VOLUME_USD`. If exits fire too often, widen `ZORA_MOMENTUM_TRAILING_STOP`. Never raise `ZORA_MOMENTUM_DAILY_CAP_ETH` above what you can afford to lose in a day.
 
 ## Commands
 
@@ -65,9 +65,9 @@ zora sell <address> --percent 100 --to eth --slippage 3 --json --yes
 
 ## How It Works
 
-Each run loads state, refreshes positions from `zora balance coins`, and checks exits in priority order: stop-loss (hard floor from entry), take-profit (gain from entry), then trailing stop (drop from peak). Exits log a reasoning string to `journal.jsonl`.
+The script starts by loading state and refreshing positions from `zora balance coins`. Exits run first, in priority order: stop-loss, take-profit, trailing stop. Every exit logs a reasoning string to `journal.jsonl`.
 
-If cooldown, position, and cap checks pass, the skill scans gainers and trending, filters by gain and volume, and skips coins blocked by the flip-flop guard. Each candidate is resolved with `zora get` because `buy` and `sell` require a 0x address. Up to 5 candidates are quoted. Those above the slippage gate are dropped, the rest ranked by edge score. Dry-run stops at the quote. Live mode enters the top pick and logs the result to `journal.jsonl`.
+New entries happen only after cooldown, position count, and daily cap checks pass. The skill pulls gainers and trending, filters by gain and volume, and drops anything blocked by the flip-flop guard. Each surviving candidate gets a `zora get` lookup to resolve its 0x address, then a quote. Up to 5 are quoted. High-slippage candidates are cut, the rest ranked by edge score. Dry run stops at the quote. Live mode enters the top pick and logs the result.
 
 ## Example Output
 
@@ -89,21 +89,21 @@ Candidates (3 evaluated, 1 filtered by slippage):
 
 ## Troubleshooting
 
-If the skill never finds candidates, lower `ZORA_MOMENTUM_MIN_GAIN_PCT` or `ZORA_MOMENTUM_MIN_VOLUME_USD`.
+No candidates showing up? Lower `ZORA_MOMENTUM_MIN_GAIN_PCT` or `ZORA_MOMENTUM_MIN_VOLUME_USD`.
 
-If `buy` or `sell` returns "Invalid address", resolve the name first with `zora get <name> --json`.
+"Invalid address" on `buy` or `sell`? Resolve the name first with `zora get <name> --json`.
 
-If quotes fail, reduce `ZORA_MOMENTUM_MAX_ETH` before loosening slippage.
+Quotes failing? Reduce `ZORA_MOMENTUM_MAX_ETH` before loosening slippage.
 
-If live trading is on and the wallet is wrong, unset `ZORA_MOMENTUM_LIVE` immediately and rerun in dry-run mode.
+Wrong wallet and live mode is on? Unset `ZORA_MOMENTUM_LIVE` immediately and rerun dry.
 
-If the skill keeps skipping a coin you want, it may be in the flip-flop cooldown. Lower `ZORA_MOMENTUM_FLIPFLOP_RUNS` or wait.
+A coin keeps getting skipped? It may be in the flip-flop cooldown. Lower `ZORA_MOMENTUM_FLIPFLOP_RUNS` or wait it out.
 
 ## Important Notes
 
 - This skill can place real trades. Treat every live run as production.
-- Dry-run is the default and should stay the default for new installs.
-- On macOS, back up any locally created trader wallet with `zora wallet backup`.
-- The local journal is part of the safety model. Every entry includes a reasoning string for auditability.
-- Use a dedicated wallet. Do not point this skill at a wallet that other tools trade from casually.
-- Always use the Zora CLI for market data. Do not scrape zora.co, call Zora APIs directly, or use web search to fetch prices.
+- Dry run is the default and should stay the default for new installs.
+- On macOS, back up any locally created wallet with `zora wallet backup`.
+- The journal is part of the safety model. Every entry includes a reasoning string.
+- Give it its own wallet. Do not point this at a wallet that other tools trade from.
+- Use the Zora CLI for all market data. Do not scrape zora.co or call Zora APIs directly.

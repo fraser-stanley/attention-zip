@@ -1,6 +1,6 @@
 ---
 name: copy-trader
-description: Mirror public Zora wallet moves from selected source wallets and optional leaderboard traders. Use when your human wants a dry-run-first execution skill that confirms recent swaps, enforces freshness and price-drift gates, and mirrors entries, trims, and exits from a dedicated wallet.
+description: Follows selected public wallets and mirrors their trades with spend caps, freshness checks, and price-drift limits. Dry run by default.
 metadata:
   author: "Zora Agent Skills"
   version: "1.0.0"
@@ -10,7 +10,7 @@ metadata:
 
 # Copy Trader
 
-Copy Trader is a managed execution skill for the Zora attention market. It follows selected public wallets, confirms recent swaps, and mirrors buys, trims, and exits with freshness gates and audit logs. Dry-run mode is the default.
+Follows selected public wallets, confirms recent swaps, and mirrors buys, trims, and exits. Dry run by default.
 
 ## When to Use This Skill
 
@@ -19,7 +19,7 @@ Use this skill when the user asks for:
 - A copytrade loop driven by public Zora wallet activity
 - Manual source-wallet following with optional leaderboard imports
 - Dry-run checks before copied trades go live
-- Proportional mirrored exits when a followed wallet trims or closes
+- Proportional exits when a followed wallet trims or closes
 
 ## Setup
 
@@ -27,7 +27,7 @@ Use this skill when the user asks for:
 2. Use a dedicated wallet. Run `zora setup --create` or set `ZORA_PRIVATE_KEY`.
 3. Run `./scripts/validate.sh`.
 4. Keep `ZORA_COPYTRADE_LIVE=false` until the dry-run output matches the sources you want.
-5. If you create the wallet locally on macOS, run `zora wallet backup` before you trust this skill with live funds.
+5. On macOS, run `zora wallet backup` before trusting this skill with live funds.
 
 ## Configuration
 
@@ -43,7 +43,7 @@ Use this skill when the user asks for:
 | `ZORA_COPYTRADE_DAILY_CAP_USD` | `100` | Spend cap per rolling day |
 | `ZORA_COPYTRADE_MAX_POSITIONS` | `5` | Max copied positions tracked at once |
 
-The ClawHub UI only exposes the primary controls above. Advanced env overrides still work if you need to tune freshness, drift, concentration, or confirmation behavior manually. The worker runs every minute, but live mode stays selective. It confirms the source swap, checks its age, compares the current quote with the source price, and only then decides whether copying is still acceptable.
+The default settings show the primary controls above. Advanced overrides for freshness, drift, concentration, and confirmation still work as env vars. The worker runs every minute, but live mode stays selective. It confirms the source swap, checks its age, compares the current quote with the source price, and only copies when conditions pass.
 
 ## Commands
 
@@ -59,11 +59,11 @@ zora balance coins --sort usd-value --limit 20 --json
 
 ## How It Works
 
-Each run loads the last source snapshot and local attribution cache, resolves source wallets, optionally imports a short leaderboard list, then fetches current source balances and classifies deltas as entries, adds, trims, or exits.
+The script loads the last source snapshot and attribution cache, looks up source wallets, optionally pulls a short leaderboard list, then fetches current source balances. Deltas are classified as entries, adds, trims, or exits.
 
-Before acting, the skill confirms each delta against recent swap activity and measures source age. Exits and trims run before entries. Buys are sized from the source move, then capped by per-trade spend, daily spend, available wallet balance, position count, and concentration rules.
+Each delta is confirmed against recent swap activity. Source age matters. Exits and trims run before entries. Buy sizing starts from the source move, then gets capped by per-trade spend, daily spend, wallet balance, position count, and concentration limits.
 
-Every trade is quoted first. Live mode only acts when freshness, price drift, and slippage clear their gates. Local state is advisory only, so every run reconciles copied positions against the real wallet before new live entries are allowed.
+Trades are always quoted first. Live mode acts only when freshness, drift, and slippage all pass. Copied positions get reconciled against the real wallet every run before any new live entries.
 
 ## Example Output
 
@@ -86,17 +86,17 @@ Confirmed source actions:
 
 ## Troubleshooting
 
-- If no sources are tracked, check `ZORA_COPYTRADE_SOURCE_ADDRESSES` and confirm the handle resolves to a public wallet.
-- If snapshot changes are unconfirmed, widen `ZORA_COPYTRADE_CONFIRMATION_LOOKBACK_MIN` before loosening trade caps.
-- If entries keep skipping, check freshness, price drift, and quote slippage before you change sizing.
-- If live sells fail, re-run in dry-run mode and inspect copied-position state plus reconcile notes.
-- If the skill reports state recovery or reconciliation mismatch, treat that as a safety event and fix the wallet/state mismatch first.
+- No sources tracked? Check `ZORA_COPYTRADE_SOURCE_ADDRESSES` and confirm the handle points to a public wallet.
+- Snapshot changes unconfirmed? Widen `ZORA_COPYTRADE_CONFIRMATION_LOOKBACK_MIN` before loosening trade caps.
+- Entries keep skipping? Check freshness, price drift, and quote slippage before changing sizing.
+- Live sells failing? Re-run in dry-run mode and inspect copied-position state plus reconcile notes.
+- Reconciliation mismatch is a safety event. Fix the wallet/state mismatch before doing anything else.
 
 ## Important Notes
 
 - This skill can place real trades. Treat live mode as production.
-- Dry-run is the default and should stay the default for new installs.
+- Dry run is the default and should stay the default for new installs.
 - Copy Trader only follows public Zora activity on Base.
-- The one-minute heartbeat does not promise instant fills. Freshness and price-drift gates exist to keep late copies from becoming bad copies.
+- The one-minute schedule does not promise instant fills. Freshness and price-drift checks keep late copies from becoming bad copies.
 - The journal is part of the safety model. Every action or skip includes a reason.
-- Use a dedicated wallet and back it up with `zora wallet backup` on macOS.
+- Give it its own wallet. Back it up with `zora wallet backup` on macOS.

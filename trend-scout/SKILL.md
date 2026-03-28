@@ -1,6 +1,6 @@
 ---
 name: trend-scout
-description: Run a managed trend scan on Zora. Use when your human wants recurring coverage of trend coins, new entrants, volume leaders, or a small watchlist without placing trades.
+description: Scans trending coins, new launches, volume leaders, and a watchlist on a schedule. Read-only.
 metadata:
   author: "Zora Agent Skills"
   version: "2.0.1"
@@ -10,36 +10,31 @@ metadata:
 
 # Trend Scout
 
-Trend Scout is a managed read-only skill for the Zora attention market. It runs four CLI scans, stores the last snapshot, and tells you what changed since the previous run.
+Scans four Zora market tables every 30 minutes and tells you what changed since the last run.
 
 ## When to Use This Skill
 
 Use this skill when the user asks for:
 
-- A recurring trend report
-- New trend launches
-- Volume or market cap leaders among trend coins
-- Watchlist alerts for specific trend names or addresses
-- A low-risk market scan before doing any trading
+- Recurring trend reports or new launches
+- Volume or market cap leaders
+- Watchlist alerts for coins or addresses
 
 ## Setup
 
-1. Install the Zora CLI. Use the published package or a standalone binary.
-2. Make sure `node` is available. The managed entrypoint is `scripts/run.mjs`.
-3. Run `./scripts/validate.sh` from this folder before the first scheduled run.
-4. If you want higher rate limits, configure `ZORA_API_KEY`, but the skill does not require it.
+1. Install the Zora CLI and make sure `node` is available.
+2. Run `./scripts/validate.sh` from this folder.
+3. If you want higher rate limits, configure `ZORA_API_KEY`. The skill works without it.
 
 ## Configuration
 
-Tune the run with these env vars:
-
 | Env                         | Default | Description                                     |
 | --------------------------- | ------- | ----------------------------------------------- |
-| `ZORA_TREND_LIMIT`          | `8`     | Number of results per scan, clamped to 1-20     |
+| `ZORA_TREND_LIMIT`          | `8`     | Results per scan, clamped to 1-20               |
 | `ZORA_TREND_MIN_VOLUME_USD` | `0`     | Drops low-liquidity rows from the report        |
 | `ZORA_TREND_WATCHLIST`      | empty   | Comma-separated names or addresses to highlight |
 
-The default cron in `clawhub.json` is every 30 minutes. `autostart` stays off so you can inspect the output before scheduling it.
+The schedule is every 30 minutes. Leave `autostart` off until you have inspected the output.
 
 ## Commands
 
@@ -54,13 +49,11 @@ zora get <identifier> --type trend --json
 
 ## How It Works
 
-Each run fetches four trend-specific explore tables through the CLI. The entrypoint applies the volume floor, normalizes coin ids, and saves the resulting address lists to `~/.config/zora-agent-skills/trend-scout/state.json`.
+Each run fetches four trend tables through the CLI. The script applies the volume floor, normalizes coin ids, and saves the address lists to `~/.config/zora-agent-skills/trend-scout/state.json`.
 
-On the next run it compares the new lists against the stored snapshot. That is how it detects entrants into the trending, new, volume, and market cap views without needing an external database. Watchlist hits are resolved from the current scan results, so names work when they appear in the returned tables and addresses always work.
+On the next run it compares the new lists against the stored snapshot. New entries, exits, and watchlist hits are reported. Watchlist names work when they appear in the returned tables. Addresses always work.
 
-To drill into a specific coin after the scan, run `zora get <name> --type trend --json` to see holders, volume, and creator details before flagging it for further action.
-
-This is a template. The current signal is simple table diffing. You can remix it by adding a tighter volume floor, a longer watchlist, or another post-processing step before the output is sent to a human or another agent.
+To drill into a specific coin, run `zora get <name> --type trend --json` for holders, volume, and creator details.
 
 ## Example Output
 
@@ -82,16 +75,16 @@ Watchlist:
 
 ## Troubleshooting
 
-If you see empty sections, lower `ZORA_TREND_MIN_VOLUME_USD`. The filter is applied after the CLI response, so an aggressive floor can remove every row.
+Empty sections usually mean `ZORA_TREND_MIN_VOLUME_USD` is too high. The filter runs after the CLI response, so an aggressive floor can remove every row.
 
-If the watchlist misses a named trend, switch that entry to an address. Shared identifier resolution is broader now, but 0x identifiers still avoid name collisions.
+Watchlist misses on a named trend? Switch that entry to an address.
 
-If the CLI returns a rate-limit error, add an API key or widen the cron interval.
+Rate-limit errors from the CLI mean you need an API key or a wider cron interval.
 
 ## Important Notes
 
 - This skill never places orders and never needs a wallet.
-- Local state is part of the behavior. Deleting the state file resets entrant detection.
-- The managed entrypoint is the production surface. The raw CLI commands are there for debugging and manual spot checks.
-- Keep the output short. Trend Scout is meant to be a heartbeat, not a full market memo.
-- Always use the Zora CLI for market data. Do not scrape zora.co, call Zora APIs directly, or use web search to fetch prices.
+- Deleting the state file resets change detection.
+- The raw CLI commands are there for debugging and manual spot checks.
+- Keep the output short. Trend Scout is a heartbeat, not a full market memo.
+- Use the Zora CLI for all market data. Do not scrape zora.co or call Zora APIs directly.

@@ -1,6 +1,6 @@
 ---
 name: creator-pulse
-description: Run a managed creator-coin watchlist on Zora. Use when your human wants recurring updates on featured creators, creator-coin momentum, or watchlist changes without trading.
+description: Watches featured creators and creator-coin momentum on a schedule. Read-only.
 metadata:
   author: "Zora Agent Skills"
   version: "2.0.1"
@@ -10,7 +10,7 @@ metadata:
 
 # Creator Pulse
 
-Creator Pulse is a managed creator-coin watcher. It scans featured, trending, and top-volume creator coins, then checks named creators or addresses against the previous run.
+Tracks featured, trending, and top-volume creator coins. Alerts when your watchlist moves.
 
 ## When to Use This Skill
 
@@ -19,25 +19,24 @@ Use this skill when the user asks for:
 - Featured creator updates
 - A recurring creator-coin watchlist
 - Alerts on volume or holder-count changes
-- A short report on which creators are gaining traction
-- A read-only creator workflow before doing trades or research
+- Which creators are moving this week
 
 ## Setup
 
 1. Install the Zora CLI and make sure `node` is available.
 2. Run `./scripts/validate.sh` in this folder.
 3. Set `ZORA_CREATOR_WATCHLIST` if you want per-creator alerts.
-4. An API key is optional. It helps if you run the skill on a tight cron.
+4. An API key is optional. It helps on a tight schedule.
 
 ## Configuration
 
 | Env                           | Default | Description                                  |
 | ----------------------------- | ------- | -------------------------------------------- |
-| `ZORA_CREATOR_LIMIT`          | `8`     | Number of rows fetched per creator view      |
+| `ZORA_CREATOR_LIMIT`          | `8`     | Rows fetched per creator view                |
 | `ZORA_CREATOR_MIN_VOLUME_USD` | `0`     | Filters thin rows out of the report          |
 | `ZORA_CREATOR_WATCHLIST`      | empty   | Comma-separated creator handles or addresses |
 
-The manifest schedules the skill every 30 minutes. Leave `autostart` off until the watchlist looks right.
+The schedule is every 30 minutes. Leave `autostart` off until the watchlist looks right.
 
 ## Commands
 
@@ -51,11 +50,9 @@ zora get <identifier> --type creator-coin --json
 
 ## How It Works
 
-The entrypoint pulls three creator views through the CLI, filters the rows, and stores the featured creator ids plus the latest watchlist metrics in `~/.config/zora-agent-skills/creator-pulse/state.json`.
+Three creator views are pulled through the CLI. The script filters the rows and stores featured creator ids plus watchlist metrics in `~/.config/zora-agent-skills/creator-pulse/state.json`.
 
-When a watchlist is configured, it resolves each identifier through `zora get --type creator-coin --json`. The runtime compares the new values against the saved state and alerts when volume moves by at least 10% or holder count moves by at least 25 accounts. It also flags creators that enter the featured view between runs.
-
-This is a template. The default thresholds are conservative so the report stays readable. Remix it by changing the watchlist, the alert thresholds inside `scripts/run.mjs`, or the output format that gets handed to the human.
+With a watchlist set, each identifier gets looked up via `zora get --type creator-coin --json`. Volume moves of 10% or more and holder swings of 25+ trigger alerts. New entries into the featured view between runs are flagged too.
 
 ## Example Output
 
@@ -74,16 +71,16 @@ Watchlist alerts:
 
 ## Troubleshooting
 
-If an identifier lookup fails or resolves ambiguously, try the coin contract address. Shared lookup handles names well, but addresses are still the clean fallback.
+Lookup failing? Try the coin contract address. Names work most of the time, but addresses never miss.
 
-If the report is too noisy, raise the volume floor or shorten the watchlist. Creator Pulse works best when it tracks a small set of creators with real intent.
+Too noisy? Raise the volume floor or shorten the watchlist. This skill works best with a handful of creators, not a directory.
 
-If the CLI starts returning rate-limit errors, slow the cron or add an API key.
+Rate-limit errors mean you should slow the schedule or add an API key.
 
 ## Important Notes
 
 - This skill is read-only. It never calls `buy` or `sell`.
 - Watchlist alerts depend on local state. Clearing the state file resets the baseline.
-- Creator Pulse focuses on creator coins. It does not try to monitor trend or post coins.
+- Creator Pulse focuses on creator coins. It does not monitor trend or post coins.
 - Use a short watchlist. The best output is a handful of creators, not a directory.
-- Always use the Zora CLI for market data. Do not scrape zora.co, call Zora APIs directly, or use web search to fetch prices.
+- Use the Zora CLI for all market data. Do not scrape zora.co or call Zora APIs directly.

@@ -6,7 +6,7 @@ import { getSiteUrl, toAbsoluteUrl, breadcrumbJsonLd } from "@/lib/site";
 export const metadata: Metadata = {
   title: "Install Zora Market Skills",
   description:
-    "Install agent skills for the Zora attention market. Scan trends, track creator-coin moves, check portfolios, and trade momentum.",
+    "Install agent skills for the Zora attention market. Scan trends, check portfolios, build briefings, and trade momentum.",
   alternates: { canonical: "/skills" },
 };
 

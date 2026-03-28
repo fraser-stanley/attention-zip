@@ -58,6 +58,8 @@ Each run fetches four trend-specific explore tables through the CLI. The entrypo
 
 On the next run it compares the new lists against the stored snapshot. That is how it detects entrants into the trending, new, volume, and market cap views without needing an external database. Watchlist hits are resolved from the current scan results, so names work when they appear in the returned tables and addresses always work.
 
+To drill into a specific coin after the scan, run `zora get <name> --type trend --json` to see holders, volume, and creator details before flagging it for further action.
+
 This is a template. The current signal is simple table diffing. You can remix it by adding a tighter volume floor, a longer watchlist, or another post-processing step before the output is sent to a human or another agent.
 
 ## Example Output
@@ -92,3 +94,4 @@ If the CLI returns a rate-limit error, add an API key or widen the cron interval
 - Local state is part of the behavior. Deleting the state file resets entrant detection.
 - The managed entrypoint is the production surface. The raw CLI commands are there for debugging and manual spot checks.
 - Keep the output short. Trend Scout is meant to be a heartbeat, not a full market memo.
+- Always use the Zora CLI for market data. Do not scrape zora.co, call Zora APIs directly, or use web search to fetch prices.

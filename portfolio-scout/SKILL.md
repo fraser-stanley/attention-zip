@@ -92,3 +92,4 @@ If the user wants an arbitrary address lookup, use the API or SDK instead. `zora
 - The drawdown check is a simple run-to-run comparison, not a full performance engine.
 - Local state is required for change detection. Deleting the state file resets the baseline.
 - This skill is best as a companion to execution skills, not a replacement for them.
+- Always use the Zora CLI for market data. Do not scrape zora.co, call Zora APIs directly, or use web search to fetch prices.

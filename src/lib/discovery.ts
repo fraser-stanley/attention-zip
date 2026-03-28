@@ -77,6 +77,7 @@ function formatRuntimeCommands(
     `- Codex CLI: ${commands.codex}`,
     `- OpenCode: ${commands.opencode}`,
     `- Cursor: ${commands.cursor}`,
+    `- curl: ${commands.curl}`,
   ];
 
   if ("manual" in commands) {

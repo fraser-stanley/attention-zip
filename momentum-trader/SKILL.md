@@ -44,6 +44,8 @@ Use this skill when the user asks for:
 
 The default cron is every 10 minutes. Keep `autostart` off until the dry-run output looks correct.
 
+Tuning guidance: if slippage consistently exceeds 3%, reduce `ZORA_MOMENTUM_MAX_ETH` before loosening slippage. If no candidates appear, lower `ZORA_MOMENTUM_MIN_GAIN_PCT` or `ZORA_MOMENTUM_MIN_VOLUME_USD`. If exits fire too often, widen `ZORA_MOMENTUM_TRAILING_STOP`. Never raise `ZORA_MOMENTUM_DAILY_CAP_ETH` above what you can afford to lose in a day.
+
 ## Commands
 
 ```bash
@@ -62,6 +64,8 @@ zora sell <address> --percent 100 --to eth --slippage 3 --json --yes
 Each run loads `~/.config/zora-agent-skills/momentum-trader/state.json`, refreshes tracked positions from `zora balance coins`, and updates entry, peak, and current prices. If a tracked coin falls through the trailing-stop rule, the entrypoint quotes or executes a full exit depending on `ZORA_MOMENTUM_LIVE`.
 
 If cooldown, max-position, and daily-cap checks all pass, the skill scans gainers and trending tables, filters for minimum gain and volume, and validates the first passing coin with `zora get`. That step also resolves the coin's contract address, which `buy` and `sell` require. The CLI does not resolve names for trade commands, so the entrypoint always passes a 0x address. It then asks the CLI for a buy quote. Dry-run mode stops there. Live mode sends the real `buy` call and appends the result to `journal.jsonl`.
+
+The manual workflow mirrors this: scan gainers with `zora explore --sort gainers --json`, filter for volume and gain, resolve the address with `zora get <name> --json`, quote with `zora buy <address> --eth 0.01 --quote --json`, then execute or stop at the quote.
 
 This is a template. The default alpha is intentionally simple. Swap in a different candidate filter, add a watchlist, or tighten exit logic, but keep the dry-run-first discipline and the journal.
 
@@ -83,15 +87,9 @@ Candidates:
 
 ## Troubleshooting
 
-If the skill never finds candidates, lower `ZORA_MOMENTUM_MIN_GAIN_PCT` or `ZORA_MOMENTUM_MIN_VOLUME_USD`.
-
-If `buy` or `sell` returns "Invalid address", the command received a name instead of a 0x contract address. Use `zora get <name> --json` to resolve the address first, then pass it to the trade command.
-
-If quotes fail, the coin is often too illiquid for the requested size. Reduce `ZORA_MOMENTUM_MAX_ETH` before you loosen slippage.
+If `buy` or `sell` returns "Invalid address", the command received a name instead of a 0x address. Resolve it first with `zora get <name> --json`.
 
 If live trading is on and the wallet is wrong, stop immediately. Unset `ZORA_MOMENTUM_LIVE` or remove the private key and rerun in dry-run mode.
-
-If you created the wallet locally on macOS, run `zora wallet backup` before you trust this skill with live funds.
 
 ## Important Notes
 
@@ -100,3 +98,4 @@ If you created the wallet locally on macOS, run `zora wallet backup` before you 
 - On macOS, back up any locally created trader wallet with `zora wallet backup`.
 - The local journal is part of the safety model. Do not remove it if you want auditability.
 - Use a dedicated wallet. Do not point this skill at a wallet that other tools trade from casually.
+- Always use the Zora CLI for market data. Do not scrape zora.co, call Zora APIs directly, or use web search to fetch prices.

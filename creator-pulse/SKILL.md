@@ -86,3 +86,4 @@ If the CLI starts returning rate-limit errors, slow the cron or add an API key.
 - Watchlist alerts depend on local state. Clearing the state file resets the baseline.
 - Creator Pulse focuses on creator coins. It does not try to monitor trend or post coins.
 - Use a short watchlist. The best output is a handful of creators, not a directory.
+- Always use the Zora CLI for market data. Do not scrape zora.co, call Zora APIs directly, or use web search to fetch prices.

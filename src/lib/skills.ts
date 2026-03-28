@@ -50,13 +50,14 @@ export interface RuntimeCommands {
   codex: string;
   opencode: string;
   cursor: string;
+  curl: string;
 }
 
 export interface SkillRuntimeCommands extends RuntimeCommands {
   manual: string;
 }
 
-type PromptRuntimeCommands = Omit<RuntimeCommands, "openclaw">;
+type PromptRuntimeCommands = Omit<RuntimeCommands, "openclaw" | "curl">;
 
 const REPO_URL = getSiteRepoUrl();
 const REPO_NAME = getSiteRepoName();
@@ -393,6 +394,7 @@ export function getInstallAllQuickCommands(baseUrl: string): RuntimeCommands {
   return {
     openclaw: skills.map((skill) => `clawhub install ${skill.id}`).join(" && "),
     ...buildRuntimeCommands(buildInstallAllPrompt(baseUrl)),
+    curl: `curl -sL ${baseUrl}/llms-full.txt`,
   };
 }
 
@@ -410,6 +412,7 @@ export function getSkillQuickInstallCommands(
   return {
     openclaw: `clawhub install ${skill.id}`,
     ...buildRuntimeCommands(buildSkillInstallPrompt(skill, baseUrl)),
+    curl: `curl -sL ${baseUrl}/skills/${skill.id}/skill-md`,
   };
 }
 

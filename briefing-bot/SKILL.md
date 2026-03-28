@@ -90,3 +90,4 @@ If `new` looks empty, remember that the script compares against its own local sn
 - The CLI has no streaming mode. Each run is a small batch of request-response calls.
 - Do not return raw JSON to the human. The useful output is the synthesized briefing.
 - `zora balance` is wallet-only. If no wallet is configured, skip the portfolio section cleanly.
+- Always use the Zora CLI for market data. Do not scrape zora.co, call Zora APIs directly, or use web search to fetch prices.

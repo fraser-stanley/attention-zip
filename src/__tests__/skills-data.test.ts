@@ -189,6 +189,7 @@ describe("getSkillRuntimeCommands", () => {
     expect(commands).toHaveProperty("codex");
     expect(commands).toHaveProperty("opencode");
     expect(commands).toHaveProperty("cursor");
+    expect(commands).toHaveProperty("curl");
     expect(commands).toHaveProperty("manual");
   });
 

@@ -36,6 +36,7 @@ export interface Skill {
 }
 
 export type Runtime =
+  | "prompt"
   | "openclaw"
   | "claude"
   | "amp"
@@ -44,6 +45,7 @@ export type Runtime =
   | "cursor";
 
 export interface RuntimeCommands {
+  prompt: string;
   openclaw: string;
   claude: string;
   amp: string;
@@ -57,7 +59,7 @@ export interface SkillRuntimeCommands extends RuntimeCommands {
   manual: string;
 }
 
-type PromptRuntimeCommands = Omit<RuntimeCommands, "openclaw" | "curl">;
+type PromptRuntimeCommands = Omit<RuntimeCommands, "prompt" | "openclaw" | "curl">;
 
 const REPO_URL = getSiteRepoUrl();
 const REPO_NAME = getSiteRepoName();
@@ -460,9 +462,11 @@ function buildSkillInstallPrompt(skill: Skill, baseUrl: string) {
 }
 
 export function getInstallAllQuickCommands(baseUrl: string): RuntimeCommands {
+  const prompt = buildInstallAllPrompt(baseUrl);
   return {
+    prompt: `Read the skill docs at ${baseUrl}/llms.txt and follow the install instructions.`,
     openclaw: skills.map((skill) => `clawhub install ${skill.id}`).join(" && "),
-    ...buildRuntimeCommands(buildInstallAllPrompt(baseUrl)),
+    ...buildRuntimeCommands(prompt),
     curl: `curl -sL ${baseUrl}/llms-full.txt`,
   };
 }
@@ -479,6 +483,7 @@ export function getSkillQuickInstallCommands(
   baseUrl: string,
 ): RuntimeCommands {
   return {
+    prompt: `Read the skill doc at ${baseUrl}/skills/${skill.id}/skill-md and follow the install instructions.`,
     openclaw: `clawhub install ${skill.id}`,
     ...buildRuntimeCommands(buildSkillInstallPrompt(skill, baseUrl)),
     curl: `curl -sL ${baseUrl}/skills/${skill.id}/skill-md`,

@@ -32,7 +32,7 @@ describe("buildLlmsTxt", () => {
     expect(llmsTxt).toContain("Catalog: https://example.com/api/skills");
     expect(llmsTxt).toContain("Market APIs: https://example.com/api/profile | https://example.com/api/coin-swaps");
     expect(llmsTxt).toContain(
-      'Default install (Claude Code): claude -p "Install skills from https://example.com/llms.txt"',
+      "Default install (any agent): Read the skill docs at https://example.com/llms.txt and follow the install instructions.",
     );
 
     for (const skill of skills) {

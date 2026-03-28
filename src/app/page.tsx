@@ -116,8 +116,7 @@ export default function Home() {
             <div>
               <h2 className="type-label text-muted-foreground">Skills</h2>
               <p className="text-xs text-muted-foreground mt-1">
-                Trend scans, briefings, portfolio checks, and momentum trades.
-                Pick one and install it.
+                Pick a skill and install it.
               </p>
             </div>
             <Link

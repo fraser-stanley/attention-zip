@@ -1,13 +1,15 @@
 "use client";
 
+import { useCallback, useRef, useState } from "react";
 import NumberFlow, { NumberFlowGroup, type Format } from "@number-flow/react";
 import Link from "next/link";
+import { HoverMediaOverlay } from "@/components/hover-media-overlay";
+import { useToast } from "@/components/toast";
 import { SkillCard } from "@/components/skill-card";
 import { Badge } from "@/components/ui/badge";
+import { CheckIcon } from "@/components/ui/check";
+import { CopyIcon } from "@/components/ui/copy";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ChartBarIncreasingIcon } from "@/components/ui/chart-bar-increasing";
-import { ClockIcon } from "@/components/ui/clock";
 import {
   usePortfolioData,
   type PortfolioPosition,
@@ -102,6 +104,18 @@ function PortfolioStats({
   address: string;
   summary: PortfolioSummary;
 }) {
+  const { toast } = useToast();
+  const [copied, setCopied] = useState(false);
+  const copyTimerRef = useRef<ReturnType<typeof setTimeout>>(null);
+
+  const handleCopy = useCallback(() => {
+    navigator.clipboard.writeText(address);
+    toast("Address copied");
+    setCopied(true);
+    if (copyTimerRef.current) clearTimeout(copyTimerRef.current);
+    copyTimerRef.current = setTimeout(() => setCopied(false), 2000);
+  }, [address, toast]);
+
   return (
     <div className="grid gap-px border border-border bg-border sm:grid-cols-2 xl:grid-cols-4">
       <div className="bg-card p-4">
@@ -148,8 +162,16 @@ function PortfolioStats({
 
       <div className="bg-card p-4">
         <p className="type-label mb-2 text-muted-foreground">Address</p>
-        <p className="font-display text-4xl tracking-tight">{truncateAddress(address)}</p>
-        <p className="type-caption mt-2 font-mono text-muted-foreground break-all">{address}</p>
+        <button
+          type="button"
+          onClick={handleCopy}
+          className="group/copy flex items-center gap-2 text-left"
+        >
+          <span className="font-display text-4xl tracking-tight">{truncateAddress(address)}</span>
+          <span className="text-muted-foreground transition-colors group-hover/copy:text-foreground">
+            {copied ? <CheckIcon size={16} /> : <CopyIcon size={16} />}
+          </span>
+        </button>
       </div>
     </div>
   );
@@ -168,13 +190,6 @@ function PortfolioSkeleton() {
       </div>
 
       <div className="overflow-hidden border border-border bg-card">
-        <div className="border-b border-border bg-muted p-1">
-          <div className="grid w-full grid-cols-3 gap-1 sm:w-auto">
-            <div className="min-h-[44px] bg-card" />
-            <div className="min-h-[44px] bg-card" />
-            <div className="min-h-[44px] bg-card" />
-          </div>
-        </div>
         <div className="space-y-3 p-4">
           {Array.from({ length: 5 }, (_, index) => (
             <Skeleton key={index} className="h-14 w-full" />
@@ -218,6 +233,9 @@ function PositionsContent({
   positions: PortfolioPosition[];
   summary: PortfolioSummary;
 }) {
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [hoveredImage, setHoveredImage] = useState<string | null>(null);
+
   if (positions.length === 0) {
     return <EmptyState />;
   }
@@ -229,9 +247,11 @@ function PositionsContent({
         <span className="tabular-nums">{formatCompactCurrency(summary.totalValueUsd)}</span> total value
       </p>
 
-      <div className="overflow-hidden border border-border bg-card">
+      <div className="relative overflow-hidden border border-border bg-card" onMouseLeave={() => setHoveredImage(null)}>
+        <HoverMediaOverlay imageUrl={hoveredImage} />
         <div className="overflow-x-auto">
-          <div className="grid min-w-[56rem] w-full grid-cols-[minmax(16rem,1.8fr)_1fr_1fr_1fr_1fr] gap-4 border-b border-border/70 px-4 py-3 type-label text-muted-foreground">
+          <div className="grid min-w-[56rem] w-full grid-cols-[3rem_minmax(14rem,1.8fr)_1fr_1fr_1fr_1fr] gap-4 border-b border-border/70 px-4 py-3 type-label text-muted-foreground">
+            <span>Rank</span>
             <span>Coin</span>
             <span className="text-right">Balance</span>
             <span className="text-right">Price</span>
@@ -239,81 +259,153 @@ function PositionsContent({
             <span className="text-right">24h</span>
           </div>
 
-          {positions.map((position) => (
-            <div
-              key={position.address}
-              className="grid min-w-[56rem] w-full grid-cols-[minmax(16rem,1.8fr)_1fr_1fr_1fr_1fr] items-center gap-4 border-b border-border/70 px-4 py-3 last:border-b-0 hover:bg-muted/35"
-            >
-              <div className="space-y-1">
-                <div className="flex items-center gap-2">
-                  <span className="type-body-sm font-medium">{position.name}</span>
-                  {position.symbol ? (
-                    <span className="type-caption font-mono text-muted-foreground">${position.symbol}</span>
-                  ) : null}
-                  {position.coinType ? (
-                    <Badge variant="outline" className="font-mono text-[10px] uppercase tracking-[0.16em]">
-                      {coinTypeLabel(position.coinType)}
-                    </Badge>
-                  ) : null}
+          {positions.map((position, i) => {
+            const isSelected = position.address === selectedId;
+
+            return (
+              <div
+                key={position.address}
+                onMouseEnter={() => {
+                  setSelectedId(position.address);
+                  setHoveredImage(position.imageUrl);
+                }}
+                onMouseLeave={() => setSelectedId(null)}
+                className={cn(
+                  "grid min-w-[56rem] w-full grid-cols-[3rem_minmax(14rem,1.8fr)_1fr_1fr_1fr_1fr] min-h-[44px] cursor-default items-center gap-4 border-b border-border/70 px-4 py-2 last:border-b-0 transition-colors duration-200",
+                  isSelected ? "bg-foreground text-background" : "hover:bg-muted/35",
+                )}
+              >
+                {/* Rank */}
+                <div
+                  className={cn(
+                    "type-body-sm flex items-center gap-2 font-mono",
+                    isSelected ? "text-background/72" : "text-muted-foreground",
+                  )}
+                >
+                  <span
+                    className={cn(
+                      "h-2.5 w-2.5 rounded-full",
+                      isSelected ? "bg-background" : "bg-foreground/25",
+                    )}
+                  />
+                  <span>{String(i + 1).padStart(2, "0")}</span>
                 </div>
-                <p className="type-caption font-mono text-muted-foreground">
-                  {truncateAddress(position.address)}
-                </p>
-              </div>
 
-              <div className="text-right font-mono text-muted-foreground">
-                <NumberFlow
-                  {...FLOW_TIMING}
-                  className="tabular-nums"
-                  format={{ maximumFractionDigits: 2 }}
-                  value={position.balance}
-                />
-              </div>
+                {/* Coin */}
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2">
+                    <span
+                      className={cn(
+                        "type-body-sm font-medium",
+                        isSelected ? "text-background" : "text-foreground",
+                      )}
+                    >
+                      {position.name}
+                    </span>
+                    {position.symbol ? (
+                      <span
+                        className={cn(
+                          "type-caption font-mono",
+                          isSelected ? "text-background/60" : "text-muted-foreground",
+                        )}
+                      >
+                        ${position.symbol}
+                      </span>
+                    ) : null}
+                    {position.coinType ? (
+                      <Badge
+                        variant="outline"
+                        className={cn(
+                          "font-mono text-[10px] uppercase tracking-[0.16em]",
+                          isSelected ? "border-background/30 text-background/70" : "",
+                        )}
+                      >
+                        {coinTypeLabel(position.coinType)}
+                      </Badge>
+                    ) : null}
+                  </div>
+                </div>
 
-              <div className="text-right font-mono text-muted-foreground">
-                {position.priceUsd === null ? (
-                  "—"
-                ) : (
+                {/* Balance */}
+                <div
+                  className={cn(
+                    "text-right font-mono",
+                    isSelected ? "text-background/80" : "text-muted-foreground",
+                  )}
+                >
                   <NumberFlow
                     {...FLOW_TIMING}
                     className="tabular-nums"
-                    format={FMT_PRICE}
-                    value={position.priceUsd}
+                    format={{ maximumFractionDigits: 2 }}
+                    value={position.balance}
                   />
-                )}
-              </div>
+                </div>
 
-              <div className="text-right">
-                <span className="type-body-sm inline-flex items-center px-1.5 py-0.5 font-mono font-medium bg-muted tabular-nums">
-                  <ValueCell value={position.balanceUsd} />
-                </span>
-              </div>
+                {/* Price */}
+                <div
+                  className={cn(
+                    "text-right font-mono",
+                    isSelected ? "text-background/80" : "text-muted-foreground",
+                  )}
+                >
+                  {position.priceUsd === null ? (
+                    "—"
+                  ) : (
+                    <NumberFlow
+                      {...FLOW_TIMING}
+                      className="tabular-nums"
+                      format={FMT_PRICE}
+                      value={position.priceUsd}
+                    />
+                  )}
+                </div>
 
-              <div className="text-right">
-                {position.changeUsd24h === null || position.changePct24h === null ? (
-                  <span className="type-caption font-mono text-muted-foreground">Unavailable</span>
-                ) : (
+                {/* Value */}
+                <div className="text-right">
                   <span
                     className={cn(
-                      "type-caption inline-flex items-center gap-1 px-1.5 py-0.5 font-mono tabular-nums",
-                      changeChipClass(position.changeUsd24h),
+                      "type-body-sm inline-flex items-center px-1.5 py-0.5 font-mono font-medium tabular-nums",
+                      isSelected ? "text-background" : "bg-muted",
                     )}
                   >
-                    <NumberFlow
-                      {...FLOW_TIMING}
-                      format={FMT_CURRENCY}
-                      value={position.changeUsd24h}
-                    />
-                    <NumberFlow
-                      {...FLOW_TIMING}
-                      format={FMT_PERCENT}
-                      value={position.changePct24h / 100}
-                    />
+                    <ValueCell value={position.balanceUsd} />
                   </span>
-                )}
+                </div>
+
+                {/* 24h */}
+                <div className="text-right">
+                  {position.changeUsd24h === null || position.changePct24h === null ? (
+                    <span
+                      className={cn(
+                        "type-caption font-mono",
+                        isSelected ? "text-background/60" : "text-muted-foreground",
+                      )}
+                    >
+                      Unavailable
+                    </span>
+                  ) : (
+                    <span
+                      className={cn(
+                        "type-caption inline-flex items-center gap-1 px-1.5 py-0.5 font-mono tabular-nums",
+                        changeChipClass(position.changeUsd24h),
+                      )}
+                    >
+                      <NumberFlow
+                        {...FLOW_TIMING}
+                        format={FMT_CURRENCY}
+                        value={position.changeUsd24h}
+                      />
+                      <NumberFlow
+                        {...FLOW_TIMING}
+                        format={FMT_PERCENT}
+                        value={position.changePct24h / 100}
+                      />
+                    </span>
+                  )}
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </div>
@@ -365,44 +457,7 @@ export function PortfolioView({ address }: { address: string }) {
     <div className="space-y-8">
       <PortfolioStats address={address} summary={summary} />
 
-      <div className="space-y-4">
-        <Tabs defaultValue="positions" className="gap-0">
-          <div className="border-b border-border bg-muted p-1">
-            <TabsList className="grid w-full grid-cols-3 bg-transparent p-0 sm:w-auto">
-              <TabsTrigger value="positions" className="gap-1.5">
-                <ChartBarIncreasingIcon size={14} />
-                Positions
-              </TabsTrigger>
-              <TabsTrigger value="orders" className="gap-1.5">
-                <ClockIcon size={14} />
-                Orders
-              </TabsTrigger>
-              <TabsTrigger value="history" className="gap-1.5">
-                <ClockIcon size={14} />
-                History
-              </TabsTrigger>
-            </TabsList>
-          </div>
-
-          <TabsContent value="positions">
-            <PositionsContent positions={positions} summary={summary} />
-          </TabsContent>
-
-          <TabsContent value="orders">
-            <PlaceholderCard
-              title="No open orders"
-              description="Order routing is not exposed through the current SDK portfolio endpoints."
-            />
-          </TabsContent>
-
-          <TabsContent value="history">
-            <PlaceholderCard
-              title="History coming soon"
-              description="Trade history needs per-coin swap indexing, so this tab is still pending."
-            />
-          </TabsContent>
-        </Tabs>
-      </div>
+      <PositionsContent positions={positions} summary={summary} />
 
       <InstalledSkills />
     </div>

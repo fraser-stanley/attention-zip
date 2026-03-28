@@ -71,6 +71,7 @@ function formatRuntimeCommands(
   commands: RuntimeCommands | SkillRuntimeCommands,
 ): string {
   const lines = [
+    `- Any agent (paste as prompt): ${commands.prompt}`,
     `- OpenClaw: ${commands.openclaw}`,
     `- Claude Code: ${commands.claude}`,
     `- Amp: ${commands.amp}`,
@@ -102,7 +103,7 @@ function buildSkillSummaryLines(siteUrl: string): string {
       const skillUrl = toAbsoluteUrl(`/skills/${skill.id}/skill-md`, siteUrl);
       const quickInstall = getSkillQuickInstallCommands(skill, siteUrl);
 
-      return `- ${skill.name}: ${skill.description} | SKILL.md: ${skillUrl} | Claude Code: ${quickInstall.claude}`;
+      return `- ${skill.name}: ${skill.description} | SKILL.md: ${skillUrl} | Install: ${quickInstall.prompt}`;
     })
     .join("\n");
 }
@@ -165,7 +166,7 @@ ${SITE_DESCRIPTION}
 
 Catalog: ${toAbsoluteUrl("/api/skills", siteUrl)}
 Market APIs: ${toAbsoluteUrl("/api/profile", siteUrl)} | ${toAbsoluteUrl("/api/coin-swaps", siteUrl)}
-Default install (Claude Code): ${installAllCommands.claude}
+Default install (any agent): ${installAllCommands.prompt}
 
 ## Skills
 

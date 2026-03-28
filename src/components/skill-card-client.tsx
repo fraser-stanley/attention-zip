@@ -61,9 +61,10 @@ function useTypewriter(text: string, active: boolean, speed = 12) {
   return { displayed, done };
 }
 
-const RUNTIME_STORAGE_KEY = "zora:skills-runtime:v2";
+const RUNTIME_STORAGE_KEY = "zora:skills-runtime:v3";
 
 const RUNTIMES: Runtime[] = [
+  "prompt",
   "claude",
   "openclaw",
   "amp",
@@ -73,6 +74,7 @@ const RUNTIMES: Runtime[] = [
 ];
 
 const RUNTIME_LABELS: Record<Runtime, string> = {
+  prompt: "Any Agent",
   openclaw: "OpenClaw",
   claude: "Claude Code",
   amp: "Amp",
@@ -179,7 +181,7 @@ function RuntimeInstallCard({
         title={copied ? "Copied" : "Copy command"}
         aria-live="polite"
       >
-        <span className="text-foreground/40">$</span>
+        <span className="text-foreground/40">{runtime === "prompt" ? ">" : "$"}</span>
         <span className="flex-1 truncate text-left text-foreground/80">
           {command}
         </span>
@@ -330,7 +332,7 @@ function SkillRow({
           </div>
         )}
 
-        <CopyableCodeBlock command={command} />
+        <CopyableCodeBlock command={command} prefix={runtime === "prompt" ? ">" : "$"} />
 
         {/* Actions: buttons */}
         <div className="flex flex-wrap items-center gap-3">

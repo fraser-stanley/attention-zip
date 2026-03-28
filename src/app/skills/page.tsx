@@ -79,31 +79,7 @@ export default function SkillsPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(howToJsonLd) }}
       />
-      <SkillsInstallList skills={skills}>
-        <section className="grid max-w-5xl gap-6 sm:grid-cols-3 mb-12">
-          <div className="space-y-1.5">
-            <p className="type-label text-muted-foreground">01</p>
-            <h2 className="type-label text-foreground">Install</h2>
-            <p className="type-body-sm text-muted-foreground">
-              Copy the command for your agent runtime.
-            </p>
-          </div>
-          <div className="space-y-1.5">
-            <p className="type-label text-muted-foreground">02</p>
-            <h2 className="type-label text-foreground">Set up</h2>
-            <p className="type-body-sm text-muted-foreground">
-              Read the skill notes. Add a wallet only if the skill needs one.
-            </p>
-          </div>
-          <div className="space-y-1.5">
-            <p className="type-label text-muted-foreground">03</p>
-            <h2 className="type-label text-foreground">Run</h2>
-            <p className="type-body-sm text-muted-foreground">
-              Run it once. Put it on a schedule later if you want.
-            </p>
-          </div>
-        </section>
-      </SkillsInstallList>
+      <SkillsInstallList skills={skills} />
     </div>
   );
 }

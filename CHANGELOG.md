@@ -1,5 +1,21 @@
 # Changelog
 
+## 2026-03-28 (Copy Trader skill + market data APIs + momentum trader upgrades)
+
+### Added
+- **Copy Trader skill** — new execution skill that mirrors public Zora wallet moves from selected source wallets and optional leaderboard traders. Confirms swaps, enforces freshness and price-drift gates, manages proportional exits, and reconciles copied positions against real wallet state. Dry run by default.
+- **Profile API** — `GET /api/profile?identifier=<0x-or-handle>` resolves a Zora profile identifier into a canonical wallet, linked wallets, handle, and avatar.
+- **Coin swaps API** — `GET /api/coin-swaps?address=<0x-coin>&count=1-50&after=<cursor>` returns recent swap activity for a single coin with pagination.
+- **Market data route tests** — `src/__tests__/market-data-routes.test.ts` covers the new profile and coin-swaps endpoints.
+- **Copy Trader tunables guardrail test** — `src/__tests__/skills-structure.test.ts` pins the ClawHub UI surface to the 8 primary tunables so advanced knobs don't quietly appear in the default UI.
+- **Momentum Trader stop-loss, take-profit, and flip-flop** — new tunables in `momentum-trader/clawhub.json` and edge-scored candidate selection in the runtime.
+
+### Changed
+- **Copy Trader ClawHub UI simplified** — only the 8 primary tunables (live toggle, source addresses, leaderboard import, spend/exit token, max buy, daily cap, max positions) are exposed in `clawhub.json`. Advanced knobs (freshness, drift, concentration, confirmation lookback, slippage, cooldown) remain as env overrides in the runtime.
+- **Discovery docs advertise new endpoints** — `/.well-known/ai.json`, `/api`, `llms.txt`, and `llms-full.txt` now list the profile and coin-swaps APIs.
+- **Skills count is now 6** — CLAUDE.md, README.md, and `src/lib/skills.ts` updated throughout.
+- **Momentum Trader v2.1.0** — SKILL.md updated with edge scoring, stop-loss/take-profit exit rules, and flip-flop re-entry blocking.
+
 ## 2026-03-27 (Direct Upstash agent registration + wallet claiming)
 
 ### Added

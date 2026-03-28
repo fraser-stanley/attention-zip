@@ -19,7 +19,7 @@ If `STAGING_PASSWORD` is set, the app redirects visitor-facing pages to `/login`
 
 ## Skills
 
-Five skills for the Zora market. Each skill directory contains:
+Six skills for the Zora market. Each skill directory contains:
 
 - `SKILL.md` for agent-facing instructions
 - `clawhub.json` for runtime metadata, cron, env, and tunables
@@ -32,9 +32,10 @@ Five skills for the Zora market. Each skill directory contains:
 | [creator-pulse](creator-pulse/)     | Tracks creator-coin leaders and watchlist moves                         | Read-only |
 | [briefing-bot](briefing-bot/)       | Turns the market into a short briefing                                  | Read-only |
 | [portfolio-scout](portfolio-scout/) | Checks balances, position changes, and concentration                    | Read-only |
+| [copy-trader](copy-trader/)         | Mirrors public Zora wallet moves with guardrails. Dry run by default    | Execution |
 | [momentum-trader](momentum-trader/) | Quotes and manages momentum trades. Dry run by default                  | Execution |
 
-Trend Scout, Creator Pulse, and Briefing Bot do not need a wallet. Portfolio Scout and Momentum Trader need a dedicated wallet configured through `zora setup` or `ZORA_PRIVATE_KEY`. If you create that wallet locally on macOS, run `zora wallet backup` after setup.
+Trend Scout, Creator Pulse, and Briefing Bot do not need a wallet. Portfolio Scout, Copy Trader, and Momentum Trader need a dedicated wallet configured through `zora setup` or `ZORA_PRIVATE_KEY`. If you create that wallet locally on macOS, run `zora wallet backup` after setup.
 
 ## API
 
@@ -47,6 +48,8 @@ Agent-facing endpoints. All responses include cache headers.
 | `GET /api/explore`          | Live coin data (`?sort=trending\|mcap\|new\|volume\|gainers\|creators\|featured`, `?count=1-20`) |
 | `GET /api/leaderboard`      | Weekly trader rankings by Zora volume (`?count=1-50`)                                            |
 | `GET /api/portfolio`        | Public portfolio lookup (`?address=<0x-address>&count=1-50`)                                     |
+| `GET /api/profile`          | Resolve a profile handle or wallet to a canonical public wallet (`?identifier=<0x-or-handle>`)   |
+| `GET /api/coin-swaps`       | Recent swap activity for one coin (`?address=<0x-coin>&count=1-50&after=<cursor>`)               |
 | `POST /api/agents/register` | Register an agent and receive a bearer API key plus a claim URL                                  |
 | `GET /api/agents/me`        | Resolve the current agent record with `Authorization: Bearer sk_zora_*`                          |
 | `POST /api/agents/claim`    | Claim an unclaimed agent with `{ claim_code, wallet }`                                           |
@@ -79,6 +82,7 @@ trend-scout/           Skill directories (SKILL.md + clawhub.json + scripts/)
 creator-pulse/
 briefing-bot/
 portfolio-scout/
+copy-trader/
 momentum-trader/
 src/
 ├── app/               Pages and API routes
@@ -123,7 +127,7 @@ Merge gate: `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm build`.
 | `NEXT_PUBLIC_SITE_REPO_REF` | No              | Repo ref used for source links, defaults to `main`                   |
 | `ALLOW_MOCK_MARKET_DATA`    | No              | Set to `true` only if you intentionally want mock market fallback    |
 
-Skill-specific env vars and tunables live in each `clawhub.json`. Momentum Trader is dry-run by default and only goes live when `ZORA_MOMENTUM_LIVE=true`.
+Skill-specific env vars and tunables live in each `clawhub.json`. Copy Trader and Momentum Trader are dry-run by default and only go live when `ZORA_COPYTRADE_LIVE=true` or `ZORA_MOMENTUM_LIVE=true`.
 
 Agent registration uses direct `@upstash/redis`. Only `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` are supported. This repo does not use `@vercel/kv` or `KV_REST_*` fallbacks for the claim flow.
 

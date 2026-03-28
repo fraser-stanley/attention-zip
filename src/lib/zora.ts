@@ -10,8 +10,11 @@ import {
   getTraderLeaderboard,
   getCoinsLastTraded,
   getCoinsLastTradedUnique,
+  getCoinSwaps,
+  getProfile,
   getProfileBalances,
 } from "@zoralabs/coins-sdk";
+import { normalizeWalletAddress } from "@/lib/wallet-address";
 
 const apiKey = process.env.ZORA_API_KEY;
 if (apiKey) {
@@ -95,6 +98,50 @@ export interface PortfolioApiResponse {
   count: number;
 }
 
+export interface LinkedWallet {
+  walletAddress: string;
+  walletType?: string;
+}
+
+export interface ProfileIdentity {
+  identifier: string;
+  handle?: string;
+  walletAddress?: string;
+  linkedWallets: LinkedWallet[];
+  profileId?: string;
+  avatar?: {
+    medium?: string;
+    small?: string;
+  };
+}
+
+export interface CoinSwapActivity {
+  id?: string;
+  coinAddress: string;
+  senderAddress?: string;
+  recipientAddress?: string;
+  transactionHash?: string;
+  blockTimestamp?: string;
+  activityType?: "BUY" | "SELL";
+  coinAmount?: string;
+  quoteAmount?: number;
+  quoteCurrencyAddress?: string;
+  quotePriceUsdc?: string;
+  senderProfileHandle?: string;
+}
+
+export interface CoinSwapsPageInfo {
+  endCursor?: string;
+  hasNextPage: boolean;
+}
+
+export interface CoinSwapsApiResponse {
+  coinAddress: string;
+  count: number;
+  pageInfo: CoinSwapsPageInfo;
+  swaps: CoinSwapActivity[];
+}
+
 interface ExploreEdge {
   node: CoinNode;
 }
@@ -151,6 +198,73 @@ interface LegacyLeaderboardResponse {
   data?: {
     traderLeaderboard?: {
       edges?: Array<{ node: TraderNode }>;
+    };
+  };
+}
+
+interface ProfileLinkedWalletEdge {
+  node?: {
+    walletAddress?: string;
+    walletType?: string;
+  };
+}
+
+interface ProfileResponse {
+  error?: unknown;
+  data?: {
+    profile?: {
+      id?: string;
+      handle?: string;
+      publicWallet?: {
+        walletAddress?: string;
+      };
+      linkedWallets?: {
+        edges?: ProfileLinkedWalletEdge[];
+      };
+      avatar?: {
+        previewImage?: {
+          medium?: string;
+          small?: string;
+        };
+      };
+    };
+  };
+}
+
+interface CoinSwapEdge {
+  node?: {
+    id?: string;
+    senderAddress?: string;
+    recipientAddress?: string;
+    transactionHash?: string;
+    blockTimestamp?: string;
+    activityType?: "BUY" | "SELL";
+    coinAmount?: string;
+    senderProfile?: {
+      handle?: string;
+    };
+    currencyAmountWithPrice?: {
+      priceUsdc?: string;
+      currencyAmount?: {
+        currencyAddress?: string;
+        amountDecimal?: number;
+      };
+    };
+  };
+}
+
+interface CoinSwapsResponse {
+  error?: unknown;
+  data?: {
+    zora20Token?: {
+      swapActivities?: {
+        count?: number;
+        edges?: CoinSwapEdge[];
+        pageInfo?: {
+          endCursor?: string;
+          hasNextPage?: boolean;
+        };
+      };
     };
   };
 }
@@ -241,6 +355,141 @@ export async function fetchProfileBalances(
   }
 
   return response.data?.profile?.coinBalances?.edges?.map((edge) => edge.node) ?? [];
+}
+
+export function extractProfileIdentity(
+  identifier: string,
+  response: unknown,
+): ProfileIdentity | null {
+  const result = response as ProfileResponse;
+  if (result.error) return null;
+
+  const profile = result.data?.profile;
+  if (!profile) return null;
+
+  const linkedWallets =
+    profile.linkedWallets?.edges?.reduce<LinkedWallet[]>((wallets, edge) => {
+      const walletAddress = normalizeWalletAddress(edge.node?.walletAddress);
+      if (!walletAddress) {
+        return wallets;
+      }
+
+      wallets.push({
+        walletAddress,
+        ...(edge.node?.walletType
+          ? { walletType: edge.node.walletType }
+          : {}),
+      });
+
+      return wallets;
+    }, []) ?? [];
+
+  const walletAddress =
+    normalizeWalletAddress(profile.publicWallet?.walletAddress) ??
+    linkedWallets[0]?.walletAddress ??
+    normalizeWalletAddress(identifier) ??
+    undefined;
+
+  return {
+    identifier,
+    handle: profile.handle,
+    walletAddress,
+    linkedWallets,
+    profileId: profile.id,
+    avatar: {
+      medium: profile.avatar?.previewImage?.medium,
+      small: profile.avatar?.previewImage?.small,
+    },
+  };
+}
+
+export async function fetchProfile(
+  identifier: string,
+): Promise<ProfileIdentity | null> {
+  const normalizedIdentifier = identifier.trim();
+  if (!normalizedIdentifier) return null;
+
+  const response = (await getProfile({
+    identifier: normalizedIdentifier,
+  })) as ProfileResponse;
+
+  if (response.error) {
+    throw new Error("Failed to fetch profile.");
+  }
+
+  return extractProfileIdentity(normalizedIdentifier, response);
+}
+
+export function extractCoinSwaps(
+  coinAddress: string,
+  response: unknown,
+): CoinSwapsApiResponse {
+  const result = response as CoinSwapsResponse;
+  if (result.error) {
+    return {
+      coinAddress,
+      count: 0,
+      pageInfo: {
+        hasNextPage: false,
+      },
+      swaps: [],
+    };
+  }
+
+  const swapActivities = result.data?.zora20Token?.swapActivities;
+  const swaps =
+    swapActivities?.edges?.map((edge) => {
+      const amountDecimal =
+        edge.node?.currencyAmountWithPrice?.currencyAmount?.amountDecimal;
+
+      return {
+        id: edge.node?.id,
+        coinAddress,
+        senderAddress: edge.node?.senderAddress,
+        recipientAddress: edge.node?.recipientAddress,
+        transactionHash: edge.node?.transactionHash,
+        blockTimestamp: edge.node?.blockTimestamp,
+        activityType: edge.node?.activityType,
+        coinAmount: edge.node?.coinAmount,
+        quoteAmount:
+          typeof amountDecimal === "number" && Number.isFinite(amountDecimal)
+            ? amountDecimal
+            : undefined,
+        quoteCurrencyAddress:
+          edge.node?.currencyAmountWithPrice?.currencyAmount?.currencyAddress,
+        quotePriceUsdc: edge.node?.currencyAmountWithPrice?.priceUsdc,
+        senderProfileHandle: edge.node?.senderProfile?.handle,
+      };
+    }) ?? [];
+
+  return {
+    coinAddress,
+    count: swapActivities?.count ?? swaps.length,
+    pageInfo: {
+      endCursor: swapActivities?.pageInfo?.endCursor,
+      hasNextPage: swapActivities?.pageInfo?.hasNextPage ?? false,
+    },
+    swaps,
+  };
+}
+
+export async function fetchCoinSwaps(
+  address: string,
+  count: number = 20,
+  after?: string,
+): Promise<CoinSwapsApiResponse> {
+  const response = (await getCoinSwaps({
+    address,
+    chain: 8453,
+    first: count,
+    ...(after ? { after } : {}),
+  })) as CoinSwapsResponse;
+
+  if (response.error) {
+    throw new Error("Failed to fetch coin swaps.");
+  }
+
+  return extractCoinSwaps(address, response);
 }
 
 export function formatCompactCurrency(value: string | number | undefined): string {

@@ -9,6 +9,7 @@ const SKILL_DIRS = [
   "creator-pulse",
   "briefing-bot",
   "portfolio-scout",
+  "copy-trader",
   "momentum-trader",
 ];
 
@@ -264,6 +265,16 @@ describe("env requirements", () => {
     expect(content.requires.env).toContain("ZORA_PRIVATE_KEY");
   });
 
+  it("copy-trader requires ZORA_PRIVATE_KEY", () => {
+    const content = JSON.parse(
+      fs.readFileSync(
+        path.join(ROOT, "copy-trader", "clawhub.json"),
+        "utf8",
+      ),
+    );
+    expect(content.requires.env).toContain("ZORA_PRIVATE_KEY");
+  });
+
   it("momentum-trader requires ZORA_PRIVATE_KEY", () => {
     const content = JSON.parse(
       fs.readFileSync(
@@ -272,6 +283,26 @@ describe("env requirements", () => {
       ),
     );
     expect(content.requires.env).toContain("ZORA_PRIVATE_KEY");
+  });
+
+  it("copy-trader exposes only the primary tunables in clawhub.json", () => {
+    const content = JSON.parse(
+      fs.readFileSync(
+        path.join(ROOT, "copy-trader", "clawhub.json"),
+        "utf8",
+      ),
+    );
+
+    expect(content.tunables.map((tunable: Tunable) => tunable.env)).toEqual([
+      "ZORA_COPYTRADE_LIVE",
+      "ZORA_COPYTRADE_SOURCE_ADDRESSES",
+      "ZORA_COPYTRADE_IMPORT_LEADERBOARD",
+      "ZORA_COPYTRADE_SPEND_TOKEN",
+      "ZORA_COPYTRADE_EXIT_TOKEN",
+      "ZORA_COPYTRADE_MAX_BUY_USD",
+      "ZORA_COPYTRADE_DAILY_CAP_USD",
+      "ZORA_COPYTRADE_MAX_POSITIONS",
+    ]);
   });
 });
 
@@ -287,7 +318,7 @@ describe.each(SKILL_DIRS)("%s/scripts/validate.sh", (skill) => {
 });
 
 describe("wallet-backed setup guidance", () => {
-  it.each(["portfolio-scout", "momentum-trader"])(
+  it.each(["portfolio-scout", "copy-trader", "momentum-trader"])(
     "%s mentions zora wallet backup",
     (skill) => {
       const content = readSkillMd(skill);

@@ -12,10 +12,12 @@ import { skills } from "@/lib/skills";
 const TEST_BASE_URL = "https://example.com";
 
 describe("buildAiDiscovery", () => {
-  it("includes llms and agent lifecycle endpoints", () => {
+  it("includes llms, market-data, and agent lifecycle endpoints", () => {
     expect(buildAiDiscovery(TEST_BASE_URL)).toMatchObject({
       llms_txt: "/llms.txt",
       llms_full_txt: "/llms-full.txt",
+      profile_endpoint: "/api/profile",
+      coin_swaps_endpoint: "/api/coin-swaps",
       agent_registration_url: "/api/agents/register",
       agent_me_url: "/api/agents/me",
       agent_claim_url: "/api/agents/claim",
@@ -24,10 +26,11 @@ describe("buildAiDiscovery", () => {
 });
 
 describe("buildLlmsTxt", () => {
-  it("includes the catalog link, default install command, and skill URLs", () => {
+  it("includes the catalog link, market APIs, default install command, and skill URLs", () => {
     const llmsTxt = buildLlmsTxt(TEST_BASE_URL);
 
     expect(llmsTxt).toContain("Catalog: https://example.com/api/skills");
+    expect(llmsTxt).toContain("Market APIs: https://example.com/api/profile | https://example.com/api/coin-swaps");
     expect(llmsTxt).toContain(
       'Default install (Claude Code): claude -p "Install skills from https://example.com/llms.txt"',
     );
@@ -42,10 +45,13 @@ describe("buildLlmsTxt", () => {
 });
 
 describe("buildLlmsFullTxt", () => {
-  it("includes install commands, skill command lists, CLI reference, and live registration docs", () => {
+  it("includes install commands, skill command lists, market APIs, CLI reference, and live registration docs", () => {
     const llmsFullTxt = buildLlmsFullTxt(TEST_BASE_URL);
 
     expect(llmsFullTxt).toContain("## Install All Skills");
+    expect(llmsFullTxt).toContain("## Market Data APIs");
+    expect(llmsFullTxt).toContain("GET https://example.com/api/profile");
+    expect(llmsFullTxt).toContain("GET https://example.com/api/coin-swaps");
     expect(llmsFullTxt).toContain("## Zora CLI Reference");
     expect(llmsFullTxt).toContain("zora explore --sort <sort>");
     expect(llmsFullTxt).toContain("POST https://example.com/api/agents/register");
@@ -62,12 +68,14 @@ describe("buildLlmsFullTxt", () => {
 });
 
 describe("/api", () => {
-  it("includes all three agent lifecycle endpoints", async () => {
+  it("includes market-data and agent lifecycle endpoints", async () => {
     const response = await getApiRoute(
       new NextRequest("https://example.com/api"),
     );
     const data = await response.json();
 
+    expect(data.endpoints.profile.url).toBe("/api/profile");
+    expect(data.endpoints.coinSwaps.url).toBe("/api/coin-swaps");
     expect(data.agentRegistrationUrl).toBe("/api/agents/register");
     expect(data.agentMeUrl).toBe("/api/agents/me");
     expect(data.agentClaimUrl).toBe("/api/agents/claim");

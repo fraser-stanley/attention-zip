@@ -55,6 +55,7 @@ trend-scout/                        # Skill: trending topic coins, new trends, m
 creator-pulse/                      # Skill: creator coin ecosystems
 briefing-bot/                       # Skill: structured market digest
 portfolio-scout/                    # Skill: coin holdings (read-only)
+copy-trader/                        # Skill: wallet-following copy trading
 momentum-trader/                    # Skill: momentum trading
 src/
 ├── __tests__/
@@ -93,6 +94,8 @@ src/
 │       ├── explore/route.ts        # Explore queries + cache headers
 │       ├── leaderboard/route.ts    # Trader leaderboard
 │       ├── portfolio/route.ts      # Address-based Zora portfolio balances
+│       ├── profile/route.ts        # Public profile identifier resolution
+│       ├── coin-swaps/route.ts     # Public coin swap activity
 │       └── staging-auth/route.ts   # Password check, sets the staging auth cookie
 ├── components/
 │   ├── nav.tsx                     # Navigation bar (6 sections incl. Portfolio + wallet menu toggle)
@@ -130,7 +133,7 @@ src/
     ├── agent-auth.ts               # Bearer API key validation
     ├── site.ts                     # Site metadata and URL helpers
     ├── zora.ts                     # SDK wrapper: all query functions + formatting helpers
-    ├── skills.ts                   # Static skill definitions (5 skills)
+    ├── skills.ts                   # Static skill definitions (6 skills)
     ├── staging-auth.ts             # Shared staging auth token + redirect sanitization helpers
     ├── providers.tsx               # React Query provider (30s staleTime)
     ├── wallet-address.ts           # Shared 0x address validation helpers
@@ -287,15 +290,16 @@ All SDK responses return `{ error, data }`. Always check `response.error` before
 
 ## Skills
 
-5 first-party verified skills:
+6 first-party verified skills:
 
 1. **Trend Scout** — trending topic coins, new trend launches, volume and mcap leaders
 2. **Creator Pulse** — creator coin ecosystems, featured creators, watchlists
 3. **Briefing Bot** — structured morning/evening market digest
 4. **Portfolio Scout** — coin holdings via CLI (local wallet) or SDK (any address). Bankr-ready bridge skill
-5. **Momentum Trader** — quotes and manages momentum trades via the Zora CLI. Dry run by default, requires a dedicated trader wallet created with `zora setup`.
+5. **Copy Trader** — mirrors public Zora wallet moves from selected sources and optional leaderboard traders. Dry run by default, requires a dedicated trader wallet created with `zora setup`.
+6. **Momentum Trader** — quotes and manages momentum trades via the Zora CLI. Dry run by default, requires a dedicated trader wallet created with `zora setup`.
 
-Skills 1–4 are read-only. Skills 1–3 do not need a wallet. Portfolio Scout and Momentum Trader do. Skill 5 is the only trading skill and stays dry-run by default until explicitly enabled. All use OpenClaw SKILL.md format. The CLI has no SKILL.md parsing, it's purely an agent-runtime convention.
+Skills 1–4 are read-only. Skills 1–3 do not need a wallet. Portfolio Scout, Copy Trader, and Momentum Trader do. Skills 5–6 are execution skills and stay dry-run by default until explicitly enabled. All use OpenClaw SKILL.md format. The CLI has no SKILL.md parsing, it's purely an agent-runtime convention.
 
 ### Skill directory structure
 

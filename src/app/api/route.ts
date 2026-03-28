@@ -55,6 +55,22 @@ export async function GET(request: NextRequest) {
             count: "1-50",
           },
         },
+        profile: {
+          url: "/api/profile",
+          description: "Resolve a Zora profile identifier into a canonical wallet.",
+          params: {
+            identifier: "0x wallet address or public handle",
+          },
+        },
+        coinSwaps: {
+          url: "/api/coin-swaps",
+          description: "Recent swap activity for a single Zora coin.",
+          params: {
+            address: "0x coin address",
+            count: "1-50",
+            after: "Optional pagination cursor",
+          },
+        },
         agentsRegister: {
           url: "/api/agents/register",
           description:

@@ -13,8 +13,8 @@ import {
 const ROOT = path.resolve(__dirname, "../..");
 
 describe("skills array", () => {
-  it("has exactly 5 skills", () => {
-    expect(skills).toHaveLength(5);
+  it("has exactly 6 skills", () => {
+    expect(skills).toHaveLength(6);
   });
 
   it("has no duplicate IDs", () => {
@@ -135,8 +135,26 @@ describe("CLI flag correctness in commands", () => {
 });
 
 describe("execution skill safety", () => {
+  const copyTrader = skills.find((skill) => skill.id === "copy-trader")!;
   const momentum = skills.find((skill) => skill.id === "momentum-trader")!;
   const readOnly = skills.filter((skill) => skill.risk === "none");
+
+  it("copy-trader has risk: medium", () => {
+    expect(copyTrader.risk).toBe("medium");
+  });
+
+  it("copy-trader is dry-run by default", () => {
+    expect(copyTrader.automation.dryRunByDefault).toBe(true);
+  });
+
+  it("copy-trader commands include buy and sell", () => {
+    expect(
+      copyTrader.commands.some((command) => command.includes("zora buy")),
+    ).toBe(true);
+    expect(
+      copyTrader.commands.some((command) => command.includes("zora sell")),
+    ).toBe(true);
+  });
 
   it("momentum-trader has risk: medium", () => {
     expect(momentum.risk).toBe("medium");

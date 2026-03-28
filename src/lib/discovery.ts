@@ -144,6 +144,8 @@ export function buildAiDiscovery(siteUrl: string) {
     explore_endpoint: "/api/explore",
     leaderboard_endpoint: "/api/leaderboard",
     portfolio_endpoint: "/api/portfolio",
+    profile_endpoint: "/api/profile",
+    coin_swaps_endpoint: "/api/coin-swaps",
     llms_txt: "/llms.txt",
     llms_full_txt: "/llms-full.txt",
     agent_registration_url: AGENT_REGISTRATION_PATH,
@@ -162,6 +164,7 @@ export function buildLlmsTxt(siteUrl: string) {
 ${SITE_DESCRIPTION}
 
 Catalog: ${toAbsoluteUrl("/api/skills", siteUrl)}
+Market APIs: ${toAbsoluteUrl("/api/profile", siteUrl)} | ${toAbsoluteUrl("/api/coin-swaps", siteUrl)}
 Default install (Claude Code): ${installAllCommands.claude}
 
 ## Skills
@@ -187,6 +190,8 @@ ${SITE_DESCRIPTION}
 - API discovery: ${toAbsoluteUrl("/api", siteUrl)}
 - Agent discovery: ${toAbsoluteUrl("/.well-known/ai.json", siteUrl)}
 - Source repository: ${getSiteRepoUrl()}
+- Profile API: ${toAbsoluteUrl("/api/profile", siteUrl)}
+- Coin swaps API: ${toAbsoluteUrl("/api/coin-swaps", siteUrl)}
 
 ## Install All Skills
 
@@ -204,6 +209,15 @@ ${CLI_REFERENCE.map(
   (item) =>
     `- ${item.command}: ${item.syntax}\n  ${item.notes}`,
 ).join("\n")}
+
+## Market Data APIs
+
+- Profile lookup: GET ${toAbsoluteUrl("/api/profile", siteUrl)}
+  Params: identifier=<0x-address-or-handle>
+  Returns: canonical wallet, linked wallets, profile id, handle, avatar
+- Coin swaps: GET ${toAbsoluteUrl("/api/coin-swaps", siteUrl)}
+  Params: address=<0x-coin-address>&count=1-50&after=<cursor?>
+  Returns: recent swap activity, quote notional, tx hash, and pagination data
 
 ## Agent Registration
 

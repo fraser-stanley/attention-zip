@@ -306,23 +306,94 @@ Tracked coin value: $6,050.00`,
     skillMdUrl: buildSkillMdUrl("portfolio-scout"),
   },
   {
-    id: "momentum-trader",
-    name: "Momentum Trader",
+    id: "copy-trader",
+    name: "Copy Trader",
     description:
-      "Quotes and manages momentum trades. Dry run by default.",
+      "Mirrors public Zora wallet moves with freshness gates. Dry run by default.",
     longDescription:
-      "Scans gainers and trending coins, quotes entries, and manages exits from a local position state.",
+      "Follows selected wallets and optional leaderboard traders, confirms swaps, then mirrors buys, trims, and exits with freshness, price-drift, and reconciliation guardrails.",
     category: "trading",
     difficulty: "advanced",
     risk: "medium",
     riskLabel: "Trading skill, dedicated wallet needed",
-    tags: ["trading", "momentum", "quotes", "trailing-stops"],
+    tags: [
+      "copytrade",
+      "leaderboard",
+      "wallet-following",
+      "execution",
+      "risk-controls",
+    ],
     monitors: [
-      "Momentum candidates",
-      "Quote slippage",
-      "Position count",
-      "Daily spend cap",
+      "Source-wallet entries",
+      "Source-wallet adds",
+      "Source-wallet trims",
+      "Source-wallet exits",
+      "Stale live-copy skips",
+      "Price-drift guards",
+      "Copied-position concentration",
+      "Duplicate action suppression",
+      "State reconciliation",
+    ],
+    commands: [
+      "node scripts/run.mjs",
+      "zora buy <address> --usd <amount> --token <asset> --quote --json",
+      "zora buy <address> --usd <amount> --token <asset> --slippage <pct> --json --yes",
+      "zora sell <address> --percent <pct> --to <asset> --quote --json",
+      "zora sell <address> --percent <pct> --to <asset> --slippage <pct> --json --yes",
+      "zora balance --json",
+      "zora balance coins --sort usd-value --limit 20 --json",
+    ],
+    requires: {
+      bins: ["zora", "node"],
+      env: ["ZORA_PRIVATE_KEY"],
+    },
+    automation: {
+      managed: true,
+      cron: "* * * * *",
+      autostart: false,
+      entrypoint: "scripts/run.mjs",
+      dryRunByDefault: true,
+    },
+    actionPrompt:
+      "Install Copy Trader and explain how dry-run mode, freshness gates, and source wallets work.",
+    samplePrompt:
+      "Install Copy Trader and show me a dry-run cycle with freshness and price-drift checks before I turn copied trades live.",
+    sampleOutput: `Copy Trader
+Run at 2026-03-27T13:40:00Z
+Mode: dry-run
+Health: healthy
+
+Sources tracked: 2
+- jacob, manual
+- reef-X4B2, leaderboard
+
+Confirmed source actions:
+- BUY hyperpop from jacob, source age 54s, source $84.00, planned copy $25.00
+  Quote: $25.00 -> 263 HYPERPOP, age 54s, drift +3.8%
+  Action: dry-run only, no order sent
+- SELL moonbag from reef-X4B2 skipped, stale exit, live mode skipped`,
+    badges: ["Copytrade", "Dry run default", "Execution"],
+    githubUrl: buildSkillGithubUrl("copy-trader"),
+    skillMdUrl: buildSkillMdUrl("copy-trader"),
+  },
+  {
+    id: "momentum-trader",
+    name: "Momentum Trader",
+    description:
+      "Scores and manages momentum trades. Dry run by default.",
+    longDescription:
+      "Scans gainers and trending coins, scores candidates by edge, and manages stop-loss, take-profit, and trailing-stop exits.",
+    category: "trading",
+    difficulty: "advanced",
+    risk: "medium",
+    riskLabel: "Trading skill, dedicated wallet needed",
+    tags: ["trading", "momentum", "edge-scoring", "trailing-stops"],
+    monitors: [
+      "Edge-scored candidates",
+      "Stop-loss exits",
+      "Take-profit exits",
       "Trailing stop exits",
+      "Flip-flop guard",
     ],
     commands: [
       "zora explore --sort gainers --limit 12 --json",
@@ -353,14 +424,15 @@ Run at 2026-03-23T13:40:00Z
 Mode: dry-run
 
 Open positions tracked: 1
-- looksmaxxing, entry $0.00021, peak $0.00024, current $0.00023
+- looksmaxxing, entry $0.000210, peak $0.000240, current $0.000170
+  Stop-loss fired: price $0.000170 is 19.0% below entry $0.000210
 
-Candidates:
-1. hyperpop, +28.3%, $210K volume
-   Quote: 0.01 ETH -> 263 HYPERPOP, slippage 1.2%
+Candidates (3 evaluated, 1 filtered by slippage):
+- Skipped FROGCOIN: exited recently (flip-flop guard)
+1. hyperpop, +28.3%, $210K volume, slippage 1.2%
+   Quote: 0.01 ETH -> 263 HYPERPOP
    Action: dry-run only, no order sent
 
-No exits fired.
 State saved to ~/.config/zora-agent-skills/momentum-trader/state.json`,
     badges: ["Momentum", "Dry run default", "Execution"],
     githubUrl: buildSkillGithubUrl("momentum-trader"),

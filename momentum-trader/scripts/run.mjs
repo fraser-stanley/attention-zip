@@ -51,6 +51,24 @@ const DAILY_CAP_ETH = readNumber("ZORA_MOMENTUM_DAILY_CAP_ETH", 0.05, {
   min: 0.001,
   max: 10,
 });
+const STOP_LOSS_PCT = readNumber("ZORA_MOMENTUM_STOP_LOSS_PCT", 25, {
+  min: 1,
+  max: 95,
+});
+const TAKE_PROFIT_PCT = readNumber("ZORA_MOMENTUM_TAKE_PROFIT_PCT", 100, {
+  min: 5,
+  max: 1000,
+});
+const FLIPFLOP_RUNS = readNumber("ZORA_MOMENTUM_FLIPFLOP_RUNS", 3, {
+  min: 1,
+  max: 20,
+});
+const MAX_QUOTE_SLIPPAGE = readNumber(
+  "ZORA_MOMENTUM_MAX_QUOTE_SLIPPAGE_PCT",
+  5,
+  { min: 0.5, max: 50 },
+);
+const CANDIDATE_CAP = 5;
 
 function readNumber(name, fallback, { min = -Infinity, max = Infinity } = {}) {
   const raw = process.env[name];
@@ -77,6 +95,13 @@ function formatUsd(value) {
 function formatPct(value) {
   const sign = value >= 0 ? "+" : "";
   return `${sign}${value.toFixed(1)}%`;
+}
+
+function formatVolume(value) {
+  const num = Number(value || 0);
+  if (num >= 1_000_000) return `$${(num / 1_000_000).toFixed(1)}M`;
+  if (num >= 1_000) return `$${(num / 1_000).toFixed(0)}K`;
+  return `$${num.toFixed(0)}`;
 }
 
 function computeChangePercent(coin) {
@@ -127,6 +152,8 @@ async function loadState() {
       spendWindowStartedAt: null,
       spentWindowEth: 0,
       positions: {},
+      recentExits: {},
+      runCount: 0,
     };
   }
 }
@@ -176,24 +203,66 @@ function reconcileTrackedPositions(state, heldCoins) {
       entryPriceUsd,
       peakPriceUsd,
       lastPriceUsd: currentPriceUsd || null,
+      stopLossPct: existing.stopLossPct ?? STOP_LOSS_PCT,
+      takeProfitPct: existing.takeProfitPct ?? TAKE_PROFIT_PCT,
     };
   }
 
   state.positions = nextPositions;
 }
 
-function eligibleForExit(position) {
+function classifyExit(position) {
   if (
     !position.entryPriceUsd ||
     !position.peakPriceUsd ||
     !position.lastPriceUsd
   ) {
-    return false;
+    return { shouldExit: false, type: null, reason: null };
   }
-  return (
+
+  const stopLoss = position.stopLossPct ?? STOP_LOSS_PCT;
+  const takeProfit = position.takeProfitPct ?? TAKE_PROFIT_PCT;
+
+  const drawdownFromEntry =
+    ((position.entryPriceUsd - position.lastPriceUsd) /
+      position.entryPriceUsd) *
+    100;
+  if (drawdownFromEntry >= stopLoss) {
+    return {
+      shouldExit: true,
+      type: "stop-loss",
+      reason: `Stop-loss fired: price ${formatUsd(position.lastPriceUsd)} is ${drawdownFromEntry.toFixed(1)}% below entry ${formatUsd(position.entryPriceUsd)}`,
+    };
+  }
+
+  const gainFromEntry =
+    ((position.lastPriceUsd - position.entryPriceUsd) /
+      position.entryPriceUsd) *
+    100;
+  if (gainFromEntry >= takeProfit) {
+    return {
+      shouldExit: true,
+      type: "take-profit",
+      reason: `Take-profit fired: price ${formatUsd(position.lastPriceUsd)} is ${gainFromEntry.toFixed(1)}% above entry ${formatUsd(position.entryPriceUsd)}`,
+    };
+  }
+
+  if (
     position.lastPriceUsd <=
     position.peakPriceUsd * (1 - TRAILING_STOP_PCT / 100)
-  );
+  ) {
+    const dropFromPeak =
+      ((position.peakPriceUsd - position.lastPriceUsd) /
+        position.peakPriceUsd) *
+      100;
+    return {
+      shouldExit: true,
+      type: "trailing-stop",
+      reason: `Trailing stop fired: price ${formatUsd(position.lastPriceUsd)} is ${dropFromPeak.toFixed(1)}% below peak ${formatUsd(position.peakPriceUsd)}`,
+    };
+  }
+
+  return { shouldExit: false, type: null, reason: null };
 }
 
 async function quoteExit(position) {
@@ -226,7 +295,21 @@ async function executeExit(position) {
   ]);
 }
 
-async function discoverCandidate(heldIds) {
+function buildBlockedIds(state) {
+  const blocked = new Set();
+  for (const [id, exit] of Object.entries(state.recentExits ?? {})) {
+    if (state.runCount - (exit.runNumber ?? 0) < FLIPFLOP_RUNS) {
+      blocked.add(id);
+    }
+  }
+  return blocked;
+}
+
+function computeEdgeScore(changePct, volumeUsd, slippage) {
+  return changePct * volumeUsd * (1 / Math.max(slippage, 0.1));
+}
+
+async function discoverCandidates(heldIds, blockedIds) {
   const [gainersPayload, trendingPayload] = await Promise.all([
     runZora([
       "explore",
@@ -254,13 +337,27 @@ async function discoverCandidate(heldIds) {
     merged.set(coinId(coin), coin);
   }
 
+  const passing = [];
+  const skippedFlipFlops = [];
+
   for (const coin of merged.values()) {
     const changePct = computeChangePercent(coin);
     const volumeUsd = Number(coin.volume24h || 0);
     if (heldIds.has(coinId(coin))) continue;
+    if (blockedIds.has(coinId(coin))) {
+      skippedFlipFlops.push(coin);
+      continue;
+    }
     if (changePct < MIN_GAIN_PCT) continue;
     if (volumeUsd < MIN_VOLUME_USD) continue;
+    passing.push(coin);
+    if (passing.length >= CANDIDATE_CAP) break;
+  }
 
+  const scored = [];
+  let filteredBySlippage = 0;
+
+  for (const coin of passing) {
     const detail = await runZora(["get", coin.address, "--json"]);
     const quote = await runZora([
       "buy",
@@ -273,10 +370,27 @@ async function discoverCandidate(heldIds) {
       "--json",
     ]);
 
-    return { coin, detail, quote };
+    const slippage = Number(quote.slippage ?? 0);
+    if (slippage > MAX_QUOTE_SLIPPAGE) {
+      filteredBySlippage++;
+      continue;
+    }
+
+    const changePct = computeChangePercent(coin);
+    const volumeUsd = Number(coin.volume24h || 0);
+    const edgeScore = computeEdgeScore(changePct, volumeUsd, slippage);
+
+    scored.push({ coin, detail, quote, slippage, changePct, volumeUsd, edgeScore });
   }
 
-  return null;
+  scored.sort((a, b) => b.edgeScore - a.edgeScore);
+
+  return {
+    best: scored[0] ?? null,
+    evaluated: passing.length,
+    filteredBySlippage,
+    skippedFlipFlops,
+  };
 }
 
 async function executeEntry(candidate) {
@@ -292,9 +406,21 @@ async function executeEntry(candidate) {
   ]);
 }
 
+function pruneRecentExits(state) {
+  for (const [id, exit] of Object.entries(state.recentExits)) {
+    if (state.runCount - (exit.runNumber ?? 0) > FLIPFLOP_RUNS * 2) {
+      delete state.recentExits[id];
+    }
+  }
+}
+
 async function main() {
   const state = await loadState();
   const now = new Date();
+
+  state.recentExits ??= {};
+  state.runCount = (state.runCount ?? 0) + 1;
+
   resetSpendWindowIfNeeded(state, now);
 
   const balancesPayload = await runZora([
@@ -325,14 +451,17 @@ async function main() {
     console.log("- No tracked positions");
   }
 
-  const exits = trackedPositions.filter(eligibleForExit);
+  const exits = trackedPositions
+    .map((position) => ({ position, ...classifyExit(position) }))
+    .filter((e) => e.shouldExit);
+
   if (exits.length > 0) {
     console.log("");
     console.log("Exits:");
-    for (const position of exits) {
+    for (const { position, type, reason } of exits) {
       if (LIVE) {
         const result = await executeExit(position);
-        console.log(`- Sold ${position.name}, tx ${result.tx}`);
+        console.log(`- Sold ${position.name} (${type}), tx ${result.tx}`);
         await appendJournal({
           timestamp: now.toISOString(),
           action: "sell",
@@ -341,13 +470,19 @@ async function main() {
           address: position.address,
           symbol: position.symbol,
           tx: result.tx,
+          exitType: type,
+          reasoning: reason,
         });
         delete state.positions[coinId(position)];
+        state.recentExits[coinId(position)] = {
+          exitedAt: now.toISOString(),
+          runNumber: state.runCount,
+        };
         state.lastTradeAt = now.toISOString();
       } else {
         const quote = await quoteExit(position);
         console.log(
-          `- Dry-run exit for ${position.name}, estimated ${quote.estimated.amount} ${quote.estimated.symbol}`,
+          `- Dry-run exit for ${position.name} (${type}), estimated ${quote.estimated.amount} ${quote.estimated.symbol}`,
         );
         await appendJournal({
           timestamp: now.toISOString(),
@@ -357,6 +492,8 @@ async function main() {
           address: position.address,
           symbol: position.symbol,
           estimated: quote.estimated.amount,
+          exitType: type,
+          reasoning: reason,
         });
       }
     }
@@ -377,6 +514,7 @@ async function main() {
         );
   const trackedCount = Object.keys(state.positions).length;
   const heldIds = new Set(Object.keys(state.positions));
+  const blockedIds = buildBlockedIds(state);
 
   if (cooldownRemaining > 0) {
     console.log("");
@@ -394,35 +532,51 @@ async function main() {
       `Entry scan skipped: daily cap would be exceeded (${state.spentWindowEth}/${DAILY_CAP_ETH} ETH).`,
     );
   } else {
-    const candidate = await discoverCandidate(heldIds);
+    const { best, evaluated, filteredBySlippage, skippedFlipFlops } =
+      await discoverCandidates(heldIds, blockedIds);
 
     console.log("");
-    console.log("Candidates:");
-    if (!candidate) {
-      console.log("- No candidate cleared the gain, volume, and quote filters");
-    } else {
-      const quote = candidate.quote;
+    console.log(
+      `Candidates (${evaluated} evaluated${filteredBySlippage > 0 ? `, ${filteredBySlippage} filtered by slippage` : ""}):`,
+    );
+
+    for (const coin of skippedFlipFlops) {
       console.log(
-        `1. ${candidate.coin.name}, ${formatPct(computeChangePercent(candidate.coin))}, ${formatUsd(candidate.coin.volume24h)} volume`,
+        `- Skipped ${coin.name}: exited recently (flip-flop guard)`,
+      );
+    }
+
+    if (!best) {
+      console.log(
+        "- No candidate cleared the gain, volume, and quote filters",
+      );
+    } else {
+      const quote = best.quote;
+      const reasoning = `Top candidate by edge score (gain ${formatPct(best.changePct)}, vol ${formatVolume(best.volumeUsd)}, slippage ${best.slippage}%). ${evaluated} evaluated${filteredBySlippage > 0 ? `, ${filteredBySlippage} filtered by slippage` : ""}.`;
+
+      console.log(
+        `1. ${best.coin.name}, ${formatPct(best.changePct)}, ${formatVolume(best.volumeUsd)} volume, slippage ${best.slippage}%`,
       );
       console.log(
-        `   Quote: ${MAX_ETH} ETH -> ${quote.estimated.amount} ${quote.estimated.symbol}, slippage ${quote.slippage}%`,
+        `   Quote: ${MAX_ETH} ETH -> ${quote.estimated.amount} ${quote.estimated.symbol}`,
       );
 
       if (LIVE) {
-        const result = await executeEntry(candidate);
+        const result = await executeEntry(best);
         console.log(
-          `   Action: bought ${candidate.coin.name}, tx ${result.tx}`,
+          `   Action: bought ${best.coin.name}, tx ${result.tx}`,
         );
-        state.positions[coinId(candidate.coin)] = {
-          address: candidate.coin.address,
-          name: candidate.coin.name,
-          symbol: candidate.coin.symbol,
+        state.positions[coinId(best.coin)] = {
+          address: best.coin.address,
+          name: best.coin.name,
+          symbol: best.coin.symbol,
           openedAt: now.toISOString(),
           balance: result.received.amount,
           entryPriceUsd: null,
           peakPriceUsd: null,
           lastPriceUsd: null,
+          stopLossPct: STOP_LOSS_PCT,
+          takeProfitPct: TAKE_PROFIT_PCT,
         };
         state.lastTradeAt = now.toISOString();
         state.spentWindowEth = Number(state.spentWindowEth || 0) + MAX_ETH;
@@ -431,11 +585,12 @@ async function main() {
           action: "buy",
           source: "zora:momentum-trader",
           live: true,
-          address: candidate.coin.address,
-          symbol: candidate.coin.symbol,
+          address: best.coin.address,
+          symbol: best.coin.symbol,
           tx: result.tx,
           spentEth: MAX_ETH,
           received: result.received.amount,
+          reasoning,
         });
       } else {
         console.log("   Action: dry-run only, no order sent");
@@ -444,15 +599,17 @@ async function main() {
           action: "buy-quote",
           source: "zora:momentum-trader",
           live: false,
-          address: candidate.coin.address,
-          symbol: candidate.coin.symbol,
+          address: best.coin.address,
+          symbol: best.coin.symbol,
           spentEth: MAX_ETH,
           estimated: quote.estimated.amount,
+          reasoning,
         });
       }
     }
   }
 
+  pruneRecentExits(state);
   state.updatedAt = now.toISOString();
   await saveState(state);
 

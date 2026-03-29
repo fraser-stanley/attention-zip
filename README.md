@@ -2,7 +2,7 @@
 
 Agent skills and live market data for the Zora attention market. Scan trends, check portfolios, build briefings, and trade momentum.
 
-Agent discovery is available through `/.well-known/ai.json`, `/llms.txt`, `/llms-full.txt`, and `/api/skills`. The shortest install prompts point agents at the hosted `llms.txt` or per-skill `skill-md` URLs. Agent self-registration and human wallet claiming are live at `/api/agents/register`, `/api/agents/me`, `/api/agents/claim`, and `/claim/<code>`.
+Agent discovery is available through `/.well-known/ai.json`, `/llms.txt`, `/llms-full.txt`, and `/api/skills`. The shortest install prompts point agents at the hosted `llms.txt` or per-skill `skill-md` URLs. The public install copy is agent-first: paste the prompt to your agent or send it the hosted URL. Agent self-registration and human wallet claiming are live at `/api/agents/register`, `/api/agents/me`, `/api/agents/claim`, and `/claim/<code>`.
 
 ## Quick start
 
@@ -35,7 +35,7 @@ Six skills for the Zora market. Each skill directory contains:
 | [copy-trader](copy-trader/)         | Mirrors public Zora wallet moves with guardrails. Dry run by default    | Execution |
 | [momentum-trader](momentum-trader/) | Quotes and manages momentum trades. Dry run by default                  | Execution |
 
-Trend Scout, Creator Pulse, and Briefing Bot do not need a wallet. Portfolio Scout, Copy Trader, and Momentum Trader need a dedicated wallet configured through `zora setup` or `ZORA_PRIVATE_KEY`. If you create that wallet locally on macOS, run `zora wallet backup` after setup.
+Trend Scout, Creator Pulse, and Briefing Bot do not need a wallet. Portfolio Scout can inspect any address through the public API, and its local wallet mode uses `zora balance`. Copy Trader and Momentum Trader need a dedicated wallet configured through `zora setup` or `ZORA_PRIVATE_KEY`. If you create that wallet locally on macOS, run `zora wallet backup` after setup.
 
 ## API
 
@@ -61,9 +61,15 @@ Agent-facing endpoints. All responses include cache headers.
 
 `POST /api/agents/register` is IP-rate-limited to 5 requests per 10 minutes. `POST /api/agents/claim` is IP-rate-limited to 10 requests per 10 minutes. Both return `429` with `Retry-After` and `X-RateLimit-*` headers when exceeded.
 
-### Install prompts
+### Paste to your agent
 
-All skills:
+Default all-skills prompt:
+
+```bash
+Read the skill docs at https://<host>/llms.txt and follow the install instructions.
+```
+
+Runtime-specific helper:
 
 ```bash
 claude -p "Install skills from https://<host>/llms.txt"
@@ -72,7 +78,7 @@ claude -p "Install skills from https://<host>/llms.txt"
 Single skill:
 
 ```bash
-claude -p "Install Trend Scout from https://<host>/skills/trend-scout/skill-md"
+Read the skill doc at https://<host>/skills/trend-scout/skill-md and follow the install instructions.
 ```
 
 ## Project structure

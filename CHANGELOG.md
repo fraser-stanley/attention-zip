@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-03-29 (Agent-first copy cleanup + docs sync)
+
+### Changed
+- **Homepage and skills install copy tightened** — the shared install surfaces now lead with shorter agent-first language, while per-skill rows rely on the command block plus `Source` and `Skill notes` links instead of repeated helper copy.
+- **Wallet guidance is now named and specific** — FAQ and discovery docs now call out the actual skills that work without a wallet, and the wallet copy correctly includes Copy Trader.
+- **Zora CLI is described in plainer terms** — discovery docs now describe it as the layer for market data, balance checks, and trading orders instead of internal shorthand.
+- **Generic trust boilerplate removed** — public copy no longer implies the whole repo is open source or repeats filler claims that do not add useful information on the page.
+- **Docs now match the live product** — `README.md`, `CLAUDE.md`, `TONE.md`, `LEARNINGS.md`, and `AGENTS.md` now reflect the prompt-first `Any Agent` default, the current homepage/skills surfaces, and the deploy workflow lesson from this pass.
+
 ## 2026-03-28 (Copy Trader skill + market data APIs + momentum trader upgrades)
 
 ### Added

@@ -2,6 +2,22 @@
 
 Decisions, trade-offs, and context that aren't obvious from the code.
 
+## 2026-03-29 — Agent-first install copy
+
+### Generic trust boilerplate drifts fast
+Lines like "open source", "no custody", "some skills need a wallet", and "trading is opt-in" looked tidy, but they quickly became filler or inaccurate on the wrong surface. The better rule is: say the smallest true thing for that page. If wallet requirements differ, name the skills.
+
+### Repetition is the fastest AI tell
+One "Paste this to your agent." at the shared install surface works. Repeating it on every skill row makes the page feel templated. Let the command block, source link, and skill notes carry the row once the shared instruction is already clear.
+
+### Explain Zora CLI by what it does
+"Market reads" and "locally" were both weaker than they sounded. "Market data and balance checks" says more, and trading skills also place orders through the CLI.
+
+## 2026-03-29 — Live deploy workflow
+
+### Start direct deploys from a clean `origin/main` base
+This workspace was behind production. Creating a clean worktree from `origin/main` let us port the copy changes without rolling back the newer merged PR. If a workspace branch is not the live base, do not push from it directly.
+
 ## 2026-03-27 — Direct Upstash agent registration + wallet claiming
 
 ### Use direct `@upstash/redis`, not `@vercel/kv`
@@ -49,8 +65,8 @@ The clearer structure for this site is: what the skill helps with, what the user
 ### Attention Index is not Zora
 The site should be framed as the place to install and inspect market skills for the Zora attention market. It is not the market itself, not a wallet product, and not a hosted execution layer. That distinction needs to stay explicit in homepage copy, metadata, and trust language.
 
-### Trust copy must stay literal
-The strongest trust claims here are plain ones: open source, no custody, some skills need a wallet, trading is opt-in, dry run by default. Broader statements like "No keys" or vague safety language create drift because they stop being true as soon as a trading skill or wallet-backed skill is in view.
+### Trust copy should stay precise
+Generic safety lines age badly. Say only what is true on that surface, name the skills when wallet needs differ, and avoid filler like "no custody" when it adds no information.
 
 ## 2026-03-24 — Custom staging auth gate
 
@@ -65,8 +81,8 @@ The initial login loop came from a fragile client redirect flow. The safer model
 
 ## 2026-03-23 — Stakeholder-ready install surface
 
-### Default to a runtime that actually works
-The top-level install surface should default to an executable path, not a placeholder. Claude Code is the best current default because the `claude -p "Read <url>..."` commands are usable today. OpenClaw can stay as a forward-looking runtime tab, but it should not be the first command stakeholders see.
+### Default to a prompt any agent can follow
+The top-level install surface should default to the broadest working instruction, not the narrowest runtime wrapper. A plain prompt that points at `llms.txt` works across agents. Runtime-specific wrappers can stay in tabs, but they should not be the first thing every visitor sees.
 
 ### Skill rows scan better when supporting detail is hidden
 The automation/schedule/needs/category grid added too much visual bookkeeping. The stronger hierarchy is: what the skill does, when to use it, how to install it, then an optional `More info` disclosure for commands and sample output. This keeps the page readable without removing depth entirely.
@@ -77,7 +93,7 @@ The automation/schedule/needs/category grid added too much visual bookkeeping. T
 The shadcn/ui `TabsList` component applies `gap-1 bg-muted p-1` in its base className. When overriding with `bg-transparent p-0`, the `gap-1` still applies unless explicitly zeroed with `gap-0`. This created a visible gap on the left side of the first tab in the `RuntimeInstallCard`. Always override all three properties (`gap-0 bg-transparent p-0`) when restyling `TabsList` as a flush container.
 
 ### Install commands are agent prompts, not shell commands
-The Zora CLI has no `install` or `skills` subcommand. What we call "install" is actually a prompt instruction: `claude -p "Read <url> and <action>"`. The SKILL.md is served from the domain at `/skills/[id]/skill-md` so URLs work in all environments. OpenClaw can remain as a runtime tab, but it should be treated as a forward-looking path rather than the default install surface.
+The Zora CLI has no `install` or `skills` subcommand. What we call "install" is an instruction for an agent, either as a plain prompt or as a runtime wrapper like `claude -p "Install <skill> from <url>"`. The SKILL.md is served from the domain at `/skills/[id]/skill-md` so URLs work in all environments.
 
 ### Activity ticker belongs in root layout
 The ticker was originally homepage-only, then moved to `HeroSection`. It makes more sense in the root layout directly under the nav so it appears on every page without each page importing it. Borders were removed since the nav already provides a visual boundary above.

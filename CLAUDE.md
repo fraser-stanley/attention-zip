@@ -2,7 +2,7 @@
 
 Agent skills and live market data for the Zora attention market. Attention Index helps agents use the Zora market, it is not Zora itself.
 
-**Not** an execution platform, custody layer, or marketplace. Execution is local to the user's agent runtime. We don't hold keys, submit transactions, or enforce guardrails server-side.
+This repo publishes skills, market data, discovery docs, and claim flows. Trading skills run through the user's agent runtime and Zora CLI, not through this site.
 
 ## Tech stack
 
@@ -65,7 +65,7 @@ src/
 │   ├── staging-auth.test.ts        # Staging auth token + redirect sanitization
 │   └── wallet-address.test.ts      # Address validation helpers
 ├── app/
-│   ├── page.tsx                    # Homepage (hero, terminal market board, skills preview, waitlist)
+│   ├── page.tsx                    # Homepage (hero, activity ticker, skills preview, works-with marquee, live market board)
 │   ├── loading.tsx                 # Homepage loading skeleton (instant nav)
 │   ├── layout.tsx                  # Root layout (metadata, JSON-LD, Providers, Nav)
 │   ├── globals.css                 # Tailwind imports + CSS variables
@@ -102,12 +102,14 @@ src/
 │   ├── hero-section.tsx            # Hero layout with orb + CTA (animated highlighter headings)
 │   ├── highlighter-stroke.tsx      # Reusable animated highlight sweep (motion/react backgroundSize)
 │   ├── copyable-code-block.tsx     # Terminal-style command block with copy button
-│   ├── home-get-started.tsx        # Homepage get-started steps section
-│   ├── home-works-with.tsx         # Homepage works-with logos section
+│   ├── home-get-started.tsx        # Legacy homepage get-started copy, currently unmounted
+│   ├── home-value-props-section.tsx # Legacy homepage wallet/trust copy, currently unmounted
+│   ├── home-works-with.tsx         # Legacy homepage logos section, currently unmounted
 │   ├── hero-orb-glass.tsx          # Concrete dithered orb (R3F + spring click + velocity rotation)
 │   ├── hero-orb-glass-loader.tsx   # Dynamic import wrapper (ssr: false)
 │   ├── command-menu-loader.tsx     # Lazy client-only command menu mount
 │   ├── home-live-cards.tsx         # Hydrated terminal market board with server initial data
+│   ├── works-with-marquee.tsx      # Current homepage works-with marquee
 │   ├── dashboard-tabs.tsx          # Client dashboard tabs + table refresh
 │   ├── leaderboard-table.tsx       # Client leaderboard refresh wrapper
 │   ├── skill-card-client.tsx       # Shared runtime picker + command blocks + typewriter example output
@@ -163,10 +165,11 @@ src/
 - **Claim URLs remain resolvable after success** — claim codes expire after 7 days while an agent is unclaimed. Once a wallet claims the agent, the `claim:*` lookup is rewritten without TTL so `/claim/[code]` can render an "already claimed" state. One-time claiming is enforced through `agent.status`, not by deleting the claim lookup.
 - **Skills are static data** in `src/lib/skills.ts`. No database, no CMS. The homepage grid and skills gallery both render from this array — add a skill to the array and both pages update automatically.
 - **Skills are managed runtimes behind the scenes**. Each public skill has a real `scripts/run.mjs`, `clawhub.json`, and source-backed manual install path. Those implementation details belong in internal docs, not primary marketing copy.
-- **Install commands are shared** from `src/lib/skills.ts` (`getSkillRuntimeCommands()`, `getSkillQuickInstallCommands()`, `getInstallAllCommands()`) so the UI, `/api/skills`, and discovery docs stay in sync. `/api/skills` exposes both the full `install` map and the prompt-only `quickInstall` map. Claude Code is the default visible runtime because its prompt-based install helper works today. OpenClaw remains as a forward-looking tab, and the generated command map still includes a manual `git clone` fallback and a `curl` command for direct SKILL.md fetching. Curl is in `RuntimeCommands` but not in the `Runtime` type or UI tabs — it's a fetch method, not an agent runtime.
+- **Install commands are shared** from `src/lib/skills.ts` (`getSkillRuntimeCommands()`, `getSkillQuickInstallCommands()`, `getInstallAllCommands()`) so the UI, `/api/skills`, and discovery docs stay in sync. `/api/skills` exposes both the full `install` map and the prompt-only `quickInstall` map. The visible default is the prompt-first `Any Agent` helper, with runtime-specific tabs for Claude Code, OpenClaw, Amp, Codex CLI, OpenCode, and Cursor. The generated command map still includes a manual `git clone` fallback and a `curl` command for direct SKILL.md fetching. Curl is in `RuntimeCommands` but not in the `Runtime` type or UI tabs, it's a fetch method, not an agent runtime.
 - **SKILL.md is served from the domain** at `/skills/[id]/skill-md` (`src/app/skills/[id]/skill-md/route.ts`). This gives agent commands clean URLs that work in any environment.
-- **The skills page has a unified install card** — `RuntimeInstallCard` in `src/components/skill-card-client.tsx` combines 6 runtime tabs (OpenClaw, Claude Code, Amp, Codex CLI, OpenCode, Cursor) with a copyable code snippet in one bordered card. Claude Code is the default runtime. Per-skill rows use standalone `CopyableCodeBlock` components.
+- **The skills page has a unified install card** — `RuntimeInstallCard` in `src/components/skill-card-client.tsx` combines 7 runtime tabs (Any Agent, Claude Code, OpenClaw, Amp, Codex CLI, OpenCode, Cursor) with a copyable code snippet in one bordered card. The prompt-first `Any Agent` tab is the default runtime. Per-skill rows use standalone `CopyableCodeBlock` components.
 - **The skills page stays intentionally flat** — one shared runtime picker updates every command block. Supporting details are hidden behind a single `More info` disclosure that reveals commands and sample output together. No nested accordions.
+- **Hotfix deploys should start from `origin/main`** — feature workspaces can lag live production. If you need to ship directly, create a clean worktree from `origin/main` first, then port the change.
 - **Tabs use a single unified style** — `TabsList` always renders with `bg-muted p-1` (gray container) and selected tabs get black fill + white text. No variants — one style for all tab UIs (skills picker, homepage terminal, portfolio, dashboard). The preferred pattern is a wrapper `<div className="border-b border-border bg-muted p-1">` around `<TabsList className="grid ... bg-transparent p-0">`. **Gotcha:** The base `TabsList` component has `justify-center` baked in. `cn()` / tailwind-merge will NOT remove it when you pass `flex w-full` — you must explicitly add `justify-start` to left-align tabs, or use `grid` layout which avoids the issue.
 - **Route-level `loading.tsx` files** exist for `/`, `/dashboard`, and `/leaderboard` — the three routes with async SDK fetches. These render instant skeleton states during navigation so the site feels like a fast SPA. Static pages (`/skills`, `/portfolio`) don't need them.
 - **No `config.schema.json`** for skills. Config is documented inline in SKILL.md files, following AgentSkills/OpenClaw conventions. Runtime config (requires, tunables) lives in `clawhub.json`.
@@ -190,7 +193,7 @@ src/
 All user-facing copy follows the guidelines in `TONE.md`. Key rules:
 
 - Zora is an "attention market". Use this phrase as the definitive description.
-- Attention Index helps agents use the Zora market. Do not imply the site is Zora, a hosted wallet, or a hosted execution layer.
+- Attention Index helps agents use the Zora market. Do not imply the site is Zora, a wallet product, or a hosted trading system.
 - Short, direct sentences. Lead with the fact, not the framing.
 - Market-first: trends, market scans, briefings, portfolios, momentum trading. Creator coins exist but are not the primary lens except on creator-specific surfaces.
 - No promotional adjectives ("fast-moving", "powerful", "seamless").
@@ -199,7 +202,9 @@ All user-facing copy follows the guidelines in `TONE.md`. Key rules:
 - No developer jargon in user-facing text ("execution-capable flows", "install surface").
 - In public copy, avoid implementation words like `entrypoint`, `clawhub.json`, `manifest`, `cron loop`, and `env vars` unless the page is explicitly technical documentation.
 - "Execution skills" not "execution-capable skills". "Points to" not "resolves to".
-- Trust language must stay literal: "open source", "no custody", "some skills need a wallet", "trading is opt-in", "dry run by default".
+- Be precise about wallet and trust language. Use only claims that are true on that surface.
+- Prefer named skills over vague buckets when wallet guidance differs.
+- One shared install instruction is enough. Repeating the same helper line on every card reads synthetic.
 - Speculation should be tasteful and optimistic, never overpromise.
 
 ## Animated buttons with icons
@@ -299,7 +304,7 @@ All SDK responses return `{ error, data }`. Always check `response.error` before
 5. **Copy Trader** — mirrors public Zora wallet moves from selected sources and optional leaderboard traders. Dry run by default, requires a dedicated trader wallet created with `zora setup`.
 6. **Momentum Trader** — quotes and manages momentum trades via the Zora CLI. Dry run by default, requires a dedicated trader wallet created with `zora setup`.
 
-Skills 1–4 are read-only. Skills 1–3 do not need a wallet. Portfolio Scout, Copy Trader, and Momentum Trader do. Skills 5–6 are execution skills and stay dry-run by default until explicitly enabled. All use OpenClaw SKILL.md format. The CLI has no SKILL.md parsing, it's purely an agent-runtime convention.
+Skills 1–4 are read-only. Trend Scout, Creator Pulse, and Briefing Bot work without a wallet. Portfolio Scout can inspect any address through the public API, and its local wallet mode uses a wallet. Copy Trader and Momentum Trader are trading skills, and both stay dry-run by default until explicitly enabled. All use OpenClaw SKILL.md format. The CLI has no SKILL.md parsing, it's purely an agent-runtime convention.
 
 ### Skill directory structure
 
@@ -427,9 +432,9 @@ The Zora CLI has 8 commands: `auth`, `explore`, `get`, `buy`, `sell`, `balance`,
 
 ## Product boundaries
 
-- Execution skills (Momentum Trader) run locally via Zora CLI — we don't execute trades server-side
-- No custody or key management
-- No server-side enforcement or guardrails
+- Trading skills run through the user's agent runtime and Zora CLI. The site does not execute trades server-side.
+- Wallet linking is address-based. The site does not ask the browser to sign messages.
+- Guardrails in trading skills live in the skill runtime, not on the server.
 - No third-party skill submissions
 - No paid features or tokens
-- Verification = we reviewed the source. Does not mean we control local runtime.
+- Verification means we reviewed the source. It does not mean we control the local runtime.

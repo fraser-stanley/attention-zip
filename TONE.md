@@ -14,7 +14,7 @@ Public copy should make three things clear:
 
 - The site helps agents use Zora. It is not Zora itself.
 - The site is market-first. Lead with trends, scans, briefings, portfolios, and momentum trading.
-- Trust claims must stay literal. Say when a wallet is needed. Say when trading is opt-in. Do not imply hosted execution or custody.
+- Trust and wallet language must be precise. Use the smallest claim that is true on that surface. Prefer named skills or exact wallet requirements over generic boilerplate.
 
 ## People, not assets
 
@@ -26,6 +26,8 @@ Creators are people building economies around their work. Supporters invest in p
 - **Active voice.** "Each skill shows the install command" not "the install command is exposed by each skill."
 - **Plain words.** "Points to" not "resolves to." "Shows" not "exposes." "Needed" not "required."
 - **Concrete facts.** "Refreshed every 30 seconds" not "real-time."
+- **Concrete names.** If wallet guidance differs by skill, name the skills.
+- **One instruction is enough.** Repeating the same helper line on every card reads synthetic.
 
 ## What to avoid
 
@@ -53,6 +55,11 @@ Don't artificially group items into three. "Skills, live data, and leaderboards"
 - "env vars" -> "wallet" or "settings", unless the page is explicit technical documentation
 - "cron loop" -> "schedule"
 - "clawhub.json" or "manifest" -> do not surface in marketing copy
+
+### Invented abstractions
+- "market job" -> say the task or name the skill
+- "read-only coverage" -> say what the skill does
+- "full toolkit" -> prefer a plainer phrase like "full set" when possible
 
 ### Em dashes
 Replace with commas or periods. Em dashes create a breathless tone that doesn't match our voice.
@@ -87,6 +94,7 @@ From the Q2 2025 messaging framework:
 ## Site-specific defaults
 
 - Homepage and skills page copy should explain the product in one sentence before describing setup.
-- The first examples should be market jobs: scan trends, build a briefing, check a portfolio, trade momentum.
+- The first examples should be concrete tasks: scan trends, build a briefing, check a portfolio, follow a wallet, trade momentum.
 - Creator language belongs on Creator Pulse and featured-creator views, not as the site-wide headline.
 - Prefer "source" or "skill notes" over file names like `SKILL.md` in public-facing UI copy.
+- If the same helper sentence appears more than twice on a page, there should be a clear reason.

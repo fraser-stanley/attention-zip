@@ -14,25 +14,25 @@ const howToJsonLd = {
   "@context": "https://schema.org",
   "@type": "HowTo",
   name: "How to install an agent skill for Zora",
-  description: "Install a Zora market skill in your agent runtime.",
+  description: "Install a Zora market skill with your agent.",
   step: [
     {
       "@type": "HowToStep",
       position: 1,
-      name: "Install",
-      text: "Copy the command for your agent runtime.",
+      name: "Paste",
+      text: "Paste the command to your agent.",
     },
     {
       "@type": "HowToStep",
       position: 2,
-      name: "Set up",
+      name: "Read",
       text: "Read the skill notes. Add a wallet only if the skill needs one.",
     },
     {
       "@type": "HowToStep",
       position: 3,
       name: "Run",
-      text: "Run it once. Put it on a schedule later if you want.",
+      text: "Run the skill. Put it on a schedule later if you want.",
     },
   ],
 };

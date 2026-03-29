@@ -17,11 +17,18 @@ export function HeroSection() {
           </h1>
           {/* On mobile, orb slot is order-2 (injected below) */}
           <div className="order-3 space-y-5 lg:order-none">
-            <CopyableCodeBlock
-              command={getInstallAllCommands(getSiteUrl()).prompt}
-              prefix=">"
-              className="max-w-lg"
-            />
+            <div className="max-w-lg space-y-3">
+              <p className="type-caption font-mono text-muted-foreground">
+                Paste this to your agent.
+              </p>
+              <CopyableCodeBlock
+                command={getInstallAllCommands(getSiteUrl()).prompt}
+                prefix=">"
+              />
+              <p className="type-body-sm text-muted-foreground">
+                Installs all six skills. Start here if you want the full set.
+              </p>
+            </div>
             <div className="flex items-center gap-3">
               <AnimatedArrowLink
                 href="/skills"

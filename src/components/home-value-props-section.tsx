@@ -1,25 +1,16 @@
 const valueProps = [
   {
-    title: "Read the skill before it runs",
-    description: (
-      <>
-        Every install path points to a readable
-        <code className="mx-1 bg-muted px-1.5 py-0.5 text-[0.95em]">
-          SKILL.md
-        </code>
-        you can inspect first.
-      </>
-    ),
+    title: "Read the skill first",
+    description: "Every skill links to its source and notes before it runs.",
   },
   {
-    title: "Start without keys",
+    title: "No wallet needed to start",
     description:
-      "Trends, creators, briefings, and portfolio reads stay in scout mode until you choose otherwise.",
+      "Trend Scout, Creator Pulse, and Briefing Bot work without one. Add a wallet when you want Portfolio Scout, Copy Trader, or Momentum Trader.",
   },
   {
-    title: "Keep risk explicit",
-    description:
-      "Momentum Trader is labeled separately and belongs in a dedicated trader wallet with bounded funds.",
+    title: "Use a trading wallet",
+    description: "Use a dedicated wallet for trading skills.",
   },
 ] as const;
 

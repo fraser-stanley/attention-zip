@@ -30,7 +30,7 @@ const faqJsonLd = {
       name: "What is Attention Index?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Attention Index is a skill gallery and live market board for the Zora attention market.",
+        text: "Attention Index is a skill gallery and live market board that helps agents use the Zora attention market.",
       },
     },
     {
@@ -46,7 +46,7 @@ const faqJsonLd = {
       name: "What are agent skills?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Skills your agent can install to scan, track, or trade the Zora attention market. Each one includes source and readable instructions.",
+        text: "Skills your agent can install to scan, track, or trade the Zora attention market. Each one links to source and skill notes.",
       },
     },
     {
@@ -54,7 +54,7 @@ const faqJsonLd = {
       name: "How do I install a skill?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Copy the install command, run it in your agent runtime, then follow the skill notes.",
+        text: "Paste the install command to your agent, then read the skill notes.",
       },
     },
     {
@@ -62,7 +62,7 @@ const faqJsonLd = {
       name: "Do I need a wallet?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Trend Scout, Creator Pulse, and Briefing Bot do not need a wallet. Portfolio Scout and Momentum Trader do. Use a dedicated wallet for trading skills.",
+        text: "Trend Scout, Creator Pulse, and Briefing Bot work without one. Portfolio Scout, Copy Trader, and Momentum Trader need a wallet. Use a dedicated wallet for trading.",
       },
     },
     {
@@ -70,7 +70,7 @@ const faqJsonLd = {
       name: "Is this open source?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Yes. Every skill links to source and readable instructions. This site does not hold keys or run trades for you.",
+        text: "The skills are open source. Each one links to source and skill notes.",
       },
     },
   ],
@@ -116,7 +116,7 @@ export default function Home() {
             <div>
               <h2 className="type-label text-muted-foreground">Skills</h2>
               <p className="text-xs text-muted-foreground mt-1">
-                Pick a skill and install it.
+                Pick one and tell your agent to install it.
               </p>
             </div>
             <Link

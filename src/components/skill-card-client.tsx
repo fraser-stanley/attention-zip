@@ -418,11 +418,19 @@ export function SkillsInstallList({
         <h1 className="type-display max-w-5xl pt-[0.06em] leading-[0.94]">
           Install Zora market skills.
         </h1>
-        <RuntimeInstallCard
-          runtime={runtime}
-          onChange={setRuntime}
-          command={getInstallAllCommands(getSiteUrl())[runtime]}
-        />
+        <div className="max-w-2xl space-y-3">
+          <p className="type-caption font-mono text-muted-foreground">
+            Paste this to your agent.
+          </p>
+          <RuntimeInstallCard
+            runtime={runtime}
+            onChange={setRuntime}
+            command={getInstallAllCommands(getSiteUrl())[runtime]}
+          />
+          <p className="type-body-sm text-muted-foreground">
+            Installs all six skills. Or pick one below.
+          </p>
+        </div>
       </section>
 
       {/* Injected content (e.g. 3-step grid) */}

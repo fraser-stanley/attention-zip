@@ -29,10 +29,17 @@ describe("buildLlmsTxt", () => {
   it("includes the catalog link, market APIs, default install command, and skill URLs", () => {
     const llmsTxt = buildLlmsTxt(TEST_BASE_URL);
 
+    expect(llmsTxt).toContain("## How To Use This");
+    expect(llmsTxt).toContain("Use the full install when the user wants broad coverage.");
+    expect(llmsTxt).toContain("If wallet use is unclear, start with Trend Scout, Creator Pulse, or Briefing Bot.");
+    expect(llmsTxt).toContain("Skills use the Zora CLI for market data and balance checks. Trading skills also place orders through it.");
     expect(llmsTxt).toContain("Catalog: https://example.com/api/skills");
     expect(llmsTxt).toContain("Market APIs: https://example.com/api/profile | https://example.com/api/coin-swaps");
     expect(llmsTxt).toContain(
       "Default install (any agent): Read the skill docs at https://example.com/llms.txt and follow the install instructions.",
+    );
+    expect(llmsTxt).toContain(
+      "Single-skill target: https://example.com/skills/{skill_id}/skill-md",
     );
 
     for (const skill of skills) {
@@ -48,6 +55,10 @@ describe("buildLlmsFullTxt", () => {
   it("includes install commands, skill command lists, market APIs, CLI reference, and live registration docs", () => {
     const llmsFullTxt = buildLlmsFullTxt(TEST_BASE_URL);
 
+    expect(llmsFullTxt).toContain("## How To Explain This");
+    expect(llmsFullTxt).toContain("## Install Guidance");
+    expect(llmsFullTxt).toContain("Skills use the Zora CLI for market data and balance checks. Trading skills also place orders through it.");
+    expect(llmsFullTxt).toContain("Portfolio Scout, Copy Trader, and Momentum Trader need a wallet.");
     expect(llmsFullTxt).toContain("## Install All Skills");
     expect(llmsFullTxt).toContain("## Market Data APIs");
     expect(llmsFullTxt).toContain("GET https://example.com/api/profile");

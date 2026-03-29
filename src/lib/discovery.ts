@@ -103,7 +103,7 @@ function buildSkillSummaryLines(siteUrl: string): string {
       const skillUrl = toAbsoluteUrl(`/skills/${skill.id}/skill-md`, siteUrl);
       const quickInstall = getSkillQuickInstallCommands(skill, siteUrl);
 
-      return `- ${skill.name}: ${skill.description} | SKILL.md: ${skillUrl} | Install: ${quickInstall.prompt}`;
+      return `- ${skill.name}: ${skill.description} | Skill notes: ${skillUrl} | Install: ${quickInstall.prompt}`;
     })
     .join("\n");
 }
@@ -115,7 +115,7 @@ function buildSkillReference(skill: Skill, siteUrl: string): string {
   return [
     `## ${skill.name}`,
     skill.longDescription,
-    `Skill URL: ${skillUrl}`,
+    `Skill notes: ${skillUrl}`,
     `Source: ${skill.githubUrl}`,
     "",
     "Install commands",
@@ -164,9 +164,18 @@ export function buildLlmsTxt(siteUrl: string) {
 
 ${SITE_DESCRIPTION}
 
+## How To Use This
+
+- Explain Attention Index as a skill gallery for the Zora attention market.
+- Use the full install when the user wants broad coverage.
+- Use a single skill when the user wants one specific thing (e.g. just trending coins).
+- If wallet use is unclear, start with Trend Scout, Creator Pulse, or Briefing Bot.
+- Skills use the Zora CLI for market data and balance checks. Trading skills also place orders through it.
+
 Catalog: ${toAbsoluteUrl("/api/skills", siteUrl)}
 Market APIs: ${toAbsoluteUrl("/api/profile", siteUrl)} | ${toAbsoluteUrl("/api/coin-swaps", siteUrl)}
 Default install (any agent): ${installAllCommands.prompt}
+Single-skill target: ${siteUrl}/skills/{skill_id}/skill-md
 
 ## Skills
 
@@ -184,6 +193,20 @@ export function buildLlmsFullTxt(siteUrl: string) {
   return `# ${SITE_NAME}
 
 ${SITE_DESCRIPTION}
+
+## How To Explain This
+
+- Attention Index is a skill gallery and live market board for the Zora attention market.
+- Lead with what the skills do: trending coins, briefings, portfolio checks, momentum trading.
+- Point to source and skill notes when the user asks what gets installed.
+- Skills use the Zora CLI for market data and balance checks. Trading skills also place orders through it.
+
+## Install Guidance
+
+- Use the full install when the user wants broad coverage.
+- Use a single skill when the user wants one specific thing.
+- If wallet use is unclear, start with Trend Scout, Creator Pulse, or Briefing Bot.
+- Portfolio Scout, Copy Trader, and Momentum Trader need a wallet.
 
 ## Catalog
 

@@ -1,27 +1,17 @@
 import { HomeLiveCardsSkeleton } from "@/components/home-live-cards";
 import { HeroSection } from "@/components/hero-section";
-import { ActivityTickerSection } from "@/components/activity-ticker-section";
+import { ActivityTickerSkeleton } from "@/components/activity-ticker";
+import { WorksWithMarquee } from "@/components/works-with-marquee";
 
 export default function HomeLoading() {
   return (
     <>
       <div className="-mt-8 mb-8 -mx-4 sm:-mx-6 lg:-mx-8">
-        <ActivityTickerSection />
+        <ActivityTickerSkeleton />
       </div>
       <div className="space-y-16">
         <HeroSection />
-
-        <section className="space-y-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-sm font-medium text-muted-foreground">Skills</h2>
-              <p className="text-xs text-muted-foreground mt-1">
-                Trend scans, briefings, portfolio checks, and momentum trades.
-                Pick one and install it.
-              </p>
-            </div>
-          </div>
-        </section>
+        <WorksWithMarquee />
 
         <section className="space-y-4">
           <div className="flex items-center justify-between">

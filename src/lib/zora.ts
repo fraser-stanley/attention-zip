@@ -142,6 +142,20 @@ export interface CoinSwapsApiResponse {
   swaps: CoinSwapActivity[];
 }
 
+export interface ActivityFeedItem {
+  id: string;
+  trader: string;
+  action: "bought" | "sold";
+  amount: string;
+  coin: string;
+  timestamp: string;
+}
+
+export interface ActivityApiResponse {
+  items: ActivityFeedItem[];
+  count: number;
+}
+
 interface ExploreEdge {
   node: CoinNode;
 }
@@ -490,6 +504,124 @@ export async function fetchCoinSwaps(
   }
 
   return extractCoinSwaps(address, response);
+}
+
+function parseFiniteNumber(value: string | number | undefined): number | null {
+  if (typeof value === "number") {
+    return Number.isFinite(value) ? value : null;
+  }
+
+  if (typeof value === "string") {
+    const parsed = Number.parseFloat(value);
+    return Number.isFinite(parsed) ? parsed : null;
+  }
+
+  return null;
+}
+
+function getSwapUsdValue(swap: CoinSwapActivity): number | null {
+  const quoteAmount = parseFiniteNumber(swap.quoteAmount);
+  const quotePriceUsdc = parseFiniteNumber(swap.quotePriceUsdc);
+
+  if (quoteAmount !== null && quotePriceUsdc !== null) {
+    return quoteAmount * quotePriceUsdc;
+  }
+
+  if (quoteAmount !== null) {
+    return quoteAmount;
+  }
+
+  return quotePriceUsdc;
+}
+
+function formatActivityTrader(swap: CoinSwapActivity): string {
+  const handle = swap.senderProfileHandle?.trim();
+  if (handle) {
+    return handle.startsWith("@") ? handle : `@${handle}`;
+  }
+
+  if (swap.senderAddress) {
+    return truncateAddress(swap.senderAddress);
+  }
+
+  return "Unknown trader";
+}
+
+function toActivityAction(
+  activityType: CoinSwapActivity["activityType"],
+): "bought" | "sold" {
+  return activityType === "SELL" ? "sold" : "bought";
+}
+
+function toTimestampValue(timestamp: string | undefined): number {
+  if (!timestamp) return 0;
+
+  const parsed = Date.parse(timestamp);
+  return Number.isFinite(parsed) ? parsed : 0;
+}
+
+function createActivityFeedItem(
+  coin: CoinNode,
+  swap: CoinSwapActivity | undefined,
+): ActivityFeedItem | null {
+  if (!swap?.blockTimestamp) {
+    return null;
+  }
+
+  const notionalUsd = getSwapUsdValue(swap);
+  const coinName = coin.name?.trim() || coin.symbol?.trim() || "Unknown coin";
+
+  return {
+    id:
+      swap.id ??
+      swap.transactionHash ??
+      `${coin.address ?? coinName}-${swap.blockTimestamp}`,
+    trader: formatActivityTrader(swap),
+    action: toActivityAction(swap.activityType),
+    amount: formatCompactCurrency(notionalUsd ?? 0),
+    coin: coinName,
+    timestamp: swap.blockTimestamp,
+  };
+}
+
+export async function fetchActivityFeed(
+  count: number = 6,
+): Promise<ActivityFeedItem[]> {
+  const requestedCount = Math.max(1, count);
+  const recentCoins = await fetchCoins("last-traded", requestedCount);
+  const seenAddresses = new Set<string>();
+  const uniqueCoins = recentCoins.filter((coin) => {
+    const address = normalizeWalletAddress(coin.address);
+    if (!address || seenAddresses.has(address)) {
+      return false;
+    }
+
+    seenAddresses.add(address);
+    return true;
+  });
+
+  const recentSwaps = await Promise.allSettled(
+    uniqueCoins.map(async (coin) => {
+      const address = normalizeWalletAddress(coin.address);
+      if (!address) {
+        return null;
+      }
+
+      const response = await fetchCoinSwaps(address, 1);
+      return createActivityFeedItem(coin, response.swaps[0]);
+    }),
+  );
+
+  return recentSwaps
+    .flatMap((result) => {
+      if (result.status !== "fulfilled" || !result.value) {
+        return [];
+      }
+
+      return [result.value];
+    })
+    .sort((left, right) => toTimestampValue(right.timestamp) - toTimestampValue(left.timestamp))
+    .slice(0, requestedCount);
 }
 
 export function formatCompactCurrency(value: string | number | undefined): string {

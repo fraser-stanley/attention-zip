@@ -1,6 +1,8 @@
+import { getActivityFeedData } from "@/lib/data";
 import { ActivityTicker } from "@/components/activity-ticker";
-import { MOCK_TRADE_ACTIVITY } from "@/lib/activity-mock-data";
 
-export function ActivityTickerSection() {
-  return <ActivityTicker initialItems={MOCK_TRADE_ACTIVITY} />;
+export async function ActivityTickerSection() {
+  const initialItems = await getActivityFeedData(6);
+
+  return <ActivityTicker initialItems={initialItems} />;
 }

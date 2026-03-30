@@ -1,8 +1,10 @@
 import { unstable_cache } from "next/cache";
 import { MOCK_COINS, MOCK_TRADERS } from "@/lib/mock-data";
 import {
+  fetchActivityFeed,
   fetchCoins,
   fetchLeaderboard,
+  type ActivityFeedItem,
   type CoinNode,
   type SortOption,
   type TraderNode,
@@ -21,6 +23,7 @@ const EXPLORE_REVALIDATE_SECONDS: Record<SortOption, number> = {
 };
 
 const LEADERBOARD_REVALIDATE_SECONDS = 300;
+const ACTIVITY_REVALIDATE_SECONDS = 30;
 const ALLOW_MOCK_MARKET_DATA =
   process.env.ALLOW_MOCK_MARKET_DATA === "true" ||
   process.env.NODE_ENV !== "production";
@@ -86,6 +89,31 @@ function getLeaderboardFetcher(count: number) {
   return fetcher;
 }
 
+const cachedActivityFeedFetchers = new Map<
+  number,
+  () => Promise<ActivityFeedItem[]>
+>();
+
+function getActivityFeedFetcher(count: number) {
+  let fetcher = cachedActivityFeedFetchers.get(count);
+  if (!fetcher) {
+    fetcher = unstable_cache(
+      async () => {
+        try {
+          return await fetchActivityFeed(count);
+        } catch {
+          return [];
+        }
+      },
+      ["activity-feed", String(count)],
+      { revalidate: ACTIVITY_REVALIDATE_SECONDS }
+    );
+    cachedActivityFeedFetchers.set(count, fetcher);
+  }
+
+  return fetcher;
+}
+
 export async function getExploreData(
   sort: SortOption,
   count: number = 10
@@ -97,4 +125,10 @@ export async function getLeaderboardData(
   count: number = 20
 ): Promise<TraderNode[]> {
   return getLeaderboardFetcher(count)();
+}
+
+export async function getActivityFeedData(
+  count: number = 6
+): Promise<ActivityFeedItem[]> {
+  return getActivityFeedFetcher(count)();
 }

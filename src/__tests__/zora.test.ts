@@ -206,3 +206,132 @@ describe("fetchCoinSwaps", () => {
     });
   });
 });
+
+describe("fetchActivityFeed", () => {
+  it("merges last-traded coins with their latest swaps and sorts them by time", async () => {
+    const sdk = mockCoinsSdk({
+      getCoinsLastTraded: vi.fn(async () => ({
+        data: {
+          exploreList: {
+            edges: [
+              {
+                node: {
+                  address: "0x4444444444444444444444444444444444444444",
+                  name: "Enjoy",
+                },
+              },
+              {
+                node: {
+                  address: "0x5555555555555555555555555555555555555555",
+                  name: "Higher",
+                },
+              },
+            ],
+          },
+        },
+      })),
+      getCoinSwaps: vi.fn(async ({ address }: { address: string }) => {
+        if (address === "0x4444444444444444444444444444444444444444") {
+          return {
+            data: {
+              zora20Token: {
+                swapActivities: {
+                  count: 1,
+                  pageInfo: {
+                    hasNextPage: false,
+                  },
+                  edges: [
+                    {
+                      node: {
+                        id: "swap_1",
+                        senderAddress:
+                          "0x2222222222222222222222222222222222222222",
+                        recipientAddress:
+                          "0x3333333333333333333333333333333333333333",
+                        transactionHash: "0xswap1",
+                        blockTimestamp: "2026-03-27T12:05:00.000Z",
+                        activityType: "SELL",
+                        coinAmount: "100",
+                        senderProfile: {
+                          handle: "jacob",
+                        },
+                        currencyAmountWithPrice: {
+                          priceUsdc: "2000",
+                          currencyAmount: {
+                            currencyAddress:
+                              "0x6666666666666666666666666666666666666666",
+                            amountDecimal: 0.1,
+                          },
+                        },
+                      },
+                    },
+                  ],
+                },
+              },
+            },
+          };
+        }
+
+        return {
+          data: {
+            zora20Token: {
+              swapActivities: {
+                count: 1,
+                pageInfo: {
+                  hasNextPage: false,
+                },
+                edges: [
+                  {
+                    node: {
+                      id: "swap_2",
+                      senderAddress:
+                        "0x1111111111111111111111111111111111111111",
+                      recipientAddress:
+                        "0x7777777777777777777777777777777777777777",
+                      transactionHash: "0xswap2",
+                      blockTimestamp: "2026-03-27T12:10:00.000Z",
+                      activityType: "BUY",
+                      coinAmount: "250",
+                      currencyAmountWithPrice: {
+                        priceUsdc: "1",
+                        currencyAmount: {
+                          currencyAddress:
+                            "0x8888888888888888888888888888888888888888",
+                          amountDecimal: 50,
+                        },
+                      },
+                    },
+                  },
+                ],
+              },
+            },
+          },
+        };
+      }),
+    });
+
+    const { fetchActivityFeed } = await import("@/lib/zora");
+    const response = await fetchActivityFeed(2);
+
+    expect(sdk.getCoinsLastTraded).toHaveBeenCalledWith({ count: 2 });
+    expect(sdk.getCoinSwaps).toHaveBeenCalledTimes(2);
+    expect(response).toEqual([
+      {
+        id: "swap_2",
+        trader: "0x1111...1111",
+        action: "bought",
+        amount: "$50",
+        coin: "Higher",
+        timestamp: "2026-03-27T12:10:00.000Z",
+      },
+      {
+        id: "swap_1",
+        trader: "@jacob",
+        action: "sold",
+        amount: "$200",
+        coin: "Enjoy",
+        timestamp: "2026-03-27T12:05:00.000Z",
+      },
+    ]);
+  });
+});

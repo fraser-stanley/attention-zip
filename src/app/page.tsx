@@ -1,14 +1,14 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import Link from "next/link";
+import {
+  ActivityTickerSkeleton,
+} from "@/components/activity-ticker";
 import {
   HomeLiveCards,
   HomeLiveCardsSkeleton,
 } from "@/components/home-live-cards";
-import { SkillCard } from "@/components/skill-card";
 import { HeroSection } from "@/components/hero-section";
 import { getExploreData, getLeaderboardData } from "@/lib/data";
-import { skills } from "@/lib/skills";
 import { WorksWithMarquee } from "@/components/works-with-marquee";
 import { ActivityTickerSection } from "@/components/activity-ticker-section";
 
@@ -102,40 +102,15 @@ export default function Home() {
       {/* Agent activity */}
       <section aria-label="Agent activity" className="-mt-20 pt-12 mb-8">
         <div className="overflow-x-clip overflow-y-visible select-none">
-          <ActivityTickerSection />
+          <Suspense fallback={<ActivityTickerSkeleton />}>
+            <ActivityTickerSection />
+          </Suspense>
         </div>
       </section>
 
       <div className="space-y-16">
         {/* Hero */}
         <HeroSection />
-
-        {/* Skills preview */}
-        <section className="space-y-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="type-label text-muted-foreground">Skills</h2>
-              <p className="text-xs text-muted-foreground mt-1">
-                Pick one and tell your agent to install it.
-              </p>
-            </div>
-            <Link
-              href="/skills"
-              className="type-label text-foreground hover:text-muted-foreground transition-colors"
-            >
-              View all
-            </Link>
-          </div>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {skills.slice(0, 4).map((skill) => (
-              <SkillCard
-                key={skill.id}
-                skill={skill}
-                href={`/skills#${skill.id}`}
-              />
-            ))}
-          </div>
-        </section>
 
         {/* Works with */}
         <WorksWithMarquee />

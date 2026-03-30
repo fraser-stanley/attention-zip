@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-03-30 (Button system cleanup + truthful wallet/skills UX)
+
+### Changed
+- **Buttons now share one visual system** — the shared button primitive now owns sans typography, focus-visible treatment, and the text-only `quiet` variant used by nav controls and similar lightweight actions.
+- **Fake install state removed** — the skills page and portfolio skill cards no longer show local `Install`, `Installed`, or `Remove` UI. The skills page is copy-and-read only, and portfolio cards link through to `/skills#<id>`.
+- **`/portfolio` now matches nav wallet UX** — visiting `/portfolio` without a stored wallet opens the existing address-entry modal instead of rendering a separate inline empty state.
+- **Footer now pins to the viewport floor** — the app shell uses a full-height flex column so the footer stays at the bottom on short pages.
+- **Docs synced with the live product** — internal docs now describe the address-only wallet flow, the removal of local installed-skill state, the current portfolio route behavior, and the `Menu` overlay wording.
+
 ## 2026-03-29 (Agent-first copy cleanup + docs sync)
 
 ### Changed

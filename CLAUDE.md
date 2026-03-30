@@ -117,10 +117,10 @@ src/
 │   ├── leaderboard-table.tsx       # Client leaderboard refresh wrapper
 │   ├── skill-card-client.tsx       # Shared runtime picker + command blocks + typewriter example output
 │   ├── coin-table.tsx              # Reusable coin data table
-│   ├── portfolio-view.tsx          # Live portfolio balances, value stats, and installed skills
-│   ├── portfolio-page-client.tsx   # Client wallet-aware portfolio entry state
+│   ├── portfolio-view.tsx          # Live portfolio balances, value stats, and related skills
+│   ├── portfolio-page-client.tsx   # Client wallet-aware portfolio gate for /portfolio
 │   ├── claim-form.tsx              # Dedicated agent-claim wallet form
-│   ├── skill-card.tsx               # Unified skill card with install/remove states and peer-hover link
+│   ├── skill-card.tsx              # Linked skill teaser card with peer-hover link
 │   ├── wallet-menu.tsx             # Brutalist wallet dropdown (QR code, balance, copy address, disconnect)
 │   ├── wallet-connect-modal.tsx     # Address entry modal for local Zora CLI wallets
 │   ├── address-connect-form.tsx    # Reusable address input form for modal + portfolio page
@@ -140,10 +140,9 @@ src/
     ├── zora.ts                     # SDK wrapper: all query functions + formatting helpers
     ├── skills.ts                   # Static skill definitions (6 skills)
     ├── staging-auth.ts             # Shared staging auth token + redirect sanitization helpers
-    ├── providers.tsx               # React Query provider (30s staleTime)
+    ├── providers.tsx               # React Query + wallet + toast providers
     ├── wallet-address.ts           # Shared 0x address validation helpers
-    ├── wallet-context.tsx          # Address store (localStorage, useSyncExternalStore, skill seeding)
-    ├── installed-skills-context.tsx # Installed skills store (localStorage, seed/clear on connect/disconnect)
+    ├── wallet-context.tsx          # Address store (localStorage, useSyncExternalStore)
     ├── utils.ts                    # cn() helper for className merging
     ├── pnl-utils.ts                # Shared PnL formatting (pnlColor, formatPnl, formatPct)
     ├── portfolio-mock-data.ts      # Mock portfolio data (positions, trades, sparkline) — used by agent ticker, not portfolio page
@@ -171,7 +170,7 @@ src/
 - **Skills are managed runtimes behind the scenes**. Each public skill has a real `scripts/run.mjs`, `clawhub.json`, and source-backed manual install path. Those implementation details belong in internal docs, not primary marketing copy.
 - **Install commands are shared** from `src/lib/skills.ts` (`getSkillRuntimeCommands()`, `getSkillQuickInstallCommands()`, `getInstallAllCommands()`) so the UI, `/api/skills`, and discovery docs stay in sync. `/api/skills` exposes both the full `install` map and the prompt-only `quickInstall` map. The visible default is the prompt-first `Any Agent` helper, with runtime-specific tabs for Claude Code, OpenClaw, Amp, Codex CLI, OpenCode, and Cursor. The generated command map still includes a manual `git clone` fallback and a `curl` command for direct SKILL.md fetching. Curl is in `RuntimeCommands` but not in the `Runtime` type or UI tabs, it's a fetch method, not an agent runtime.
 - **SKILL.md is served from the domain** at `/skills/[id]/skill-md` (`src/app/skills/[id]/skill-md/route.ts`). This gives agent commands clean URLs that work in any environment.
-- **The skills page has a unified install card** — `RuntimeInstallCard` in `src/components/skill-card-client.tsx` combines 7 runtime tabs (Any Agent, Claude Code, OpenClaw, Amp, Codex CLI, OpenCode, Cursor) with a copyable code snippet in one bordered card. The prompt-first `Any Agent` tab is the default runtime. Per-skill rows use standalone `CopyableCodeBlock` components.
+- **The skills page has a unified install card** — `RuntimeInstallCard` in `src/components/skill-card-client.tsx` combines 7 runtime tabs (Any Agent, Claude Code, OpenClaw, Amp, Codex CLI, OpenCode, Cursor) with a copyable code snippet in one bordered card. The prompt-first `Any Agent` tab is the default runtime. Per-skill rows use standalone `CopyableCodeBlock` components and no longer simulate local install/remove state.
 - **The skills page stays intentionally flat** — one shared runtime picker updates every command block. Supporting details are hidden behind a single `More info` disclosure that reveals commands and sample output together. No nested accordions.
 - **Hotfix deploys should start from `origin/main`** — feature workspaces can lag live production. If you need to ship directly, create a clean worktree from `origin/main` first, then port the change.
 - **Tabs use a single unified style** — `TabsList` always renders with `bg-muted p-1` (gray container) and selected tabs get black fill + white text. No variants — one style for all tab UIs (skills picker, homepage terminal, portfolio, dashboard). The preferred pattern is a wrapper `<div className="border-b border-border bg-muted p-1">` around `<TabsList className="grid ... bg-transparent p-0">`. **Gotcha:** The base `TabsList` component has `justify-center` baked in. `cn()` / tailwind-merge will NOT remove it when you pass `flex w-full` — you must explicitly add `justify-start` to left-align tabs, or use `grid` layout which avoids the issue.
@@ -184,10 +183,10 @@ src/
 - **Shared staging deploys target `zoraskills-staging`** — `https://zoraskills-staging.vercel.app/` is the production alias for the Vercel project `zoraskills-staging` in the `frasers-projects-053d31c6` scope. Relink the workspace before deploying if `.vercel/project.json` points somewhere else.
 - **Leaderboard uses the current SDK weekly shape** — `getTraderLeaderboard()` currently resolves to `data.exploreTraderLeaderboard`, with `weekVolumeUsd`, `weekTradesCount`, and `traderProfile.handle`. `src/lib/zora.ts` normalizes this into `TraderNode`.
 - **Portfolio page uses live address-based balances** — `src/app/api/portfolio/route.ts` proxies the SDK `getProfileBalances()` query, `src/hooks/use-portfolio-data.ts` hydrates React Query clients, and `src/components/portfolio-view.tsx` renders current positions, total value, and 24h change from public on-chain data.
-- **Wallet connect is address-only** — the modal at `src/components/wallet-connect-modal.tsx` accepts a wallet address from `zora wallet`, stores it locally, and seeds default skills. The `/claim/[code]` flow uses the same address-only model through `src/components/claim-form.tsx`. No signatures, nonces, or browser-side verification flow are involved because portfolio data is public and the agent ownership link is established server-side.
-- **Portfolio is always reachable** — the nav always shows the Portfolio link. `/portfolio` uses the locally stored wallet address when present, and `/portfolio/[address]` renders any valid address directly for shareable lookups.
-- **Wallet menu uses the same overlay pattern as the Index** — `fixed inset-0 z-[100]`, split backdrop/content transitions (200ms blur, 100ms content snap), rendered outside the `<header>` to avoid `inert` conflicts. Brutalist design: `gap-px` grid cells, QR code spanning rows, condensed bold `font-display` for balance.
-- **Skill cards use `peer/link` for hover isolation** — `SkillCard` places an absolute `<Link>` as `peer/link` at z-0 and buttons at z-10. The card inverts on `peer-hover/link:` but button hover/click does not trigger the card's hover state.
+- **Wallet connect is address-only** — the modal at `src/components/wallet-connect-modal.tsx` accepts a wallet address from `zora wallet` and stores it locally. The `/claim/[code]` flow uses the same address-only model through `src/components/claim-form.tsx`. No signatures, nonces, or browser-side verification flow are involved because portfolio data is public and the agent ownership link is established server-side.
+- **Portfolio is always reachable** — the nav always shows the Portfolio link. `/portfolio` uses the locally stored wallet address when present, opens the same wallet modal when no local address exists, and `/portfolio/[address]` renders any valid address directly for shareable lookups.
+- **Wallet menu uses the same overlay pattern as the Menu** — `fixed inset-0 z-[100]`, split backdrop/content transitions (200ms blur, 100ms content snap), rendered outside the `<header>` to avoid `inert` conflicts. Brutalist design: `gap-px` grid cells, QR code spanning rows, condensed bold `font-display` for balance.
+- **Skill cards use `peer/link` for hover isolation** — `SkillCard` places an absolute `<Link>` as `peer/link` at z-0 and the visible CTA copy at z-10. The card inverts on `peer-hover/link:` without nested install/remove controls.
 - **PnL utilities are shared** — `src/lib/pnl-utils.ts` exports `pnlColor()`, `formatPnl()`, `formatPct()`. Gains = `#3FFF00`, losses = `#FF00F0`.
 - **Market colors stay full-strength** — use `#3FFF00`, `#FF00F0`, or no market color at all. Only neutral grays should be faded with opacity.
 - **Hover media overlay** — Inspired by hausotto.com. When hovering a coin row in `CoinTable` or `HomeLiveCards`, the token's `mediaContent.previewImage.medium` is shown as a large image centered on the viewport (`fixed inset-0 z-50`). Uses `pointer-events: none` so hover detection stays on the table rows. Disabled on touch devices via `(pointer: fine)` media query check in `useHasPointer()` hook (`useSyncExternalStore`-based, SSR-safe). The overlay fades in after the image loads (`loadedUrl === imageUrl` check prevents stale flashes). Mock data in `src/lib/mock-data.ts` includes picsum.photos URLs for dev testing.
@@ -256,7 +255,7 @@ Import `buttonVariants` from `@/components/ui/button-variants` for server-safe u
 
 ## Nav overlay transition pattern
 
-The Index menu overlay uses split transitions for a snappy-but-smooth feel:
+The Menu overlay uses split transitions for a snappy-but-smooth feel:
 
 - **Content** (section grid + logo): `transition-[transform,opacity] duration-100 ease-out` — snaps in/out fast (100ms). High-frequency interaction = minimal animation per Emil's frequency principle.
 - **Backdrop** (blur + tint): `transition-[opacity,backdrop-filter] duration-200 ease-out` — eases blur smoothly at 200ms. Blur filters need more time to avoid choppy rendering.

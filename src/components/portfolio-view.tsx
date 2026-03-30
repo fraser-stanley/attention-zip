@@ -292,11 +292,11 @@ function PositionsContent({
                 </div>
 
                 {/* Coin */}
-                <div className="space-y-1">
-                  <div className="flex items-center gap-2">
+                <div className="space-y-1 min-w-0">
+                  <div className="flex items-center gap-2 min-w-0">
                     <span
                       className={cn(
-                        "type-body-sm font-medium",
+                        "type-body-sm font-medium truncate min-w-0",
                         isSelected ? "text-background" : "text-foreground",
                       )}
                     >
@@ -305,7 +305,7 @@ function PositionsContent({
                     {position.symbol ? (
                       <span
                         className={cn(
-                          "type-caption font-mono",
+                          "type-caption font-mono truncate max-w-[120px]",
                           isSelected ? "text-background/60" : "text-muted-foreground",
                         )}
                       >

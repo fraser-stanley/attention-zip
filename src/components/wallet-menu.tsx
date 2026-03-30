@@ -166,7 +166,7 @@ export function WalletMenu({ open, onClose }: WalletMenuProps) {
 
               <button
                 onClick={handleDisconnect}
-                className="col-start-2 flex w-full items-center justify-center bg-black p-4 text-sm font-medium text-white/50 transition-colors hover:bg-white hover:text-black hover:ring-1 hover:ring-black"
+                className="col-start-2 flex w-full items-center justify-center bg-white p-4 text-sm font-medium text-black ring-1 ring-inset ring-black transition-colors hover:bg-black hover:text-white hover:ring-0"
               >
                 Disconnect
               </button>

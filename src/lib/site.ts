@@ -1,6 +1,6 @@
 export const SITE_NAME = "attention.zip";
 export const SITE_DESCRIPTION =
-  "Install agent skills for the Zora attention market. Scan trends, build briefings, check portfolios, and trade momentum.";
+  "Install agent skills for the Zora attention market.";
 export const API_VERSION = "0.1.0";
 
 const DEFAULT_SITE_URL = "http://localhost:3000";

@@ -23,7 +23,7 @@ export function AddressConnectForm({
   className,
   description,
   onSuccess,
-  submitLabel = "Connect wallet",
+  submitLabel = "View portfolio",
   title,
   variant = "light",
 }: AddressConnectFormProps) {
@@ -59,7 +59,7 @@ export function AddressConnectForm({
     setAddress(nextAddress);
     setValue("");
     setError(null);
-    toast(`Connected ${truncateAddress(nextAddress)}`);
+    toast(`Loaded ${truncateAddress(nextAddress)}`);
     onSuccess?.();
   }
 
@@ -130,7 +130,7 @@ export function AddressConnectForm({
             type="submit"
             className={cn(
               buttonVariants({ variant: isDark ? "default" : "outline" }),
-              "min-w-[176px] font-mono touch-manipulation",
+              "min-w-[176px] touch-manipulation",
               isDark ? "bg-white text-black hover:bg-white/85" : "",
             )}
           >

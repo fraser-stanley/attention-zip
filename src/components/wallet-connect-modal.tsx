@@ -115,10 +115,10 @@ export function WalletConnectModal({ open, onClose }: WalletConnectModalProps) {
                   <div className="space-y-2">
                     <p className="type-label text-white/45">Wallet</p>
                     <h2 id="wallet-connect-title" className="font-display text-3xl tracking-tight sm:text-4xl">
-                      Connect by address
+                      View your positions
                     </h2>
                     <p className="type-body-sm max-w-xl text-white/60">
-                      Portfolio data is public. Paste the address from your local Zora CLI wallet.
+                      Paste your address from your Zora wallet to view your positions.
                     </p>
                   </div>
 
@@ -149,7 +149,7 @@ export function WalletConnectModal({ open, onClose }: WalletConnectModalProps) {
                 <AddressConnectForm
                   autoFocus
                   onSuccess={onClose}
-                  submitLabel="Connect wallet"
+                  submitLabel="View portfolio"
                   variant="dark"
                 />
               </div>

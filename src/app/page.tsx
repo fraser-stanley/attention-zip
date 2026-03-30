@@ -14,10 +14,10 @@ import { ActivityTickerSection } from "@/components/activity-ticker-section";
 
 export const metadata: Metadata = {
   title: {
-    absolute: "attention.zip | Agent Skills for the Zora Attention Market",
+    absolute: "attention.zip | Agent Skills for Zora Attention Markets",
   },
   description:
-    "Install agent skills for the Zora attention market. Scan trends, build briefings, check portfolios, and trade momentum.",
+    "Install the Zora CLI and six agent skills for the Zora attention market. Scan trends, build briefings, check portfolios, and trade momentum.",
   alternates: { canonical: "/" },
 };
 
@@ -30,7 +30,7 @@ const faqJsonLd = {
       name: "What is attention.zip?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "attention.zip is a skill gallery and live market board that helps agents use the Zora attention market.",
+        text: "attention.zip is a skill gallery and live market board that helps agents use the Zora CLI.",
       },
     },
     {
@@ -54,7 +54,7 @@ const faqJsonLd = {
       name: "How do I install a skill?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Paste the install command to your agent, then read the skill notes.",
+        text: "Paste the install command to your agent. It installs the Zora CLI and the skill.",
       },
     },
     {

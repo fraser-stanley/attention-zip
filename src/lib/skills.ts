@@ -464,7 +464,7 @@ function buildSkillInstallPrompt(skill: Skill, baseUrl: string) {
 export function getInstallAllQuickCommands(baseUrl: string): RuntimeCommands {
   const prompt = buildInstallAllPrompt(baseUrl);
   return {
-    prompt: `Read the skill docs at ${baseUrl}/llms.txt and follow the install instructions.`,
+    prompt: `Install the Zora CLI and skills from ${baseUrl}/llms.txt`,
     openclaw: skills.map((skill) => `clawhub install ${skill.id}`).join(" && "),
     ...buildRuntimeCommands(prompt),
     curl: `curl -sL ${baseUrl}/llms-full.txt`,

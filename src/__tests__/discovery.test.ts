@@ -36,7 +36,7 @@ describe("buildLlmsTxt", () => {
     expect(llmsTxt).toContain("Catalog: https://example.com/api/skills");
     expect(llmsTxt).toContain("Market APIs: https://example.com/api/profile | https://example.com/api/coin-swaps");
     expect(llmsTxt).toContain(
-      "Default install (any agent): Read the skill docs at https://example.com/llms.txt and follow the install instructions.",
+      "Default install (any agent): Install the Zora CLI and skills from https://example.com/llms.txt",
     );
     expect(llmsTxt).toContain(
       "Single-skill target: https://example.com/skills/{skill_id}/skill-md",

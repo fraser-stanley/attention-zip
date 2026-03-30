@@ -22,18 +22,17 @@ export function PortfolioPageClient() {
         <div className="space-y-2">
           <p className="type-label text-muted-foreground">Portfolio</p>
           <h2 className="font-display text-4xl tracking-tight sm:text-5xl">
-            Look up your Zora coin positions by address
+            View your positions
           </h2>
           <p className="type-body-sm max-w-2xl text-muted-foreground">
-            Portfolio data is public. Paste the address from your local Zora CLI wallet to load
-            holdings and market value.
+            Paste your address from your Zora wallet to view your positions.
           </p>
         </div>
 
         <AddressConnectForm
           autoFocus
           description="The address is stored locally in your browser so the portfolio page stays unlocked."
-          submitLabel="Load portfolio"
+          submitLabel="View portfolio"
         />
       </div>
     );

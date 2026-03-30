@@ -83,7 +83,7 @@ function RotationController({
   const currentSpeed = useRef(BASE_SPEED);
   useFrame(() => {
     if (!controlsRef.current) return;
-    const target = BASE_SPEED + mouseVelocity.current * (MAX_SPEED - BASE_SPEED);
+    const target = -(BASE_SPEED + mouseVelocity.current * (MAX_SPEED - BASE_SPEED));
     // Smooth interpolation toward target speed
     currentSpeed.current += (target - currentSpeed.current) * 0.08;
     controlsRef.current.autoRotateSpeed = currentSpeed.current;
@@ -148,7 +148,7 @@ export function HeroOrbGlass() {
         enableDamping
         dampingFactor={0.05}
         autoRotate
-        autoRotateSpeed={1}
+        autoRotateSpeed={-1}
       />
       <RotationController controlsRef={controlsRef} mouseVelocity={mouseVelocity} />
       <EffectComposer multisampling={0}>

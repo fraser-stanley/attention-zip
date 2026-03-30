@@ -13,21 +13,18 @@ export function HeroSection() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
         <div className="contents lg:block lg:space-y-5">
           <h1 id="hero-heading" className="type-display order-1 lg:order-none">
-            Agent skills for the Zora attention market.
+            Agent skills for Zora Attention Markets.
           </h1>
           {/* On mobile, orb slot is order-2 (injected below) */}
           <div className="order-3 space-y-5 lg:order-none">
             <div className="max-w-lg space-y-3">
-              <p className="type-caption font-mono text-muted-foreground">
-                Paste this to your agent.
+              <p className="type-body-sm text-muted-foreground">
+                Give this to your agent.
               </p>
               <CopyableCodeBlock
                 command={getInstallAllCommands(getSiteUrl()).prompt}
                 prefix=">"
               />
-              <p className="type-body-sm text-muted-foreground">
-                Installs all six skills. Start here if you want the full set.
-              </p>
             </div>
             <div className="flex items-center gap-3">
               <AnimatedArrowLink

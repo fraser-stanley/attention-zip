@@ -8,7 +8,6 @@ import {
   normalizeClaimCode,
 } from "@/lib/agents";
 import { isRedisConfigured } from "@/lib/redis";
-import { cn } from "@/lib/utils";
 import { truncateAddress } from "@/lib/zora";
 
 export const dynamic = "force-dynamic";
@@ -161,7 +160,7 @@ export default async function ClaimPage({ params }: ClaimPageProps) {
             {portfolioHref ? (
               <Link
                 href={portfolioHref}
-                className={cn(buttonVariants({ variant: "outline" }), "font-mono")}
+                className={buttonVariants({ variant: "outline" })}
               >
                 View portfolio
               </Link>

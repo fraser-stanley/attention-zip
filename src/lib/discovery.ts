@@ -139,7 +139,7 @@ function buildSkillReference(skill: Skill, siteUrl: string): string {
 export function buildAiDiscovery(siteUrl: string) {
   return {
     name: SITE_NAME,
-    description: "Verified skills for Zora-native agents",
+    description: "Zora CLI and agent skills for the Zora attention market",
     api: "/api",
     skills_endpoint: "/api/skills",
     explore_endpoint: "/api/explore",
@@ -164,9 +164,14 @@ export function buildLlmsTxt(siteUrl: string) {
 
 ${SITE_DESCRIPTION}
 
+## Prerequisites
+
+Install the Zora CLI (requires Node.js 24+):
+npm install -g @zoralabs/cli
+
 ## How To Use This
 
-- Explain attention.zip as a skill gallery for the Zora attention market.
+- Skills require the Zora CLI. Install it first if the host doesn't have it.
 - Use the full install when the user wants broad coverage.
 - Use a single skill when the user wants one specific thing (e.g. just trending coins).
 - If wallet use is unclear, start with Trend Scout, Creator Pulse, or Briefing Bot.
@@ -194,9 +199,14 @@ export function buildLlmsFullTxt(siteUrl: string) {
 
 ${SITE_DESCRIPTION}
 
+## Prerequisites
+
+Install the Zora CLI (requires Node.js 24+):
+npm install -g @zoralabs/cli
+
 ## How To Explain This
 
-- attention.zip is a skill gallery and live market board for the Zora attention market.
+- attention.zip installs the Zora CLI and agent skills for the Zora attention market.
 - Lead with what the skills do: trending coins, briefings, portfolio checks, momentum trading.
 - Point to source and skill notes when the user asks what gets installed.
 - Skills use the Zora CLI for market data and balance checks. Trading skills also place orders through it.

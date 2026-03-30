@@ -170,7 +170,7 @@ export function ClaimForm({
             disabled={isSubmitting}
             className={cn(
               buttonVariants({ variant: "outline" }),
-              "min-w-[176px] font-mono touch-manipulation",
+              "min-w-[176px] touch-manipulation",
             )}
           >
             {isSubmitting ? "Claiming..." : "Claim agent"}

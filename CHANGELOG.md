@@ -1,5 +1,21 @@
 # Changelog
 
+## 2026-03-30 (CLI docs refresh + homepage copy)
+
+### Changed
+- **Homepage copy** — hero heading now reads "Agent skills for Zora Attention Markets", site description simplified to "Install agent skills for the Zora attention market."
+- **Wallet CTAs** — replaced "Connect" language with "Portfolio" throughout nav, modal, and empty states. Modal now says "View your positions".
+- **CLI install instructions** — all SKILL.md files, llms.txt, and llms-full.txt now include `npm install -g @zoralabs/cli` (requires Node.js 20+).
+- **New CLI commands documented** — `price-history`, `profile`, and `send` (CLI 0.3.0) added to discovery docs, CLAUDE.md CLI table, and relevant skill command lists.
+- **Price-history in skills** — briefing-bot (1w interval) and momentum-trader (24h interval) now list `zora price-history` in their commands.
+- **Orb rotation** — hero orb now rotates right-to-left matching page marquee direction.
+- **AEO-optimized FAQ** — discovery docs include structured FAQ section for answer engine optimization.
+
+### Fixed
+- **`zora wallet backup` does not exist** — replaced all references with `zora wallet export` across SKILL.md files, validate.sh scripts, CLAUDE.md, README, and discovery docs. The CLI only has `wallet info` and `wallet export`.
+- **Node.js version** — corrected from "24+" to "20+" per zora-protocol-private#1742.
+- **Long coin name truncation** — portfolio positions table now properly truncates long names/symbols with `min-w-0` grid containment.
+
 ## 2026-03-30 (Button system cleanup + truthful wallet/skills UX)
 
 ### Changed

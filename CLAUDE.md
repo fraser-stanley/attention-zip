@@ -381,7 +381,7 @@ Run `pnpm lint`, `pnpm typecheck`, `pnpm test`, and `pnpm build` before merge. `
 
 ### CLI commands
 
-The Zora CLI has 8 commands: `auth`, `explore`, `get`, `buy`, `sell`, `balance`, `setup`, `wallet`.
+The Zora CLI has 11 commands: `auth`, `explore`, `get`, `buy`, `sell`, `balance`, `price-history`, `profile`, `send`, `setup`, `wallet`.
 
 | Command        | Syntax                                           | Notes                                                                                                                                                                |
 | -------------- | ------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -390,6 +390,9 @@ The Zora CLI has 8 commands: `auth`, `explore`, `get`, `buy`, `sell`, `balance`,
 | `zora buy`     | `zora buy <address> --eth <amount> --json`   | Requires 0x address, does not resolve names. Also: --usd, --token (eth/usdc/zora), --percent, --all, --quote (preview only), --yes (skip confirm), --slippage, --debug |
 | `zora sell`    | `zora sell <address> --amount <tokens> --json` | Requires 0x address, does not resolve names. Also: --usd, --token (alias for --to), --percent, --all, --to <ETH\|USDC\|ZORA>, --quote, --yes, --slippage, --debug    |
 | `zora balance` | `zora balance [spendable\|coins] --json`         | Subcommands: (none) = wallet + coins, `spendable` = ETH/USDC/ZORA only, `coins` = coin holdings with --sort                                                          |
+| `zora price-history` | `zora price-history [identifier] [--type <type>] [--interval <interval>] --json` | Price history with sparkline data. Intervals: 1h, 24h, 1w, 1m, ALL                                                               |
+| `zora profile`  | `zora profile [identifier] [--live\|--static] [--refresh <seconds>] --json` | Profile activity with posts and holdings. Defaults to active wallet                                                                                                  |
+| `zora send`     | `zora send [identifier] --to <address> [--amount <value>\|--percent <value>\|--all] [--type <type>] [--yes] --json` | Send coins or ETH to another address. Requires wallet                                                              |
 | `zora setup`   | `zora setup [--create] [--force]`                | Creates/imports wallet at ~/.config/zora/wallet.json                                                                                                                 |
 | `zora wallet`  | `wallet info`, `wallet export`                    | Wallet inspection and private key export                                                                                                                             |
 | `zora auth`    | `auth configure`, `auth status`                  | API key management                                                                                                                                                   |

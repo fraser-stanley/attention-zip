@@ -23,7 +23,7 @@ Use this skill when the user asks for:
 
 ## Setup
 
-1. Install the Zora CLI and make sure `node` is available.
+1. Install the Zora CLI: `npm install -g @zoralabs/cli` (requires Node.js 20+) and make sure `node` is available.
 2. Configure a wallet with `zora setup` or set `ZORA_PRIVATE_KEY`. On macOS, run `zora wallet export` and save the key securely after setup.
 3. Run `./scripts/validate.sh`.
 4. Trigger the script manually before putting it on a schedule.

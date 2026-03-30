@@ -213,6 +213,7 @@ Saved snapshot to ~/.config/zora-agent-skills/creator-pulse/state.json`,
       "zora explore --sort new --limit 5 --json",
       "zora explore --sort gainers --limit 5 --json",
       "zora balance --json",
+      "zora price-history <identifier> --interval 1w --json",
     ],
     requires: {
       bins: ["zora", "node"],
@@ -402,6 +403,7 @@ Confirmed source actions:
       "zora buy <identifier> --eth <amount> --quote --json",
       "zora buy <identifier> --eth <amount> --slippage <pct> --json --yes",
       "zora sell <identifier> --percent 100 --to eth --slippage <pct> --json --yes",
+      "zora price-history <identifier> --interval 24h --json",
     ],
     requires: {
       bins: ["zora", "node"],

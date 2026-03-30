@@ -23,8 +23,8 @@ Use this skill when the user asks for:
 
 ## Setup
 
-1. Install the Zora CLI and `node`.
-2. Run `zora setup --create` or set `ZORA_PRIVATE_KEY`. Back up via `zora wallet export`.
+1. Install the Zora CLI: `npm install -g @zoralabs/cli` (requires Node.js 20+).
+2. Run `zora setup --create` or set `ZORA_PRIVATE_KEY`. Back up with `zora wallet export`.
 3. Run `./scripts/validate.sh`.
 4. Leave `ZORA_MOMENTUM_LIVE=false` for the first run.
 
@@ -47,7 +47,7 @@ Use this skill when the user asks for:
 | `ZORA_MOMENTUM_FLIPFLOP_RUNS`        | `3`     | Re-entry block duration (runs)           |
 | `ZORA_MOMENTUM_MAX_QUOTE_SLIPPAGE_PCT` | `5`  | Skip above this slippage                 |
 
-Schedule: every 10 minutes. Keep `autostart` off until dry-run output looks correct.
+Schedule: every 10 minutes. Keep `autostart` off until dry-run output is correct.
 
 ## Commands
 
@@ -60,6 +60,7 @@ zora balance coins --sort usd-value --limit 20 --json
 zora buy <identifier> --eth <amount> --quote --json
 zora buy <identifier> --eth <amount> --slippage <pct> --json --yes
 zora sell <identifier> --percent 100 --to eth --slippage <pct> --json --yes
+zora price-history <identifier> --interval 24h --json
 ```
 
 ## How It Works
@@ -115,8 +116,8 @@ Candidates (3 evaluated, 1 filtered by slippage):
 
 - NEVER enable live mode without reviewing dry-run output first, unless the user explicitly asks to skip dry-run.
 - NEVER raise daily cap beyond the user's stated risk tolerance.
-- ALWAYS run exits before scanning for new entries. ALWAYS quote before executing.
-- ALWAYS use a dedicated wallet. Export it with `zora wallet export`.
+- ALWAYS run exits before scanning for new entries. Quote before executing.
+- Use a dedicated wallet.
 - ALWAYS use the Zora CLI for market data. Do not scrape zora.co or call Zora APIs directly.
 
 The user has final say. If they explicitly override a mandate, respect their decision.

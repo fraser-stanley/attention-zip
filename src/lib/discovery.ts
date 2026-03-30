@@ -19,6 +19,9 @@ const AGENT_REGISTRATION_PATH = "/api/agents/register";
 const AGENT_ME_PATH = "/api/agents/me";
 const AGENT_CLAIM_PATH = "/api/agents/claim";
 
+const CLI_INSTALL =
+  "CLI install: npm install -g @zoralabs/cli (requires Node.js 20+)";
+
 const CLI_REFERENCE = [
   {
     command: "zora explore",
@@ -64,6 +67,24 @@ const CLI_REFERENCE = [
     command: "zora auth",
     syntax: "zora auth configure | zora auth status",
     notes: "API key management.",
+  },
+  {
+    command: "zora price-history",
+    syntax: "zora price-history [identifier] [--type <type>] [--interval <interval>] --json",
+    notes:
+      "Displays price history for a coin. Types: creator-coin, post, trend. Intervals: 1h, 24h, 1w, 1m, ALL.",
+  },
+  {
+    command: "zora profile",
+    syntax: "zora profile [identifier] [--live|--static] [--refresh <seconds>] --json",
+    notes:
+      "Views profile activity with posts and holdings. Defaults to the active wallet when identifier is omitted.",
+  },
+  {
+    command: "zora send",
+    syntax: "zora send [identifier] --to <address> [--amount <value>|--percent <value>|--all] [--type <type>] [--yes] --json",
+    notes:
+      "Sends coins or ETH to another address. Identifier can be a coin address, name, or token symbol such as eth, usdc, or zora.",
   },
 ] as const;
 
@@ -166,7 +187,7 @@ ${SITE_DESCRIPTION}
 
 ## Prerequisites
 
-Install the Zora CLI (requires Node.js 24+):
+Install the Zora CLI (requires Node.js 20+):
 npm install -g @zoralabs/cli
 
 ## How To Use This
@@ -201,7 +222,7 @@ ${SITE_DESCRIPTION}
 
 ## Prerequisites
 
-Install the Zora CLI (requires Node.js 24+):
+Install the Zora CLI (requires Node.js 20+):
 npm install -g @zoralabs/cli
 
 ## How To Explain This

@@ -22,7 +22,7 @@ Use this skill when the user asks for:
 
 ## Setup
 
-1. Install the Zora CLI and make sure `node` is available.
+1. Install the Zora CLI: `npm install -g @zoralabs/cli` (requires Node.js 20+) and make sure `node` is available.
 2. Run `./scripts/validate.sh` from this folder.
 3. If you want higher rate limits, configure `ZORA_API_KEY`. The skill works without it.
 

@@ -23,7 +23,7 @@ Use this skill when the user asks for:
 
 ## Setup
 
-1. Install the Zora CLI and make sure `node` is available.
+1. Install the Zora CLI: `npm install -g @zoralabs/cli` (requires Node.js 20+) and make sure `node` is available.
 2. Run `./scripts/validate.sh` in this folder.
 3. Set `ZORA_CREATOR_WATCHLIST` if you want per-creator alerts.
 4. An API key is optional. It helps on a tight schedule.

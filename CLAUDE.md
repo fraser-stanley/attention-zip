@@ -65,7 +65,7 @@ src/
 │   ├── staging-auth.test.ts        # Staging auth token + redirect sanitization
 │   └── wallet-address.test.ts      # Address validation helpers
 ├── app/
-│   ├── page.tsx                    # Homepage (hero, activity ticker, skills preview, works-with marquee, live market board)
+│   ├── page.tsx                    # Homepage (activity ticker, hero, works-with marquee, live market board)
 │   ├── loading.tsx                 # Homepage loading skeleton (instant nav)
 │   ├── layout.tsx                  # Root layout (metadata, JSON-LD, Providers, Nav)
 │   ├── globals.css                 # Tailwind imports + CSS variables
@@ -87,6 +87,7 @@ src/
 │   ├── .well-known/ai.json/route.ts # Machine-readable discovery metadata
 │   └── api/
 │       ├── route.ts                # API discovery document
+│       ├── activity/route.ts       # Live homepage trade marquee feed
 │       ├── agents/register/route.ts # Agent registration
 │       ├── agents/me/route.ts      # Bearer-authenticated agent lookup
 │       ├── agents/claim/route.ts   # Human wallet claim endpoint
@@ -108,6 +109,8 @@ src/
 │   ├── hero-orb-glass.tsx          # Concrete dithered orb (R3F + spring click + velocity rotation)
 │   ├── hero-orb-glass-loader.tsx   # Dynamic import wrapper (ssr: false)
 │   ├── command-menu-loader.tsx     # Lazy client-only command menu mount
+│   ├── activity-ticker.tsx         # Live trade marquee with loading/empty/error states
+│   ├── activity-ticker-section.tsx # Server-fetched initial activity wrapper
 │   ├── home-live-cards.tsx         # Hydrated terminal market board with server initial data
 │   ├── works-with-marquee.tsx      # Current homepage works-with marquee
 │   ├── dashboard-tabs.tsx          # Client dashboard tabs + table refresh
@@ -149,6 +152,7 @@ src/
         └── dither-effect.ts        # 4x4 Bayer matrix dithering post-process (binary output)
 ├── hooks/
 │   ├── use-portfolio-data.ts       # React Query hook for SDK getProfileBalances
+│   ├── use-ticker-width.ts         # Pretext-based marquee width measurement
 │   ├── use-has-hover.ts            # SSR-safe (pointer: fine) media query hook
 │   ├── use-expandable-memory.ts    # Persist expand/collapse state across navigations
 │   └── use-session-storage-state.ts # Generic session storage hook
@@ -163,7 +167,7 @@ src/
 - **Agent discovery is explicit and host-aware** via `/api`, `/api/skills`, `/.well-known/ai.json`, `/llms.txt`, and `/llms-full.txt`. These are generated from App Router routes so they follow the current deployment host. `/.well-known/ai.json` now publishes the live `agent_registration_url`, `agent_me_url`, and `agent_claim_url` endpoints.
 - **Agent registration uses direct Upstash Redis** — `src/lib/redis.ts` creates `new Redis({ url, token })` from `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN`. The repo does not use `@vercel/kv` or `Redis.fromEnv()` fallbacks. Agent records live under `agent:*`, bearer key lookups under `apikey:*`, and claim lookups under `claim:*`.
 - **Claim URLs remain resolvable after success** — claim codes expire after 7 days while an agent is unclaimed. Once a wallet claims the agent, the `claim:*` lookup is rewritten without TTL so `/claim/[code]` can render an "already claimed" state. One-time claiming is enforced through `agent.status`, not by deleting the claim lookup.
-- **Skills are static data** in `src/lib/skills.ts`. No database, no CMS. The homepage grid and skills gallery both render from this array — add a skill to the array and both pages update automatically.
+- **Skills are static data** in `src/lib/skills.ts`. No database, no CMS. The skills gallery, install commands, API discovery output, and portfolio skill list all derive from this array.
 - **Skills are managed runtimes behind the scenes**. Each public skill has a real `scripts/run.mjs`, `clawhub.json`, and source-backed manual install path. Those implementation details belong in internal docs, not primary marketing copy.
 - **Install commands are shared** from `src/lib/skills.ts` (`getSkillRuntimeCommands()`, `getSkillQuickInstallCommands()`, `getInstallAllCommands()`) so the UI, `/api/skills`, and discovery docs stay in sync. `/api/skills` exposes both the full `install` map and the prompt-only `quickInstall` map. The visible default is the prompt-first `Any Agent` helper, with runtime-specific tabs for Claude Code, OpenClaw, Amp, Codex CLI, OpenCode, and Cursor. The generated command map still includes a manual `git clone` fallback and a `curl` command for direct SKILL.md fetching. Curl is in `RuntimeCommands` but not in the `Runtime` type or UI tabs, it's a fetch method, not an agent runtime.
 - **SKILL.md is served from the domain** at `/skills/[id]/skill-md` (`src/app/skills/[id]/skill-md/route.ts`). This gives agent commands clean URLs that work in any environment.
@@ -176,7 +180,8 @@ src/
 - **Command menu is lazy-loaded** through `src/components/command-menu-loader.tsx` so it does not affect the initial page payload.
 - **React Query** handles live refresh after hydration. Initial render is server-owned for `/`, `/dashboard`, and `/leaderboard`.
 - **Homepage "Agent activity" is a terminal board**, not a 4-card grid. It preloads 8 rows per tab, refreshes through `/api/explore` and `/api/leaderboard`, and uses a subtle CRT-style loading sweep plus simulated preview motion between fetches.
-- **Activity ticker is illustrative** — the marquee uses mock trade entries from `src/lib/activity-mock-data.ts` and is labeled that way in the UI. It is a presentation surface, not a live trade feed yet.
+- **Activity ticker is live** — the marquee server-renders initial `/api/activity` data, refreshes on the client every 30 seconds, and keeps production honest with loading, empty, and unavailable states instead of fabricated fallback trades.
+- **Shared staging deploys target `zoraskills-staging`** — `https://zoraskills-staging.vercel.app/` is the production alias for the Vercel project `zoraskills-staging` in the `frasers-projects-053d31c6` scope. Relink the workspace before deploying if `.vercel/project.json` points somewhere else.
 - **Leaderboard uses the current SDK weekly shape** — `getTraderLeaderboard()` currently resolves to `data.exploreTraderLeaderboard`, with `weekVolumeUsd`, `weekTradesCount`, and `traderProfile.handle`. `src/lib/zora.ts` normalizes this into `TraderNode`.
 - **Portfolio page uses live address-based balances** — `src/app/api/portfolio/route.ts` proxies the SDK `getProfileBalances()` query, `src/hooks/use-portfolio-data.ts` hydrates React Query clients, and `src/components/portfolio-view.tsx` renders current positions, total value, and 24h change from public on-chain data.
 - **Wallet connect is address-only** — the modal at `src/components/wallet-connect-modal.tsx` accepts a wallet address from `zora wallet`, stores it locally, and seeds default skills. The `/claim/[code]` flow uses the same address-only model through `src/components/claim-form.tsx`. No signatures, nonces, or browser-side verification flow are involved because portfolio data is public and the agent ownership link is established server-side.

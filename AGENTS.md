@@ -84,7 +84,7 @@ Use `src/lib/redis.ts` for agent registration and claiming. Only `UPSTASH_REDIS_
 1. Create a skill directory at the project root: `<skill-slug>/SKILL.md`, `<skill-slug>/clawhub.json`, `<skill-slug>/scripts/run.mjs`, `<skill-slug>/scripts/validate.sh`
 2. Add a new entry to the `skills` array in `src/lib/skills.ts`. The `id` must match the directory name and SKILL.md `name` field.
 3. Follow the `Skill` interface in `src/lib/skills.ts`: metadata, `commands`, `requires`, `automation`, sample prompt/output, badges, and public source URLs all need to stay in sync with the skill folder.
-4. Both the homepage skills preview grid and `/skills` gallery render from this array. If you change the managed/runtime shape, update the UI copy, `src/lib/discovery.ts`, and `/api/skills` serializer too.
+4. The `/skills` gallery, install command surfaces, discovery docs, and `/api/skills` serializer all derive from this array. If you change the managed/runtime shape, update those surfaces together.
 5. If the skill needs new SDK data, add the wrapper function to `src/lib/zora.ts` and create an API route.
 6. Run `pnpm lint`, `pnpm typecheck`, `pnpm test`, and `pnpm build` before merging. `pnpm test` validates SKILL.md structure, entrypoint metadata, CLI flag correctness, and the managed entrypoint harness.
 
@@ -111,6 +111,17 @@ pnpm typecheck   # direct TypeScript check (tsc --noEmit)
 pnpm test        # vitest — structure, metadata, and managed entrypoint integration
 pnpm build       # TypeScript + Next.js compilation
 ```
+
+## Deploy
+
+The shared staging site is the Vercel project `zoraskills-staging` in the `frasers-projects-053d31c6` scope. `https://zoraskills-staging.vercel.app/` is that project's production alias, so updating staging requires:
+
+```bash
+vercel link --yes --scope frasers-projects-053d31c6 --project zoraskills-staging
+vercel deploy --prod --yes --scope frasers-projects-053d31c6
+```
+
+If a workspace was previously linked to another Vercel project, check `.vercel/project.json` before deploying.
 
 Tests validate SKILL.md frontmatter, required body sections, word count (300-800), CLI flag correctness in commands, managed entrypoint metadata in `clawhub.json`, process-level `scripts/run.mjs` behavior through `src/__tests__/skill-entrypoints.test.ts`, cross-file sync between skills.ts IDs and skill directories, and the agent registration/claiming contract in `src/__tests__/agents.test.ts`. `scripts/validate.sh` is still useful, but it is a host-readiness check. Run it from inside the skill directory, make sure the installed `zora` CLI is on your shell `PATH`, and expect wallet-backed skills to require a configured wallet.
 

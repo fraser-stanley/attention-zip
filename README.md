@@ -139,6 +139,17 @@ Agent registration uses direct `@upstash/redis`. Only `UPSTASH_REDIS_REST_URL` a
 
 ## Deploy
 
+Shared staging lives on the Vercel project `zoraskills-staging` in the `frasers-projects-053d31c6` scope. `https://zoraskills-staging.vercel.app/` is that project's production alias, so staging updates need a production deploy:
+
+```bash
+vercel link --yes --scope frasers-projects-053d31c6 --project zoraskills-staging
+vercel deploy --prod --yes --scope frasers-projects-053d31c6
+```
+
+Check `.vercel/project.json` before deploying if you switch between workspaces, otherwise `vercel` may publish to the wrong project.
+
+For an ad hoc preview deploy:
+
 ```bash
 vercel
 ```
@@ -152,7 +163,7 @@ For a stakeholder build on Vercel:
 - Set `NEXT_PUBLIC_SITE_REPO_URL` and `NEXT_PUBLIC_SITE_REPO_REF` when the public skills repo is ready.
 - You do not need `ZORA_PRIVATE_KEY` unless you are testing wallet-backed skills or live trading flows.
 - `/dashboard` and `/leaderboard` use live SDK data. Mock fallback is disabled in production unless `ALLOW_MOCK_MARKET_DATA=true` is set intentionally.
-- The wallet connect flow is address-only. Users paste the address from their local Zora CLI wallet. The activity ticker remains illustrative until real trade activity is wired in.
+- The wallet connect flow is address-only. Users paste the address from their local Zora CLI wallet. The homepage activity ticker uses live `/api/activity` data and falls back to loading, empty, or unavailable states instead of fabricated production trades.
 - Agent-facing routes stay public when the gate is on: `/api`, `/api/*`, `/skills/<id>/skill-md`, `/.well-known/ai.json`, `/llms.txt`, `/llms-full.txt`, `/claim/<code>`, and static public files.
 
 ## Documentation

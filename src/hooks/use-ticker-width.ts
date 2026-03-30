@@ -43,7 +43,7 @@ export function useTickerWidth(items: string[], font: string): number {
         ITEM_PADDING_X_PX +
         ITEM_SEGMENT_GAPS_PX +
         ACTION_CHIP_PADDING_X_PX
-      ) + Math.max(items.length - 1, 0) * ENTRY_SEPARATOR_WIDTH_PX;
+      ) + items.length * ENTRY_SEPARATOR_WIDTH_PX;
       setWidth(totalTextWidth + totalChromeWidth);
     };
 

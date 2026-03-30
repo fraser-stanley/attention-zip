@@ -1,8 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { Fragment, useEffect, useMemo, useRef, useState } from "react";
-import { useTickerWidth } from "@/hooks/use-ticker-width";
+import { Fragment, useLayoutEffect, useMemo, useRef, useState } from "react";
 import type { TradeActivityItem } from "@/lib/activity-mock-data";
 import { type ActivityApiResponse } from "@/lib/zora";
 
@@ -12,12 +11,13 @@ const REFRESH_INTERVAL_MS = 30_000;
 const DEFAULT_DURATION_SECONDS = 30;
 const MIN_DURATION_SECONDS = 18;
 const SCROLL_SPEED_PX_PER_SECOND = 80;
+const MIN_ASSUMED_ENTRY_WIDTH_PX = 120;
+const MIN_ASSUMED_CYCLE_WIDTH_PX = 120;
+const EXTRA_BUFFER_COPIES = 2;
+const FALLBACK_REPEAT_COUNT = 14;
+const SEAM_BUFFER_PX = 32;
 const ACTION_CHIP_CLASS =
   "rounded-[2px] px-1.5 py-px text-black";
-
-function getMeasurementText(item: TradeActivityItem): string {
-  return `${item.trader}${item.action}${item.amount} ${item.coin}`;
-}
 
 function TickerItems({
   items,
@@ -43,14 +43,12 @@ function TickerItems({
               {item.amount} {item.coin}
             </span>
           </span>
-          {index < items.length - 1 ? (
-            <span
-              aria-hidden="true"
-              className="inline-flex h-full w-3 shrink-0 items-center justify-center self-center"
-            >
-              <span className="-translate-y-px block h-3 w-2 bg-foreground/85" />
-            </span>
-          ) : null}
+          <span
+            aria-hidden="true"
+            className="inline-flex h-full w-3 shrink-0 items-center justify-center self-center"
+          >
+            <span className="-translate-y-px animate-ticker-cursor block h-3 w-2 bg-foreground/85" />
+          </span>
         </Fragment>
       ))}
     </>
@@ -106,16 +104,18 @@ function TickerStatusMessage({
 
 /**
  * CSS marquee ticker with live activity data from the public API.
- * Animation speed is derived from precomputed content width so the scroll rate
- * stays stable even when trade text lengths change.
+ * Animation speed is derived from the measured width of one rendered cycle so
+ * the scroll rate stays stable even when trade text lengths change.
  */
 export function ActivityTicker({
   initialItems = [],
 }: {
   initialItems?: TradeActivityItem[];
 }) {
-  const fontProbeRef = useRef<HTMLSpanElement | null>(null);
-  const [font, setFont] = useState("");
+  const viewportRef = useRef<HTMLDivElement | null>(null);
+  const cycleRef = useRef<HTMLDivElement | null>(null);
+  const [viewportWidth, setViewportWidth] = useState(0);
+  const [cycleWidth, setCycleWidth] = useState(0);
 
   const query = useQuery<ActivityApiResponse, Error>({
     queryKey: ["activity-feed"],
@@ -138,31 +138,6 @@ export function ActivityTicker({
     },
   });
 
-  useEffect(() => {
-    let frameId = 0;
-
-    const updateFont = () => {
-      const element = fontProbeRef.current;
-      if (!element) return;
-
-      const nextFont = window.getComputedStyle(element).font;
-      setFont((currentFont) => (currentFont === nextFont ? currentFont : nextFont));
-    };
-
-    frameId = window.requestAnimationFrame(updateFont);
-    window.addEventListener("resize", updateFont);
-
-    const fontFaceSet = document.fonts;
-    fontFaceSet?.addEventListener?.("loadingdone", updateFont);
-    void fontFaceSet?.ready.then(updateFont);
-
-    return () => {
-      window.cancelAnimationFrame(frameId);
-      window.removeEventListener("resize", updateFont);
-      fontFaceSet?.removeEventListener?.("loadingdone", updateFont);
-    };
-  }, []);
-
   const liveItems = query.data?.items ?? initialItems;
   const hasLiveItems = liveItems.length > 0;
   const isLoadingItems = !hasLiveItems && query.isPending;
@@ -173,15 +148,69 @@ export function ActivityTicker({
     [hasLiveItems, liveItems],
   );
 
-  const measurementItems = useMemo(
-    () => items.map((item) => getMeasurementText(item)),
-    [items],
-  );
-  const contentWidth = useTickerWidth(measurementItems, font);
+  useLayoutEffect(() => {
+    const viewportElement = viewportRef.current;
+    const cycleElement = cycleRef.current;
+
+    if (!viewportElement || !cycleElement) {
+      return;
+    }
+
+    let frameId = 0;
+
+    const measure = () => {
+      const nextViewportWidth = viewportElement.getBoundingClientRect().width;
+      const nextCycleWidth = cycleElement.getBoundingClientRect().width;
+
+      setViewportWidth((current) =>
+        current === nextViewportWidth ? current : nextViewportWidth,
+      );
+      setCycleWidth((current) =>
+        current === nextCycleWidth ? current : nextCycleWidth,
+      );
+    };
+
+    measure();
+    frameId = window.requestAnimationFrame(measure);
+    window.addEventListener("resize", measure);
+
+    const fontFaceSet = document.fonts;
+    fontFaceSet?.addEventListener?.("loadingdone", measure);
+    void fontFaceSet?.ready.then(measure);
+
+    const observer =
+      typeof ResizeObserver === "undefined"
+        ? null
+        : new ResizeObserver(measure);
+
+    observer?.observe(viewportElement);
+    observer?.observe(cycleElement);
+
+    return () => {
+      window.cancelAnimationFrame(frameId);
+      window.removeEventListener("resize", measure);
+      fontFaceSet?.removeEventListener?.("loadingdone", measure);
+      observer?.disconnect();
+    };
+  }, [items]);
+
   const animationDurationSeconds =
-    contentWidth > 0
-      ? Math.max(contentWidth / SCROLL_SPEED_PX_PER_SECOND, MIN_DURATION_SECONDS)
+    cycleWidth > 0
+      ? Math.max(cycleWidth / SCROLL_SPEED_PX_PER_SECOND, MIN_DURATION_SECONDS)
       : DEFAULT_DURATION_SECONDS;
+  const minimumCycleWidth =
+    items.length > 0
+      ? Math.max(items.length * MIN_ASSUMED_ENTRY_WIDTH_PX, MIN_ASSUMED_CYCLE_WIDTH_PX)
+      : MIN_ASSUMED_CYCLE_WIDTH_PX;
+  const minimumRepeatCount =
+    viewportWidth > 0
+      ? Math.ceil((viewportWidth + SEAM_BUFFER_PX) / minimumCycleWidth) + EXTRA_BUFFER_COPIES
+      : FALLBACK_REPEAT_COUNT;
+  const measuredRepeatCount =
+    cycleWidth > 0 && viewportWidth > 0
+      ? Math.ceil((viewportWidth + cycleWidth + SEAM_BUFFER_PX) / cycleWidth) + 1
+      : 0;
+  const repeatCount = Math.max(minimumRepeatCount, measuredRepeatCount);
   const canAnimateTicker = items.length > 0;
   const statusLabel = isErrorState ? "Unavailable" : "Live";
   const statusDotClass = isErrorState
@@ -195,14 +224,6 @@ export function ActivityTicker({
       aria-label="Recent agent activity feed"
       className="relative flex h-8 items-center overflow-hidden border-y border-border bg-white dark:bg-black"
     >
-      <span
-        ref={fontProbeRef}
-        aria-hidden="true"
-        className="type-caption pointer-events-none absolute -left-full top-0 font-mono opacity-0"
-      >
-        {items[0]?.trader ?? "@"}
-      </span>
-
       <div className="mx-auto flex h-full w-full max-w-7xl items-center">
         <div className="flex h-full shrink-0 items-center gap-1.5 border-r border-border px-4">
           <span aria-hidden="true" className={statusDotClass} />
@@ -212,20 +233,24 @@ export function ActivityTicker({
         </div>
 
         {items.length > 0 ? (
-          <div className="flex-1 overflow-hidden">
+          <div ref={viewportRef} className="flex-1 overflow-hidden">
             <div
               className="ticker-track"
               style={{
                 animationDuration: `${animationDurationSeconds}s`,
                 animationPlayState: canAnimateTicker ? "running" : "paused",
+                ["--ticker-shift" as string]: `-${cycleWidth || viewportWidth || 0}px`,
               }}
             >
-              <div className="flex shrink-0">
-                <TickerItems items={items} />
-              </div>
-              <div className="flex shrink-0">
-                <TickerItems items={items} />
-              </div>
+              {Array.from({ length: repeatCount }, (_, copyIndex) => (
+                <div
+                  key={copyIndex}
+                  ref={copyIndex === 0 ? cycleRef : undefined}
+                  className="flex shrink-0"
+                >
+                  <TickerItems items={items} />
+                </div>
+              ))}
             </div>
           </div>
         ) : isLoadingItems ? (

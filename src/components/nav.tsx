@@ -263,7 +263,7 @@ export function Nav() {
                         <span className="type-label text-[0.875rem]">
                           {section.label}
                         </span>
-                        <p className="type-caption text-white/50 group-hover:text-black/60">
+                        <p className="type-caption font-mono text-white/50 group-hover:text-black/60">
                           {section.description}
                         </p>
                       </div>

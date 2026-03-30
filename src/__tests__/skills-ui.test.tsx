@@ -28,9 +28,8 @@ describe("SkillsInstallList", () => {
   it("keeps copy-and-read actions without fake install state", () => {
     render(<SkillsInstallList skills={skills.slice(0, 1)} />);
 
-    expect(screen.getByRole("button", { name: /more info/i })).toBeTruthy();
+    expect(screen.getByRole("button", { name: /see example/i })).toBeTruthy();
     expect(screen.getByRole("link", { name: /source/i })).toBeTruthy();
-    expect(screen.getByRole("link", { name: /skill notes/i })).toBeTruthy();
     expect(screen.getAllByTitle(/copy command/i)).toHaveLength(2);
     expect(screen.queryByText("Install")).toBeNull();
     expect(screen.queryByText("Installing...")).toBeNull();

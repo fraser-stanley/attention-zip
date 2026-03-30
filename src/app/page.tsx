@@ -108,7 +108,7 @@ export default function Home() {
         </div>
       </section>
 
-      <div className="space-y-16">
+      <div className="space-y-16 pb-24 sm:space-y-20 sm:pb-32">
         {/* Hero */}
         <HeroSection />
 
@@ -116,7 +116,7 @@ export default function Home() {
         <WorksWithMarquee />
 
         {/* Live data cards */}
-        <section className="space-y-4">
+        <section className="space-y-4 py-8 sm:space-y-6 sm:py-12 lg:py-14">
           <Suspense fallback={<HomeLiveCardsSkeleton />}>
             <HomeLiveCardsSection />
           </Suspense>

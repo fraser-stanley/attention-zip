@@ -167,6 +167,11 @@
   50% { opacity: 0; }
 }
 
+@keyframes ticker-cursor-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.28; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
@@ -191,7 +196,7 @@
 
 @keyframes ticker-scroll {
   0% { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
+  100% { transform: translateX(var(--ticker-shift, -50%)); }
 }
 
 .ticker-track {
@@ -234,6 +239,10 @@
 
 @utility animate-blink {
   animation: blink 1s step-end infinite;
+}
+
+@utility animate-ticker-cursor {
+  animation: ticker-cursor-blink 1s step-end infinite;
 }
 
 @utility type-display {

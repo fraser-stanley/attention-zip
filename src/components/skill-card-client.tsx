@@ -2,12 +2,10 @@
 
 import { useEffect, useId, useRef, useState } from "react";
 
-import { Badge } from "@/components/ui/badge";
-import { buttonVariants } from "@/components/ui/button-variants";
 import { ArrowUpRightIcon } from "@/components/ui/arrow-up-right";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CopyableCodeBlock } from "@/components/copyable-code-block";
-import { useExpandableMemory } from "@/hooks/use-expandable-memory";
+import { HighlightedCodeText } from "@/components/highlighted-code-text";
 import { useSessionStorageState } from "@/hooks/use-session-storage-state";
 import {
   getInstallAllCommands,
@@ -59,14 +57,13 @@ const RUNTIMES: Runtime[] = [
   "prompt",
   "claude",
   "openclaw",
-  "amp",
   "codex",
   "opencode",
   "cursor",
 ];
 
 const RUNTIME_LABELS: Record<Runtime, string> = {
-  prompt: "Any Agent",
+  prompt: "Any",
   openclaw: "OpenClaw",
   claude: "Claude Code",
   amp: "Amp",
@@ -81,16 +78,55 @@ function isRuntime(value: string | null): value is Runtime {
   return value !== null && VALID_RUNTIMES.has(value);
 }
 
-const PRE_BLOCK_CLASS =
-  "border border-border bg-foreground/5 px-4 py-3 font-mono text-sm text-foreground/80 whitespace-pre-wrap break-all";
+const EXAMPLE_BLOCK_CLASS =
+  "h-48 overflow-y-auto border border-border bg-foreground/5 px-4 py-3 font-mono text-[0.8125rem] text-foreground/80 whitespace-pre-wrap break-all";
+const EXAMPLE_PLACEHOLDER_CLASS =
+  "h-48 border border-dashed border-border/80 bg-foreground/[0.02] px-4 py-3";
+
+function formatMonitorSummary(monitors: string[]) {
+  const summary = monitors
+    .slice(0, 3)
+    .map((monitor) => {
+      const trimmed = monitor.trim();
+      return trimmed.charAt(0).toLowerCase() + trimmed.slice(1);
+    });
+
+  if (summary.length === 0) {
+    return "";
+  }
+  if (summary.length === 1) {
+    return summary[0];
+  }
+  if (summary.length === 2) {
+    return `${summary[0]} and ${summary[1]}`;
+  }
+
+  return `${summary.slice(0, -1).join(", ")}, and ${summary.at(-1)}`;
+}
+
+function formatBadgeLabel(badge: string) {
+  switch (badge) {
+    case "Creator coins":
+      return "Creator coin";
+    case "No wallet":
+    case "Wallet optional":
+      return "No wallet required";
+    case "Wallet needed":
+      return "Wallet required";
+    default:
+      return badge;
+  }
+}
 
 function TerminalOutput({
   id,
   displayed,
+  active,
   typingDone,
 }: {
   id: string;
   displayed: string;
+  active: boolean;
   typingDone: boolean;
 }) {
   const ref = useRef<HTMLPreElement>(null);
@@ -102,14 +138,59 @@ function TerminalOutput({
   }, [displayed]);
 
   return (
-    <pre
-      ref={ref}
-      id={id}
-      className={`h-64 overflow-y-auto ${PRE_BLOCK_CLASS}`}
-    >
-      {displayed}
-      {!typingDone && <span className="animate-blink">&#9608;</span>}
+    <pre ref={ref} id={id} className={EXAMPLE_BLOCK_CLASS}>
+      <HighlightedCodeText text={displayed} variant="output" />
+      {active && !typingDone ? <span className="animate-blink">&#9608;</span> : null}
     </pre>
+  );
+}
+
+function SkillRowDetails({
+  outputId,
+  exampleId,
+  displayed,
+  active,
+  typingDone,
+  exampleExpanded,
+  onToggleExample,
+}: {
+  outputId: string;
+  exampleId: string;
+  displayed: string;
+  active: boolean;
+  typingDone: boolean;
+  exampleExpanded: boolean;
+  onToggleExample: () => void;
+}) {
+  return (
+    <div>
+      {exampleExpanded ? (
+        <div id={exampleId}>
+          <TerminalOutput
+            id={outputId}
+            displayed={displayed}
+            active={active}
+            typingDone={typingDone}
+          />
+        </div>
+      ) : (
+        <button
+          id={exampleId}
+          type="button"
+          className={cn(
+            EXAMPLE_PLACEHOLDER_CLASS,
+            "flex w-full items-center justify-center overflow-hidden whitespace-normal break-normal text-center transition-[background-color,border-color] duration-150 ease-out hover:bg-foreground/[0.035] hover:border-foreground/20",
+          )}
+          aria-expanded="false"
+          aria-controls={outputId}
+          onClick={onToggleExample}
+        >
+          <span className="type-label text-muted-foreground transition-colors hover:text-foreground">
+            see example
+          </span>
+        </button>
+      )}
+    </div>
   );
 }
 
@@ -164,110 +245,104 @@ function SkillRow({
   index: number;
 }) {
   const detailsId = useId();
+  const sectionRef = useRef<HTMLElement>(null);
   const commands = getSkillRuntimeCommands(skill, getSiteUrl());
   const command = commands[runtime];
-  const { expanded: expandedDetails, toggleExpanded: toggleDetails } =
-    useExpandableMemory(`zora:skill-output:${skill.id}`);
+  const [expandedExample, setExpandedExample] = useState(false);
+  const [hasEnteredViewport, setHasEnteredViewport] = useState(
+    typeof IntersectionObserver === "undefined",
+  );
+  const exampleActive = hasEnteredViewport && expandedExample;
+  const monitorSummary = formatMonitorSummary(skill.monitors);
+
+  function handleToggleExample() {
+    setExpandedExample((current) => !current);
+  }
+
+  useEffect(() => {
+    const section = sectionRef.current;
+
+    if (!section || hasEnteredViewport) {
+      return;
+    }
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const [entry] = entries;
+
+        if (entry && entry.isIntersecting && entry.intersectionRatio >= 0.3) {
+          setHasEnteredViewport(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: [0.3] },
+    );
+
+    observer.observe(section);
+
+    return () => observer.disconnect();
+  }, [hasEnteredViewport]);
+
   const { displayed, done: typingDone } = useTypewriter(
     skill.sampleOutput ?? "",
-    expandedDetails,
+    exampleActive,
   );
 
   return (
-    <section className="scroll-mt-32 py-10 sm:py-14" id={skill.id}>
+    <section
+      ref={sectionRef}
+      className="scroll-mt-32 py-6 sm:py-8"
+      id={skill.id}
+    >
       {index !== 0 && (
-        <p
+        <div
           aria-hidden="true"
-          className="type-caption -mt-10 mb-10 select-none text-border tracking-[0.35em] sm:-mt-14 sm:mb-14"
-        >
-          {"- ".repeat(40).trim()}
-        </p>
+          className="-mt-6 mb-6 w-full border-t border-border/80 sm:-mt-8 sm:mb-8"
+        />
       )}
-      <div className="max-w-3xl space-y-4">
-        {/* Name + description */}
-        <h2 className="type-title">{skill.name}</h2>
-        <p className="type-body text-muted-foreground">
-          {skill.longDescription}
-        </p>
+      <div className="grid grid-cols-1 gap-5 lg:grid-cols-2 lg:gap-x-10">
+        <div className="space-y-3">
+          <h2 className="type-title leading-[0.98]">
+            {`${String(index + 1).padStart(2, "0")}. ${skill.name}`}
+          </h2>
+          <p className="type-body-sm text-muted-foreground">
+            {skill.longDescription}
+            {monitorSummary ? ` Checks ${monitorSummary}.` : ""}
+          </p>
 
-        {/* Badges */}
-        {skill.badges.length > 0 && (
-          <div className="flex flex-wrap items-center gap-1.5">
-            {skill.badges.map((badge) => (
-              <Badge
-                key={badge}
-                variant={badge === "Execution" ? "default" : "outline"}
-                className={cn(
-                  "type-caption font-normal",
-                  badge === "Execution"
-                    ? "border-transparent bg-[#FF00F0] text-black"
-                    : "",
-                )}
-              >
-                {badge}
-              </Badge>
-            ))}
+          {skill.badges.length > 0 ? (
+            <p className="font-display text-[0.9rem] leading-[1.1] tracking-[0.04em] text-muted-foreground/78">
+              {skill.badges.map(formatBadgeLabel).join(", ")}
+            </p>
+          ) : null}
+
+          <CopyableCodeBlock
+            command={command}
+            prefix={runtime === "prompt" ? ">" : "$"}
+          />
+
+          <div className="type-caption flex flex-wrap items-center gap-4 font-mono text-muted-foreground">
+            <a
+              href={skill.githubUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1 transition-colors hover:text-foreground"
+            >
+              Source
+              <ArrowUpRightIcon size={12} />
+            </a>
           </div>
-        )}
 
-        <CopyableCodeBlock command={command} prefix={runtime === "prompt" ? ">" : "$"} />
-
-        {/* Actions: buttons */}
-        <div className="flex flex-wrap items-center">
-          <button
-            type="button"
-            className={cn(
-              buttonVariants({ variant: "outline" }),
-              "aria-expanded:bg-background aria-expanded:text-foreground aria-expanded:border-foreground",
-            )}
-            aria-expanded={expandedDetails}
-            aria-controls={detailsId}
-            onClick={toggleDetails}
-          >
-            {expandedDetails ? "Less info" : "More info"}
-          </button>
         </div>
 
-        {/* Links: separate row */}
-        <div className="type-caption flex items-center gap-4 font-mono text-muted-foreground">
-          <a
-            href={skill.githubUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-1 transition-colors hover:text-foreground"
-          >
-            Source
-            <ArrowUpRightIcon size={12} />
-          </a>
-          <a
-            href={skill.skillMdUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-1 transition-colors hover:text-foreground"
-          >
-            Skill notes
-            <ArrowUpRightIcon size={12} />
-          </a>
-        </div>
-
-        {expandedDetails ? (
-          <div id={detailsId} className="space-y-4">
-            <div>
-              <p className="type-label mb-2 text-muted-foreground">Commands</p>
-              <pre className={PRE_BLOCK_CLASS}>{skill.commands.join("\n")}</pre>
-            </div>
-            <div>
-              <p className="type-label mb-2 text-muted-foreground">
-                Example output
-              </p>
-              <TerminalOutput
-                id={`${detailsId}-output`}
-                displayed={displayed}
-                typingDone={typingDone}
-              />
-            </div>
-          </div>
-        ) : null}
+        <SkillRowDetails
+          outputId={`${detailsId}-desktop-output`}
+          exampleId={`${detailsId}-desktop-example`}
+          displayed={displayed}
+          active={exampleActive}
+          typingDone={typingDone}
+          exampleExpanded={expandedExample}
+          onToggleExample={handleToggleExample}
+        />
       </div>
     </section>
   );
@@ -280,6 +355,10 @@ export function SkillsInstallList({
   skills: Skill[];
   children?: React.ReactNode;
 }) {
+  const orderedSkills = [
+    ...skills.filter((skill) => skill.badges.includes("Execution")),
+    ...skills.filter((skill) => !skill.badges.includes("Execution")),
+  ];
   const [runtime, setRuntime] = useSessionStorageState<Runtime>({
     key: RUNTIME_STORAGE_KEY,
     initialValue: "claude",
@@ -288,24 +367,24 @@ export function SkillsInstallList({
   });
 
   return (
-    <div className="max-w-5xl">
+    <div className="w-full">
       {/* Hero: heading + unified install card */}
       <section className="space-y-6 mb-12">
         <h1 className="type-display max-w-5xl pt-[0.06em] leading-[0.94]">
           Install Zora market skills.
         </h1>
-        <div className="max-w-2xl space-y-3">
-          <p className="type-caption font-mono text-muted-foreground">
-            Paste this to your agent.
-          </p>
-          <RuntimeInstallCard
-            runtime={runtime}
-            onChange={setRuntime}
-            command={getInstallAllCommands(getSiteUrl())[runtime]}
-          />
-          <p className="type-body-sm text-muted-foreground">
-            Installs all six skills. Or pick one below.
-          </p>
+        <div className="grid grid-cols-1 lg:grid-cols-2 lg:gap-x-10">
+          <div className="space-y-3">
+            <p className="type-body-sm text-muted-foreground">
+              Send this to your agent. Installs the Zora CLI and all skills
+              below.
+            </p>
+            <RuntimeInstallCard
+              runtime={runtime}
+              onChange={setRuntime}
+              command={getInstallAllCommands(getSiteUrl())[runtime]}
+            />
+          </div>
         </div>
       </section>
 
@@ -313,7 +392,7 @@ export function SkillsInstallList({
       {children}
 
       <div>
-        {skills.map((skill, index) => (
+        {orderedSkills.map((skill, index) => (
           <SkillRow
             key={skill.id}
             skill={skill}

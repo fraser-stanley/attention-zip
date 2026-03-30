@@ -19,9 +19,6 @@ const AGENT_REGISTRATION_PATH = "/api/agents/register";
 const AGENT_ME_PATH = "/api/agents/me";
 const AGENT_CLAIM_PATH = "/api/agents/claim";
 
-const CLI_INSTALL =
-  "CLI install: npm install -g @zoralabs/cli (requires Node.js 20+)";
-
 const CLI_REFERENCE = [
   {
     command: "zora explore",

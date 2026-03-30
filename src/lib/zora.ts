@@ -527,11 +527,46 @@ function getSwapUsdValue(swap: CoinSwapActivity): number | null {
     return quoteAmount * quotePriceUsdc;
   }
 
-  if (quoteAmount !== null) {
-    return quoteAmount;
-  }
+  return null;
+}
 
-  return quotePriceUsdc;
+/** Known Base-chain currency addresses → ticker symbols. */
+const BASE_CURRENCY_SYMBOLS: Record<string, string> = {
+  "0x0000000000000000000000000000000000000000": "ETH",
+  "0x4200000000000000000000000000000000000006": "ETH", // WETH
+  "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913": "USDC",
+};
+
+function getSwapNativeAmount(swap: CoinSwapActivity): string | null {
+  const quoteAmount = parseFiniteNumber(swap.quoteAmount);
+  if (quoteAmount === null || quoteAmount === 0) return null;
+
+  const currencyAddress = swap.quoteCurrencyAddress?.toLowerCase();
+  const symbol = currencyAddress
+    ? BASE_CURRENCY_SYMBOLS[currencyAddress] ?? null
+    : null;
+
+  if (!symbol) return null;
+
+  // Format to reasonable precision — drop trailing zeros
+  const formatted =
+    quoteAmount < 0.001
+      ? quoteAmount.toExponential(1)
+      : quoteAmount < 1
+        ? quoteAmount.toPrecision(3)
+        : quoteAmount < 1000
+          ? quoteAmount.toFixed(2)
+          : formatCompactNumber(quoteAmount);
+
+  return `${formatted} ${symbol}`;
+}
+
+function formatCompactNumber(value: number): string {
+  const abs = Math.abs(value);
+  if (abs >= 1e9) return `${(value / 1e9).toFixed(1)}B`;
+  if (abs >= 1e6) return `${(value / 1e6).toFixed(1)}M`;
+  if (abs >= 1e3) return `${(value / 1e3).toFixed(1)}K`;
+  return value.toFixed(0);
 }
 
 function formatActivityTrader(swap: CoinSwapActivity): string {
@@ -571,6 +606,14 @@ function createActivityFeedItem(
   const notionalUsd = getSwapUsdValue(swap);
   const coinName = coin.name?.trim() || coin.symbol?.trim() || "Unknown coin";
 
+  // Prefer USD, fall back to native currency, then "—"
+  let amount: string;
+  if (notionalUsd !== null) {
+    amount = formatCompactCurrency(notionalUsd);
+  } else {
+    amount = getSwapNativeAmount(swap) ?? "\u2014";
+  }
+
   return {
     id:
       swap.id ??
@@ -578,7 +621,7 @@ function createActivityFeedItem(
       `${coin.address ?? coinName}-${swap.blockTimestamp}`,
     trader: formatActivityTrader(swap),
     action: toActivityAction(swap.activityType),
-    amount: formatCompactCurrency(notionalUsd ?? 0),
+    amount,
     coin: coinName,
     timestamp: swap.blockTimestamp,
   };
@@ -588,7 +631,9 @@ export async function fetchActivityFeed(
   count: number = 6,
 ): Promise<ActivityFeedItem[]> {
   const requestedCount = Math.max(1, count);
-  const recentCoins = await fetchCoins("last-traded", requestedCount);
+  // Fetch extra to compensate for deduplication and failed swaps
+  const fetchCount = Math.min(requestedCount * 2, 12);
+  const recentCoins = await fetchCoins("last-traded", fetchCount);
   const seenAddresses = new Set<string>();
   const uniqueCoins = recentCoins.filter((coin) => {
     const address = normalizeWalletAddress(coin.address);
@@ -612,7 +657,7 @@ export async function fetchActivityFeed(
     }),
   );
 
-  return recentSwaps
+  const sorted = recentSwaps
     .flatMap((result) => {
       if (result.status !== "fulfilled" || !result.value) {
         return [];
@@ -620,19 +665,32 @@ export async function fetchActivityFeed(
 
       return [result.value];
     })
-    .sort((left, right) => toTimestampValue(right.timestamp) - toTimestampValue(left.timestamp))
-    .slice(0, requestedCount);
+    .sort((left, right) => toTimestampValue(right.timestamp) - toTimestampValue(left.timestamp));
+
+  // Deduplicate visually identical entries (same trader + action + coin)
+  const seenKeys = new Set<string>();
+  const deduplicated: ActivityFeedItem[] = [];
+  for (const item of sorted) {
+    const key = `${item.trader}|${item.action}|${item.coin}`;
+    if (seenKeys.has(key)) continue;
+    seenKeys.add(key);
+    deduplicated.push(item);
+  }
+
+  return deduplicated.slice(0, requestedCount);
 }
 
-export function formatCompactCurrency(value: string | number | undefined): string {
-  if (value === undefined || value === null) return "$0";
+export function formatCompactCurrency(value: string | number | undefined | null): string {
+  if (value === undefined || value === null) return "\u2014";
   const num = typeof value === "string" ? parseFloat(value) : value;
-  if (isNaN(num)) return "$0";
+  if (isNaN(num)) return "\u2014";
   const abs = Math.abs(num);
   const sign = num < 0 ? "-" : "";
   if (abs >= 1e9) return `${sign}$${(abs / 1e9).toFixed(1)}B`;
   if (abs >= 1e6) return `${sign}$${(abs / 1e6).toFixed(1)}M`;
   if (abs >= 1e3) return `${sign}$${(abs / 1e3).toFixed(1)}K`;
+  if (abs === 0) return "$0";
+  if (abs < 1) return `${sign}<$1`;
   return `${sign}$${abs.toFixed(0)}`;
 }
 

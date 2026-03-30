@@ -313,7 +313,7 @@ describe("fetchActivityFeed", () => {
     const { fetchActivityFeed } = await import("@/lib/zora");
     const response = await fetchActivityFeed(2);
 
-    expect(sdk.getCoinsLastTraded).toHaveBeenCalledWith({ count: 2 });
+    expect(sdk.getCoinsLastTraded).toHaveBeenCalledWith({ count: 4 });
     expect(sdk.getCoinSwaps).toHaveBeenCalledTimes(2);
     expect(response).toEqual([
       {

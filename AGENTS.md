@@ -131,7 +131,7 @@ Discovery coverage lives in `src/__tests__/discovery.test.ts`. If you change `ll
 
 `src/lib/zora.ts` exports these utilities:
 
-- `formatCompactCurrency(value)` — `"$1.2M"`, `"$450.2K"` format
+- `formatCompactCurrency(value)` — `"$1.2M"`, `"$450.2K"`, `"<$1"` for sub-dollar, `"—"` for null/undefined
 - `formatChange(marketCap, delta)` — `{ value: "+12.3%", positive: true }` from absolute delta
 - `truncateAddress(addr)` — `"0x1234...5678"`
 - `coinTypeLabel(type)` — `"CONTENT"` → `"post"`, `"CREATOR"` → `"creator-coin"`, `"TREND"` → `"trend"`

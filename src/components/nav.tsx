@@ -245,7 +245,15 @@ export function Nav() {
                   <Link
                     key={section.id}
                     href={section.href}
-                    onClick={(e) => navigateWithClose(e, section.href)}
+                    onClick={(e) => {
+                      if (section.id === "portfolio" && !isConnected) {
+                        e.preventDefault();
+                        close();
+                        setTimeout(() => setWalletModalOpen(true), 100);
+                      } else {
+                        navigateWithClose(e, section.href);
+                      }
+                    }}
                     className="group bg-black p-6 flex flex-col gap-3 transition-colors duration-200 outline-none hover:bg-white hover:text-black focus-visible:bg-white focus-visible:text-black focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black"
                     onMouseEnter={() => iconRefs[section.id]?.current?.startAnimation()}
                     onMouseLeave={() => iconRefs[section.id]?.current?.stopAnimation()}

@@ -33,6 +33,7 @@ Use this skill when the user asks for:
 | Env                                  | Default | Description                              |
 | ------------------------------------ | ------- | ---------------------------------------- |
 | `ZORA_MOMENTUM_LIVE`                 | `false` | Enable real trading                      |
+| `ZORA_MOMENTUM_LIMIT`               | `12`    | Scan depth (coins per query)             |
 | `ZORA_MOMENTUM_MAX_ETH`              | `0.01`  | Max ETH per entry                        |
 | `ZORA_MOMENTUM_MAX_POSITIONS`        | `3`     | Max tracked positions                    |
 | `ZORA_MOMENTUM_MIN_GAIN_PCT`         | `15`    | Min 24h gain for candidates              |
@@ -53,18 +54,19 @@ Schedule: every 10 minutes. Keep `autostart` off until dry-run output looks corr
 ```bash
 node scripts/run.mjs
 zora explore --sort gainers --limit 12 --json
+zora explore --sort trending --limit 12 --json
 zora get <identifier> --json
 zora balance coins --sort usd-value --limit 20 --json
-zora buy <address> --eth 0.01 --quote --slippage 3 --json
-zora buy <address> --eth 0.01 --token eth --slippage 3 --json --yes
-zora sell <address> --percent 100 --to eth --slippage 3 --json --yes
+zora buy <identifier> --eth <amount> --quote --json
+zora buy <identifier> --eth <amount> --slippage <pct> --json --yes
+zora sell <identifier> --percent 100 --to eth --slippage <pct> --json --yes
 ```
 
 ## How It Works
 
-Loads state, refreshes positions from `zora balance coins`, and runs exits first (stop-loss, take-profit, trailing stop). Every exit logs a reasoning string to `journal.jsonl`.
+Loads state, refreshes positions, runs exits first (stop-loss, take-profit, trailing stop). Every exit logs to `journal.jsonl`.
 
-New entries run after cooldown, position count, and daily cap checks pass. Pulls gainers and trending, filters by gain and volume, drops flip-flop blocked coins, resolves addresses, and quotes up to 5 candidates. Dry run stops at the quote. Live mode enters the top pick.
+New entries run after cooldown, position, and daily cap checks. Pulls gainers and trending, filters by gain and volume, drops flip-flop blocked coins, resolves addresses, quotes up to 5 candidates. Dry run stops at the quote. Live mode enters the top pick.
 
 ### Decision Rules
 

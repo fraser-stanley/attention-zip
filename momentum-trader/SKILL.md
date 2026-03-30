@@ -10,52 +10,49 @@ metadata:
 
 # Momentum Trader
 
-Finds momentum candidates, quotes entries, and manages stop-loss, take-profit, and trailing-stop exits. Dry run by default.
+Finds momentum candidates, quotes entries, and manages exit rules. Dry run by default.
 
 ## When to Use This Skill
 
 Use this skill when the user asks for:
 
 - Recurring momentum scans and entries
-- Dry-run candidate scans before a trade goes live
+- Dry-run candidate scans before going live
 - Stop-loss, take-profit, or trailing-stop management
-- A flip-flop guard that blocks re-entry into recently exited coins
+- A flip-flop guard blocking re-entry into recently exited coins
 
 ## Setup
 
-1. Install the Zora CLI and make sure `node` is available.
-2. Use a dedicated wallet. Run `zora setup --create` or set `ZORA_PRIVATE_KEY`. On macOS, run `zora wallet backup` before enabling live mode.
+1. Install the Zora CLI and `node`.
+2. Run `zora setup --create` or set `ZORA_PRIVATE_KEY`. On macOS, run `zora wallet backup`.
 3. Run `./scripts/validate.sh`.
-4. Leave `ZORA_MOMENTUM_LIVE=false` for the first manual run.
+4. Leave `ZORA_MOMENTUM_LIVE=false` for the first run.
 
 ## Configuration
 
 | Env                                  | Default | Description                              |
 | ------------------------------------ | ------- | ---------------------------------------- |
-| `ZORA_MOMENTUM_LIVE`                 | `false` | Turns real trading on                    |
+| `ZORA_MOMENTUM_LIVE`                 | `false` | Enable real trading                      |
 | `ZORA_MOMENTUM_MAX_ETH`              | `0.01`  | Max ETH per entry                        |
 | `ZORA_MOMENTUM_MAX_POSITIONS`        | `3`     | Max tracked positions                    |
-| `ZORA_MOMENTUM_MIN_GAIN_PCT`         | `15`    | Minimum 24h change for a candidate       |
-| `ZORA_MOMENTUM_MIN_VOLUME_USD`       | `50000` | Minimum 24h volume                       |
-| `ZORA_MOMENTUM_MAX_SLIPPAGE_PCT`     | `3`     | Passed into quote and live orders        |
-| `ZORA_MOMENTUM_TRAILING_STOP`        | `15`    | Exit when price falls this far from peak |
-| `ZORA_MOMENTUM_COOLDOWN_SEC`         | `300`   | Delay between trade attempts             |
-| `ZORA_MOMENTUM_DAILY_CAP_ETH`       | `0.05`  | Spend limit per rolling day              |
-| `ZORA_MOMENTUM_STOP_LOSS_PCT`        | `25`    | Exit when price drops this far from entry |
-| `ZORA_MOMENTUM_TAKE_PROFIT_PCT`      | `100`   | Exit when price rises this far from entry |
-| `ZORA_MOMENTUM_FLIPFLOP_RUNS`        | `3`     | Block re-entry for this many runs        |
-| `ZORA_MOMENTUM_MAX_QUOTE_SLIPPAGE_PCT` | `5`  | Skip candidates above this slippage      |
+| `ZORA_MOMENTUM_MIN_GAIN_PCT`         | `15`    | Min 24h gain for candidates              |
+| `ZORA_MOMENTUM_MIN_VOLUME_USD`       | `50000` | Min 24h volume                           |
+| `ZORA_MOMENTUM_MAX_SLIPPAGE_PCT`     | `3`     | Slippage for quotes and orders           |
+| `ZORA_MOMENTUM_TRAILING_STOP`        | `15`    | Exit pct drop from peak                  |
+| `ZORA_MOMENTUM_COOLDOWN_SEC`         | `300`   | Delay between trades                     |
+| `ZORA_MOMENTUM_DAILY_CAP_ETH`       | `0.05`  | Rolling daily spend limit                |
+| `ZORA_MOMENTUM_STOP_LOSS_PCT`        | `25`    | Exit pct drop from entry                 |
+| `ZORA_MOMENTUM_TAKE_PROFIT_PCT`      | `100`   | Exit pct rise from entry                 |
+| `ZORA_MOMENTUM_FLIPFLOP_RUNS`        | `3`     | Re-entry block duration (runs)           |
+| `ZORA_MOMENTUM_MAX_QUOTE_SLIPPAGE_PCT` | `5`  | Skip above this slippage                 |
 
-The schedule is every 10 minutes. Keep `autostart` off until the dry-run output looks correct.
-
-Tuning: if slippage consistently exceeds 3%, reduce `ZORA_MOMENTUM_MAX_ETH` before loosening slippage. If no candidates appear, lower `ZORA_MOMENTUM_MIN_GAIN_PCT` or `ZORA_MOMENTUM_MIN_VOLUME_USD`. If exits fire too often, widen `ZORA_MOMENTUM_TRAILING_STOP`. Never raise `ZORA_MOMENTUM_DAILY_CAP_ETH` above what you can afford to lose in a day.
+Schedule: every 10 minutes. Keep `autostart` off until dry-run output looks correct.
 
 ## Commands
 
 ```bash
 node scripts/run.mjs
 zora explore --sort gainers --limit 12 --json
-zora explore --sort trending --limit 12 --json
 zora get <identifier> --json
 zora balance coins --sort usd-value --limit 20 --json
 zora buy <address> --eth 0.01 --quote --slippage 3 --json
@@ -65,9 +62,22 @@ zora sell <address> --percent 100 --to eth --slippage 3 --json --yes
 
 ## How It Works
 
-The script starts by loading state and refreshing positions from `zora balance coins`. Exits run first, in priority order: stop-loss, take-profit, trailing stop. Every exit logs a reasoning string to `journal.jsonl`.
+Loads state, refreshes positions from `zora balance coins`, and runs exits first (stop-loss, take-profit, trailing stop). Every exit logs a reasoning string to `journal.jsonl`.
 
-New entries happen only after cooldown, position count, and daily cap checks pass. The skill pulls gainers and trending, filters by gain and volume, and drops anything blocked by the flip-flop guard. Each surviving candidate gets a `zora get` lookup to resolve its 0x address, then a quote. Up to 5 are quoted. High-slippage candidates are cut, the rest ranked by edge score. Dry run stops at the quote. Live mode enters the top pick and logs the result.
+New entries run after cooldown, position count, and daily cap checks pass. Pulls gainers and trending, filters by gain and volume, drops flip-flop blocked coins, resolves addresses, and quotes up to 5 candidates. Dry run stops at the quote. Live mode enters the top pick.
+
+### Decision Rules
+
+| Condition | Action |
+| --- | --- |
+| Price below stop-loss from entry | Exit immediately, log reason |
+| Price above take-profit from entry | Exit immediately, log reason |
+| Price below trailing stop from peak | Exit immediately, log reason |
+| Cooldown timer not elapsed | Block new entries |
+| Position count at max | Block new entries |
+| Daily ETH cap reached | Block new entries |
+| Candidate in flip-flop cooldown | Skip candidate |
+| Quote slippage > threshold | Skip candidate |
 
 ## Example Output
 
@@ -89,21 +99,31 @@ Candidates (3 evaluated, 1 filtered by slippage):
 
 ## Troubleshooting
 
-No candidates showing up? Lower `ZORA_MOMENTUM_MIN_GAIN_PCT` or `ZORA_MOMENTUM_MIN_VOLUME_USD`.
-
-"Invalid address" on `buy` or `sell`? Resolve the name first with `zora get <name> --json`.
-
-Quotes failing? Reduce `ZORA_MOMENTUM_MAX_ETH` before loosening slippage.
-
-Wrong wallet and live mode is on? Unset `ZORA_MOMENTUM_LIVE` immediately and rerun dry.
-
-A coin keeps getting skipped? It may be in the flip-flop cooldown. Lower `ZORA_MOMENTUM_FLIPFLOP_RUNS` or wait it out.
+| Symptom | Cause | Fix |
+| --- | --- | --- |
+| No candidates showing | Filters too tight | Lower `MIN_GAIN_PCT` or `MIN_VOLUME_USD` |
+| "Invalid address" on buy/sell | Name not resolved | Run `zora get <name> --json` first |
+| Quotes failing | Size too large for liquidity | Reduce `MAX_ETH` before loosening slippage |
+| Wrong wallet in live mode | Env misconfiguration | Unset `ZORA_MOMENTUM_LIVE` immediately, rerun dry |
+| Coin keeps getting skipped | Flip-flop cooldown active | Lower `FLIPFLOP_RUNS` or wait it out |
 
 ## Important Notes
 
-- This skill can place real trades. Treat every live run as production.
-- Dry run is the default and should stay the default for new installs.
-- On macOS, back up any locally created wallet with `zora wallet backup`.
-- The journal is part of the safety model. Every entry includes a reasoning string.
-- Give it its own wallet. Do not point this at a wallet that other tools trade from.
-- Use the Zora CLI for all market data. Do not scrape zora.co or call Zora APIs directly.
+### Mandates
+
+- NEVER enable live mode without reviewing dry-run output first, unless the user explicitly asks to skip dry-run.
+- NEVER raise daily cap beyond the user's stated risk tolerance.
+- ALWAYS run exits before scanning for new entries. ALWAYS quote before executing.
+- ALWAYS use a dedicated wallet. Back it up with `zora wallet backup` on macOS.
+- ALWAYS use the Zora CLI for market data. Do not scrape zora.co or call Zora APIs directly.
+
+The user has final say. If they explicitly override a mandate, respect their decision.
+
+### Anti-Patterns
+
+| Pattern | Consequence |
+| --- | --- |
+| Loosening slippage to force fills | Overpays on illiquid coins |
+| Raising daily cap to chase momentum | Amplifies losses on reversal |
+| Skipping exits to hold longer | Defeats the stop-loss safety model |
+| Re-entering a flip-flop blocked coin | Churn erodes balance to fees |

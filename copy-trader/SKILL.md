@@ -43,7 +43,7 @@ Use this skill when the user asks for:
 | `ZORA_COPYTRADE_DAILY_CAP_USD` | `100` | Spend cap per rolling day |
 | `ZORA_COPYTRADE_MAX_POSITIONS` | `5` | Max copied positions tracked at once |
 
-The default settings show the primary controls above. Advanced overrides for freshness, drift, concentration, and confirmation still work as env vars. The worker runs every minute, but live mode stays selective. It confirms the source swap, checks its age, compares the current quote with the source price, and only copies when conditions pass.
+Advanced overrides for freshness, drift, concentration, and confirmation still work as env vars.
 
 ## Commands
 
@@ -59,11 +59,19 @@ zora balance coins --sort usd-value --limit 20 --json
 
 ## How It Works
 
-The script loads the last source snapshot and attribution cache, looks up source wallets, optionally pulls a short leaderboard list, then fetches current source balances. Deltas are classified as entries, adds, trims, or exits.
+The script loads the last source snapshot, looks up source wallets, optionally pulls a short leaderboard list, then fetches current balances. Deltas are classified as entries, adds, trims, or exits. Exits and trims run before entries. Copied positions get reconciled against the real wallet every run before any new live entries.
 
-Each delta is confirmed against recent swap activity. Source age matters. Exits and trims run before entries. Buy sizing starts from the source move, then gets capped by per-trade spend, daily spend, wallet balance, position count, and concentration limits.
+### Decision Rules
 
-Trades are always quoted first. Live mode acts only when freshness, drift, and slippage all pass. Copied positions get reconciled against the real wallet every run before any new live entries.
+| Condition | Action |
+| --- | --- |
+| Source swap not confirmed in recent activity | Skip, log "unconfirmed" |
+| Source swap age > freshness window | Skip, log "stale" |
+| Price drift from source price > threshold | Skip, log "drift exceeded" |
+| Quote slippage > limit | Skip, log "slippage" |
+| Daily spend cap reached | Block all entries |
+| Position count at max | Block new entries |
+| Reconciliation mismatch detected | Halt entries, log safety event |
 
 ## Example Output
 
@@ -86,17 +94,30 @@ Confirmed source actions:
 
 ## Troubleshooting
 
-- No sources tracked? Check `ZORA_COPYTRADE_SOURCE_ADDRESSES` and confirm the handle points to a public wallet.
-- Snapshot changes unconfirmed? Widen `ZORA_COPYTRADE_CONFIRMATION_LOOKBACK_MIN` before loosening trade caps.
-- Entries keep skipping? Check freshness, price drift, and quote slippage before changing sizing.
-- Live sells failing? Re-run in dry-run mode and inspect copied-position state plus reconcile notes.
-- Reconciliation mismatch is a safety event. Fix the wallet/state mismatch before doing anything else.
+| Symptom | Cause | Fix |
+| --- | --- | --- |
+| No sources tracked | Bad address or handle | Check `ZORA_COPYTRADE_SOURCE_ADDRESSES`, confirm public wallet |
+| Snapshot changes unconfirmed | Lookback too short | Widen `CONFIRMATION_LOOKBACK_MIN` before loosening caps |
+| Entries keep skipping | Freshness, drift, or slippage failing | Check each threshold in dry-run output before changing sizing |
+| Live sells failing | Stale copied-position state | Re-run dry, inspect reconcile notes |
+| Reconciliation mismatch | Wallet/state divergence | Safety event. Fix mismatch before anything else |
 
 ## Important Notes
 
-- This skill can place real trades. Treat live mode as production.
-- Dry run is the default and should stay the default for new installs.
-- Copy Trader only follows public Zora activity on Base.
-- The one-minute schedule does not promise instant fills. Freshness and price-drift checks keep late copies from becoming bad copies.
-- The journal is part of the safety model. Every action or skip includes a reason.
-- Give it its own wallet. Back it up with `zora wallet backup` on macOS.
+### Mandates
+
+- NEVER enable live mode without reviewing dry-run output first, unless the user explicitly asks to skip dry-run.
+- NEVER raise the daily cap beyond the user's stated risk tolerance.
+- ALWAYS run exits before entries. ALWAYS quote before executing.
+- ALWAYS use a dedicated wallet. Back it up with `zora wallet backup` on macOS.
+
+The user has final say. If they explicitly override a mandate, respect their decision.
+
+### Anti-Patterns
+
+| Pattern | Consequence |
+| --- | --- |
+| Loosening slippage to force fills | Overpays on illiquid coins |
+| Raising daily cap to chase a run | Amplifies losses on reversal |
+| Ignoring reconciliation mismatches | Trades against stale state |
+| Copying without confirming source swap | Follows phantom deltas |

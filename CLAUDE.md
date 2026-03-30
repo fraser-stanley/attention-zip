@@ -346,10 +346,17 @@ Do NOT put `requires`, `tunables`, or `openclaw` in SKILL.md frontmatter — tho
 2. `## Setup`
 3. `## Configuration`
 4. `## Commands`
-5. `## How It Works`
+5. `## How It Works` — trading skills include a `### Decision Rules` condition/action table
 6. `## Example Output`
-7. `## Troubleshooting`
-8. `## Important Notes`
+7. `## Troubleshooting` — trading skills use symptom/cause/fix tables instead of prose
+8. `## Important Notes` — trading skills split into `### Mandates` (NEVER/ALWAYS defaults) and `### Anti-Patterns` (pattern/consequence table)
+
+**Trading skill structured patterns** (copy-trader, momentum-trader):
+
+- **Mandates** are strong defaults, not hard blocks. Every mandate includes user-override language ("unless the user explicitly..."). The human always has final say.
+- **Anti-Patterns** warn about common mistakes with consequences. They are warnings, not prohibitions.
+- **Decision Rules** make the skill's logic explicit as condition/action tables so agents can parse the decision flow reliably.
+- **Troubleshooting tables** use symptom/cause/fix columns instead of prose for agent-parseable error recovery.
 
 **clawhub.json** structure:
 

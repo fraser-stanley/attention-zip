@@ -30,9 +30,7 @@ if ! zora wallet info >/dev/null 2>&1; then
 fi
 echo "  ok wallet available"
 
-if [[ "${OSTYPE:-}" == darwin* ]]; then
-  echo "  note run 'zora wallet backup' to save a Keychain backup"
-fi
+echo "  note run 'zora wallet export' and save the key securely"
 
 echo "PASS: copy-trader ready"
 echo "  note public reads require outbound access to api-sdk.zora.engineering"

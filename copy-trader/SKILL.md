@@ -27,7 +27,7 @@ Use this skill when the user asks for:
 2. Use a dedicated wallet. Run `zora setup --create` or set `ZORA_PRIVATE_KEY`.
 3. Run `./scripts/validate.sh`.
 4. Keep `ZORA_COPYTRADE_LIVE=false` until the dry-run output matches the sources you want.
-5. On macOS, run `zora wallet backup` before trusting this skill with live funds.
+5. On macOS, run `zora wallet export` and save the key securely before trusting this skill with live funds.
 
 ## Configuration
 
@@ -109,7 +109,7 @@ Confirmed source actions:
 - NEVER enable live mode without reviewing dry-run output first, unless the user explicitly asks to skip dry-run.
 - NEVER raise the daily cap beyond the user's stated risk tolerance.
 - ALWAYS run exits before entries. ALWAYS quote before executing.
-- ALWAYS use a dedicated wallet. Back it up with `zora wallet backup` on macOS.
+- ALWAYS use a dedicated wallet. Back it up with `zora wallet export`.
 
 The user has final say. If they explicitly override a mandate, respect their decision.
 

@@ -24,7 +24,7 @@ Use this skill when the user asks for:
 ## Setup
 
 1. Install the Zora CLI and make sure `node` is available.
-2. Configure a wallet with `zora setup` or set `ZORA_PRIVATE_KEY`. On macOS, run `zora wallet backup` after setup.
+2. Configure a wallet with `zora setup` or set `ZORA_PRIVATE_KEY`. On macOS, run `zora wallet export` and save the key securely after setup.
 3. Run `./scripts/validate.sh`.
 4. Trigger the script manually before putting it on a schedule.
 
@@ -75,7 +75,7 @@ Alerts:
 
 ## Troubleshooting
 
-"No wallet configured" means you need `zora setup` or `ZORA_PRIVATE_KEY`. On macOS, follow setup with `zora wallet backup`.
+"No wallet configured" means you need `zora setup` or `ZORA_PRIVATE_KEY`. On macOS, follow setup with `zora wallet export` and save the exported key securely.
 
 Concentration warning too sensitive? Raise `ZORA_PORTFOLIO_CONCENTRATION_ALERT_PCT`.
 
@@ -86,7 +86,7 @@ Want to check someone else's wallet? Use the API or SDK. `zora balance` reads on
 ## Important Notes
 
 - Portfolio Scout is read-only. It does not place or cancel orders.
-- On macOS, `zora wallet backup` keeps a local wallet recoverable.
+- On macOS, `zora wallet export` can export the private key for external backup.
 - The drawdown check is a simple run-to-run comparison, not a full performance engine.
 - Deleting the state file resets the baseline.
 - Pairs well with execution skills like Momentum Trader or Copy Trader.

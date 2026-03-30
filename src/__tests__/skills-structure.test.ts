@@ -319,10 +319,10 @@ describe.each(SKILL_DIRS)("%s/scripts/validate.sh", (skill) => {
 
 describe("wallet-backed setup guidance", () => {
   it.each(["portfolio-scout", "copy-trader", "momentum-trader"])(
-    "%s mentions zora wallet backup",
+    "%s mentions zora wallet export",
     (skill) => {
       const content = readSkillMd(skill);
-      expect(content).toContain("zora wallet backup");
+      expect(content).toContain("zora wallet export");
     },
   );
 });

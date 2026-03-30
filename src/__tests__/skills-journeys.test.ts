@@ -67,7 +67,7 @@ describe("trading skill safety for new users", () => {
       const body = getBody(readSkillMd(skill.id));
       const setup = getSection(body, "## Setup");
       expect(setup).toMatch(/zora setup|dedicated wallet/i);
-      expect(setup).toMatch(/wallet backup|backup/i);
+      expect(setup).toMatch(/wallet export|save the key/i);
     },
   );
 

@@ -392,7 +392,7 @@ The Zora CLI has 8 commands: `auth`, `explore`, `get`, `buy`, `sell`, `balance`,
 | `zora sell`    | `zora sell <address> --amount <tokens> --json` | Requires 0x address, does not resolve names. Also: --usd, --token (alias for --to), --percent, --all, --to <ETH\|USDC\|ZORA>, --quote, --yes, --slippage, --debug    |
 | `zora balance` | `zora balance [spendable\|coins] --json`         | Subcommands: (none) = wallet + coins, `spendable` = ETH/USDC/ZORA only, `coins` = coin holdings with --sort                                                          |
 | `zora setup`   | `zora setup [--create] [--force]`                | Creates/imports wallet at ~/.config/zora/wallet.json                                                                                                                 |
-| `zora wallet`  | `wallet info`, `wallet export`, `wallet backup`  | Wallet inspection, export, and Keychain backup on macOS                                                                                                              |
+| `zora wallet`  | `wallet info`, `wallet export`                    | Wallet inspection and private key export                                                                                                                             |
 | `zora auth`    | `auth configure`, `auth status`                  | API key management                                                                                                                                                   |
 
 **CLI behavioral notes:**
@@ -427,7 +427,6 @@ The Zora CLI has 8 commands: `auth`, `explore`, `get`, `buy`, `sell`, `balance`,
 - `zora setup` creates a new EOA keypair or imports an existing private key
 - Keys stored at `~/.config/zora/wallet.json` (mode 0600)
 - `ZORA_PRIVATE_KEY` env var takes precedence over stored wallet
-- On macOS, `zora wallet backup` stores a recoverable backup in Keychain
 - `--create` skips interactive prompt, `--force` overwrites existing wallet
 - **No spending limits or scope restrictions** — it's a raw private key
 

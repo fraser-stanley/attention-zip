@@ -35,7 +35,7 @@ Six skills for the Zora market. Each skill directory contains:
 | [copy-trader](copy-trader/)         | Mirrors public Zora wallet moves with guardrails. Dry run by default    | Execution |
 | [momentum-trader](momentum-trader/) | Quotes and manages momentum trades. Dry run by default                  | Execution |
 
-Trend Scout, Creator Pulse, and Briefing Bot do not need a wallet. Portfolio Scout can inspect any address through the public API, and its local wallet mode uses `zora balance`. Copy Trader and Momentum Trader need a dedicated wallet configured through `zora setup` or `ZORA_PRIVATE_KEY`. If you create that wallet locally on macOS, run `zora wallet backup` after setup.
+Trend Scout, Creator Pulse, and Briefing Bot do not need a wallet. Portfolio Scout can inspect any address through the public API, and its local wallet mode uses `zora balance`. Copy Trader and Momentum Trader need a dedicated wallet configured through `zora setup` or `ZORA_PRIVATE_KEY`. If you create that wallet locally, run `zora wallet export` and save the key securely.
 
 ## API
 

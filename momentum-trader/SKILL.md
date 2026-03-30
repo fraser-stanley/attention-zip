@@ -24,7 +24,7 @@ Use this skill when the user asks for:
 ## Setup
 
 1. Install the Zora CLI and `node`.
-2. Run `zora setup --create` or set `ZORA_PRIVATE_KEY`. On macOS, run `zora wallet backup`.
+2. Run `zora setup --create` or set `ZORA_PRIVATE_KEY`. Back up via `zora wallet export`.
 3. Run `./scripts/validate.sh`.
 4. Leave `ZORA_MOMENTUM_LIVE=false` for the first run.
 
@@ -116,7 +116,7 @@ Candidates (3 evaluated, 1 filtered by slippage):
 - NEVER enable live mode without reviewing dry-run output first, unless the user explicitly asks to skip dry-run.
 - NEVER raise daily cap beyond the user's stated risk tolerance.
 - ALWAYS run exits before scanning for new entries. ALWAYS quote before executing.
-- ALWAYS use a dedicated wallet. Back it up with `zora wallet backup` on macOS.
+- ALWAYS use a dedicated wallet. Export it with `zora wallet export`.
 - ALWAYS use the Zora CLI for market data. Do not scrape zora.co or call Zora APIs directly.
 
 The user has final say. If they explicitly override a mandate, respect their decision.

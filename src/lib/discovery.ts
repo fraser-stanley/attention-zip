@@ -57,8 +57,8 @@ const CLI_REFERENCE = [
   },
   {
     command: "zora wallet",
-    syntax: "zora wallet info | zora wallet export | zora wallet backup",
-    notes: "Wallet inspection, export, and Keychain backup on macOS.",
+    syntax: "zora wallet info | zora wallet export",
+    notes: "Wallet inspection and private key export.",
   },
   {
     command: "zora auth",

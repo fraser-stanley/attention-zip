@@ -2,6 +2,8 @@
 
 import { useSearchParams } from "next/navigation";
 import { useState, Suspense } from "react";
+import { buttonVariants } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 function LoginForm() {
   const searchParams = useSearchParams();
@@ -65,7 +67,7 @@ function LoginForm() {
         <button
           type="submit"
           disabled={loading || !password}
-          className="w-full bg-foreground px-3 py-2 font-mono text-sm text-background disabled:opacity-50"
+          className={cn(buttonVariants({ variant: "default" }), "w-full")}
         >
           {loading ? "..." : "Enter"}
         </button>

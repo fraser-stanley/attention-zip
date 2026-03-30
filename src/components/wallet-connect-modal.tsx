@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { AddressConnectForm } from "@/components/address-connect-form";
+import { Button } from "@/components/ui/button";
 
 interface WalletConnectModalProps {
   open: boolean;
@@ -122,11 +123,13 @@ export function WalletConnectModal({ open, onClose }: WalletConnectModalProps) {
                     </p>
                   </div>
 
-                  <button
+                  <Button
                     type="button"
+                    variant="ghost"
+                    size="icon"
                     onClick={onClose}
                     aria-label="Close wallet connect modal"
-                    className="inline-flex min-h-[44px] min-w-[44px] items-center justify-center border border-white/10 text-white/50 transition-colors hover:border-white/30 hover:text-white"
+                    className="border-white/10 text-white/50 hover:border-white/30 hover:bg-white/[0.06] hover:text-white"
                   >
                     <svg
                       width="14"
@@ -141,7 +144,7 @@ export function WalletConnectModal({ open, onClose }: WalletConnectModalProps) {
                       <path d="M18 6 6 18" />
                       <path d="m6 6 12 12" />
                     </svg>
-                  </button>
+                  </Button>
                 </div>
               </div>
 

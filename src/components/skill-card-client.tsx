@@ -2,21 +2,13 @@
 
 import { useEffect, useId, useRef, useState } from "react";
 
-import { AnimatedButton } from "@/components/ui/animated-button";
-import { BrailleSpinner } from "@/components/ui/braille-spinner";
-import { TextMorph } from "@/components/text-morph";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button-variants";
 import { ArrowUpRightIcon } from "@/components/ui/arrow-up-right";
-import { CheckIcon } from "@/components/ui/check";
-import { CopyIcon } from "@/components/ui/copy";
-import { PlusIcon } from "@/components/ui/plus";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CopyableCodeBlock } from "@/components/copyable-code-block";
-import { useToast } from "@/components/toast";
 import { useExpandableMemory } from "@/hooks/use-expandable-memory";
 import { useSessionStorageState } from "@/hooks/use-session-storage-state";
-import { useInstalledSkills } from "@/lib/installed-skills-context";
 import {
   getInstallAllCommands,
   getSkillRuntimeCommands,
@@ -130,34 +122,14 @@ function RuntimeInstallCard({
   onChange: (runtime: Runtime) => void;
   command: string;
 }) {
-  const [copied, setCopied] = useState(false);
-  const timeoutRef = useRef<number | null>(null);
-
-  useEffect(() => {
-    return () => {
-      if (timeoutRef.current !== null) window.clearTimeout(timeoutRef.current);
-    };
-  }, []);
-
-  async function handleCopy() {
-    try {
-      await navigator.clipboard.writeText(command);
-      setCopied(true);
-    } catch {
-      return;
-    }
-    if (timeoutRef.current !== null) window.clearTimeout(timeoutRef.current);
-    timeoutRef.current = window.setTimeout(() => setCopied(false), 2000);
-  }
-
   return (
-    <div className="max-w-2xl border border-border">
+    <div className="max-w-2xl">
       <Tabs
         value={runtime}
         onValueChange={(value) => onChange(value as Runtime)}
         className="w-full gap-0"
       >
-        <div className="border-b border-border bg-muted p-1">
+        <div className="border border-border border-b-0 bg-muted p-1">
           <TabsList
             aria-label="Agent runtime"
             className="flex w-full flex-wrap justify-start bg-transparent p-0"
@@ -174,105 +146,11 @@ function RuntimeInstallCard({
           </TabsList>
         </div>
       </Tabs>
-      <button
-        type="button"
-        onClick={handleCopy}
-        className="group flex w-full items-center gap-3 bg-foreground/5 px-4 py-3.5 font-mono text-sm transition-colors hover:bg-foreground/[0.07]"
-        title={copied ? "Copied" : "Copy command"}
-        aria-live="polite"
-      >
-        <span className="text-foreground/40">{runtime === "prompt" ? ">" : "$"}</span>
-        <span className="flex-1 truncate text-left text-foreground/80">
-          {command}
-        </span>
-        <span className="shrink-0 text-muted-foreground/60 transition-colors group-hover:text-foreground/60">
-          {copied ? <CheckIcon size={16} /> : <CopyIcon size={16} />}
-        </span>
-      </button>
+      <CopyableCodeBlock
+        command={command}
+        prefix={runtime === "prompt" ? ">" : "$"}
+      />
     </div>
-  );
-}
-
-type InstallState = "idle" | "installing" | "installed";
-
-function InstallButton({ skill, command }: { skill: Skill; command: string }) {
-  const { isInstalled, install, uninstall, hydrated } = useInstalledSkills();
-  const { toast } = useToast();
-  const [installing, setInstalling] = useState(false);
-  const timerRef = useRef<number | null>(null);
-  const installed = hydrated && isInstalled(skill.id);
-  const state: InstallState = installing
-    ? "installing"
-    : installed
-      ? "installed"
-      : "idle";
-
-  useEffect(() => {
-    return () => {
-      if (timerRef.current !== null) {
-        window.clearTimeout(timerRef.current);
-      }
-    };
-  }, []);
-
-  function handleInstall() {
-    navigator.clipboard.writeText(command).catch(() => {});
-    setInstalling(true);
-    timerRef.current = window.setTimeout(() => {
-      install(skill.id);
-      setInstalling(false);
-      toast(`${skill.name} installed`);
-      timerRef.current = null;
-    }, 800);
-  }
-
-  function handleUninstall() {
-    uninstall(skill.id);
-  }
-
-  if (!hydrated) {
-    return (
-      <div className="h-[44px] w-full max-w-40 border border-border bg-muted/50 animate-pulse" />
-    );
-  }
-
-  if (state === "installed") {
-    return (
-      <div className="flex flex-wrap items-center gap-2">
-        <div className="type-body-sm inline-flex min-h-[44px] items-center gap-2 bg-[#3FFF00] px-4 py-2.5 font-medium text-black">
-          <CheckIcon size={14} />
-          <TextMorph>Installed</TextMorph>
-        </div>
-        <button
-          type="button"
-          className={cn(
-            buttonVariants({ variant: "outline" }),
-            "border-red-500/20 text-red-500 hover:border-red-500/30 hover:bg-red-500/10 hover:text-red-500",
-          )}
-          onClick={handleUninstall}
-        >
-          Remove
-        </button>
-      </div>
-    );
-  }
-
-  return (
-    <AnimatedButton
-      variant={state === "installing" ? "outline" : "default"}
-      className="w-full sm:w-auto"
-      disabled={state === "installing"}
-      onClick={state === "idle" ? handleInstall : undefined}
-    >
-      {state === "installing" ? (
-        <BrailleSpinner name="scan" className="text-sm" />
-      ) : (
-        <PlusIcon size={14} />
-      )}
-      <TextMorph>
-        {state === "installing" ? "Installing..." : "Install"}
-      </TextMorph>
-    </AnimatedButton>
   );
 }
 
@@ -335,13 +213,11 @@ function SkillRow({
         <CopyableCodeBlock command={command} prefix={runtime === "prompt" ? ">" : "$"} />
 
         {/* Actions: buttons */}
-        <div className="flex flex-wrap items-center gap-3">
-          <InstallButton skill={skill} command={command} />
+        <div className="flex flex-wrap items-center">
           <button
             type="button"
             className={cn(
               buttonVariants({ variant: "outline" }),
-              "w-[7.5rem]",
               "aria-expanded:bg-background aria-expanded:text-foreground aria-expanded:border-foreground",
             )}
             aria-expanded={expandedDetails}

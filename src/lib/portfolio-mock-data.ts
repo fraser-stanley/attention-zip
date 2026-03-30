@@ -46,7 +46,6 @@ export interface MockPortfolio {
   pnl: MockPortfolioPnl;
   positions: MockPosition[];
   recentTrades: MockTrade[];
-  installedSkillIds: string[];
   sparkline: SparklinePoint[];
 }
 
@@ -188,7 +187,6 @@ export const MOCK_PORTFOLIO: MockPortfolio = {
     { coin: "IMAGINE", side: "buy", amount: 800, pnl: 195.6, pct: 24.5, date: "Mar 11" },
     { coin: "ZORA", side: "sell", amount: 3_200, pnl: 664.95, pct: 20.8, date: "Mar 10" },
   ],
-  installedSkillIds: ["trend-scout", "portfolio-scout"],
   sparkline: [
     { value: 0 },
     { value: 180 },

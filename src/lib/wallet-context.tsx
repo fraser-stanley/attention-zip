@@ -7,7 +7,6 @@ import {
   useSyncExternalStore,
   type ReactNode,
 } from "react";
-import { seedDefaultSkills, clearInstalledSkills } from "@/lib/installed-skills-context";
 import { normalizeWalletAddress } from "@/lib/wallet-address";
 
 const STORAGE_KEY = "zora:wallet";
@@ -110,12 +109,10 @@ export function WalletProvider({ children }: { children: ReactNode }) {
     if (!normalizedAddress) return;
 
     emit(normalizedAddress);
-    seedDefaultSkills();
   }, []);
 
   const disconnect = useCallback(() => {
     emit(null);
-    clearInstalledSkills();
   }, []);
 
   return (

@@ -1,7 +1,7 @@
 import { cva } from "class-variance-authority";
 
 export const buttonVariants = cva(
-  "group/button inline-flex shrink-0 items-center justify-center border text-sm font-medium whitespace-nowrap outline-none select-none transition-[background-color,color,border-color] duration-150 disabled:pointer-events-none disabled:opacity-50 active:scale-[0.97] motion-reduce:active:scale-100 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+  "group/button inline-flex shrink-0 items-center justify-center border font-sans text-sm font-medium whitespace-nowrap outline-none select-none transition-[background-color,color,border-color] duration-150 focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-1 focus-visible:outline-ring disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 active:scale-[0.97] motion-reduce:active:scale-100 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
   {
     variants: {
       variant: {
@@ -14,6 +14,8 @@ export const buttonVariants = cva(
         destructive:
           "bg-[color-mix(in_oklch,var(--destructive)_10%,transparent)] text-destructive border-transparent hover:bg-[color-mix(in_oklch,var(--destructive)_20%,transparent)] focus-visible:border-destructive/40 focus-visible:ring-destructive/20",
         link: "bg-transparent text-primary border-transparent underline-offset-4 hover:underline",
+        quiet:
+          "bg-transparent text-muted-foreground border-transparent hover:text-foreground focus-visible:text-foreground",
       },
       size: {
         default:

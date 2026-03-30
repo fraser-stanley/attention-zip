@@ -5,6 +5,7 @@ import { useEffect, useRef, useState, useCallback } from "react";
 import { QRCodeSVG } from "qrcode.react";
 import { CheckIcon } from "@/components/ui/check";
 import { CopyIcon } from "@/components/ui/copy";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { useToast } from "@/components/toast";
 import { usePortfolioData } from "@/hooks/use-portfolio-data";
 import { truncateAddress, useWallet } from "@/lib/wallet-context";
@@ -102,9 +103,12 @@ export function WalletMenu({ open, onClose }: WalletMenuProps) {
               <div className="flex flex-col gap-3 bg-black p-4">
                 <div className="flex items-start justify-between">
                   <p className="type-caption font-mono text-white/50">YOUR WALLET</p>
-                  <button
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
                     onClick={onClose}
-                    className="p-1 -m-1 text-white/50 transition-colors hover:text-white"
+                    className="border-white/10 text-white/50 hover:border-white/30 hover:bg-white/[0.06] hover:text-white"
                     aria-label="Close wallet menu"
                   >
                     <svg
@@ -120,7 +124,7 @@ export function WalletMenu({ open, onClose }: WalletMenuProps) {
                       <path d="M18 6 6 18" />
                       <path d="m6 6 12 12" />
                     </svg>
-                  </button>
+                  </Button>
                 </div>
 
                 <div>
@@ -146,8 +150,12 @@ export function WalletMenu({ open, onClose }: WalletMenuProps) {
 
               <div className="flex items-center gap-3 bg-black px-4 py-3">
                 <button
+                  type="button"
                   onClick={handleCopy}
-                  className="group/copy flex flex-1 items-center justify-between border border-white/10 px-3 py-2 text-sm font-mono transition-colors hover:border-white/30"
+                  className={cn(
+                    buttonVariants({ variant: "outline" }),
+                    "group/copy flex-1 justify-between border-white/10 bg-transparent px-3 py-2 font-mono text-white hover:border-white/30 hover:bg-white/[0.06] hover:text-white",
+                  )}
                 >
                   <span>{truncateAddress(address)}</span>
                   <span className="text-white/50 group-hover/copy:text-white">
@@ -158,18 +166,23 @@ export function WalletMenu({ open, onClose }: WalletMenuProps) {
                 <Link
                   href="/portfolio"
                   onClick={onClose}
-                  className="flex min-h-[44px] shrink-0 items-center justify-center bg-white px-5 py-2 text-sm font-medium text-black ring-1 ring-inset ring-black transition-colors"
+                  className={cn(
+                    buttonVariants({ variant: "default" }),
+                    "shrink-0 bg-white text-black hover:bg-white/85 hover:text-black",
+                  )}
                 >
                   Portfolio
                 </Link>
               </div>
 
-              <button
+              <Button
+                type="button"
+                variant="outline"
                 onClick={handleDisconnect}
-                className="col-start-2 flex w-full items-center justify-center bg-white p-4 text-sm font-medium text-black ring-1 ring-inset ring-black transition-colors hover:bg-black hover:text-white hover:ring-0"
+                className="col-start-2 w-full border-white/10 bg-transparent text-white hover:border-white/30 hover:bg-white/[0.06] hover:text-white"
               >
                 Disconnect
-              </button>
+              </Button>
             </div>
           </div>
         </div>

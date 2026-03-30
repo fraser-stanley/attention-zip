@@ -102,7 +102,7 @@ export default function RootLayout({
         />
       </head>
       <body
-        className={`${commitMono.variable} ${helveticaHeavyCn.variable} antialiased`}
+        className={`${commitMono.variable} ${helveticaHeavyCn.variable} flex min-h-screen flex-col antialiased`}
 
       >
         <a
@@ -114,7 +114,7 @@ export default function RootLayout({
         <Providers>
           <Nav />
           <CommandMenuLoader />
-          <main id="main-content" className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-20 pb-12">
+          <main id="main-content" className="mx-auto flex-1 w-full max-w-7xl px-4 pt-20 pb-12 sm:px-6 lg:px-8">
             {children}
           </main>
           <Footer />

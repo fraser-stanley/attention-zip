@@ -6,6 +6,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { TextMorph } from "@/components/text-morph";
 import { skills } from "@/lib/skills";
+import { Button } from "@/components/ui/button";
 import { ZapIcon, type ZapHandle } from "@/components/ui/zap";
 import { ChartBarIncreasingIcon, type ChartBarIncreasingIconHandle } from "@/components/ui/chart-bar-increasing";
 import { ActivityIcon, type ActivityIconHandle } from "@/components/ui/activity";
@@ -36,12 +37,16 @@ const allSections: Section[] = [
   { id: "portfolio", label: "Portfolio", href: "/portfolio", description: "Your positions & PnL" },
 ];
 
+const headerActionClass =
+  "px-0 !font-display !text-[0.75rem] !font-normal uppercase !tracking-[0.08em] !leading-[1.1]";
+
 export function Nav() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const [walletModalOpen, setWalletModalOpen] = useState(false);
   const [walletMenuOpen, setWalletMenuOpen] = useState(false);
-  const { address, isConnected } = useWallet();
+  const [portfolioPromptDismissed, setPortfolioPromptDismissed] = useState(false);
+  const { address, hydrated, isConnected } = useWallet();
   const router = useRouter();
   const close = useCallback(() => {
     setOpen(false);
@@ -96,10 +101,55 @@ export function Nav() {
   useEffect(() => {
     if (prevPathname.current !== pathname) {
       prevPathname.current = pathname;
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- close menu on route change
-      close();
+      const frame = window.requestAnimationFrame(() => {
+        close();
+      });
+
+      return () => window.cancelAnimationFrame(frame);
     }
   }, [pathname, close]);
+
+  useEffect(() => {
+    if (pathname === "/portfolio" && !address) {
+      return;
+    }
+
+    if (!portfolioPromptDismissed) {
+      return;
+    }
+
+    const timer = window.setTimeout(() => {
+      setPortfolioPromptDismissed(false);
+    }, 0);
+
+    return () => window.clearTimeout(timer);
+  }, [address, pathname, portfolioPromptDismissed]);
+
+  useEffect(() => {
+    if (
+      !hydrated ||
+      address ||
+      pathname !== "/portfolio" ||
+      walletModalOpen ||
+      portfolioPromptDismissed
+    ) {
+      return;
+    }
+
+    const frame = window.requestAnimationFrame(() => {
+      setWalletModalOpen(true);
+    });
+
+    return () => window.cancelAnimationFrame(frame);
+  }, [address, hydrated, pathname, portfolioPromptDismissed, walletModalOpen]);
+
+  function handleWalletModalClose() {
+    if (!address && pathname === "/portfolio") {
+      setPortfolioPromptDismissed(true);
+    }
+
+    setWalletModalOpen(false);
+  }
 
   return (
     <>
@@ -122,27 +172,38 @@ export function Nav() {
             </Link>
             <div className="flex items-center gap-6">
               {isConnected && address ? (
-                  <button
+                  <Button
+                    type="button"
+                    variant="quiet"
                     onClick={() => setWalletMenuOpen((v) => !v)}
-                    className="type-label text-muted-foreground hover:text-foreground transition-colors py-3"
+                    className={headerActionClass}
                   >
                     <TextMorph>{truncateAddress(address)}</TextMorph>
-                  </button>
+                  </Button>
               ) : (
-                <button
-                  onClick={() => { setOpen(false); setWalletModalOpen(true); }}
-                  className="type-label text-muted-foreground hover:text-foreground transition-colors py-3"
+                <Button
+                  type="button"
+                  variant="quiet"
+                  onClick={() => {
+                    setPortfolioPromptDismissed(false);
+                    setOpen(false);
+                    setWalletModalOpen(true);
+                  }}
+                  className={headerActionClass}
                 >
                   <TextMorph>Portfolio</TextMorph>
-                </button>
+                </Button>
               )}
-              <button
+              <Button
+                type="button"
+                variant="quiet"
                 onClick={() => setOpen(true)}
+                aria-label={open ? "Close menu" : "Open menu"}
                 aria-expanded={open}
-                className="type-label text-foreground hover:opacity-70 transition-opacity py-3"
+                className={cn(headerActionClass, "text-foreground hover:opacity-70")}
               >
-                Index
-              </button>
+                Menu
+              </Button>
             </div>
           </div>
         </div>
@@ -250,7 +311,7 @@ export function Nav() {
       </div>
 
       <WalletMenu open={walletMenuOpen} onClose={() => setWalletMenuOpen(false)} />
-      <WalletConnectModal open={walletModalOpen} onClose={() => setWalletModalOpen(false)} />
+      <WalletConnectModal open={walletModalOpen} onClose={handleWalletModalClose} />
     </>
   );
 }

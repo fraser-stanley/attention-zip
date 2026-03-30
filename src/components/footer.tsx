@@ -23,7 +23,7 @@ const columns = [
 
 export function Footer() {
   return (
-    <footer className="border-t border-background/10 bg-foreground text-background mt-16">
+    <footer className="mt-auto border-t border-background/10 bg-foreground text-background">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
         <div className="border-b border-background/10 pb-6 mb-6">
           <span className="type-label text-background/50">attention.zip</span>

@@ -412,7 +412,7 @@ function PositionsContent({
   );
 }
 
-function InstalledSkills() {
+function RelatedSkills() {
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between gap-4">
@@ -427,7 +427,7 @@ function InstalledSkills() {
 
       <div className="grid gap-3 sm:grid-cols-2">
         {skills.map((skill) => (
-          <SkillCard key={skill.id} skill={skill} />
+          <SkillCard key={skill.id} href={`/skills#${skill.id}`} skill={skill} />
         ))}
       </div>
     </div>
@@ -448,7 +448,7 @@ export function PortfolioView({ address }: { address: string }) {
           title="Portfolio unavailable"
           description="The portfolio lookup failed. Try again in a moment."
         />
-        <InstalledSkills />
+        <RelatedSkills />
       </div>
     );
   }
@@ -459,7 +459,7 @@ export function PortfolioView({ address }: { address: string }) {
 
       <PositionsContent positions={positions} summary={summary} />
 
-      <InstalledSkills />
+      <RelatedSkills />
     </div>
   );
 }

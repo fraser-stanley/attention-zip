@@ -6,7 +6,7 @@ import { breadcrumbJsonLd, getSiteUrl } from "@/lib/site";
 export const metadata: Metadata = {
   title: "Portfolio",
   description:
-    "Track your Zora coin positions by address. View current holdings, total value, and installed skills.",
+    "Track your Zora coin positions by address. View current holdings, total value, and related skills.",
   alternates: { canonical: "/portfolio" },
 };
 

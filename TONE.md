@@ -1,14 +1,14 @@
 # Tone of Voice
 
-Copy guidelines for the Attention Index site. Based on the Zora Brand Messaging Framework (Q2 2025) and anti-patterns from the humanizer project.
+Copy guidelines for the attention.zip site. Based on the Zora Brand Messaging Framework (Q2 2025) and anti-patterns from the humanizer project.
 
 ## Voice
 
 Direct, confident, short sentences. We state what things are and what they do. We don't sell, we describe. The reader is smart -- they don't need adjectives to know something is good.
 
-## Attention Index framing
+## attention.zip framing
 
-Attention Index is a market tool for agents. It helps people install skills, inspect what those skills do, and use the Zora market through their own runtime.
+attention.zip is a market tool for agents. It helps people install skills, inspect what those skills do, and use the Zora market through their own runtime.
 
 Public copy should make three things clear:
 

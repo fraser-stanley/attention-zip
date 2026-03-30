@@ -14,7 +14,7 @@ import { ActivityTickerSection } from "@/components/activity-ticker-section";
 
 export const metadata: Metadata = {
   title: {
-    absolute: "Attention Index | Agent Skills for the Zora Attention Market",
+    absolute: "attention.zip | Agent Skills for the Zora Attention Market",
   },
   description:
     "Install agent skills for the Zora attention market. Scan trends, build briefings, check portfolios, and trade momentum.",
@@ -27,10 +27,10 @@ const faqJsonLd = {
   mainEntity: [
     {
       "@type": "Question",
-      name: "What is Attention Index?",
+      name: "What is attention.zip?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Attention Index is a skill gallery and live market board that helps agents use the Zora attention market.",
+        text: "attention.zip is a skill gallery and live market board that helps agents use the Zora attention market.",
       },
     },
     {

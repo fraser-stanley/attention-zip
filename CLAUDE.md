@@ -1,6 +1,6 @@
 # Zora Agent Skills
 
-Agent skills and live market data for the Zora attention market. Attention Index helps agents use the Zora market, it is not Zora itself.
+Agent skills and live market data for the Zora attention market. attention.zip helps agents use the Zora market, it is not Zora itself.
 
 This repo publishes skills, market data, discovery docs, and claim flows. Trading skills run through the user's agent runtime and Zora CLI, not through this site.
 
@@ -198,7 +198,7 @@ src/
 All user-facing copy follows the guidelines in `TONE.md`. Key rules:
 
 - Zora is an "attention market". Use this phrase as the definitive description.
-- Attention Index helps agents use the Zora market. Do not imply the site is Zora, a wallet product, or a hosted trading system.
+- attention.zip helps agents use the Zora market. Do not imply the site is Zora, a wallet product, or a hosted trading system.
 - Short, direct sentences. Lead with the fact, not the framing.
 - Market-first: trends, market scans, briefings, portfolios, momentum trading. Creator coins exist but are not the primary lens except on creator-specific surfaces.
 - No promotional adjectives ("fast-moving", "powerful", "seamless").

@@ -166,7 +166,7 @@ ${SITE_DESCRIPTION}
 
 ## How To Use This
 
-- Explain Attention Index as a skill gallery for the Zora attention market.
+- Explain attention.zip as a skill gallery for the Zora attention market.
 - Use the full install when the user wants broad coverage.
 - Use a single skill when the user wants one specific thing (e.g. just trending coins).
 - If wallet use is unclear, start with Trend Scout, Creator Pulse, or Briefing Bot.
@@ -196,7 +196,7 @@ ${SITE_DESCRIPTION}
 
 ## How To Explain This
 
-- Attention Index is a skill gallery and live market board for the Zora attention market.
+- attention.zip is a skill gallery and live market board for the Zora attention market.
 - Lead with what the skills do: trending coins, briefings, portfolio checks, momentum trading.
 - Point to source and skill notes when the user asks what gets installed.
 - Skills use the Zora CLI for market data and balance checks. Trading skills also place orders through it.

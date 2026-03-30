@@ -69,7 +69,7 @@ When docs say a skill requires a "real `zora` binary on `PATH`", that means the 
 
 ### Public copy is market-first
 
-For homepage, skills page, metadata, JSON-LD, and other visitor-facing copy, lead with trends, market scans, briefings, portfolios, and momentum trading. Do not lead with `entrypoint`, `clawhub.json`, `manifest`, `env vars`, or other implementation terms unless the page is explicit technical documentation. Attention Index helps agents use the Zora market, it is not Zora itself. Prefer named skills when wallet guidance differs. Avoid generic trust boilerplate unless it is literally true on that surface. One clear install instruction is enough, repeating the same helper line on every skill row reads robotic.
+For homepage, skills page, metadata, JSON-LD, and other visitor-facing copy, lead with trends, market scans, briefings, portfolios, and momentum trading. Do not lead with `entrypoint`, `clawhub.json`, `manifest`, `env vars`, or other implementation terms unless the page is explicit technical documentation. attention.zip helps agents use the Zora market, it is not Zora itself. Prefer named skills when wallet guidance differs. Avoid generic trust boilerplate unless it is literally true on that surface. One clear install instruction is enough, repeating the same helper line on every skill row reads robotic.
 
 ### Custom staging auth only gates pages
 

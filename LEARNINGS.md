@@ -62,7 +62,7 @@ The wallet context now stores a plain `0x` address string in localStorage. The o
 ### Public copy should lead with jobs, not internals
 The clearer structure for this site is: what the skill helps with, what the user can do with it, then any trust or setup detail. Visitors should first see trends, briefings, portfolios, and momentum trading, not `entrypoint`, `clawhub.json`, or other runtime plumbing.
 
-### Attention Index is not Zora
+### attention.zip is not Zora
 The site should be framed as the place to install and inspect market skills for the Zora attention market. It is not the market itself, not a wallet product, and not a hosted execution layer. That distinction needs to stay explicit in homepage copy, metadata, and trust language.
 
 ### Trust copy should stay precise

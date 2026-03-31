@@ -227,6 +227,11 @@
   animation-play-state: paused;
 }
 
+.marquee-fade {
+  mask-image: linear-gradient(to right, transparent, black 48px, black calc(100% - 48px), transparent);
+  -webkit-mask-image: linear-gradient(to right, transparent, black 48px, black calc(100% - 48px), transparent);
+}
+
 .highlight-block {
   background-color: #3FFF00;
   color: black;

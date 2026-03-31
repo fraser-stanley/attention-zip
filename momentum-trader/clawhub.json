@@ -1,0 +1,125 @@
+{
+  "emoji": "⚡",
+  "requires": {
+    "bins": ["zora", "node"],
+    "env": ["ZORA_PRIVATE_KEY"]
+  },
+  "cron": "*/10 * * * *",
+  "autostart": false,
+  "automaton": {
+    "managed": true,
+    "entrypoint": "scripts/run.mjs"
+  },
+  "tunables": [
+    {
+      "env": "ZORA_MOMENTUM_LIVE",
+      "type": "boolean",
+      "default": false,
+      "label": "Enable live trading"
+    },
+    {
+      "env": "ZORA_MOMENTUM_LIMIT",
+      "type": "number",
+      "default": 12,
+      "range": [5, 20],
+      "step": 1,
+      "label": "Scan depth"
+    },
+    {
+      "env": "ZORA_MOMENTUM_MAX_ETH",
+      "type": "number",
+      "default": 0.01,
+      "range": [0.001, 1],
+      "step": 0.001,
+      "label": "Max ETH per trade"
+    },
+    {
+      "env": "ZORA_MOMENTUM_MAX_POSITIONS",
+      "type": "number",
+      "default": 3,
+      "range": [1, 10],
+      "step": 1,
+      "label": "Max open positions"
+    },
+    {
+      "env": "ZORA_MOMENTUM_MIN_GAIN_PCT",
+      "type": "number",
+      "default": 15,
+      "range": [5, 100],
+      "step": 5,
+      "label": "Minimum gain percent"
+    },
+    {
+      "env": "ZORA_MOMENTUM_MIN_VOLUME_USD",
+      "type": "number",
+      "default": 50000,
+      "range": [0, 1000000],
+      "step": 5000,
+      "label": "Minimum 24h volume"
+    },
+    {
+      "env": "ZORA_MOMENTUM_MAX_SLIPPAGE_PCT",
+      "type": "number",
+      "default": 3,
+      "range": [0.5, 20],
+      "step": 0.5,
+      "label": "Max slippage percent"
+    },
+    {
+      "env": "ZORA_MOMENTUM_TRAILING_STOP",
+      "type": "number",
+      "default": 15,
+      "range": [5, 50],
+      "step": 5,
+      "label": "Trailing stop percent"
+    },
+    {
+      "env": "ZORA_MOMENTUM_COOLDOWN_SEC",
+      "type": "number",
+      "default": 300,
+      "range": [0, 3600],
+      "step": 60,
+      "label": "Cooldown in seconds"
+    },
+    {
+      "env": "ZORA_MOMENTUM_DAILY_CAP_ETH",
+      "type": "number",
+      "default": 0.05,
+      "range": [0.01, 5],
+      "step": 0.01,
+      "label": "Daily ETH cap"
+    },
+    {
+      "env": "ZORA_MOMENTUM_STOP_LOSS_PCT",
+      "type": "number",
+      "default": 25,
+      "range": [5, 95],
+      "step": 5,
+      "label": "Stop-loss percent from entry"
+    },
+    {
+      "env": "ZORA_MOMENTUM_TAKE_PROFIT_PCT",
+      "type": "number",
+      "default": 100,
+      "range": [10, 500],
+      "step": 10,
+      "label": "Take-profit percent from entry"
+    },
+    {
+      "env": "ZORA_MOMENTUM_FLIPFLOP_RUNS",
+      "type": "number",
+      "default": 3,
+      "range": [1, 10],
+      "step": 1,
+      "label": "Runs to block re-entry after exit"
+    },
+    {
+      "env": "ZORA_MOMENTUM_MAX_QUOTE_SLIPPAGE_PCT",
+      "type": "number",
+      "default": 5,
+      "range": [1, 20],
+      "step": 1,
+      "label": "Max quote slippage for candidates"
+    }
+  ]
+}

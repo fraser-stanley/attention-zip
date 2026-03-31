@@ -1,0 +1,36 @@
+{
+  "emoji": "🎨",
+  "requires": {
+    "bins": ["zora", "node"]
+  },
+  "cron": "*/30 * * * *",
+  "autostart": false,
+  "automaton": {
+    "managed": true,
+    "entrypoint": "scripts/run.mjs"
+  },
+  "tunables": [
+    {
+      "env": "ZORA_CREATOR_LIMIT",
+      "type": "number",
+      "default": 8,
+      "range": [3, 20],
+      "step": 1,
+      "label": "Results per scan"
+    },
+    {
+      "env": "ZORA_CREATOR_MIN_VOLUME_USD",
+      "type": "number",
+      "default": 0,
+      "range": [0, 1000000],
+      "step": 5000,
+      "label": "Minimum 24h volume"
+    },
+    {
+      "env": "ZORA_CREATOR_WATCHLIST",
+      "type": "string",
+      "default": "",
+      "label": "Comma-separated handles or addresses"
+    }
+  ]
+}

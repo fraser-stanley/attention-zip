@@ -1,0 +1,39 @@
+{
+  "emoji": "💼",
+  "requires": {
+    "bins": ["zora", "node"],
+    "env": ["ZORA_PRIVATE_KEY"]
+  },
+  "cron": "0 */4 * * *",
+  "autostart": false,
+  "automaton": {
+    "managed": true,
+    "entrypoint": "scripts/run.mjs"
+  },
+  "tunables": [
+    {
+      "env": "ZORA_PORTFOLIO_LIMIT",
+      "type": "number",
+      "default": 20,
+      "range": [5, 20],
+      "step": 1,
+      "label": "Tracked positions"
+    },
+    {
+      "env": "ZORA_PORTFOLIO_CONCENTRATION_ALERT_PCT",
+      "type": "number",
+      "default": 35,
+      "range": [10, 100],
+      "step": 5,
+      "label": "Concentration alert percent"
+    },
+    {
+      "env": "ZORA_PORTFOLIO_DRAWNDOWN_ALERT_PCT",
+      "type": "number",
+      "default": 15,
+      "range": [5, 80],
+      "step": 5,
+      "label": "Drawdown alert percent"
+    }
+  ]
+}

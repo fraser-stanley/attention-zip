@@ -9,9 +9,9 @@ We will acknowledge reports within 48 hours and provide a timeline for resolutio
 ## What counts as a security issue
 
 - Credential or API key exposure in source code or logs
-- Authentication bypass in the staging gate or agent registration flow
-- Rate limit bypass on mutation endpoints
 - Server-side code execution or injection vulnerabilities
+- XSS via user-controlled data in API responses
+- Supply chain compromise of dependencies or CI actions
 
 ## Architecture context
 

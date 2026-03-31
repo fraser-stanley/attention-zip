@@ -2,19 +2,19 @@
 
 ## Reporting vulnerabilities
 
-If you find a security issue, please report it through [GitHub Security Advisories](https://github.com/fraser-stanley/attention-zip/security/advisories/new) rather than opening a public issue.
+Found a security issue? Report it through [GitHub Security Advisories](https://github.com/fraser-stanley/attention-zip/security/advisories/new), not a public issue.
 
-We will acknowledge reports within 48 hours and provide a timeline for resolution.
+We'll acknowledge reports within 48 hours and give you a timeline for resolution.
 
 ## What counts as a security issue
 
 - Credential or API key exposure in source code or logs
-- Server-side code execution or injection vulnerabilities
+- Server-side code execution or injection
 - XSS via user-controlled data in API responses
 - Supply chain compromise of dependencies or CI actions
 
 ## Architecture context
 
-Trading skills (Copy Trader, Momentum Trader) run locally through the user's agent runtime and Zora CLI. The site does not execute trades, hold keys, or custody funds server-side. Skill guardrails live in the local skill runtime, not on the server.
+Trading skills (Copy Trader, Momentum Trader) run locally through the user's agent runtime and Zora CLI. The site doesn't execute trades, hold keys, or custody funds server-side. Guardrails live in the local skill runtime, not on the server.
 
-The wallet connect flow is address-only. The site does not ask browsers to sign messages. Portfolio data is public on-chain data.
+Wallet connect is address-only -- the site never asks browsers to sign messages. Portfolio data is public on-chain data.

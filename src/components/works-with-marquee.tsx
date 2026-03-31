@@ -32,7 +32,7 @@ export function WorksWithMarquee() {
       <h2 className="type-body-sm font-medium text-muted-foreground">
         Works with
       </h2>
-      <div className="overflow-x-clip overflow-y-visible select-none">
+      <div className="marquee-fade overflow-x-clip overflow-y-visible select-none">
         <nav
           aria-label="Compatible agent platforms"
           className="logo-marquee-track"

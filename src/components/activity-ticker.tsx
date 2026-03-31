@@ -233,7 +233,7 @@ export function ActivityTicker({
         </div>
 
         {items.length > 0 ? (
-          <div ref={viewportRef} className="flex-1 overflow-hidden">
+          <div ref={viewportRef} className="marquee-fade flex-1 overflow-hidden">
             <div
               className="ticker-track"
               style={{

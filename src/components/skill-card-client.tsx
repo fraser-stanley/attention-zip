@@ -362,7 +362,7 @@ export function SkillsInstallList({
 
   return (
     <div className="w-full">
-      {/* Hero: heading + unified install card, centered in viewport */}
+      {/* Hero: heading + unified install card */}
       <section className="space-y-5 pt-1 pb-20 lg:pb-28 sm:pt-4">
         <div className="grid grid-cols-1 lg:grid-cols-2 lg:gap-x-10">
           <div className="space-y-5">

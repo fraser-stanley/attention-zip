@@ -1,6 +1,6 @@
 # Zora Agent Skills
 
-Agent skills for the Zora attention market. Scan trends, check portfolios, build briefings, and trade momentum.
+Agent skills for the Zora attention market. Scan trends, copy trades, and track portfolios. Works with Claude Code, Cursor, Codex, and OpenClaw.
 
 ## Skills
 

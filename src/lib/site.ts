@@ -1,11 +1,11 @@
 export const SITE_NAME = "attention.zip";
 export const SITE_DESCRIPTION =
-  "Install agent skills for the Zora attention market.";
+  "Agent skills for the Zora attention market. Scan trends, copy trades, and track portfolios. Works with Claude Code, Cursor, Codex, and OpenClaw.";
 export const API_VERSION = "0.1.0";
 
 const DEFAULT_SITE_URL = "http://localhost:3000";
 const DEFAULT_SITE_REPO_URL =
-  "https://github.com/fraser-stanley/zora-agent-skills";
+  "https://github.com/fraser-stanley/attention-zip";
 const DEFAULT_SITE_REPO_REF = "main";
 
 function normalizeUrl(value: string) {
@@ -74,9 +74,9 @@ export function getSiteRepoName() {
   try {
     const pathname = new URL(getSiteRepoUrl()).pathname.replace(/\/$/, "");
     const repoName = pathname.split("/").pop();
-    return repoName?.replace(/\.git$/, "") || "zora-agent-skills";
+    return repoName?.replace(/\.git$/, "") || "attention-zip";
   } catch {
-    return "zora-agent-skills";
+    return "attention-zip";
   }
 }
 

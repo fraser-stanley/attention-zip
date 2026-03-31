@@ -240,7 +240,7 @@ describe("getSkillRuntimeCommands", () => {
   it("manual command clones the source repo", () => {
     const commands = getSkillRuntimeCommands(skills[0], TEST_BASE_URL);
     expect(commands.manual).toContain("git clone --depth 1");
-    expect(commands.manual).toContain("zora-agent-skills");
+    expect(commands.manual).toContain("attention-zip");
   });
 
   it("manual install stays as the extra fallback", () => {
@@ -250,7 +250,7 @@ describe("getSkillRuntimeCommands", () => {
 
       expect(commands.openclaw).toBe(quickInstall.openclaw);
       expect(commands.claude).toBe(quickInstall.claude);
-      expect(commands.manual).toContain(`cd zora-agent-skills/${skill.id}`);
+      expect(commands.manual).toContain(`cd attention-zip/${skill.id}`);
     }
   });
 });

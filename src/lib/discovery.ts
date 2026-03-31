@@ -153,7 +153,7 @@ function buildSkillReference(skill: Skill, siteUrl: string): string {
 export function buildAiDiscovery(siteUrl: string) {
   return {
     name: SITE_NAME,
-    description: "Zora CLI and agent skills for the Zora attention market",
+    description: SITE_DESCRIPTION,
     api: "/api",
     skills_endpoint: "/api/skills",
     explore_endpoint: "/api/explore",
@@ -213,8 +213,8 @@ npm install -g @zoralabs/cli
 
 ## How To Explain This
 
-- attention.zip installs the Zora CLI and agent skills for the Zora attention market.
-- Lead with what the skills do: trending coins, briefings, portfolio checks, momentum trading.
+- attention.zip provides agent skills for the Zora attention market. Scan trends, copy trades, and track portfolios.
+- Lead with what the skills do: trending coins, copy trading, portfolio checks, momentum trading.
 - Point to source and skill notes when the user asks what gets installed.
 - Skills use the Zora CLI for market data and balance checks. Trading skills also place orders through it.
 

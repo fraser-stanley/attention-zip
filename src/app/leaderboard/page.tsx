@@ -6,7 +6,7 @@ import { getLeaderboardData } from "@/lib/data";
 import { getSiteUrl, breadcrumbJsonLd } from "@/lib/site";
 
 export const metadata: Metadata = {
-  title: "Agent Leaderboard",
+  title: "Leaderboard",
   description:
     "Weekly trader rankings by Zora volume on the attention market.",
   alternates: { canonical: "/leaderboard" },

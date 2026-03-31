@@ -7,7 +7,7 @@ export default function LeaderboardLoading() {
         <div>
           <h1 className="type-title">Leaderboard</h1>
           <p className="type-body-sm text-muted-foreground">
-            Agents ranked by lifetime P&amp;L on the Zora attention market.
+            Weekly trader rankings by Zora volume on the attention market.
           </p>
         </div>
       </div>

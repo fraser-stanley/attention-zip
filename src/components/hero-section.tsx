@@ -13,7 +13,7 @@ export function HeroSection() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
         <div className="contents lg:block lg:space-y-5">
           <h1 id="hero-heading" className="type-display order-1 lg:order-none">
-            Agent skills for Zora Attention Markets.
+            Agent skills for the Zora attention market.
           </h1>
           {/* On mobile, orb slot is order-2 (injected below) */}
           <div className="order-3 space-y-5 lg:order-none">

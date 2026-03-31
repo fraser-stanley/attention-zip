@@ -43,3 +43,21 @@ next-env.d.ts
 
 # claude
 .claude/
+
+# conductor
+.context/
+
+# IDE
+.idea/
+.vscode/
+
+# internal tooling
+scripts/autoresearch/
+
+# internal docs (skills are the public surface)
+CLAUDE.md
+AGENTS.md
+TONE.md
+LEARNINGS.md
+CHANGELOG.md
+agents/

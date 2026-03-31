@@ -14,12 +14,17 @@ export default function WithZorbLayout({
   const reducedMotion = useReducedMotion();
 
   return (
-    <div className="relative flex flex-col">
-      {/* Zorb: in-flow centered on mobile, absolutely positioned to match grid col 2 on desktop */}
-      <div className="flex justify-center lg:absolute lg:top-10 lg:right-0 lg:w-[calc(50%-1.25rem)] lg:justify-center lg:z-10">
-        <Suspense fallback={null}>
-          <PersistentOrb />
-        </Suspense>
+    <div className="relative">
+      {/* Zorb: in-flow on mobile, fixed to hero content area on desktop */}
+      <div
+        aria-hidden="true"
+        className="flex justify-center py-4 lg:fixed lg:top-32 lg:right-[calc((100vw-80rem)/2+2rem)] lg:w-[calc(min(80rem,100vw-4rem)/2-1.25rem)] lg:justify-center lg:py-0 lg:pointer-events-none lg:z-10"
+      >
+        <div className="lg:pointer-events-auto">
+          <Suspense fallback={null}>
+            <PersistentOrb />
+          </Suspense>
+        </div>
       </div>
 
       <AnimatePresence

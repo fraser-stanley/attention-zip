@@ -10,12 +10,10 @@ import { cn } from "@/lib/utils";
 
 export function CopyableCodeBlock({
   command,
-  prefix = "$",
   highlight = true,
   className,
 }: {
   command: string;
-  prefix?: string;
   highlight?: boolean;
   className?: string;
 }) {
@@ -60,14 +58,26 @@ export function CopyableCodeBlock({
       title={copied ? "Copied" : "Copy command"}
       aria-live="polite"
     >
-      <span className="text-foreground/40">{prefix}</span>
-      <HighlightedCodeText
-        text={command}
-        variant={highlight ? (prefix === ">" ? "prompt" : "shell") : "plain"}
-        className="min-w-0 flex-1 truncate text-left text-foreground/80 whitespace-nowrap"
-      />
-      <span className="shrink-0 text-muted-foreground/60 transition-colors group-hover:text-foreground/60">
-        {copied ? <CheckIcon size={16} /> : <CopyIcon size={16} />}
+      <span className="min-w-0 flex-1 truncate text-left text-foreground/40 whitespace-nowrap">
+        <HighlightedCodeText
+          text={command}
+          variant={highlight ? "shell" : "plain"}
+          className="text-foreground/80"
+        />
+      </span>
+      <span className="relative shrink-0 size-4 text-muted-foreground/60">
+        <span className={cn(
+          "absolute inset-0 transition-[opacity,transform] duration-200 ease-out",
+          copied ? "scale-50 opacity-0" : "scale-100 opacity-100",
+        )}>
+          <CopyIcon size={16} />
+        </span>
+        <span className={cn(
+          "absolute inset-0 transition-[opacity,transform] duration-200 ease-out",
+          copied ? "scale-100 opacity-100" : "scale-50 opacity-0",
+        )}>
+          <CheckIcon size={16} />
+        </span>
       </span>
     </button>
   );

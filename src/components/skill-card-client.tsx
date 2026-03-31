@@ -236,7 +236,6 @@ function RuntimeInstallCard({
       </Tabs>
       <CopyableCodeBlock
         command={command}
-        prefix={runtime === "prompt" ? ">" : "$"}
       />
     </div>
   );
@@ -325,7 +324,6 @@ function SkillRow({
           <div className="mt-auto">
             <CopyableCodeBlock
               command={command}
-              prefix={runtime === "prompt" ? ">" : "$"}
             />
           </div>
 

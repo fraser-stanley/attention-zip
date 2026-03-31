@@ -19,7 +19,6 @@ export function HeroSection() {
             </p>
             <CopyableCodeBlock
               command={getInstallAllCommands(getSiteUrl()).prompt}
-              prefix=">"
               highlight={false}
             />
           </div>

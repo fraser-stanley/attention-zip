@@ -6,6 +6,8 @@ import { Providers } from "@/lib/providers";
 import { Nav } from "@/components/nav";
 import { Footer } from "@/components/footer";
 import { CommandMenuLoader } from "@/components/command-menu-loader";
+import { Screensaver } from "@/components/screensaver";
+import { AgentationDev } from "@/components/agentation-dev";
 
 import {
   getSiteUrl,
@@ -119,6 +121,8 @@ export default function RootLayout({
           </main>
           <Footer />
           <Analytics />
+          <Screensaver />
+          <AgentationDev />
         </Providers>
       </body>
     </html>

@@ -13,6 +13,7 @@ import { LayersIcon, type LayersIconHandle } from "@/components/ui/layers";
 import { SparklesIcon, type SparklesIconHandle } from "@/components/ui/sparkles";
 import { ArrowUpRightIcon, type ArrowUpRightIconHandle } from "@/components/ui/arrow-up-right";
 import { useWallet, truncateAddress } from "@/lib/wallet-context";
+import { triggerScreensaver } from "@/components/screensaver";
 import { WalletConnectModal } from "@/components/wallet-connect-modal";
 import { WalletMenu } from "@/components/wallet-menu";
 
@@ -164,16 +165,17 @@ export function Nav() {
       >
         <div className="mx-auto max-w-7xl px-4 pb-1 sm:px-6 lg:px-8">
           <div className="flex h-11 items-center justify-between py-[2px]">
-            <Link
-              href="/"
+            <button
+              type="button"
               onClick={() => {
                 close();
                 setWalletModalOpen(false);
+                triggerScreensaver();
               }}
               className="type-label py-3 text-foreground"
             >
               attention.zip
-            </Link>
+            </button>
             <div className="flex items-center gap-6">
               {isConnected && address ? (
                   <Button

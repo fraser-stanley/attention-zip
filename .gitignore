@@ -53,6 +53,7 @@ next-env.d.ts
 
 # internal tooling
 scripts/autoresearch/
+agentation/
 
 # internal docs (skills are the public surface)
 CLAUDE.md

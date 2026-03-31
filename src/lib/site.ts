@@ -1,6 +1,6 @@
 export const SITE_NAME = "attention.zip";
 export const SITE_DESCRIPTION =
-  "Install agent skills for the Zora attention market.";
+  "Agent skills for the Zora attention market. Scan trends, copy trades, and track portfolios. Works with Claude Code, Cursor, Codex, and OpenClaw.";
 export const API_VERSION = "0.1.0";
 
 const DEFAULT_SITE_URL = "http://localhost:3000";

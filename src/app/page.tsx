@@ -17,7 +17,7 @@ export const metadata: Metadata = {
     absolute: "attention.zip | Agent skills for the Zora attention market",
   },
   description:
-    "Install the Zora CLI and six agent skills for the Zora attention market. Scan trends, build briefings, check portfolios, and trade momentum.",
+    "Agent skills for the Zora attention market. Scan trends, copy trades, and track portfolios. Works with Claude Code, Cursor, Codex, and OpenClaw.",
   alternates: { canonical: "/" },
 };
 

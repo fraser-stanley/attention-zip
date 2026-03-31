@@ -18,17 +18,6 @@ One "Paste this to your agent." at the shared install surface works. Repeating i
 ### Start direct deploys from a clean `origin/main` base
 This workspace was behind production. Creating a clean worktree from `origin/main` let us port the copy changes without rolling back the newer merged PR. If a workspace branch is not the live base, do not push from it directly.
 
-## 2026-03-27 — Direct Upstash agent registration + wallet claiming
-
-### Use direct `@upstash/redis`, not `@vercel/kv`
-The Redis client should be instantiated explicitly with `new Redis({ url, token })` from `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN`. `Redis.fromEnv()` accepts legacy `KV_REST_*` fallbacks, which would blur the storage contract we want to keep explicit.
-
-### Claim links should survive successful claims
-Deleting the claim lookup on success makes `/claim/[code]` useless for humans and agents that revisit the link later. The better rule is: keep `claim:{code} -> agent_id`, remove the TTL after a successful claim, and enforce one-time claiming through `agent.status`.
-
-### Address-only claiming stays consistent with portfolio lookups
-The browser claim flow uses the same plain `0x` address entry model as the portfolio page. That keeps the UX consistent and avoids adding browser wallet signing until there is a stronger ownership requirement than "link this agent to that address".
-
 ## 2026-03-27 — Production hardening + truthful discovery
 
 ### Discovery docs should come from routes, not `public/`
@@ -49,13 +38,13 @@ Each per-skill validator checks `scripts/run.mjs` using a relative path. Running
 The original SIWE flow authenticated the CLI to the web, which is backwards. Portfolio data (coin balances, values, 24h changes) is all public on-chain data queryable via `getProfileBalances()`. Users just paste their CLI wallet address (`zora wallet`) and the site looks everything up. No challenge, no nonce, no signature verification.
 
 ### SIWE was solving the wrong problem
-The Simmer reference model auths the web to the agent, not the other way around. The agent is the primary actor. For read-only portfolio views, even that isn't needed — a plain address is sufficient. That logic carried into the later claim flow: the agent registers itself server-side, then the human completes ownership by visiting a claim link and entering the wallet address that should own the profile.
+The Simmer reference model auths the web to the agent, not the other way around. The agent is the primary actor. For read-only portfolio views, even that isn't needed — a plain address is sufficient.
 
 ### Address validation is the only gate
 The wallet context now stores a plain `0x` address string in localStorage. The only validation is format checking (`/^0x[a-fA-F0-9]{40}$/`). This is intentional — anyone can look up any address, same as on Etherscan. The connect flow seeds default skills and the disconnect flow clears them.
 
 ### Shareable portfolio URLs matter
-`/portfolio/[address]` enables the CLI to generate direct links to agent portfolios. This became part of the claim flow: after a successful claim, the browser redirects to `/portfolio/[address]`, and an old claim link can still point the human back to the claimed wallet.
+`/portfolio/[address]` enables the CLI to generate direct links to agent portfolios.
 
 ## 2026-03-24 — Market-first copy system
 

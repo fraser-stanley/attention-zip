@@ -73,11 +73,7 @@ For homepage, skills page, metadata, JSON-LD, and other visitor-facing copy, lea
 
 ### Custom staging auth only gates pages
 
-If `STAGING_PASSWORD` is set, `src/proxy.ts` redirects visitor-facing pages to `/login` and expects the `staging_auth` cookie. Do not remove this as "redundant" auth. It exists because the Vercel project cannot use native password protection. Keep `/api`, `/api/*`, `/skills/[id]/skill-md`, `/.well-known/ai.json`, `/llms.txt`, `/llms-full.txt`, `/claim`, `/claim/*`, and static public files accessible so agent installs, discovery, and claiming still work.
-
-### Agent registration uses direct Upstash Redis
-
-Use `src/lib/redis.ts` for agent registration and claiming. Only `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` are supported. Do not reintroduce `@vercel/kv`, `Redis.fromEnv()`, or `KV_REST_*` fallbacks. Claim codes expire after 7 days while unclaimed, then the `claim:*` lookup becomes permanent after a successful claim so `/claim/[code]` can render "already claimed". The write routes are IP-rate-limited via Redis in `src/lib/agent-rate-limit.ts`: registration allows 5 requests per 10 minutes and claiming allows 10 requests per 10 minutes.
+If `STAGING_PASSWORD` is set, `src/proxy.ts` redirects visitor-facing pages to `/login` and expects the `staging_auth` cookie. Do not remove this as "redundant" auth. It exists because the Vercel project cannot use native password protection. Keep `/api`, `/api/*`, `/skills/[id]/skill-md`, `/.well-known/ai.json`, `/llms.txt`, `/llms-full.txt`, and static public files accessible so agent installs and discovery still work.
 
 ## How to add a skill
 
@@ -123,7 +119,7 @@ vercel deploy --prod --yes --scope frasers-projects-053d31c6
 
 If a workspace was previously linked to another Vercel project, check `.vercel/project.json` before deploying.
 
-Tests validate SKILL.md frontmatter, required body sections, word count (300-800), CLI flag correctness in commands, managed entrypoint metadata in `clawhub.json`, process-level `scripts/run.mjs` behavior through `src/__tests__/skill-entrypoints.test.ts`, cross-file sync between skills.ts IDs and skill directories, and the agent registration/claiming contract in `src/__tests__/agents.test.ts`. `scripts/validate.sh` is still useful, but it is a host-readiness check. Run it from inside the skill directory, make sure the installed `zora` CLI is on your shell `PATH`, and expect wallet-backed skills to require a configured wallet.
+Tests validate SKILL.md frontmatter, required body sections, word count (300-800), CLI flag correctness in commands, managed entrypoint metadata in `clawhub.json`, process-level `scripts/run.mjs` behavior through `src/__tests__/skill-entrypoints.test.ts`, and cross-file sync between skills.ts IDs and skill directories. `scripts/validate.sh` is still useful, but it is a host-readiness check. Run it from inside the skill directory, make sure the installed `zora` CLI is on your shell `PATH`, and expect wallet-backed skills to require a configured wallet.
 
 Discovery coverage lives in `src/__tests__/discovery.test.ts`. If you change `llms.txt`, `llms-full.txt`, `/.well-known/ai.json`, or `/api/skills` install serialization, update those assertions in the same PR.
 

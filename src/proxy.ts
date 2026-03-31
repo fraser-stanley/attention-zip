@@ -21,7 +21,6 @@ async function checkAuth(request: NextRequest): Promise<NextResponse | null> {
 
   // Agent-facing endpoints are public
   if (path === "/api" || path.startsWith("/api/")) return null;
-  if (path === "/claim" || path.startsWith("/claim/")) return null;
   if (PUBLIC_DISCOVERY_PATHS.has(path)) return null;
   if (path.endsWith("/skill-md")) return null;
   if (path.startsWith("/.well-known/")) return null;

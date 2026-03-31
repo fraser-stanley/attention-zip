@@ -102,7 +102,7 @@ export function WalletMenu({ open, onClose }: WalletMenuProps) {
 
               <div className="flex flex-col gap-3 bg-black p-4">
                 <div className="flex items-start justify-between">
-                  <p className="type-caption font-mono text-white/50">YOUR WALLET</p>
+                  <p className="type-label text-white/50">Your wallet</p>
                   <Button
                     type="button"
                     variant="ghost"

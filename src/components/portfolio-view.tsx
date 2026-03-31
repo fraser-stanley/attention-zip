@@ -1,22 +1,24 @@
 "use client";
 
 import { useCallback, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import NumberFlow, { NumberFlowGroup, type Format } from "@number-flow/react";
-import Link from "next/link";
+
+import { QRCodeSVG } from "qrcode.react";
 import { HoverMediaOverlay } from "@/components/hover-media-overlay";
 import { useToast } from "@/components/toast";
-import { SkillCard } from "@/components/skill-card";
+
 import { CheckIcon } from "@/components/ui/check";
 import { CopyIcon } from "@/components/ui/copy";
 import { Skeleton } from "@/components/ui/skeleton";
+import { isWalletAddress } from "@/lib/wallet-address";
 import {
   usePortfolioData,
   type PortfolioPosition,
   type PortfolioSummary,
 } from "@/hooks/use-portfolio-data";
-import { skills } from "@/lib/skills";
+
 import {
-  formatCompactCurrency,
   truncateAddress,
 } from "@/lib/zora";
 import { cn } from "@/lib/utils";
@@ -55,7 +57,6 @@ const FMT_COMPACT = {
   maximumFractionDigits: 1,
 } satisfies Format;
 
-const FMT_INT = { maximumFractionDigits: 0 } satisfies Format;
 
 const FMT_PERCENT = {
   style: "percent",
@@ -101,6 +102,56 @@ function ValueCell({
   );
 }
 
+function AddressLookup() {
+  const router = useRouter();
+  const [input, setInput] = useState("");
+  const [error, setError] = useState(false);
+
+  function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    const trimmed = input.trim();
+    if (isWalletAddress(trimmed)) {
+      setError(false);
+      router.push(`/portfolio/${trimmed}`);
+    } else {
+      setError(true);
+    }
+  }
+
+  return (
+    <form onSubmit={handleSubmit} className="flex items-center gap-3 bg-black px-4 py-3" role="search" aria-label="Look up wallet portfolio">
+      <label htmlFor="address-lookup" className="sr-only">Wallet address</label>
+      <input
+        id="address-lookup"
+        type="text"
+        value={input}
+        onChange={(e) => { setInput(e.target.value); setError(false); }}
+        placeholder="Look up any address"
+        spellCheck={false}
+        autoComplete="off"
+        data-1p-ignore
+        data-lpignore="true"
+        data-form-type="other"
+        className={cn(
+          "flex-1 border bg-white/[0.06] px-3 py-2 font-mono text-sm text-white placeholder:text-white/50 transition-colors focus:outline-none focus:ring-1 focus:ring-white",
+          error ? "border-[#FF00F0]" : "border-white/20 focus:border-white/50",
+        )}
+      />
+      <button
+        type="submit"
+        className={cn(
+          "shrink-0 border px-4 py-2 font-mono text-sm transition-colors",
+          input.trim()
+            ? "border-white bg-white text-black hover:bg-white/85"
+            : "border-white/20 bg-white/[0.06] text-white/50 hover:border-white/40 hover:bg-white/10 hover:text-white",
+        )}
+      >
+        View
+      </button>
+    </form>
+  );
+}
+
 function PortfolioStats({
   address,
   summary,
@@ -121,62 +172,79 @@ function PortfolioStats({
   }, [address, toast]);
 
   return (
-    <div className="grid gap-px border border-border bg-border sm:grid-cols-2 xl:grid-cols-4">
-      <div className="bg-card p-4">
-        <p className="type-label mb-2 text-muted-foreground">Portfolio value</p>
-        <p className="font-display text-5xl tracking-tight">
-          <span className="tabular-nums">
-            <ValueCell value={summary.totalValueUsd} />
-          </span>
-        </p>
+    <div className="grid grid-cols-[auto_1fr] gap-px bg-white/10">
+      {/* QR code — left column, spans all rows */}
+      <div className="row-span-2 flex aspect-square items-center justify-center bg-black p-5">
+        <QRCodeSVG
+          value={address}
+          size={0}
+          bgColor="transparent"
+          fgColor="#ffffff"
+          level="M"
+          className="h-full w-full"
+        />
       </div>
 
-      <div className="bg-card p-4">
-        <p className="type-label mb-2 text-muted-foreground">24h change</p>
-        {summary.totalChangeUsd24h === null || summary.totalChangePct24h === null ? (
-          <p className="font-display text-5xl tracking-tight text-muted-foreground">Unavailable</p>
-        ) : (
-          <p className="font-display text-5xl tracking-tight">
-            <span className={cn("inline px-[0.15em] py-[0.02em] box-decoration-clone", changeChipClass(summary.totalChangeUsd24h, false))}>
-              <ValueCell value={summary.totalChangeUsd24h} />
+      {/* Stats — right column, top row */}
+      <div className="grid gap-px sm:grid-cols-3 bg-white/10">
+        <div className="bg-black p-4">
+          <p className="type-label text-white/50">Portfolio value</p>
+          <p className="mt-2 font-display text-5xl font-bold tracking-tight text-white">
+            <span className="tabular-nums">
+              <ValueCell value={summary.totalValueUsd} />
             </span>
-            <span
-              className={cn(
-                "type-body-sm ml-2 inline-flex items-center px-1.5 py-0.5 font-mono align-middle",
-                changeChipClass(summary.totalChangeUsd24h, false),
-              )}
-            >
-              <NumberFlow
-                {...FLOW_TIMING}
-                className="tabular-nums"
-                format={FMT_PERCENT}
-                value={summary.totalChangePct24h / 100}
-              />
-            </span>
+            <span className="ml-2 text-xs text-white/50">USD</span>
           </p>
-        )}
+          <p className="mt-1 text-xs font-mono text-white/50">
+            {summary.positionCount} positions
+          </p>
+        </div>
+
+        <div className="bg-black p-4">
+          <p className="type-label text-white/50">24h change</p>
+          {summary.totalChangeUsd24h === null || summary.totalChangePct24h === null ? (
+            <p className="mt-2 font-display text-5xl font-bold tracking-tight text-white/40">—</p>
+          ) : (
+            <div className="mt-2">
+              <p className="font-display text-5xl font-bold tracking-tight text-white">
+                <span className={cn("inline px-[0.15em] py-[0.02em] box-decoration-clone", changeChipClass(summary.totalChangeUsd24h, false))}>
+                  <ValueCell value={summary.totalChangeUsd24h} />
+                </span>
+              </p>
+              <span
+                className={cn(
+                  "mt-1 inline-flex items-center px-1.5 py-0.5 font-mono text-xs",
+                  changeChipClass(summary.totalChangeUsd24h, false),
+                )}
+              >
+                <NumberFlow
+                  {...FLOW_TIMING}
+                  className="tabular-nums"
+                  format={FMT_PERCENT}
+                  value={summary.totalChangePct24h / 100}
+                />
+              </span>
+            </div>
+          )}
+        </div>
+
+        <div className="bg-black p-4">
+          <p className="type-label text-white/50">Address</p>
+          <button
+            type="button"
+            onClick={handleCopy}
+            className="group/copy mt-2 flex items-center gap-2 text-left"
+          >
+            <span className="font-display text-4xl tracking-tight text-white">{truncateAddress(address)}</span>
+            <span className="text-white/50 transition-colors group-hover/copy:text-white">
+              {copied ? <CheckIcon size={16} /> : <CopyIcon size={16} />}
+            </span>
+          </button>
+        </div>
       </div>
 
-      <div className="bg-card p-4">
-        <p className="type-label mb-2 text-muted-foreground">Positions</p>
-        <p className="font-display text-5xl tracking-tight">
-          <NumberFlow {...FLOW_TIMING} className="tabular-nums" format={FMT_INT} value={summary.positionCount} />
-        </p>
-      </div>
-
-      <div className="bg-card p-4">
-        <p className="type-label mb-2 text-muted-foreground">Address</p>
-        <button
-          type="button"
-          onClick={handleCopy}
-          className="group/copy flex items-center gap-2 text-left"
-        >
-          <span className="font-display text-4xl tracking-tight">{truncateAddress(address)}</span>
-          <span className="text-muted-foreground transition-colors group-hover/copy:text-foreground">
-            {copied ? <CheckIcon size={16} /> : <CopyIcon size={16} />}
-          </span>
-        </button>
-      </div>
+      {/* Address lookup — right column, bottom row */}
+      <AddressLookup />
     </div>
   );
 }
@@ -184,13 +252,21 @@ function PortfolioStats({
 function PortfolioSkeleton() {
   return (
     <div className="space-y-8">
-      <div className="grid gap-px border border-border bg-border sm:grid-cols-2 xl:grid-cols-4">
-        {Array.from({ length: 4 }, (_, index) => (
-          <div key={index} className="bg-card p-4">
-            <Skeleton className="mb-3 h-4 w-24" />
-            <Skeleton className="h-16 w-full" />
-          </div>
-        ))}
+      <div className="grid grid-cols-[auto_1fr] gap-px bg-white/10">
+        <div className="row-span-2 flex aspect-square items-center justify-center bg-black p-5">
+          <Skeleton className="h-full w-full bg-white/10" />
+        </div>
+        <div className="grid gap-px sm:grid-cols-3 bg-white/10">
+          {Array.from({ length: 3 }, (_, index) => (
+            <div key={index} className="bg-black p-4">
+              <Skeleton className="mb-3 h-4 w-24 bg-white/10" />
+              <Skeleton className="h-12 w-full bg-white/10" />
+            </div>
+          ))}
+        </div>
+        <div className="bg-black px-4 py-3">
+          <Skeleton className="h-10 w-48 bg-white/10" />
+        </div>
       </div>
 
       <div className="overflow-hidden border border-border bg-card">
@@ -232,10 +308,8 @@ function PlaceholderCard({
 
 function PositionsContent({
   positions,
-  summary,
 }: {
   positions: PortfolioPosition[];
-  summary: PortfolioSummary;
 }) {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [hoveredImage, setHoveredImage] = useState<string | null>(null);
@@ -246,11 +320,6 @@ function PositionsContent({
 
   return (
     <div className="space-y-4">
-      <p className="py-6 font-display text-5xl tracking-tight">
-        {summary.positionCount} positions,{" "}
-        <span className="tabular-nums">{formatCompactCurrency(summary.totalValueUsd)}</span> total value
-      </p>
-
       <div className="relative overflow-hidden border border-border bg-card text-sm" onMouseLeave={() => setHoveredImage(null)}>
         <HoverMediaOverlay imageUrl={hoveredImage} />
         <div className="overflow-x-auto">
@@ -396,27 +465,6 @@ function PositionsContent({
   );
 }
 
-function RelatedSkills() {
-  return (
-    <div className="space-y-3">
-      <div className="flex items-center justify-between gap-4">
-        <h2 className="type-label text-foreground">Skills</h2>
-        <Link
-          href="/skills"
-          className="type-label text-muted-foreground transition-colors hover:text-foreground"
-        >
-          View all
-        </Link>
-      </div>
-
-      <div className="grid gap-3 sm:grid-cols-2">
-        {skills.map((skill) => (
-          <SkillCard key={skill.id} href={`/skills#${skill.id}`} skill={skill} />
-        ))}
-      </div>
-    </div>
-  );
-}
 
 export function PortfolioView({ address }: { address: string }) {
   const { positions, summary, isLoading, error } = usePortfolioData(address);
@@ -432,18 +480,15 @@ export function PortfolioView({ address }: { address: string }) {
           title="Portfolio unavailable"
           description="The portfolio lookup failed. Try again in a moment."
         />
-        <RelatedSkills />
       </div>
     );
   }
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-2">
       <PortfolioStats address={address} summary={summary} />
 
-      <PositionsContent positions={positions} summary={summary} />
-
-      <RelatedSkills />
+      <PositionsContent positions={positions} />
     </div>
   );
 }

@@ -17,6 +17,9 @@ export async function GET(request: NextRequest) {
       description: SITE_DESCRIPTION,
       documentation: getDocumentationUrl(request.url),
       sourceRepository: getSiteRepoUrl(),
+      agentRegistrationUrl: "/api/agents/register",
+      agentMeUrl: "/api/agents/me",
+      agentClaimUrl: "/api/agents/claim",
       endpoints: {
         index: {
           url: "/api",
@@ -35,13 +38,6 @@ export async function GET(request: NextRequest) {
           params: {
             sort: "trending|mcap|new|volume|gainers|creators|featured",
             count: "1-20",
-          },
-        },
-        leaderboard: {
-          url: "/api/leaderboard",
-          description: "Weekly trader rankings by Zora volume.",
-          params: {
-            count: "1-50",
           },
         },
         portfolio: {
@@ -67,6 +63,21 @@ export async function GET(request: NextRequest) {
             count: "1-50",
             after: "Optional pagination cursor",
           },
+        },
+        agentsRegister: {
+          url: "/api/agents/register",
+          description:
+            "Register an agent and receive a bearer API key plus a human claim URL.",
+        },
+        agentsMe: {
+          url: "/api/agents/me",
+          description:
+            "Return the current agent record for a valid Bearer sk_zora_* API key.",
+        },
+        agentsClaim: {
+          url: "/api/agents/claim",
+          description:
+            "Claim an unclaimed agent by claim code and wallet address.",
         },
       },
     },

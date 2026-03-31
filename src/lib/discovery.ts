@@ -15,6 +15,10 @@ import {
   toAbsoluteUrl,
 } from "@/lib/site";
 
+const AGENT_REGISTRATION_PATH = "/api/agents/register";
+const AGENT_ME_PATH = "/api/agents/me";
+const AGENT_CLAIM_PATH = "/api/agents/claim";
+
 const CLI_REFERENCE = [
   {
     command: "zora explore",
@@ -153,54 +157,72 @@ function buildSkillReference(skill: Skill, siteUrl: string): string {
 export function buildAiDiscovery(siteUrl: string) {
   return {
     name: SITE_NAME,
-    description: SITE_DESCRIPTION,
+    description: "Zora CLI and agent skills for the Zora attention market",
     api: "/api",
     skills_endpoint: "/api/skills",
     explore_endpoint: "/api/explore",
-    leaderboard_endpoint: "/api/leaderboard",
     portfolio_endpoint: "/api/portfolio",
     profile_endpoint: "/api/profile",
     coin_swaps_endpoint: "/api/coin-swaps",
     llms_txt: "/llms.txt",
     llms_full_txt: "/llms-full.txt",
+    agent_registration_url: AGENT_REGISTRATION_PATH,
+    agent_me_url: AGENT_ME_PATH,
+    agent_claim_url: AGENT_CLAIM_PATH,
     documentation: getDocumentationUrl(siteUrl),
     source_repository: getSiteRepoUrl(),
   };
 }
 
 export function buildLlmsTxt(siteUrl: string) {
-  const installAllCommands = getInstallAllCommands(siteUrl);
+  const skillMdUrls = skills
+    .map((skill) => `- ${skill.name}: ${toAbsoluteUrl(`/skills/${skill.id}/skill-md`, siteUrl)}`)
+    .join("\n");
 
   return `# ${SITE_NAME}
 
 ${SITE_DESCRIPTION}
 
-## Prerequisites
+## Quick Start
 
-Install the Zora CLI (requires Node.js 20+):
+Step 1 — Install the Zora CLI (skip if \`zora --help\` succeeds):
+
 npm install -g @zoralabs/cli
 
-## How To Use This
+Step 2 — Install skills (read each SKILL.md and follow its instructions):
 
-- Skills require the Zora CLI. Install it first if the host doesn't have it.
-- Use the full install when the user wants broad coverage.
-- Use a single skill when the user wants one specific thing (e.g. just trending coins).
-- If wallet use is unclear, start with Trend Scout, Creator Pulse, or Briefing Bot.
-- Skills use the Zora CLI for market data and balance checks. Trading skills also place orders through it.
+${skillMdUrls}
 
-Catalog: ${toAbsoluteUrl("/api/skills", siteUrl)}
-Market APIs: ${toAbsoluteUrl("/api/profile", siteUrl)} | ${toAbsoluteUrl("/api/coin-swaps", siteUrl)}
-Default install (any agent): ${installAllCommands.prompt}
-Single-skill target: ${siteUrl}/skills/{skill_id}/skill-md
+Step 3 — Verify the CLI works:
+
+zora explore --sort trending --limit 3 --json
+
+Step 4 — Optional wallet setup (needed for Portfolio Scout, Copy Trader, Momentum Trader):
+
+zora setup --create
+
+Step 5 — Try a skill:
+
+"What's trending on Zora right now?"
 
 ## Skills
 
 ${buildSkillSummaryLines(siteUrl)}
+
+## Reference
+
+Skill catalog API: ${toAbsoluteUrl("/api/skills", siteUrl)}
+Profile API: ${toAbsoluteUrl("/api/profile", siteUrl)}
+Coin swaps API: ${toAbsoluteUrl("/api/coin-swaps", siteUrl)}
 `;
 }
 
 export function buildLlmsFullTxt(siteUrl: string) {
   const installAllCommands = getInstallAllCommands(siteUrl);
+  const claimPageExampleUrl = toAbsoluteUrl("/claim/CLAIM_CODE", siteUrl).replace(
+    "CLAIM_CODE",
+    "{claim_code}",
+  );
 
   return `# ${SITE_NAME}
 
@@ -213,8 +235,8 @@ npm install -g @zoralabs/cli
 
 ## How To Explain This
 
-- attention.zip provides agent skills for the Zora attention market. Scan trends, copy trades, and track portfolios.
-- Lead with what the skills do: trending coins, copy trading, portfolio checks, momentum trading.
+- attention.zip installs the Zora CLI and agent skills for the Zora attention market.
+- Lead with what the skills do: trending coins, briefings, portfolio checks, momentum trading.
 - Point to source and skill notes when the user asks what gets installed.
 - Skills use the Zora CLI for market data and balance checks. Trading skills also place orders through it.
 
@@ -260,5 +282,18 @@ ${CLI_REFERENCE.map(
   Params: address=<0x-coin-address>&count=1-50&after=<cursor?>
   Returns: recent swap activity, quote notional, tx hash, and pagination data
 
+## Agent Registration
+
+- Register agent: POST ${toAbsoluteUrl(AGENT_REGISTRATION_PATH, siteUrl)}
+  Body: {"name":"agent-name","description":"optional","runtime":"optional"}
+  Returns: agent_id, api_key, key_prefix, claim_url, claim_code, status
+- Agent lookup: GET ${toAbsoluteUrl(AGENT_ME_PATH, siteUrl)}
+  Header: Authorization: Bearer sk_zora_xxx
+  Returns: agent_id, name, status, wallet, claim_url, created_at
+- Human claim: POST ${toAbsoluteUrl(AGENT_CLAIM_PATH, siteUrl)}
+  Body: {"claim_code":"reef-X4B2","wallet":"0x..."}
+  Returns: ok, agent_id, wallet
+- Public claim page: ${claimPageExampleUrl}
+- Claim links stay resolvable after a successful claim and render the current ownership state.
 `;
 }

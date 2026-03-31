@@ -47,7 +47,15 @@ function ConcreteOrb({ pressed }: { pressed: boolean }) {
   diffuseMap.colorSpace = SRGBColorSpace;
 
   const meshRef = useRef<THREE.Mesh>(null);
-  const scale = useSpring(pressed ? 0.88 : 1, 200, 16);
+  const [mounted, setMounted] = useState(false);
+  // Start small, spring to full size on mount — same feel as a press release
+  const targetScale = !mounted ? 0.6 : pressed ? 0.88 : 1;
+  const scale = useSpring(targetScale, 200, 16);
+
+  // Trigger the entrance spring after first frame
+  useFrame(() => {
+    if (!mounted) setMounted(true);
+  });
 
   useFrame(() => {
     if (!meshRef.current) return;

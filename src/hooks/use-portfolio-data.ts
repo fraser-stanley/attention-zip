@@ -133,7 +133,7 @@ export function usePortfolioData(address: string | null) {
   const query = useQuery<PortfolioApiResponse, Error>({
     enabled: Boolean(address),
     queryKey: ["portfolio", address],
-    refetchInterval: 30_000,
+    refetchInterval: 15_000,
     queryFn: async () => {
       const response = await fetch(`/api/portfolio?address=${address}&count=20`);
       if (!response.ok) {

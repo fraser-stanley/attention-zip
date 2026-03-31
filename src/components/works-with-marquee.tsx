@@ -28,11 +28,11 @@ function PlatformItems({ items }: { items: Platform[] }) {
 
 export function WorksWithMarquee() {
   return (
-    <section aria-label="Compatible platforms" className="space-y-3">
+    <section aria-label="Compatible platforms" className="space-y-3 pt-8 sm:pt-12 lg:pt-16">
       <h2 className="type-body-sm font-medium text-muted-foreground">
         Works with
       </h2>
-      <div className="overflow-x-clip overflow-y-visible select-none">
+      <div className="overflow-x-clip overflow-y-visible select-none marquee-fade">
         <nav
           aria-label="Compatible agent platforms"
           className="logo-marquee-track"

@@ -114,7 +114,6 @@ export function WalletConnectModal({ open, onClose }: WalletConnectModalProps) {
               <div className="border-b border-white/10 px-5 py-4">
                 <div className="flex items-start justify-between gap-4">
                   <div className="space-y-2">
-                    <p className="type-label text-white/45">Wallet</p>
                     <h2 id="wallet-connect-title" className="font-display text-3xl tracking-tight sm:text-4xl">
                       View your positions
                     </h2>
@@ -129,7 +128,7 @@ export function WalletConnectModal({ open, onClose }: WalletConnectModalProps) {
                     size="icon"
                     onClick={onClose}
                     aria-label="Close wallet connect modal"
-                    className="border-white/10 text-white/50 hover:border-white/30 hover:bg-white/[0.06] hover:text-white"
+                    className="border-transparent text-white/50 hover:bg-white/[0.06] hover:text-white"
                   >
                     <svg
                       width="14"

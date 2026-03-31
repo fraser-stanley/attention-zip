@@ -5,17 +5,21 @@ import { useEffect, useRef, useState } from "react";
 import { CheckIcon } from "@/components/ui/check";
 import { CopyIcon } from "@/components/ui/copy";
 import { HighlightedCodeText } from "@/components/highlighted-code-text";
+import { useToast } from "@/components/toast";
 import { cn } from "@/lib/utils";
 
 export function CopyableCodeBlock({
   command,
   prefix = "$",
+  highlight = true,
   className,
 }: {
   command: string;
   prefix?: string;
+  highlight?: boolean;
   className?: string;
 }) {
+  const { toast } = useToast();
   const [copied, setCopied] = useState(false);
   const timeoutRef = useRef<number | null>(null);
 
@@ -27,10 +31,11 @@ export function CopyableCodeBlock({
     };
   }, []);
 
-  async function handleCopy() {
+  async function handleCopy(e: React.MouseEvent) {
     try {
       await navigator.clipboard.writeText(command);
       setCopied(true);
+      toast("Copied to clipboard", { x: e.clientX, y: e.clientY });
     } catch {
       return;
     }
@@ -58,7 +63,7 @@ export function CopyableCodeBlock({
       <span className="text-foreground/40">{prefix}</span>
       <HighlightedCodeText
         text={command}
-        variant={prefix === ">" ? "prompt" : "shell"}
+        variant={highlight ? (prefix === ">" ? "prompt" : "shell") : "plain"}
         className="min-w-0 flex-1 truncate text-left text-foreground/80 whitespace-nowrap"
       />
       <span className="shrink-0 text-muted-foreground/60 transition-colors group-hover:text-foreground/60">

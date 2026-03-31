@@ -1,12 +1,11 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { motion, useReducedMotion } from "motion/react";
 import { HoverMediaOverlay } from "@/components/hover-media-overlay";
 import { TextMorph } from "@/components/text-morph";
 import { BrailleSpinner } from "@/components/ui/braille-spinner";
-import { Badge } from "@/components/ui/badge";
 import type { CoinNode, ExploreApiResponse, SortOption } from "@/lib/zora";
 import {
   formatCompactCurrency,
@@ -14,6 +13,7 @@ import {
   truncateAddress,
   coinTypeLabel,
 } from "@/lib/zora";
+import { useToast } from "@/components/toast";
 import { cn } from "@/lib/utils";
 
 const TICK_MS = 1600;
@@ -171,10 +171,24 @@ export function CoinTable({
   compact = false,
   initialCoins,
 }: CoinTableProps) {
+  const { toast } = useToast();
   const reduceMotion = useReducedMotion() ?? false;
   const [tick, setTick] = useState(0);
   const [selectedRowId, setSelectedRowId] = useState<string | null>(null);
   const [hoveredImage, setHoveredImage] = useState<string | null>(null);
+  const [copiedId, setCopiedId] = useState<string | null>(null);
+  const copyTimeoutRef = useRef<number | null>(null);
+
+  const handleRowClick = useCallback((e: React.MouseEvent, coin: BoardCoin) => {
+    if (!coin.address) return;
+    const pos = { x: e.clientX, y: e.clientY };
+    void navigator.clipboard.writeText(coin.address).then(() => {
+      setCopiedId(coin.id);
+      toast(`Copied ${truncateAddress(coin.address)}`, pos);
+      if (copyTimeoutRef.current !== null) window.clearTimeout(copyTimeoutRef.current);
+      copyTimeoutRef.current = window.setTimeout(() => setCopiedId(null), 1500);
+    });
+  }, [toast]);
 
   const { data, isLoading, error } = useQuery({
     queryKey: ["explore", sort, count],
@@ -224,12 +238,12 @@ export function CoinTable({
   const minWidth = compact ? "min-w-[44rem]" : "min-w-[56rem]";
 
   return (
-    <div className="relative overflow-x-auto" onMouseLeave={() => setHoveredImage(null)}>
+    <div className="relative overflow-x-auto text-sm font-mono" onMouseLeave={() => setHoveredImage(null)}>
       <HoverMediaOverlay imageUrl={hoveredImage} />
       {/* Header */}
       <div
         className={cn(
-          "type-label border-b border-border/70 px-4 py-3 text-muted-foreground",
+          "type-label border-b border-border/70 px-4 py-3 font-mono text-muted-foreground",
           gridCols, "grid w-full gap-4", minWidth
         )}
       >
@@ -245,15 +259,14 @@ export function CoinTable({
       {/* Rows */}
       {frame.rows.map((coin, i) => {
         const flashTone = frame.flashById[coin.id] ?? null;
-        const rankDelta = frame.rankDeltaById[coin.id] ?? 0;
         const isFlash = flashTone !== null;
         const isSelected = coin.id === selectedRowId;
-        const movementLabel = rankDelta > 0 ? `+${rankDelta}` : rankDelta < 0 ? `${rankDelta}` : null;
 
         return (
           <motion.div
             key={coin.id}
             layout
+            onClick={(e) => handleRowClick(e, coin)}
             onMouseEnter={() => {
               setSelectedRowId(coin.id);
               setHoveredImage(data?.coins?.[i]?.mediaContent?.previewImage?.medium ?? null);
@@ -265,7 +278,7 @@ export function CoinTable({
               transition: flashTone ? "background-color 0s" : "background-color 200ms cubic-bezier(0.33, 1, 0.68, 1)",
             }}
             className={cn(
-              "group relative min-h-[44px] cursor-default items-center border-b border-border/70 px-4 py-2 last:border-b-0",
+              "group relative min-h-[44px] cursor-pointer items-center border-b border-border/70 px-4 py-2 last:border-b-0",
               gridCols, "grid w-full gap-4", minWidth,
               isFlash ? "text-black" : "",
               !isFlash && isSelected ? "bg-foreground text-background" : "",
@@ -275,33 +288,17 @@ export function CoinTable({
             {/* Rank */}
             <div
               className={cn(
-                "type-body-sm flex items-center gap-2 font-mono",
-                isFlash ? "text-black/72" : isSelected ? "text-background/72" : "text-muted-foreground"
+                "tabular-nums",
+                isFlash ? "text-black/60" : isSelected ? "text-background/60" : "text-muted-foreground"
               )}
             >
-              <span
-                className={cn(
-                  "h-2.5 w-2.5 rounded-full",
-                  isFlash ? "bg-black" : isSelected ? "bg-background" : "bg-foreground/25"
-                )}
-              />
-              <span>{String(i + 1).padStart(2, "0")}</span>
-              {movementLabel ? (
-                <span
-                  className={cn(
-                    "type-caption",
-                    isFlash ? "text-black" : rankDelta > 0 ? "text-[#198754]" : "text-[#9f3f84]"
-                  )}
-                >
-                  {movementLabel}
-                </span>
-              ) : null}
+              {String(i + 1).padStart(2, "0")}
             </div>
 
             {/* Name */}
             <div
               className={cn(
-                "type-body-sm truncate font-medium",
+                "truncate",
                 isFlash ? "text-black" : isSelected ? "text-background" : "text-foreground"
               )}
             >
@@ -312,27 +309,22 @@ export function CoinTable({
             {!compact && (
               <div
                 className={cn(
-                  "type-caption truncate font-mono",
+                  "truncate",
                   isFlash ? "text-black/60" : isSelected ? "text-background/60" : "text-muted-foreground"
                 )}
               >
-                {truncateAddress(coin.address)}
+                {copiedId === coin.id ? "Copied" : truncateAddress(coin.address)}
               </div>
             )}
 
             {/* Type (dashboard only) */}
             {!compact && (
-              <div>
-                <Badge
-                  variant="secondary"
-                  className={cn(
-                    "type-caption font-normal",
-                    isFlash ? "bg-black/15 text-black border-transparent" : "",
-                    isSelected ? "bg-background/15 text-background border-transparent" : ""
-                  )}
-                >
-                  {coinTypeLabel(coin.coinType)}
-                </Badge>
+              <div
+                className={cn(
+                  isFlash ? "text-black/60" : isSelected ? "text-background/60" : "text-muted-foreground"
+                )}
+              >
+                {coinTypeLabel(coin.coinType)}
               </div>
             )}
 
@@ -340,7 +332,7 @@ export function CoinTable({
             <div className="text-right">
               <TextMorph
                 className={cn(
-                  "type-body-sm inline-flex rounded-sm px-1.5 py-0.5",
+                  "inline-flex px-1.5 py-0.5",
                   isFlash ? "text-black/72" : isSelected ? "text-background/80" : "text-muted-foreground"
                 )}
               >
@@ -352,7 +344,7 @@ export function CoinTable({
             <div className="text-right">
               <TextMorph
                 className={cn(
-                  "type-body-sm inline-flex rounded-sm px-1.5 py-0.5",
+                  "inline-flex px-1.5 py-0.5",
                   isFlash ? "text-black/72" : isSelected ? "text-background/80" : "text-muted-foreground"
                 )}
               >
@@ -364,7 +356,7 @@ export function CoinTable({
             <div className="text-right">
               <TextMorph
                 className={cn(
-                  "type-body-sm inline-flex items-center rounded-sm px-1.5 py-0.5 font-mono font-medium",
+                  "inline-flex items-center px-1.5 py-0.5 tabular-nums",
                   changeChipClass(coin.positive, flashTone, isSelected)
                 )}
               >

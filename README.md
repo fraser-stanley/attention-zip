@@ -13,13 +13,13 @@ Agent skills for the Zora attention market. Scan trends, check portfolios, build
 | [copy-trader](copy-trader/) | Mirrors public Zora wallet moves with guardrails. Dry run by default | Execution |
 | [momentum-trader](momentum-trader/) | Quotes and manages momentum trades. Dry run by default | Execution |
 
-Each skill directory contains a `SKILL.md` for agent instructions, `clawhub.json` for runtime metadata, and `scripts/` for the managed entrypoint and validation.
+Each skill directory has a `SKILL.md` with agent instructions, a `clawhub.json` for runtime config, and a `scripts/` directory.
 
 ## Quick start
 
 ```bash
 git clone git@github.com:fraser-stanley/attention-zip.git
-cd zora-agent-skills
+cd attention-zip
 pnpm install
 pnpm dev
 ```

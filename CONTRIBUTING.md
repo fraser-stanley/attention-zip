@@ -17,7 +17,7 @@ Open an issue before starting work on:
 - Changes to the skill format (SKILL.md structure, clawhub.json schema)
 - Significant site changes beyond bug fixes
 
-The site design and UI are not the contribution surface. We accept bug fixes and skill-serving improvements, but not unsolicited redesigns.
+The site design and UI aren't open for contributions. Bug fixes and skill-serving improvements are.
 
 ## Skill structure
 
@@ -31,7 +31,7 @@ Each skill lives in its own directory at the project root:
   scripts/validate.sh
 ```
 
-See [AGENTS.md](AGENTS.md) for the full skill format reference and how to add a new skill.
+The skill format follows the AgentSkills/OpenClaw convention. See any existing skill directory for reference.
 
 ## Before submitting
 

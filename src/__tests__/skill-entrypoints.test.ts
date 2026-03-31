@@ -762,14 +762,6 @@ describe("managed skill entrypoints", { timeout: 30_000 }, () => {
       marketCapDelta24h: "3000",
       volume24h: "9000",
     });
-    const hyper = createCoin({
-      name: "hyperpop",
-      address: "0x3000000000000000000000000000000000000005",
-      marketCap: "950000",
-      marketCapDelta24h: "175000",
-      volume24h: "210000",
-    });
-
     const harness = createHarness({
       [keyOf(["explore", "--sort", "trending", "--limit", "5", "--json"])]: [
         { coins: [looks] },
@@ -783,10 +775,7 @@ describe("managed skill entrypoints", { timeout: 30_000 }, () => {
         { coins: [oldLaunch] },
         { coins: [freshLaunch] },
       ],
-      [keyOf(["explore", "--sort", "gainers", "--limit", "5", "--json"])]: [
-        { coins: [hyper] },
-        { coins: [hyper] },
-      ],
+
       [keyOf(["balance", "--json"])]: [
         {
           wallet: [
@@ -890,7 +879,7 @@ describe("managed skill entrypoints", { timeout: 30_000 }, () => {
         "20",
         "--json",
       ])]: { coins: [] },
-      [keyOf(["explore", "--sort", "gainers", "--limit", "12", "--json"])]: {
+      [keyOf(["explore", "--sort", "volume", "--limit", "12", "--json"])]: {
         coins: [hyper],
       },
       [keyOf(["explore", "--sort", "trending", "--limit", "12", "--json"])]: {
@@ -1126,7 +1115,7 @@ describe("managed skill entrypoints", { timeout: 30_000 }, () => {
         "20",
         "--json",
       ])]: { coins: [] },
-      [keyOf(["explore", "--sort", "gainers", "--limit", "12", "--json"])]: {
+      [keyOf(["explore", "--sort", "volume", "--limit", "12", "--json"])]: {
         coins: [hyper],
       },
       [keyOf(["explore", "--sort", "trending", "--limit", "12", "--json"])]: {

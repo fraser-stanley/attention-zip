@@ -115,6 +115,10 @@ describe.each(SKILL_DIRS)("%s/SKILL.md", (skill) => {
     const codeBlocks = body.match(/```[\s\S]*?```/g) ?? [];
     const codeContent = codeBlocks.join("\n");
 
+    const VALID_EXPLORE_SORTS = ["mcap", "volume", "new", "trending", "featured"];
+    const VALID_EXPLORE_TYPES = ["all", "trend", "creator-coin", "post"];
+    const VALID_TOKEN_ASSETS = ["eth", "usdc", "zora"];
+
     it("explore commands use --json", () => {
       const lines = codeContent
         .split("\n")
@@ -122,6 +126,50 @@ describe.each(SKILL_DIRS)("%s/SKILL.md", (skill) => {
       for (const line of lines) {
         expect(line).toContain("--json");
         expect(line).not.toMatch(/-o\s+json/);
+      }
+    });
+
+    it("explore --sort values are valid", () => {
+      const lines = codeContent
+        .split("\n")
+        .filter((line) => line.includes("zora explore") && line.includes("--sort"));
+      for (const line of lines) {
+        const match = line.match(/--sort\s+(\S+)/);
+        if (match && !match[1].startsWith("<")) {
+          expect(VALID_EXPLORE_SORTS).toContain(match[1]);
+        }
+      }
+    });
+
+    it("explore --type values are valid", () => {
+      const lines = codeContent
+        .split("\n")
+        .filter((line) => line.includes("zora explore") && line.includes("--type"));
+      for (const line of lines) {
+        const match = line.match(/--type\s+(\S+)/);
+        if (match && !match[1].startsWith("<")) {
+          expect(VALID_EXPLORE_TYPES).toContain(match[1]);
+        }
+      }
+    });
+
+    it("buy/sell --token/--to values are valid", () => {
+      const lines = codeContent
+        .split("\n")
+        .filter(
+          (line) =>
+            (line.includes("zora buy") || line.includes("zora sell")) &&
+            (line.includes("--token") || line.includes("--to")),
+        );
+      for (const line of lines) {
+        const tokenMatch = line.match(/--token\s+(\S+)/);
+        const toMatch = line.match(/--to\s+(\S+)/);
+        if (tokenMatch && !tokenMatch[1].startsWith("<")) {
+          expect(VALID_TOKEN_ASSETS).toContain(tokenMatch[1]);
+        }
+        if (toMatch && !toMatch[1].startsWith("<")) {
+          expect(VALID_TOKEN_ASSETS).toContain(toMatch[1]);
+        }
       }
     });
 

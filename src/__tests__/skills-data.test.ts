@@ -9,6 +9,7 @@ import {
   getSkillQuickInstallCommands,
   getSkillRuntimeCommands,
 } from "@/lib/skills";
+import { CLI_REFERENCE } from "@/lib/discovery";
 
 const ROOT = path.resolve(__dirname, "../..");
 
@@ -71,6 +72,220 @@ describe("cross-file sync", () => {
       expect(frontmatter.name).toBe(id);
     },
   );
+});
+
+const VALID_EXPLORE_SORTS = ["mcap", "volume", "new", "trending", "featured"];
+const VALID_EXPLORE_TYPES = ["all", "trend", "creator-coin", "post"];
+const VALID_BALANCE_SUBCOMMANDS = ["spendable", "coins"];
+const VALID_BALANCE_COINS_SORTS = [
+  "usd-value",
+  "balance",
+  "market-cap",
+  "price-change",
+];
+const VALID_TOKEN_ASSETS = ["eth", "usdc", "zora"];
+const VALID_PRICE_HISTORY_INTERVALS = ["1h", "24h", "1w", "1m", "ALL"];
+
+function extractFlag(command: string, flag: string): string | null {
+  const regex = new RegExp(`${flag}\\s+(\\S+)`);
+  const match = command.match(regex);
+  return match ? match[1] : null;
+}
+
+describe("CLI compatibility", () => {
+  const allCommands = skills.flatMap((skill) =>
+    skill.commands.map((command) => ({ skill: skill.id, command })),
+  );
+
+  describe("explore --sort values match CLI", () => {
+    const exploreCmds = allCommands.filter(({ command }) =>
+      command.includes("zora explore"),
+    );
+
+    it.each(exploreCmds)(
+      "$skill: $command",
+      ({ command }) => {
+        const sort = extractFlag(command, "--sort");
+        if (sort) {
+          expect(VALID_EXPLORE_SORTS).toContain(sort);
+        }
+      },
+    );
+  });
+
+  describe("explore --type values match CLI", () => {
+    const exploreCmds = allCommands.filter(
+      ({ command }) =>
+        command.includes("zora explore") && command.includes("--type"),
+    );
+
+    it.each(exploreCmds)(
+      "$skill: $command",
+      ({ command }) => {
+        const type = extractFlag(command, "--type");
+        if (type) {
+          expect(VALID_EXPLORE_TYPES).toContain(type);
+        }
+      },
+    );
+  });
+
+  describe("balance subcommands match CLI", () => {
+    const balanceCmds = allCommands.filter(({ command }) =>
+      command.includes("zora balance"),
+    );
+
+    it.each(balanceCmds)(
+      "$skill: $command",
+      ({ command }) => {
+        const parts = command.replace("zora balance", "").trim().split(/\s+/);
+        const subcommand = parts[0];
+        if (subcommand && !subcommand.startsWith("-")) {
+          expect(VALID_BALANCE_SUBCOMMANDS).toContain(subcommand);
+        }
+      },
+    );
+  });
+
+  describe("balance coins --sort values match CLI", () => {
+    const coinsCmds = allCommands.filter(
+      ({ command }) =>
+        command.includes("zora balance coins") && command.includes("--sort"),
+    );
+
+    it.each(coinsCmds)(
+      "$skill: $command",
+      ({ command }) => {
+        const sort = extractFlag(command, "--sort");
+        if (sort) {
+          expect(VALID_BALANCE_COINS_SORTS).toContain(sort);
+        }
+      },
+    );
+  });
+
+  describe("buy/sell --token/--to values match CLI", () => {
+    const tradeCmds = allCommands.filter(
+      ({ command }) =>
+        (command.includes("zora buy") || command.includes("zora sell")) &&
+        (command.includes("--token") || command.includes("--to")),
+    );
+
+    if (tradeCmds.length > 0) {
+      it.each(tradeCmds)(
+        "$skill: $command",
+        ({ command }) => {
+          const token = extractFlag(command, "--token");
+          const to = extractFlag(command, "--to");
+          if (token && !token.startsWith("<")) {
+            expect(VALID_TOKEN_ASSETS).toContain(token);
+          }
+          if (to && !to.startsWith("<")) {
+            expect(VALID_TOKEN_ASSETS).toContain(to);
+          }
+        },
+      );
+    }
+  });
+
+  describe("price-history --interval values match CLI", () => {
+    const phCmds = allCommands.filter(
+      ({ command }) =>
+        command.includes("zora price-history") &&
+        command.includes("--interval"),
+    );
+
+    if (phCmds.length > 0) {
+      it.each(phCmds)(
+        "$skill: $command",
+        ({ command }) => {
+          const interval = extractFlag(command, "--interval");
+          if (interval) {
+            expect(VALID_PRICE_HISTORY_INTERVALS).toContain(interval);
+          }
+        },
+      );
+    }
+  });
+
+  describe("all commands use --json", () => {
+    it.each(allCommands)(
+      "$skill: $command",
+      ({ command }) => {
+        if (!command.startsWith("node ")) {
+          expect(command).toContain("--json");
+        }
+      },
+    );
+  });
+
+  describe("entrypoint scripts use valid CLI options", () => {
+    const SKILL_DIRS = skills
+      .filter((s) => s.automation.entrypoint)
+      .map((s) => s.id);
+
+    it.each(SKILL_DIRS)(
+      "%s/scripts/run.mjs only uses valid --sort values for their context",
+      (id) => {
+        const script = fs.readFileSync(
+          path.join(ROOT, id, "scripts", "run.mjs"),
+          "utf8",
+        );
+        // Match array-style CLI args: ["explore", ..., "--sort", "value"]
+        // or ["balance", "coins", ..., "--sort", "value"]
+        const exploreSortMatches = script.matchAll(
+          /["']explore["'][\s\S]*?["']--sort["'],\s*\n?\s*["']([^"']+)["']/g,
+        );
+        for (const match of exploreSortMatches) {
+          expect(VALID_EXPLORE_SORTS).toContain(match[1]);
+        }
+        const balanceCoinsSortMatches = script.matchAll(
+          /["']balance["'][\s\S]*?["']coins["'][\s\S]*?["']--sort["'],\s*\n?\s*["']([^"']+)["']/g,
+        );
+        for (const match of balanceCoinsSortMatches) {
+          expect(VALID_BALANCE_COINS_SORTS).toContain(match[1]);
+        }
+      },
+    );
+
+    it.each(SKILL_DIRS)(
+      "%s/scripts/run.mjs only uses valid explore --type values",
+      (id) => {
+        const script = fs.readFileSync(
+          path.join(ROOT, id, "scripts", "run.mjs"),
+          "utf8",
+        );
+        const typeMatches = script.matchAll(
+          /["']--type["'],\s*\n?\s*["']([^"']+)["']/g,
+        );
+        for (const match of typeMatches) {
+          expect(VALID_EXPLORE_TYPES).toContain(match[1]);
+        }
+      },
+    );
+
+    it.each(SKILL_DIRS)(
+      "%s/scripts/run.mjs only uses valid --to/--token asset values",
+      (id) => {
+        const script = fs.readFileSync(
+          path.join(ROOT, id, "scripts", "run.mjs"),
+          "utf8",
+        );
+        const toMatches = script.matchAll(
+          /["']--to["'],\s*\n?\s*["']([^"']+)["']/g,
+        );
+        for (const match of toMatches) {
+          expect(VALID_TOKEN_ASSETS).toContain(match[1]);
+        }
+        const tokenMatches = script.matchAll(
+          /["']--token["'],\s*\n?\s*["']([^"']+)["']/g,
+        );
+        for (const match of tokenMatches) {
+          expect(VALID_TOKEN_ASSETS).toContain(match[1]);
+        }
+      },
+    );
+  });
 });
 
 describe("CLI flag correctness in commands", () => {
@@ -279,4 +494,85 @@ describe("actionPrompt", () => {
       expect(skill.actionPrompt.length).toBeGreaterThan(5);
     },
   );
+});
+
+describe("CLI_REFERENCE in discovery.ts", () => {
+  const exploreRef = CLI_REFERENCE.find((r) => r.command === "zora explore");
+  const balanceRef = CLI_REFERENCE.find((r) => r.command === "zora balance");
+  const priceHistoryRef = CLI_REFERENCE.find(
+    (r) => r.command === "zora price-history",
+  );
+
+  it("explore entry documents all valid sort values", () => {
+    expect(exploreRef).toBeDefined();
+    for (const sort of VALID_EXPLORE_SORTS) {
+      expect(exploreRef!.notes).toContain(sort);
+    }
+  });
+
+  it("explore entry documents all valid type values", () => {
+    expect(exploreRef).toBeDefined();
+    for (const type of VALID_EXPLORE_TYPES) {
+      expect(exploreRef!.notes).toContain(type);
+    }
+  });
+
+  it("explore entry does not list stale sort values", () => {
+    const sortsInNotes = exploreRef!.notes
+      .match(/Sorts: ([^.]+)\./)?.[1]
+      ?.split(", ")
+      .map((s) => s.trim());
+    expect(sortsInNotes).toBeDefined();
+    for (const sort of sortsInNotes!) {
+      expect(VALID_EXPLORE_SORTS).toContain(sort);
+    }
+  });
+
+  it("explore entry does not list stale type values", () => {
+    const typesInNotes = exploreRef!.notes
+      .match(/Types: ([^.]+)\./)?.[1]
+      ?.split(", ")
+      .map((s) => s.trim());
+    expect(typesInNotes).toBeDefined();
+    for (const type of typesInNotes!) {
+      expect(VALID_EXPLORE_TYPES).toContain(type);
+    }
+  });
+
+  it("balance entry documents valid subcommands", () => {
+    expect(balanceRef).toBeDefined();
+    for (const sub of VALID_BALANCE_SUBCOMMANDS) {
+      expect(balanceRef!.notes + " " + balanceRef!.syntax).toContain(sub);
+    }
+  });
+
+  it("price-history entry documents all valid interval values", () => {
+    expect(priceHistoryRef).toBeDefined();
+    for (const interval of VALID_PRICE_HISTORY_INTERVALS) {
+      expect(priceHistoryRef!.notes).toContain(interval);
+    }
+  });
+
+  it("every CLI_REFERENCE entry has syntax containing --json where applicable", () => {
+    const jsonCommands = ["zora explore", "zora get", "zora buy", "zora sell", "zora balance", "zora price-history", "zora profile", "zora send"];
+    for (const ref of CLI_REFERENCE) {
+      if (jsonCommands.includes(ref.command)) {
+        expect(ref.syntax).toContain("--json");
+      }
+    }
+  });
+
+  it("CLI_REFERENCE covers all commands used by skills", () => {
+    const refCommands = CLI_REFERENCE.map((r) => r.command);
+    const skillCommandPrefixes = new Set<string>();
+    for (const skill of skills) {
+      for (const cmd of skill.commands) {
+        const match = cmd.match(/^(zora\s+\S+)/);
+        if (match) skillCommandPrefixes.add(match[1]);
+      }
+    }
+    for (const prefix of skillCommandPrefixes) {
+      expect(refCommands).toContain(prefix);
+    }
+  });
 });

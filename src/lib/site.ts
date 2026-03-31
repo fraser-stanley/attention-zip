@@ -26,9 +26,21 @@ function getEnvSiteUrl() {
 }
 
 export function getSiteUrl(requestUrl?: string) {
+  // Explicit env var is the canonical domain — always wins
+  const explicit = process.env.NEXT_PUBLIC_SITE_URL ?? process.env.SITE_URL;
+  if (explicit) {
+    try {
+      return normalizeUrl(explicit);
+    } catch {
+      /* fall through */
+    }
+  }
+
+  // Fallback chain for preview deploys and dev
   const candidate =
     requestUrl ??
-    getEnvSiteUrl() ??
+    process.env.VERCEL_PROJECT_PRODUCTION_URL ??
+    process.env.VERCEL_URL ??
     (typeof window !== "undefined" ? window.location.origin : undefined);
 
   if (!candidate) {

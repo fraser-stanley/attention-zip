@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
+import { Analytics } from "@vercel/analytics/next";
 import { Providers } from "@/lib/providers";
 import { Nav } from "@/components/nav";
 import { Footer } from "@/components/footer";
@@ -120,6 +121,7 @@ export default function RootLayout({
           </main>
           <Footer />
           <AgentationLoader />
+          <Analytics />
         </Providers>
       </body>
     </html>

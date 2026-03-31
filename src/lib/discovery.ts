@@ -19,12 +19,12 @@ const AGENT_REGISTRATION_PATH = "/api/agents/register";
 const AGENT_ME_PATH = "/api/agents/me";
 const AGENT_CLAIM_PATH = "/api/agents/claim";
 
-const CLI_REFERENCE = [
+export const CLI_REFERENCE = [
   {
     command: "zora explore",
     syntax: "zora explore --sort <sort> --type <type> --limit <n> --json",
     notes:
-      "Sorts: mcap, volume, new, gainers, trending, featured, last-traded, last-traded-unique. Types: all, trend, creator-coin, post.",
+      "Sorts: mcap, volume, new, trending, featured. Types: all, trend, creator-coin, post.",
   },
   {
     command: "zora get",

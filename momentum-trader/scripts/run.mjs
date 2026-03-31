@@ -310,11 +310,11 @@ function computeEdgeScore(changePct, volumeUsd, slippage) {
 }
 
 async function discoverCandidates(heldIds, blockedIds) {
-  const [gainersPayload, trendingPayload] = await Promise.all([
+  const [volumePayload, trendingPayload] = await Promise.all([
     runZora([
       "explore",
       "--sort",
-      "gainers",
+      "volume",
       "--limit",
       String(LIMIT),
       "--json",
@@ -331,7 +331,7 @@ async function discoverCandidates(heldIds, blockedIds) {
 
   const merged = new Map();
   for (const coin of [
-    ...(gainersPayload.coins ?? []),
+    ...(volumePayload.coins ?? []),
     ...(trendingPayload.coins ?? []),
   ]) {
     merged.set(coinId(coin), coin);

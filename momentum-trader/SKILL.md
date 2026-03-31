@@ -1,6 +1,6 @@
 ---
 name: momentum-trader
-description: Scans gainers, scores candidates, and manages stop-loss, take-profit, and trailing-stop exits. Dry run by default.
+description: Scans volume leaders and trending coins, scores candidates, and manages stop-loss, take-profit, and trailing-stop exits. Dry run by default.
 metadata:
   author: "Zora Agent Skills"
   version: "2.1.0"
@@ -53,7 +53,7 @@ Schedule: every 10 minutes. Keep `autostart` off until dry-run output is correct
 
 ```bash
 node scripts/run.mjs
-zora explore --sort gainers --limit 12 --json
+zora explore --sort volume --limit 12 --json
 zora explore --sort trending --limit 12 --json
 zora get <identifier> --json
 zora balance coins --sort usd-value --limit 20 --json
@@ -67,7 +67,7 @@ zora price-history <identifier> --interval 24h --json
 
 Loads state, refreshes positions, runs exits first (stop-loss, take-profit, trailing stop). Every exit logs to `journal.jsonl`.
 
-New entries run after cooldown, position, and daily cap checks. Pulls gainers and trending, filters by gain and volume, drops flip-flop blocked coins, resolves addresses, quotes up to 5 candidates. Dry run stops at the quote. Live mode enters the top pick.
+New entries run after cooldown, position, and daily cap checks. Pulls volume and trending, filters by gain and volume, drops flip-flop blocked coins, resolves addresses, quotes up to 5 candidates. Dry run stops at the quote. Live mode enters the top pick.
 
 ### Decision Rules
 

@@ -1,6 +1,6 @@
 ---
 name: briefing-bot
-description: Runs a compact market digest on a schedule. Covers trends, volume, new launches, gainers, and portfolio overlap.
+description: Runs a compact market digest on a schedule. Covers trends, volume, new launches, and portfolio overlap.
 metadata:
   author: "Zora Agent Skills"
   version: "2.0.0"
@@ -10,7 +10,7 @@ metadata:
 
 # Briefing Bot
 
-Rolls trending, volume, new launches, gainers, and portfolio overlap into one short report.
+Rolls trending, volume, new launches, and portfolio overlap into one short report.
 
 ## When to Use This Skill
 
@@ -43,14 +43,13 @@ node scripts/run.mjs
 zora explore --sort trending --limit 5 --json
 zora explore --sort volume --limit 5 --json
 zora explore --sort new --limit 5 --json
-zora explore --sort gainers --limit 5 --json
 zora balance --json
 zora price-history <identifier> --interval 1w --json
 ```
 
 ## How It Works
 
-Four market scans run through the CLI. The ids from each table go into `~/.config/zora-agent-skills/briefing-bot/state.json`. Next run, the `new` table is compared against the previous snapshot so the briefing can say what launched since last time.
+Three market scans run through the CLI. The ids from each table go into `~/.config/zora-agent-skills/briefing-bot/state.json`. Next run, the `new` table is compared against the previous snapshot so the briefing can say what launched since last time.
 
 When `ZORA_BRIEFING_INCLUDE_PORTFOLIO=true`, the script also runs `zora balance --json`. No wallet configured? The briefing still runs and notes the overlap check was skipped.
 
@@ -63,7 +62,6 @@ Run at 2026-03-23T09:00:00Z
 Trending: looksmaxxing leads at $2.3M, +12.3%.
 Volume: frog market leads at $3.1M volume.
 New: 3 fresh launches since the last run, largest is $45K.
-Gainers: hyperpop leads at +22.8%.
 
 Portfolio overlap:
 - looksmaxxing is both held and active in the market scans

@@ -83,27 +83,6 @@ const EXAMPLE_BLOCK_CLASS =
 const EXAMPLE_PLACEHOLDER_CLASS =
   "h-48 border border-dashed border-border/80 bg-foreground/[0.02] px-4 py-3";
 
-function formatMonitorSummary(monitors: string[]) {
-  const summary = monitors
-    .slice(0, 3)
-    .map((monitor) => {
-      const trimmed = monitor.trim();
-      return trimmed.charAt(0).toLowerCase() + trimmed.slice(1);
-    });
-
-  if (summary.length === 0) {
-    return "";
-  }
-  if (summary.length === 1) {
-    return summary[0];
-  }
-  if (summary.length === 2) {
-    return `${summary[0]} and ${summary[1]}`;
-  }
-
-  return `${summary.slice(0, -1).join(", ")}, and ${summary.at(-1)}`;
-}
-
 function formatBadgeLabel(badge: string) {
   switch (badge) {
     case "Creator coins":
@@ -253,7 +232,6 @@ function SkillRow({
     typeof IntersectionObserver === "undefined",
   );
   const exampleActive = hasEnteredViewport && expandedExample;
-  const monitorSummary = formatMonitorSummary(skill.monitors);
 
   function handleToggleExample() {
     setExpandedExample((current) => !current);
@@ -306,7 +284,6 @@ function SkillRow({
           </h2>
           <p className="type-body-sm text-muted-foreground">
             {skill.longDescription}
-            {monitorSummary ? ` Checks ${monitorSummary}.` : ""}
           </p>
 
           {skill.badges.length > 0 ? (
@@ -371,7 +348,7 @@ export function SkillsInstallList({
       {/* Hero: heading + unified install card */}
       <section className="space-y-6 mb-12">
         <h1 className="type-display max-w-5xl pt-[0.06em] leading-[0.94]">
-          Install Zora market skills.
+          Six skills for the Zora attention market.
         </h1>
         <div className="grid grid-cols-1 lg:grid-cols-2 lg:gap-x-10">
           <div className="space-y-3">

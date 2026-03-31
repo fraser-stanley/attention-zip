@@ -6,7 +6,7 @@ FAILED=0
 
 for skill in trend-scout creator-pulse briefing-bot portfolio-scout momentum-trader; do
   echo "--- $skill ---"
-  if bash "$SCRIPT_DIR/$skill/scripts/validate.sh"; then
+  if (cd "$SCRIPT_DIR/$skill" && bash scripts/validate.sh); then
     echo ""
   else
     FAILED=1

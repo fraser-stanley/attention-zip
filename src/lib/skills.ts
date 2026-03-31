@@ -189,7 +189,7 @@ Signal: \`jacob\` volume spike without new holders suggests large buyer. \`isabe
     name: "Briefing Bot",
     description: "Turns the market into a short briefing.",
     longDescription:
-      "Rolls trending, volume, new launches, gainers, and portfolio overlap into one report.",
+      "Rolls trending, volume, new launches, and portfolio overlap into one report.",
     category: "utility",
     difficulty: "intermediate",
     risk: "none",
@@ -199,14 +199,12 @@ Signal: \`jacob\` volume spike without new holders suggests large buyer. \`isabe
       "Trending coins",
       "Top volume",
       "New launches",
-      "Top gainers",
       "Portfolio overlap",
     ],
     commands: [
       "zora explore --sort trending --limit 5 --json",
       "zora explore --sort volume --limit 5 --json",
       "zora explore --sort new --limit 5 --json",
-      "zora explore --sort gainers --limit 5 --json",
       "zora balance --json",
       "zora price-history <identifier> --interval 1w --json",
     ],
@@ -230,13 +228,12 @@ Signal: \`jacob\` volume spike without new holders suggests large buyer. \`isabe
 Trending:\u200B \`aliens\` leads at $2.3M mcap, +12.3%
 Volume:\u200B \`sadprt\` leads at $3.1M vol
 New:\u200B 3 launches, largest \`hyperpop\` at $45K mcap
-Gainers:\u200B \`aliens\` +22.8%
 \u200B
 Portfolio overlap:\u200B\u200B
 - You hold \`aliens\` and it's trending — consider taking partial profit
 - You hold \`jacob\` and it leads creators — strong position, hold
 \u200B
-Watchlist: \`isabellalovestory\` is gaining across trend + volume. Not held yet.`,
+Assessment: Active tape. Momentum is broad enough to watch closely.`,
     badges: ["Briefing", "Read-only", "Wallet optional"],
     githubUrl: buildSkillGithubUrl("briefing-bot"),
     skillMdUrl: buildSkillMdUrl("briefing-bot"),
@@ -371,9 +368,9 @@ Next: Set ZORA_COPYTRADE_LIVE=true to execute.`,
     id: "momentum-trader",
     name: "Momentum Trader",
     description:
-      "Scans gainers, scores entries, manages exits. Dry run by default.",
+      "Scans volume leaders and trending coins, scores entries, manages exits. Dry run by default.",
     longDescription:
-      "Finds momentum candidates, quotes entries, and manages stop-loss, take-profit, and trailing-stop exits.",
+      "Finds momentum candidates from volume and trending scans, quotes entries, and manages stop-loss, take-profit, and trailing-stop exits.",
     category: "trading",
     difficulty: "advanced",
     risk: "medium",
@@ -387,7 +384,7 @@ Next: Set ZORA_COPYTRADE_LIVE=true to execute.`,
       "Flip-flop guard",
     ],
     commands: [
-      "zora explore --sort gainers --limit 12 --json",
+      "zora explore --sort volume --limit 12 --json",
       "zora explore --sort trending --limit 12 --json",
       "zora get <identifier> --json",
       "zora balance coins --sort usd-value --limit 20 --json",

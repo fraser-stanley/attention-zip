@@ -20,7 +20,7 @@ const STATE_FILE = path.join(STATE_DIR, "state.json");
 const LIMIT = readNumber("ZORA_BRIEFING_LIMIT", 5, { min: 1, max: 20 });
 const INCLUDE_PORTFOLIO = readBoolean("ZORA_BRIEFING_INCLUDE_PORTFOLIO", true);
 
-const SCANS = ["trending", "volume", "new", "gainers"];
+const SCANS = ["trending", "volume", "new"];
 
 function readNumber(name, fallback, { min = -Infinity, max = Infinity } = {}) {
   const raw = process.env[name];
@@ -131,14 +131,13 @@ async function main() {
   const trending = scans.trending ?? [];
   const volume = scans.volume ?? [];
   const newest = scans.new ?? [];
-  const gainers = scans.gainers ?? [];
 
   const newSinceLastRun = newest.filter((coin) => {
     const previousIds = new Set(previous.scans?.new ?? []);
     return !previousIds.has(coinId(coin));
   });
 
-  const overlap = [...trending, ...volume, ...gainers]
+  const overlap = [...trending, ...volume]
     .filter((coin) => heldIds.has(coinId(coin)))
     .slice(0, 3);
 
@@ -159,12 +158,6 @@ async function main() {
   console.log(
     `New: ${newSinceLastRun.length} fresh launches since the last run${newSinceLastRun[0] ? `, largest is ${newSinceLastRun[0].name} at ${formatUsd(newSinceLastRun[0].marketCap)}.` : "."}`,
   );
-  if (gainers[0]) {
-    console.log(
-      `Gainers: ${gainers[0].name} leads at ${formatPct(computeChangePercent(gainers[0]))}.`,
-    );
-  }
-
   console.log("");
   console.log("Portfolio overlap:");
   if (!portfolio) {
@@ -177,8 +170,9 @@ async function main() {
     }
   }
 
+  const topTrendingChange = trending[0] ? computeChangePercent(trending[0]) : 0;
   const assessment =
-    gainers.length > 0 && computeChangePercent(gainers[0]) >= 20
+    trending.length > 0 && topTrendingChange >= 20
       ? "Active tape. Momentum is broad enough to watch closely."
       : "Calmer tape. Most movement is concentrated in a small set of coins.";
 

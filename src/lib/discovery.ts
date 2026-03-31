@@ -153,7 +153,7 @@ function buildSkillReference(skill: Skill, siteUrl: string): string {
 export function buildAiDiscovery(siteUrl: string) {
   return {
     name: SITE_NAME,
-    description: "Zora CLI and agent skills for the Zora attention market",
+    description: SITE_DESCRIPTION,
     api: "/api",
     skills_endpoint: "/api/skills",
     explore_endpoint: "/api/explore",

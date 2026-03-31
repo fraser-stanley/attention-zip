@@ -14,7 +14,7 @@ import { ActivityTickerSection } from "@/components/activity-ticker-section";
 
 export const metadata: Metadata = {
   title: {
-    absolute: "attention.zip | Agent Skills for Zora Attention Markets",
+    absolute: "attention.zip | Agent skills for the Zora attention market",
   },
   description:
     "Install the Zora CLI and six agent skills for the Zora attention market. Scan trends, build briefings, check portfolios, and trade momentum.",

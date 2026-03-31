@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useId, useRef, useState } from "react";
+import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { buttonVariants } from "@/components/ui/button-variants";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/toast";
@@ -47,13 +47,11 @@ export function AddressConnectForm({
 
   const isDark = variant === "dark";
 
-  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-
-    const nextAddress = normalizeWalletAddress(value);
+  const submitAddress = useCallback((addressValue: string) => {
+    const nextAddress = normalizeWalletAddress(addressValue);
     if (!nextAddress) {
       setError("Enter a valid 0x wallet address.");
-      return;
+      return false;
     }
 
     setAddress(nextAddress);
@@ -61,7 +59,28 @@ export function AddressConnectForm({
     setError(null);
     toast(`Loaded ${truncateAddress(nextAddress)}`);
     onSuccess?.();
+    return true;
+  }, [setAddress, toast, onSuccess]);
+
+  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    submitAddress(value);
   }
+
+  async function handlePasteAndSubmit() {
+    try {
+      const clipboardText = await navigator.clipboard.readText();
+      const trimmed = clipboardText.trim();
+      if (trimmed) {
+        setValue(trimmed);
+        submitAddress(trimmed);
+      }
+    } catch {
+      setError("Unable to read clipboard. Paste your address manually.");
+    }
+  }
+
+  const showPasteButton = value.trim() === "";
 
   return (
     <form className={cn("space-y-4", className)} onSubmit={handleSubmit}>
@@ -127,14 +146,15 @@ export function AddressConnectForm({
           />
 
           <button
-            type="submit"
+            type={showPasteButton ? "button" : "submit"}
+            onClick={showPasteButton ? handlePasteAndSubmit : undefined}
             className={cn(
               buttonVariants({ variant: isDark ? "default" : "outline" }),
               "min-w-[176px] touch-manipulation",
               isDark ? "bg-white text-black hover:bg-white/85" : "",
             )}
           >
-            {submitLabel}
+            {showPasteButton ? "Paste address" : submitLabel}
           </button>
         </div>
 

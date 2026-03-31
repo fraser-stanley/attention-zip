@@ -17,9 +17,9 @@ interface TextMorphProps {
 }
 
 const SPRING_DEFAULTS = {
-  stiffness: 170,
-  damping: 22,
-  mass: 0.8,
+  stiffness: 600,
+  damping: 40,
+  mass: 0.3,
 };
 
 function flatten(node: ReactNode): string {

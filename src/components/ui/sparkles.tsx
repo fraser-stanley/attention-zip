@@ -20,10 +20,12 @@ const SPARKLE_VARIANTS: Variants = {
   initial: {
     y: 0,
     fill: "none",
+    strokeWidth: 2,
   },
   hover: {
     y: [0, -1, 0, 0],
     fill: "currentColor",
+    strokeWidth: 0,
     transition: {
       duration: 1,
       bounce: 0.3,

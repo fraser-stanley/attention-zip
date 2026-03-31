@@ -6,7 +6,6 @@ import Link from "next/link";
 import { HoverMediaOverlay } from "@/components/hover-media-overlay";
 import { useToast } from "@/components/toast";
 import { SkillCard } from "@/components/skill-card";
-import { Badge } from "@/components/ui/badge";
 import { CheckIcon } from "@/components/ui/check";
 import { CopyIcon } from "@/components/ui/copy";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -17,7 +16,6 @@ import {
 } from "@/hooks/use-portfolio-data";
 import { skills } from "@/lib/skills";
 import {
-  coinTypeLabel,
   formatCompactCurrency,
   truncateAddress,
 } from "@/lib/zora";
@@ -73,9 +71,15 @@ const FMT_PRICE = {
   maximumFractionDigits: 4,
 } satisfies Format;
 
-function changeChipClass(value: number | null) {
+function changeChipClass(value: number | null, isSelected: boolean) {
   if (value === null) {
     return "border border-dashed border-border text-muted-foreground";
+  }
+
+  if (isSelected) {
+    if (value > 0) return "text-[#3FFF00]";
+    if (value < 0) return "text-[#FF00F0]";
+    return "text-background";
   }
 
   if (value > 0) return "bg-[#3FFF00] text-black";
@@ -108,9 +112,9 @@ function PortfolioStats({
   const [copied, setCopied] = useState(false);
   const copyTimerRef = useRef<ReturnType<typeof setTimeout>>(null);
 
-  const handleCopy = useCallback(() => {
+  const handleCopy = useCallback((e: React.MouseEvent) => {
     navigator.clipboard.writeText(address);
-    toast("Address copied");
+    toast("Address copied", { x: e.clientX, y: e.clientY });
     setCopied(true);
     if (copyTimerRef.current) clearTimeout(copyTimerRef.current);
     copyTimerRef.current = setTimeout(() => setCopied(false), 2000);
@@ -121,7 +125,7 @@ function PortfolioStats({
       <div className="bg-card p-4">
         <p className="type-label mb-2 text-muted-foreground">Portfolio value</p>
         <p className="font-display text-5xl tracking-tight">
-          <span className="highlight-block tabular-nums">
+          <span className="tabular-nums">
             <ValueCell value={summary.totalValueUsd} />
           </span>
         </p>
@@ -133,13 +137,13 @@ function PortfolioStats({
           <p className="font-display text-5xl tracking-tight text-muted-foreground">Unavailable</p>
         ) : (
           <p className="font-display text-5xl tracking-tight">
-            <span className={cn("inline px-[0.15em] py-[0.02em] box-decoration-clone", changeChipClass(summary.totalChangeUsd24h))}>
+            <span className={cn("inline px-[0.15em] py-[0.02em] box-decoration-clone", changeChipClass(summary.totalChangeUsd24h, false))}>
               <ValueCell value={summary.totalChangeUsd24h} />
             </span>
             <span
               className={cn(
                 "type-body-sm ml-2 inline-flex items-center px-1.5 py-0.5 font-mono align-middle",
-                changeChipClass(summary.totalChangeUsd24h),
+                changeChipClass(summary.totalChangeUsd24h, false),
               )}
             >
               <NumberFlow
@@ -247,10 +251,10 @@ function PositionsContent({
         <span className="tabular-nums">{formatCompactCurrency(summary.totalValueUsd)}</span> total value
       </p>
 
-      <div className="relative overflow-hidden border border-border bg-card" onMouseLeave={() => setHoveredImage(null)}>
+      <div className="relative overflow-hidden border border-border bg-card text-sm" onMouseLeave={() => setHoveredImage(null)}>
         <HoverMediaOverlay imageUrl={hoveredImage} />
         <div className="overflow-x-auto">
-          <div className="grid min-w-[56rem] w-full grid-cols-[3rem_minmax(14rem,1.8fr)_1fr_1fr_1fr_1fr] gap-4 border-b border-border/70 px-4 py-3 type-label text-muted-foreground">
+          <div className="grid min-w-[56rem] w-full grid-cols-[3rem_minmax(14rem,1.8fr)_1fr_1fr_1fr_1fr] gap-4 border-b border-border/70 px-4 py-3 type-label font-mono text-muted-foreground">
             <span>Rank</span>
             <span>Coin</span>
             <span className="text-right">Balance</span>
@@ -278,64 +282,44 @@ function PositionsContent({
                 {/* Rank */}
                 <div
                   className={cn(
-                    "type-body-sm flex items-center gap-2 font-mono",
-                    isSelected ? "text-background/72" : "text-muted-foreground",
+                    "font-mono tabular-nums",
+                    isSelected ? "text-background/60" : "text-muted-foreground",
                   )}
                 >
-                  <span
-                    className={cn(
-                      "h-2.5 w-2.5 rounded-full",
-                      isSelected ? "bg-background" : "bg-foreground/25",
-                    )}
-                  />
-                  <span>{String(i + 1).padStart(2, "0")}</span>
+                  {String(i + 1).padStart(2, "0")}
                 </div>
 
                 {/* Coin */}
-                <div className="space-y-1 min-w-0">
-                  <div className="flex items-center gap-2 min-w-0">
+                <div className="flex items-center gap-2 min-w-0 font-mono">
+                  <span
+                    className={cn(
+                      "truncate min-w-0",
+                      isSelected ? "text-background" : "text-foreground",
+                    )}
+                  >
+                    {position.name}
+                  </span>
+                  {position.symbol ? (
                     <span
                       className={cn(
-                        "type-body-sm font-medium truncate min-w-0",
-                        isSelected ? "text-background" : "text-foreground",
+                        "truncate max-w-[120px]",
+                        isSelected ? "text-background/50" : "text-muted-foreground",
                       )}
                     >
-                      {position.name}
+                      ${position.symbol}
                     </span>
-                    {position.symbol ? (
-                      <span
-                        className={cn(
-                          "type-caption font-mono truncate max-w-[120px]",
-                          isSelected ? "text-background/60" : "text-muted-foreground",
-                        )}
-                      >
-                        ${position.symbol}
-                      </span>
-                    ) : null}
-                    {position.coinType ? (
-                      <Badge
-                        variant="outline"
-                        className={cn(
-                          "font-mono text-[10px] uppercase tracking-[0.16em]",
-                          isSelected ? "border-background/30 text-background/70" : "",
-                        )}
-                      >
-                        {coinTypeLabel(position.coinType)}
-                      </Badge>
-                    ) : null}
-                  </div>
+                  ) : null}
                 </div>
 
                 {/* Balance */}
                 <div
                   className={cn(
-                    "text-right font-mono",
-                    isSelected ? "text-background/80" : "text-muted-foreground",
+                    "text-right font-mono tabular-nums",
+                    isSelected ? "text-background/60" : "text-muted-foreground",
                   )}
                 >
                   <NumberFlow
                     {...FLOW_TIMING}
-                    className="tabular-nums"
                     format={{ maximumFractionDigits: 2 }}
                     value={position.balance}
                   />
@@ -344,8 +328,8 @@ function PositionsContent({
                 {/* Price */}
                 <div
                   className={cn(
-                    "text-right font-mono",
-                    isSelected ? "text-background/80" : "text-muted-foreground",
+                    "text-right font-mono tabular-nums",
+                    isSelected ? "text-background/60" : "text-muted-foreground",
                   )}
                 >
                   {position.priceUsd === null ? (
@@ -364,7 +348,7 @@ function PositionsContent({
                 <div className="text-right">
                   <span
                     className={cn(
-                      "type-body-sm inline-flex items-center px-1.5 py-0.5 font-mono font-medium tabular-nums",
+                      "inline-flex items-center px-1.5 py-0.5 font-mono tabular-nums",
                       isSelected ? "text-background" : "bg-muted",
                     )}
                   >
@@ -377,17 +361,17 @@ function PositionsContent({
                   {position.changeUsd24h === null || position.changePct24h === null ? (
                     <span
                       className={cn(
-                        "type-caption font-mono",
-                        isSelected ? "text-background/60" : "text-muted-foreground",
+                        "font-mono",
+                        isSelected ? "text-background/50" : "text-muted-foreground",
                       )}
                     >
-                      Unavailable
+                      —
                     </span>
                   ) : (
                     <span
                       className={cn(
-                        "type-caption inline-flex items-center gap-1 px-1.5 py-0.5 font-mono tabular-nums",
-                        changeChipClass(position.changeUsd24h),
+                        "inline-flex items-center gap-1 px-1.5 py-0.5 font-mono tabular-nums",
+                        changeChipClass(position.changeUsd24h, isSelected),
                       )}
                     >
                       <NumberFlow

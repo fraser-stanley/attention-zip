@@ -30,10 +30,10 @@ export function WalletMenu({ open, onClose }: WalletMenuProps) {
     };
   }, []);
 
-  const handleCopy = useCallback(() => {
+  const handleCopy = useCallback((e: React.MouseEvent) => {
     if (!address) return;
     navigator.clipboard.writeText(address);
-    toast("Address copied");
+    toast("Address copied", { x: e.clientX, y: e.clientY });
     setCopied(true);
     if (copyTimerRef.current) clearTimeout(copyTimerRef.current);
     copyTimerRef.current = setTimeout(() => setCopied(false), 1500);
@@ -108,7 +108,7 @@ export function WalletMenu({ open, onClose }: WalletMenuProps) {
                     variant="ghost"
                     size="icon"
                     onClick={onClose}
-                    className="border-white/10 text-white/50 hover:border-white/30 hover:bg-white/[0.06] hover:text-white"
+                    className="border-transparent text-white/50 hover:bg-white/[0.06] hover:text-white"
                     aria-label="Close wallet menu"
                   >
                     <svg
@@ -163,26 +163,26 @@ export function WalletMenu({ open, onClose }: WalletMenuProps) {
                   </span>
                 </button>
 
-                <Link
-                  href="/portfolio"
-                  onClick={onClose}
-                  className={cn(
-                    buttonVariants({ variant: "default" }),
-                    "shrink-0 bg-white text-black hover:bg-white/85 hover:text-black",
-                  )}
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handleDisconnect}
+                  className="shrink-0 border-white/10 bg-transparent text-white/50 hover:border-white/30 hover:bg-white/[0.06] hover:text-white"
                 >
-                  Portfolio
-                </Link>
+                  Disconnect
+                </Button>
               </div>
 
-              <Button
-                type="button"
-                variant="outline"
-                onClick={handleDisconnect}
-                className="col-start-2 w-full border-white/10 bg-transparent text-white hover:border-white/30 hover:bg-white/[0.06] hover:text-white"
+              <Link
+                href="/portfolio"
+                onClick={onClose}
+                className={cn(
+                  buttonVariants({ variant: "default" }),
+                  "col-start-2 w-full bg-white text-black hover:bg-white/85 hover:text-black",
+                )}
               >
-                Disconnect
-              </Button>
+                Portfolio
+              </Link>
             </div>
           </div>
         </div>

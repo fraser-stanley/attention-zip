@@ -3,7 +3,7 @@
 import { Suspense } from "react";
 import { CopyableCodeBlock } from "@/components/copyable-code-block";
 import { getInstallAllCommands } from "@/lib/skills";
-import { getSiteUrl, getSiteRepoUrl } from "@/lib/site";
+import { getSiteUrl } from "@/lib/site";
 import { HeroOrbGlassLoader } from "@/components/hero-orb-glass-loader";
 import { AnimatedArrowLink } from "@/components/animated-arrow-link";
 
@@ -13,17 +13,18 @@ export function HeroSection() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
         <div className="contents lg:block lg:space-y-5">
           <h1 id="hero-heading" className="type-display order-1 lg:order-none">
-            Agent skills for the Zora attention market.
+            Agent skills for Zora Attention Markets.
           </h1>
           {/* On mobile, orb slot is order-2 (injected below) */}
           <div className="order-3 space-y-5 lg:order-none">
             <div className="max-w-lg space-y-3">
-              <p className="type-body-sm text-muted-foreground">
+              <p className="type-body-sm font-medium text-muted-foreground">
                 Give this to your agent.
               </p>
               <CopyableCodeBlock
                 command={getInstallAllCommands(getSiteUrl()).prompt}
                 prefix=">"
+                highlight={false}
               />
             </div>
             <div className="flex items-center gap-3">
@@ -33,13 +34,6 @@ export function HeroSection() {
                 className="w-full px-8 sm:w-auto"
               >
                 Browse skills
-              </AnimatedArrowLink>
-              <AnimatedArrowLink
-                href={getSiteRepoUrl()}
-                variant="outline"
-                className="w-full px-8 sm:w-auto"
-              >
-                View source
               </AnimatedArrowLink>
             </div>
           </div>

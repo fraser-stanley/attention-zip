@@ -81,6 +81,7 @@ const organizationJsonLd = {
   name: SITE_NAME,
   url: siteUrl,
   logo: `${siteUrl}/icon-512.png`,
+  image: `${siteUrl}/og.png`,
   sameAs: [SITE_REPO_URL],
 };
 

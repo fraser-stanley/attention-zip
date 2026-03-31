@@ -79,7 +79,7 @@ export const skills: Skill[] = [
     description:
       "Scans trending coins, new launches, and volume leaders.",
     longDescription:
-      "Runs four market scans every 30 minutes and tells you what changed since the last run.",
+      "Know what moved before you check. Surfaces trending coins, new launches, and volume leaders every 30 minutes.",
     category: "attention",
     difficulty: "beginner",
     risk: "none",
@@ -139,7 +139,7 @@ Saved snapshot to ~/.config/zora-agent-skills/trend-scout/state.json`,
     description:
       "Watches featured creators and creator-coin momentum.",
     longDescription:
-      "Tracks featured, trending, and top-volume creator coins. Alerts when your watchlist moves.",
+      "Get notified when creators you follow gain momentum. Tracks featured creators and top-volume creator coins.",
     category: "analytics",
     difficulty: "intermediate",
     risk: "none",
@@ -194,7 +194,7 @@ Saved snapshot to ~/.config/zora-agent-skills/creator-pulse/state.json`,
     name: "Briefing Bot",
     description: "Turns the market into a short briefing.",
     longDescription:
-      "Rolls trending, volume, new launches, gainers, and portfolio overlap into one report.",
+      "One report instead of five tabs. Combines trending, volume, new launches, gainers, and your portfolio into a single briefing.",
     category: "utility",
     difficulty: "intermediate",
     risk: "none",
@@ -253,7 +253,7 @@ Assessment: Active tape. Trend flow is stronger than creator flow today.`,
     description:
       "Snapshots wallet positions and flags concentration risk.",
     longDescription:
-      "Reads wallet balances and coin positions. Flags new entries, exits, and concentration risk.",
+      "See where your wallet stands without digging through explorers. Flags new entries, exits, and concentration risk.",
     category: "analytics",
     difficulty: "intermediate",
     risk: "none",
@@ -314,7 +314,7 @@ Tracked coin value: $6,050.00`,
     description:
       "Follows public wallets and mirrors their trades. Dry run by default.",
     longDescription:
-      "Picks up buys, trims, and exits from source wallets. Confirms each swap before copying.",
+      "Follow the best Zora wallets. Copies their trades automatically, dry-run by default.",
     category: "trading",
     difficulty: "advanced",
     risk: "medium",
@@ -382,7 +382,7 @@ Confirmed source actions:
     description:
       "Scans gainers, scores entries, manages exits. Dry run by default.",
     longDescription:
-      "Finds momentum candidates, quotes entries, and manages stop-loss, take-profit, and trailing-stop exits.",
+      "Catch runners early and manage exits automatically. Scores candidates, quotes entries, and runs trailing stops.",
     category: "trading",
     difficulty: "advanced",
     risk: "medium",

@@ -3,7 +3,7 @@
 import { Suspense } from "react";
 import { CopyableCodeBlock } from "@/components/copyable-code-block";
 import { getInstallAllCommands } from "@/lib/skills";
-import { getSiteUrl } from "@/lib/site";
+import { getSiteUrl, getSiteRepoUrl } from "@/lib/site";
 import { HeroOrbGlassLoader } from "@/components/hero-orb-glass-loader";
 import { AnimatedArrowLink } from "@/components/animated-arrow-link";
 
@@ -33,6 +33,13 @@ export function HeroSection() {
                 className="w-full px-8 sm:w-auto"
               >
                 Browse skills
+              </AnimatedArrowLink>
+              <AnimatedArrowLink
+                href={getSiteRepoUrl()}
+                variant="outline"
+                className="w-full px-8 sm:w-auto"
+              >
+                View source
               </AnimatedArrowLink>
             </div>
           </div>

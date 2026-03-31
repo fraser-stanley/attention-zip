@@ -28,7 +28,7 @@ function PlatformItems({ items }: { items: Platform[] }) {
 
 export function WorksWithMarquee() {
   return (
-    <section aria-label="Compatible platforms" className="space-y-3">
+    <section aria-label="Compatible platforms" className="space-y-3 pt-8 sm:pt-12 lg:pt-16">
       <h2 className="type-body-sm font-medium text-muted-foreground">
         Works with
       </h2>

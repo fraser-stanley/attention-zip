@@ -17,6 +17,7 @@ const EXPLORE_REVALIDATE_SECONDS: Record<SortOption, number> = {
   volume: 60,
   gainers: 30,
   creators: 60,
+  trends: 30,
   featured: 60,
   "last-traded": 30,
   "last-traded-unique": 30,

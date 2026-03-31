@@ -22,7 +22,7 @@ import type {
 import { formatCompactCurrency, formatChange, truncateAddress } from "@/lib/zora";
 import { cn } from "@/lib/utils";
 
-type BoardTab = "trending" | "gainers" | "volume" | "traders";
+type BoardTab = "trending" | "trends" | "gainers" | "volume" | "traders";
 type FlashTone = "green" | "pink" | null;
 
 type CoinBoardRow = {
@@ -64,11 +64,12 @@ const TAB_DEFS: Array<{
   icon: ComponentType<{ size?: number }>;
 }> = [
   { id: "trending", label: "Trending", icon: FlameIcon },
+  { id: "trends", label: "Trends", icon: TrendingUpIcon },
   { id: "gainers", label: "Gainers", icon: TrendingUpIcon },
   { id: "volume", label: "Volume", icon: ChartBarIncreasingIcon },
   { id: "traders", label: "Traders", icon: ActivityIcon },
 ];
-const BOARD_SKELETON_TAB_WIDTHS = ["w-20", "w-[4.75rem]", "w-[4.25rem]", "w-[4.5rem]"] as const;
+const BOARD_SKELETON_TAB_WIDTHS = ["w-20", "w-[4.25rem]", "w-[4.75rem]", "w-[4.25rem]", "w-[4.5rem]"] as const;
 const BOARD_SKELETON_ROWS = [
   { coin: "w-[70%]", marketCap: "w-16", volume: "w-14", change: "w-14" },
   { coin: "w-[62%]", marketCap: "w-14", volume: "w-16", change: "w-12" },
@@ -236,7 +237,7 @@ export function HomeLiveCardsSkeleton() {
       />
 
       <div className="flex flex-col gap-2 border-b border-border bg-muted p-1 sm:flex-row sm:items-center sm:justify-between">
-        <div className="grid w-full grid-cols-2 gap-1 sm:w-auto sm:grid-cols-4">
+        <div className="grid w-full grid-cols-3 gap-1 sm:w-auto sm:grid-cols-5">
           {TAB_DEFS.map((tab, index) => (
             <div
               key={tab.id}
@@ -448,7 +449,7 @@ export function HomeLiveCards({
   initialCoins,
   initialTraders,
 }: {
-  initialCoins?: Partial<Record<"trending" | "gainers" | "volume", CoinNode[]>>;
+  initialCoins?: Partial<Record<"trending" | "trends" | "gainers" | "volume", CoinNode[]>>;
   initialTraders?: TraderNode[];
 }) {
   const reduceMotion = useReducedMotion() ?? false;
@@ -457,6 +458,7 @@ export function HomeLiveCards({
   const [previewTick, setPreviewTick] = useState(0);
   const [selectedRowIds, setSelectedRowIds] = useState<Record<BoardTab, string | null>>({
     trending: null,
+    trends: null,
     gainers: null,
     volume: null,
     traders: null,
@@ -481,6 +483,20 @@ export function HomeLiveCards({
     },
     initialData: initialCoins?.trending
       ? { coins: initialCoins.trending, sort: "trending" as const, count: ROW_COUNT }
+      : undefined,
+    initialDataUpdatedAt: undefined,
+    refetchInterval: REFRESH_INTERVAL_MS,
+  });
+
+  const trendsQuery = useQuery({
+    queryKey: ["explore", "trends", ROW_COUNT],
+    queryFn: async () => {
+      const res = await fetch(`/api/explore?sort=trends&count=${ROW_COUNT}`);
+      if (!res.ok) throw new Error("Failed to fetch");
+      return res.json() as Promise<ExploreApiResponse>;
+    },
+    initialData: initialCoins?.trends
+      ? { coins: initialCoins.trends, sort: "trends" as const, count: ROW_COUNT }
       : undefined,
     initialDataUpdatedAt: undefined,
     refetchInterval: REFRESH_INTERVAL_MS,
@@ -532,6 +548,10 @@ export function HomeLiveCards({
         rows: createCoinRows(trendingQuery.data?.coins),
         isLoading: trendingQuery.isLoading,
       },
+      trends: {
+        rows: createCoinRows(trendsQuery.data?.coins),
+        isLoading: trendsQuery.isLoading,
+      },
       gainers: {
         rows: createCoinRows(gainersQuery.data?.coins),
         isLoading: gainersQuery.isLoading,
@@ -548,6 +568,8 @@ export function HomeLiveCards({
     [
       trendingQuery.data?.coins,
       trendingQuery.isLoading,
+      trendsQuery.data?.coins,
+      trendsQuery.isLoading,
       gainersQuery.data?.coins,
       gainersQuery.isLoading,
       volumeQuery.data?.coins,
@@ -589,7 +611,7 @@ export function HomeLiveCards({
       <div className="overflow-hidden border border-border bg-card">
         <div className="flex flex-col gap-2 border-b border-border bg-muted p-1 sm:flex-row sm:items-center sm:justify-between">
           <TabsList
-            className="grid w-full grid-cols-2 bg-transparent p-0 sm:w-auto sm:grid-cols-4"
+            className="grid w-full grid-cols-3 bg-transparent p-0 sm:w-auto sm:grid-cols-5"
           >
             {TAB_DEFS.map((tab) => {
               const Icon = tab.icon;

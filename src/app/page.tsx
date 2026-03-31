@@ -77,8 +77,9 @@ const faqJsonLd = {
 };
 
 async function HomeLiveCardsSection() {
-  const [trending, gainers, volume, traders] = await Promise.all([
+  const [trending, trends, gainers, volume, traders] = await Promise.all([
     getExploreData("trending", 8),
+    getExploreData("trends", 8),
     getExploreData("gainers", 8),
     getExploreData("volume", 8),
     getLeaderboardData(8),
@@ -86,7 +87,7 @@ async function HomeLiveCardsSection() {
 
   return (
     <HomeLiveCards
-      initialCoins={{ trending, gainers, volume }}
+      initialCoins={{ trending, trends, gainers, volume }}
       initialTraders={traders}
     />
   );

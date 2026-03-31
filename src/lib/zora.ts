@@ -7,6 +7,8 @@ import {
   getCreatorCoins,
   getFeaturedCreators,
   getTrendingAll,
+  getTrendingTrends,
+  getTopVolumeTrends24h,
   getTraderLeaderboard,
   getCoinsLastTraded,
   getCoinsLastTradedUnique,
@@ -29,6 +31,7 @@ export type SortOption =
   | "gainers"
   | "creators"
   | "featured"
+  | "trends"
   | "last-traded"
   | "last-traded-unique";
 
@@ -283,7 +286,7 @@ interface CoinSwapsResponse {
   };
 }
 
-const QUERY_MAP: Record<SortOption, (count: number) => Promise<ExploreResponse>> = {
+const QUERY_MAP: Partial<Record<SortOption, (count: number) => Promise<ExploreResponse>>> = {
   trending: (count) => getTrendingAll({ count }) as Promise<ExploreResponse>,
   mcap: (count) => getCoinsMostValuable({ count }) as Promise<ExploreResponse>,
   new: (count) => getCoinsNew({ count }) as Promise<ExploreResponse>,
@@ -295,10 +298,41 @@ const QUERY_MAP: Record<SortOption, (count: number) => Promise<ExploreResponse>>
   "last-traded-unique": (count) => getCoinsLastTradedUnique({ count }) as Promise<ExploreResponse>,
 };
 
+async function fetchTrends(count: number): Promise<CoinNode[]> {
+  const [trendingRes, volumeRes] = await Promise.all([
+    getTrendingTrends({ count }) as Promise<ExploreResponse>,
+    getTopVolumeTrends24h({ count }) as Promise<ExploreResponse>,
+  ]);
+
+  const trendingNodes =
+    trendingRes.data?.exploreList?.edges.map((e: ExploreEdge) => e.node) ?? [];
+  const volumeNodes =
+    volumeRes.data?.exploreList?.edges.map((e: ExploreEdge) => e.node) ?? [];
+
+  // Interleave trending and volume, deduplicate by address
+  const seen = new Set<string>();
+  const merged: CoinNode[] = [];
+  const maxLen = Math.max(trendingNodes.length, volumeNodes.length);
+
+  for (let i = 0; i < maxLen && merged.length < count; i++) {
+    for (const node of [trendingNodes[i], volumeNodes[i]]) {
+      if (!node || merged.length >= count) continue;
+      const addr = node.address?.toLowerCase();
+      if (addr && seen.has(addr)) continue;
+      if (addr) seen.add(addr);
+      merged.push(node);
+    }
+  }
+
+  return merged;
+}
+
 export async function fetchCoins(
   sort: SortOption,
   count: number = 10
 ): Promise<CoinNode[]> {
+  if (sort === "trends") return fetchTrends(count);
+
   const queryFn = QUERY_MAP[sort];
   if (!queryFn) return [];
 

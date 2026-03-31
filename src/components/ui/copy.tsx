@@ -61,8 +61,6 @@ const CopyIcon = forwardRef<CopyIconHandle, CopyIconProps>(
     return (
       <div
         className={cn(className)}
-        onMouseEnter={handleMouseEnter}
-        onMouseLeave={handleMouseLeave}
         {...props}
       >
         <svg

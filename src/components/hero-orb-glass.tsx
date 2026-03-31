@@ -81,25 +81,41 @@ function ConcreteOrb({ pressed }: { pressed: boolean }) {
   );
 }
 
+const SPIN_SPEED = 120;
+const SPIN_DECAY = 0.035;
+
 function RotationController({
   controlsRef,
   mouseVelocity,
+  spinSignal,
 }: {
   controlsRef: React.RefObject<{ autoRotateSpeed: number } | null>;
   mouseVelocity: React.RefObject<number>;
+  spinSignal: number;
 }) {
   const currentSpeed = useRef(BASE_SPEED);
+  const spinBoost = useRef(0);
+  const lastSignal = useRef(spinSignal);
+
   useFrame(() => {
     if (!controlsRef.current) return;
-    const target = -(BASE_SPEED + mouseVelocity.current * (MAX_SPEED - BASE_SPEED));
-    // Smooth interpolation toward target speed
+
+    if (spinSignal !== lastSignal.current) {
+      lastSignal.current = spinSignal;
+      spinBoost.current = SPIN_SPEED;
+    }
+
+    spinBoost.current *= 1 - SPIN_DECAY;
+    if (spinBoost.current < 0.01) spinBoost.current = 0;
+
+    const target = -(BASE_SPEED + mouseVelocity.current * (MAX_SPEED - BASE_SPEED)) - spinBoost.current;
     currentSpeed.current += (target - currentSpeed.current) * 0.08;
     controlsRef.current.autoRotateSpeed = currentSpeed.current;
   });
   return null;
 }
 
-export function HeroOrbGlass() {
+export function HeroOrbGlass({ spinSignal = 0 }: { spinSignal?: number }) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const controlsRef = useRef<any>(null);
   const mouseVelocity = useRef(0);
@@ -158,7 +174,7 @@ export function HeroOrbGlass() {
         autoRotate
         autoRotateSpeed={-1}
       />
-      <RotationController controlsRef={controlsRef} mouseVelocity={mouseVelocity} />
+      <RotationController controlsRef={controlsRef} mouseVelocity={mouseVelocity} spinSignal={spinSignal} />
       <EffectComposer multisampling={0}>
         <Dither />
       </EffectComposer>

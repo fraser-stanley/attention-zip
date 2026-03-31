@@ -32,9 +32,10 @@ describe("SkillsInstallList", () => {
     expect(screen.getByRole("link", { name: /source/i })).toBeTruthy();
     // Unified install + per-skill install = 2 copy blocks
     expect(screen.getAllByTitle(/copy command/i)).toHaveLength(2);
-    expect(screen.queryByText("Install")).toBeNull();
-    expect(screen.queryByText("Installing...")).toBeNull();
-    expect(screen.queryByText("Installed")).toBeNull();
-    expect(screen.queryByText("Remove")).toBeNull();
+    // No install-state buttons should appear (Install/Installing.../Installed/Remove)
+    expect(screen.queryByRole("button", { name: /^Install$/ })).toBeNull();
+    expect(screen.queryByRole("button", { name: /^Installing/ })).toBeNull();
+    expect(screen.queryByRole("button", { name: /^Installed$/ })).toBeNull();
+    expect(screen.queryByRole("button", { name: /^Remove$/ })).toBeNull();
   });
 });

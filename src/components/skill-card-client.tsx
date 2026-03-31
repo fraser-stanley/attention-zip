@@ -211,7 +211,7 @@ function RuntimeInstallCard({
   command: string;
 }) {
   return (
-    <div className="max-w-2xl">
+    <div>
       <Tabs
         value={runtime}
         onValueChange={(value) => onChange(value as Runtime)}
@@ -357,38 +357,41 @@ export function SkillsInstallList({
   ];
   const [runtime, setRuntime] = useSessionStorageState<Runtime>({
     key: RUNTIME_STORAGE_KEY,
-    initialValue: "claude",
-    parse: (stored) => (isRuntime(stored) ? stored : "claude"),
+    initialValue: "prompt",
+    parse: (stored) => (isRuntime(stored) ? stored : "prompt"),
     serialize: (value) => value,
   });
 
   return (
     <div className="w-full">
       {/* Hero: heading + unified install card */}
-      <section className="space-y-6 mb-12">
-        <h1 className="type-display max-w-5xl pt-[0.06em] leading-[0.94]">
-          Install Zora market skills.
-        </h1>
+      <section className="space-y-5 pt-1 pb-20 lg:pb-28 sm:pt-4">
         <div className="grid grid-cols-1 lg:grid-cols-2 lg:gap-x-10">
-          <div className="space-y-3">
-            <p className="type-body-sm text-muted-foreground">
-              Send this to your agent. Installs the{" "}
-              <a
-                href="https://docs.zora.co"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="underline transition-colors hover:text-foreground"
-              >
-                Zora CLI
-              </a>{" "}
-              and all skills below.
-            </p>
-            <RuntimeInstallCard
-              runtime={runtime}
-              onChange={setRuntime}
-              command={getInstallAllCommands(getSiteUrl())[runtime]}
-            />
+          <div className="space-y-5">
+            <h1 className="type-display">
+              Pick a skill, or grab<br className="hidden lg:inline" />{" "}them all.
+            </h1>
+            <div className="space-y-3">
+              <p className="type-body-sm font-medium text-muted-foreground">
+                Six open-source skills for the{" "}
+                <a
+                  href="https://cli.zora.com/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline transition-colors hover:text-foreground"
+                >
+                  Zora CLI
+                </a>
+                . One command installs them all.
+              </p>
+              <RuntimeInstallCard
+                runtime={runtime}
+                onChange={setRuntime}
+                command={getInstallAllCommands(getSiteUrl())[runtime]}
+              />
+            </div>
           </div>
+          {/* Right column: zorb from layout overlays here */}
         </div>
       </section>
 

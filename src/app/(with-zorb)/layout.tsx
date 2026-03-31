@@ -14,9 +14,9 @@ export default function WithZorbLayout({
   const reducedMotion = useReducedMotion();
 
   return (
-    <div className="relative">
-      {/* Zorb: in-flow on mobile, absolutely positioned on desktop — same spot on every page */}
-      <div className="flex justify-center lg:absolute lg:right-0 lg:top-4 lg:z-10">
+    <div className="relative flex flex-col">
+      {/* Zorb: in-flow centered on mobile, absolutely positioned to match grid col 2 on desktop */}
+      <div className="flex justify-center lg:absolute lg:top-10 lg:right-0 lg:w-[calc(50%-1.25rem)] lg:justify-center lg:z-10">
         <Suspense fallback={null}>
           <PersistentOrb />
         </Suspense>

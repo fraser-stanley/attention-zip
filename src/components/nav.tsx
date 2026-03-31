@@ -35,7 +35,7 @@ const allSections: Section[] = [
   { id: "skills", label: "Skills", href: "/skills", description: `${skills.length} skills` },
   { id: "dashboard", label: "Dashboard", href: "/dashboard", description: "Live market data" },
   { id: "portfolio", label: "Portfolio", href: "/portfolio", description: "Your positions & PnL" },
-  { id: "zora-docs", label: "Zora Docs", href: "https://docs.zora.co", description: "Official CLI & SDK docs", external: true },
+  { id: "zora-docs", label: "Zora Docs", href: "https://cli.zora.com/", description: "Official CLI & SDK docs", external: true },
 ];
 
 const headerActionClass =

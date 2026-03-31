@@ -130,7 +130,7 @@ export function WalletMenu({ open, onClose }: WalletMenuProps) {
                 <div>
                   <p className="mb-1 font-display text-5xl font-bold tracking-tight">
                     {isLoading ? "Loading" : formatCompactCurrency(summary.totalValueUsd)}
-                    <span className="ml-2 text-sm text-white/50">USD</span>
+                    <span className="ml-2 text-sm tracking-wider text-white/50">USD</span>
                   </p>
                   {error ? (
                     <p className="text-sm font-mono text-white/45">Portfolio unavailable</p>

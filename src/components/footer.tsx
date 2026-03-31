@@ -15,7 +15,7 @@ const columns = [
     title: "Developers",
     links: [
       { label: "GitHub", href: SITE_REPO_URL, external: true },
-      { label: "Zora CLI Docs", href: "https://docs.zora.co", external: true },
+      { label: "Zora CLI Docs", href: "https://cli.zora.com/", external: true },
       { label: "API Discovery", href: "/api" },
       { label: "Skill Catalog", href: "/api/skills" },
     ],

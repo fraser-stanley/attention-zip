@@ -6,7 +6,7 @@ import { WorksWithMarquee } from "@/components/works-with-marquee";
 export default function HomeLoading() {
   return (
     <>
-      <div className="-mt-8 mb-8 -mx-4 sm:-mx-6 lg:-mx-8">
+      <div className="-mt-20 pt-12 mb-8">
         <ActivityTickerSkeleton />
       </div>
       <div className="space-y-16">

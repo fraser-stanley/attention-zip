@@ -193,7 +193,7 @@ function PortfolioStats({
             <span className="tabular-nums">
               <ValueCell value={summary.totalValueUsd} />
             </span>
-            <span className="ml-2 text-xs text-white/50">USD</span>
+            <span className="ml-2 text-xs tracking-wider text-white/50">USD</span>
           </p>
           <p className="mt-1 text-xs font-mono text-white/50">
             {summary.positionCount} positions
@@ -206,15 +206,13 @@ function PortfolioStats({
             <p className="mt-2 font-display text-5xl font-bold tracking-tight text-white/40">—</p>
           ) : (
             <div className="mt-2">
-              <p className="font-display text-5xl font-bold tracking-tight text-white">
-                <span className={cn("inline px-[0.15em] py-[0.02em] box-decoration-clone", changeChipClass(summary.totalChangeUsd24h, false))}>
-                  <ValueCell value={summary.totalChangeUsd24h} />
-                </span>
+              <p className={cn("font-display text-5xl font-bold tracking-tight", changeChipClass(summary.totalChangeUsd24h, true))}>
+                <ValueCell value={summary.totalChangeUsd24h} />
               </p>
               <span
                 className={cn(
                   "mt-1 inline-flex items-center px-1.5 py-0.5 font-mono text-xs",
-                  changeChipClass(summary.totalChangeUsd24h, false),
+                  changeChipClass(summary.totalChangeUsd24h, true),
                 )}
               >
                 <NumberFlow

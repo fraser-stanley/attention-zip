@@ -14,22 +14,26 @@ export function PersistentOrb() {
 
   // Spin immediately on any internal link click (before routing starts)
   useEffect(() => {
-    function handleClick(e: MouseEvent) {
+    function handleMouseDown(e: MouseEvent | TouchEvent) {
       const anchor = (e.target as HTMLElement).closest("a[href]");
       if (!anchor) return;
 
       const href = anchor.getAttribute("href");
       if (!href || href.startsWith("http") || href.startsWith("//")) return;
 
-      // Internal link to a different page — spin now
+      // Internal link to a different page — spin on press, before routing
       if (href !== pathname.current) {
         pathname.current = href;
         spin();
       }
     }
 
-    document.addEventListener("click", handleClick, { capture: true });
-    return () => document.removeEventListener("click", handleClick, { capture: true });
+    document.addEventListener("mousedown", handleMouseDown, { capture: true });
+    document.addEventListener("touchstart", handleMouseDown, { capture: true });
+    return () => {
+      document.removeEventListener("mousedown", handleMouseDown, { capture: true });
+      document.removeEventListener("touchstart", handleMouseDown, { capture: true });
+    };
   }, [spin]);
 
   return (

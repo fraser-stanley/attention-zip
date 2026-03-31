@@ -79,7 +79,7 @@ export const skills: Skill[] = [
     description:
       "Scans trending coins, new launches, and volume leaders.",
     longDescription:
-      "Know what moved before you check. Surfaces trending coins, new launches, and volume leaders every 30 minutes.",
+      "Runs four market scans every 30 minutes and tells you what changed since the last run.",
     category: "attention",
     difficulty: "beginner",
     risk: "none",
@@ -114,21 +114,17 @@ export const skills: Skill[] = [
       "Install Trend Scout and show what it reports on a schedule.",
     samplePrompt:
       "What's trending on Zora right now?",
-    sampleOutput: `Trend Scout
-Run at 2026-03-23T13:30:00Z
+    sampleOutput: `Trend Scout — 2026-03-23T13:30:00Z\u200B\u200B
 
-Trending leaders:
-1. looksmaxxing, $2.3M mcap, +12.3%, $450.2K volume
-2. hyperpop, $950.2K mcap, +22.8%, $210.4K volume
-
-New entrants since the last run:
-- hyperpop entered the trending top 8
-- based penguin entered the volume top 8
-
-Watchlist:
-- 0x1234...5678 is live in the trending table
-
-Saved snapshot to ~/.config/zora-agent-skills/trend-scout/state.json`,
+Trending:\u200B
+1. \`aliens\` $2.3M mcap, +12.3%, $450K vol
+2. \`hyperpop\` $950K mcap, +22.8%, $210K vol
+\u200B
+New since last run:\u200B
+- \`aliens\` entered trending top 8 with volume confirming — worth watching
+- \`isabellalovestory\` entered volume top 8, crossing from creator into trend
+\u200B\u200B
+Signal: \`aliens\` has both price momentum and rising volume. \`hyperpop\` is consolidating near highs with steady flow.`,
     badges: ["Trend scan", "Read-only", "No wallet"],
     githubUrl: buildSkillGithubUrl("trend-scout"),
     skillMdUrl: buildSkillMdUrl("trend-scout"),
@@ -139,7 +135,7 @@ Saved snapshot to ~/.config/zora-agent-skills/trend-scout/state.json`,
     description:
       "Watches featured creators and creator-coin momentum.",
     longDescription:
-      "Get notified when creators you follow gain momentum. Tracks featured creators and top-volume creator coins.",
+      "Tracks featured, trending, and top-volume creator coins. Alerts when your watchlist moves.",
     category: "analytics",
     difficulty: "intermediate",
     risk: "none",
@@ -172,19 +168,18 @@ Saved snapshot to ~/.config/zora-agent-skills/trend-scout/state.json`,
     actionPrompt:
       "Install Creator Pulse and show watchlist alerts.",
     samplePrompt:
-      "Which creators are moving today?",
-    sampleOutput: `Creator Pulse
-Run at 2026-03-23T13:30:00Z
+      "Which creator coins are moving today?",
+    sampleOutput: `Creator Pulse — 2026-03-23T13:30:00Z\u200B\u200B
 
-Featured creators:
-1. jacob, $8.1M mcap, $1.2M volume, 2,341 holders
-2. alysaliu, $4.2M mcap, $890.3K volume, 1,890 holders
-
-Watchlist alerts:
-- jacob volume rose 14.8% since the last run
-- alysaliu gained 67 holders since the last run
-
-Saved snapshot to ~/.config/zora-agent-skills/creator-pulse/state.json`,
+Featured:\u200B
+1. \`jacob\` $8.1M mcap, $1.2M vol, 2,341 holders
+2. \`isabellalovestory\` $4.2M mcap, $890K vol, 1,890 holders
+\u200B
+Alerts:\u200B
+- \`jacob\` volume +14.8% since last run, holder count flat — whale accumulation likely
+- \`isabellalovestory\` +67 new holders, volume steady — organic growth pattern
+\u200B\u200B
+Signal: \`jacob\` volume spike without new holders suggests large buyer. \`isabellalovestory\` holder growth is broad-based.`,
     badges: ["Creator coins", "Read-only", "No wallet"],
     githubUrl: buildSkillGithubUrl("creator-pulse"),
     skillMdUrl: buildSkillMdUrl("creator-pulse"),
@@ -194,7 +189,7 @@ Saved snapshot to ~/.config/zora-agent-skills/creator-pulse/state.json`,
     name: "Briefing Bot",
     description: "Turns the market into a short briefing.",
     longDescription:
-      "One report instead of five tabs. Combines trending, volume, new launches, gainers, and your portfolio into a single briefing.",
+      "Rolls trending, volume, new launches, gainers, and portfolio overlap into one report.",
     category: "utility",
     difficulty: "intermediate",
     risk: "none",
@@ -230,19 +225,18 @@ Saved snapshot to ~/.config/zora-agent-skills/creator-pulse/state.json`,
       "Install Briefing Bot and show a sample briefing.",
     samplePrompt:
       "Give me a morning market briefing.",
-    sampleOutput: `Zora Briefing
-Run at 2026-03-23T09:00:00Z
+    sampleOutput: `Zora Briefing — 2026-03-23T09:00:00Z\u200B\u200B
 
-Trending: looksmaxxing leads at $2.3M mcap, up 12.3%.
-Volume: frog market leads at $3.1M volume.
-New: 3 launches since the last run, largest is $45K mcap.
-Gainers: hyperpop leads at +22.8%.
-
-Portfolio overlap:
-- looksmaxxing is both held and trending
-- jacob is both held and a creator leader
-
-Assessment: Active tape. Trend flow is stronger than creator flow today.`,
+Trending:\u200B \`aliens\` leads at $2.3M mcap, +12.3%
+Volume:\u200B \`sadprt\` leads at $3.1M vol
+New:\u200B 3 launches, largest \`hyperpop\` at $45K mcap
+Gainers:\u200B \`aliens\` +22.8%
+\u200B
+Portfolio overlap:\u200B\u200B
+- You hold \`aliens\` and it's trending — consider taking partial profit
+- You hold \`jacob\` and it leads creators — strong position, hold
+\u200B
+Watchlist: \`isabellalovestory\` is gaining across trend + volume. Not held yet.`,
     badges: ["Briefing", "Read-only", "Wallet optional"],
     githubUrl: buildSkillGithubUrl("briefing-bot"),
     skillMdUrl: buildSkillMdUrl("briefing-bot"),
@@ -253,7 +247,7 @@ Assessment: Active tape. Trend flow is stronger than creator flow today.`,
     description:
       "Snapshots wallet positions and flags concentration risk.",
     longDescription:
-      "See where your wallet stands without digging through explorers. Flags new entries, exits, and concentration risk.",
+      "Reads wallet balances and coin positions. Flags new entries, exits, and concentration risk.",
     category: "analytics",
     difficulty: "intermediate",
     risk: "none",
@@ -287,23 +281,20 @@ Assessment: Active tape. Trend flow is stronger than creator flow today.`,
       "Install Portfolio Scout and show a portfolio report.",
     samplePrompt:
       "How does my wallet look?",
-    sampleOutput: `Portfolio Scout
-Run at 2026-03-23T12:00:00Z
+    sampleOutput: `Portfolio Scout — 2026-03-23T12:00:00Z\u200B\u200B
 
-Spendable:
-- 0.42 ETH
-- 183.20 USDC
-- 95.11 ZORA
-
-Coin positions:
-1. jacob, $4,120.00, 68.1% of tracked coin value
-2. looksmaxxing, $1,150.00, 19.0% of tracked coin value
-
-Alerts:
-- Concentration warning: jacob is above the 35% threshold
-- based penguin is no longer held
-
-Tracked coin value: $6,050.00`,
+Spendable:\u200B 0.42 ETH, 183.20 USDC, 95.11 ZORA
+\u200B
+Positions:\u200B\u200B
+1. \`jacob\` $4,120, 68.1% of portfolio — concentration risk
+2. \`aliens\` $1,150, 19.0% of portfolio
+\u200B
+Alerts:\u200B
+- \`jacob\` is 68.1% of holdings, above 35% threshold — consider trimming
+- \`sadprt\` exited since last run, position closed
+- Total tracked: $6,050
+\u200B\u200B
+Action: Rebalance \`jacob\` to reduce single-asset exposure. Portfolio is ETH-heavy on spendable side.`,
     badges: ["Portfolio", "Read-only", "Wallet needed"],
     githubUrl: buildSkillGithubUrl("portfolio-scout"),
     skillMdUrl: buildSkillMdUrl("portfolio-scout"),
@@ -314,7 +305,7 @@ Tracked coin value: $6,050.00`,
     description:
       "Follows public wallets and mirrors their trades. Dry run by default.",
     longDescription:
-      "Follow the best Zora wallets. Copies their trades automatically, dry-run by default.",
+      "Follow wallets you choose, or import top traders from the Zora leaderboard. Mirrors buys, trims, and exits with spend caps and freshness checks.",
     category: "trading",
     difficulty: "advanced",
     risk: "medium",
@@ -358,20 +349,20 @@ Tracked coin value: $6,050.00`,
       "Install Copy Trader and show a dry-run cycle.",
     samplePrompt:
       "Show me what jacob's wallet has been doing and dry-run a copy.",
-    sampleOutput: `Copy Trader
-Run at 2026-03-27T13:40:00Z
-Mode: dry-run
-Health: healthy
+    sampleOutput: `Copy Trader — 2026-03-27T13:40:00Z
+Mode: dry-run | Sources: 2\u200B\u200B
 
-Sources tracked: 2
-- jacob, manual
-- reef-X4B2, leaderboard
-
-Confirmed source actions:
-- BUY hyperpop from jacob, source age 54s, source $84.00, planned copy $25.00
-  Quote: $25.00 -> 263 HYPERPOP, age 54s, drift +3.8%
-  Action: dry-run only, no order sent
-- SELL moonbag from reef-X4B2 skipped, stale exit, live mode skipped`,
+Tracking:\u200B
+- \`jacob\` (manual) — 3 trades this week, +18% win rate
+- \`reef-X4B2\` (leaderboard) — top 5 weekly volume
+\u200B\u200B
+Actions:\u200B
+- BUY \`aliens\` from \`jacob\`, age 54s, $84 source, $25 copy
+  Quote:\u200B $25 -> 263 tokens, drift +3.8%
+  Result: dry-run, no order sent
+- SELL \`sadprt\` from \`reef-X4B2\` — skipped, stale exit (>5min)
+\u200B
+Next: Set ZORA_COPYTRADE_LIVE=true to execute.`,
     badges: ["Copytrade", "Dry run default", "Execution"],
     githubUrl: buildSkillGithubUrl("copy-trader"),
     skillMdUrl: buildSkillMdUrl("copy-trader"),
@@ -382,7 +373,7 @@ Confirmed source actions:
     description:
       "Scans gainers, scores entries, manages exits. Dry run by default.",
     longDescription:
-      "Catch runners early and manage exits automatically. Scores candidates, quotes entries, and runs trailing stops.",
+      "Finds momentum candidates, quotes entries, and manages stop-loss, take-profit, and trailing-stop exits.",
     category: "trading",
     difficulty: "advanced",
     risk: "medium",
@@ -420,21 +411,20 @@ Confirmed source actions:
       "Install Momentum Trader and show a dry-run cycle.",
     samplePrompt:
       "Scan for momentum and show me what you'd buy.",
-    sampleOutput: `Momentum Trader
-Run at 2026-03-23T13:40:00Z
-Mode: dry-run
+    sampleOutput: `Momentum Trader — 2026-03-23T13:40:00Z
+Mode: dry-run\u200B\u200B
 
-Open positions tracked: 1
-- looksmaxxing, entry $0.000210, peak $0.000240, current $0.000170
-  Stop-loss fired: price $0.000170 is 19.0% below entry $0.000210
-
-Candidates (3 evaluated, 1 filtered by slippage):
-- Skipped FROGCOIN: exited recently (flip-flop guard)
-1. hyperpop, +28.3%, $210K volume, slippage 1.2%
-   Quote: 0.01 ETH -> 263 HYPERPOP
-   Action: dry-run only, no order sent
-
-State saved to ~/.config/zora-agent-skills/momentum-trader/state.json`,
+Open positions:\u200B
+- \`hyperpop\` entry $0.000210, peak $0.000240, now $0.000170
+  Stop-loss fired:\u200B -19% below entry, exiting position
+\u200B\u200B
+Scan (3 evaluated):\u200B
+- \`sadprt\` skipped — exited recently (flip-flop guard)
+1. \`aliens\` +28.3%, $210K vol, slippage 1.2%
+   Quote:\u200B 0.01 ETH -> 263 tokens
+   Result: dry-run, no order sent
+\u200B
+Signal: \`aliens\` has clean momentum with low slippage. Entry quality: high.`,
     badges: ["Momentum", "Dry run default", "Execution"],
     githubUrl: buildSkillGithubUrl("momentum-trader"),
     skillMdUrl: buildSkillMdUrl("momentum-trader"),

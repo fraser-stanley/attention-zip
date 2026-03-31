@@ -169,7 +169,7 @@
 
 @keyframes ticker-cursor-blink {
   0%, 100% { opacity: 1; }
-  50% { opacity: 0.28; }
+  50% { opacity: 0; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -225,6 +225,11 @@
 
 .logo-marquee-track:hover {
   animation-play-state: paused;
+}
+
+.marquee-fade {
+  mask-image: linear-gradient(to right, transparent, black 48px, black calc(100% - 48px), transparent);
+  -webkit-mask-image: linear-gradient(to right, transparent, black 48px, black calc(100% - 48px), transparent);
 }
 
 .highlight-block {

@@ -9,9 +9,9 @@ import { skills } from "@/lib/skills";
 import { Button } from "@/components/ui/button";
 import { ZapIcon, type ZapHandle } from "@/components/ui/zap";
 import { ChartBarIncreasingIcon, type ChartBarIncreasingIconHandle } from "@/components/ui/chart-bar-increasing";
-import { ActivityIcon, type ActivityIconHandle } from "@/components/ui/activity";
 import { LayersIcon, type LayersIconHandle } from "@/components/ui/layers";
 import { SparklesIcon, type SparklesIconHandle } from "@/components/ui/sparkles";
+import { ArrowUpRightIcon, type ArrowUpRightIconHandle } from "@/components/ui/arrow-up-right";
 import { useWallet, truncateAddress } from "@/lib/wallet-context";
 import { WalletConnectModal } from "@/components/wallet-connect-modal";
 import { WalletMenu } from "@/components/wallet-menu";
@@ -26,6 +26,7 @@ type Section = {
   label: string;
   href: string;
   description: string;
+  external?: boolean;
 };
 
 
@@ -33,12 +34,12 @@ const allSections: Section[] = [
   { id: "home", label: "Home", href: "/", description: "Project info" },
   { id: "skills", label: "Skills", href: "/skills", description: `${skills.length} skills` },
   { id: "dashboard", label: "Dashboard", href: "/dashboard", description: "Live market data" },
-  { id: "leaderboard", label: "Leaderboard", href: "/leaderboard", description: "Weekly trader rankings" },
   { id: "portfolio", label: "Portfolio", href: "/portfolio", description: "Your positions & PnL" },
+  { id: "zora-docs", label: "Zora Docs", href: "https://cli.zora.com/", description: "Official CLI & SDK docs", external: true },
 ];
 
 const headerActionClass =
-  "px-0 !font-display !text-[0.75rem] !font-normal uppercase !tracking-[0.08em] !leading-[1.1]";
+  "px-0 !font-display !text-[0.75rem] !font-normal uppercase !tracking-[0.08em] !leading-[1.1] text-foreground hover:opacity-70";
 
 export function Nav() {
   const pathname = usePathname();
@@ -72,19 +73,19 @@ export function Nav() {
   const homeRef = useRef<SparklesIconHandle>(null);
   const skillsRef = useRef<ZapHandle>(null);
   const dashboardRef = useRef<ChartBarIncreasingIconHandle>(null);
-  const leaderboardRef = useRef<ActivityIconHandle>(null);
   const portfolioRef = useRef<LayersIconHandle>(null);
+  const zoraDocsRef = useRef<ArrowUpRightIconHandle>(null);
   const iconRefs: Record<string, React.RefObject<IconHandle | null>> = {
     home: homeRef, skills: skillsRef, dashboard: dashboardRef,
-    leaderboard: leaderboardRef, portfolio: portfolioRef,
+    portfolio: portfolioRef, "zora-docs": zoraDocsRef,
   };
 
   const iconComponents: Record<string, React.ReactNode> = {
     home: <SparklesIcon ref={homeRef} size={18} />,
     skills: <ZapIcon ref={skillsRef} size={18} />,
     dashboard: <ChartBarIncreasingIcon ref={dashboardRef} size={18} />,
-    leaderboard: <ActivityIcon ref={leaderboardRef} size={18} />,
     portfolio: <LayersIcon ref={portfolioRef} size={18} />,
+    "zora-docs": <ArrowUpRightIcon ref={zoraDocsRef} size={18} />,
   };
 
   useEffect(() => {
@@ -153,10 +154,13 @@ export function Nav() {
 
   return (
     <>
-      {/* Persistent header */}
+      {/* Persistent header — sits above the overlay */}
       <header
-        className="fixed top-0 left-0 right-0 z-50 bg-background"
-        inert={open || walletMenuOpen ? true : undefined}
+        className={cn(
+          "fixed top-0 left-0 right-0 z-[101]",
+          open || walletMenuOpen ? "bg-transparent" : "bg-background",
+        )}
+        inert={walletMenuOpen ? true : undefined}
       >
         <div className="mx-auto max-w-7xl px-4 pb-1 sm:px-6 lg:px-8">
           <div className="flex h-11 items-center justify-between py-[2px]">
@@ -166,7 +170,7 @@ export function Nav() {
                 close();
                 setWalletModalOpen(false);
               }}
-              className="type-label text-foreground py-3"
+              className="type-label py-3 text-foreground"
             >
               attention.zip
             </Link>
@@ -197,12 +201,21 @@ export function Nav() {
               <Button
                 type="button"
                 variant="quiet"
-                onClick={() => setOpen(true)}
+                onClick={() => open ? close() : setOpen(true)}
                 aria-label={open ? "Close menu" : "Open menu"}
                 aria-expanded={open}
-                className={cn(headerActionClass, "text-foreground hover:opacity-70")}
+                className={headerActionClass}
               >
-                Menu
+                <span className="relative inline-grid overflow-hidden">
+                  <span className={cn(
+                    "col-start-1 row-start-1 transition-[opacity,transform] duration-150 ease-out",
+                    open ? "opacity-0 scale-95" : "opacity-100 scale-100"
+                  )}>Menu</span>
+                  <span className={cn(
+                    "col-start-1 row-start-1 transition-[opacity,transform] duration-150 ease-out",
+                    open ? "opacity-100 scale-100" : "opacity-0 scale-95"
+                  )}>Close</span>
+                </span>
               </Button>
             </div>
           </div>
@@ -241,36 +254,60 @@ export function Nav() {
           <div className="flex-1 overflow-y-auto">
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12">
               <div className="grid gap-px sm:grid-cols-2 lg:grid-cols-3">
-                {allSections.map((section) => (
-                  <Link
-                    key={section.id}
-                    href={section.href}
-                    onClick={(e) => {
-                      if (section.id === "portfolio" && !isConnected) {
-                        e.preventDefault();
-                        close();
-                        setTimeout(() => setWalletModalOpen(true), 100);
-                      } else {
-                        navigateWithClose(e, section.href);
-                      }
-                    }}
-                    className="group bg-black p-6 flex flex-col gap-3 transition-colors duration-200 outline-none hover:bg-white hover:text-black focus-visible:bg-white focus-visible:text-black focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black"
-                    onMouseEnter={() => iconRefs[section.id]?.current?.startAnimation()}
-                    onMouseLeave={() => iconRefs[section.id]?.current?.stopAnimation()}
-                  >
+                {allSections.map((section) => {
+                  const cardClass = "group bg-black p-6 flex flex-col gap-3 transition-colors duration-200 outline-none hover:bg-white hover:text-black focus-visible:bg-white focus-visible:text-black focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black";
+                  const cardContent = (
                     <div className="flex items-start justify-between">
                       <div className="flex flex-col gap-1">
                         <span className="type-label text-[0.875rem]">
                           {section.label}
                         </span>
-                        <p className="type-caption font-mono text-white/50 group-hover:text-black/60">
+                        <p className="type-caption font-mono text-[#808080] group-hover:text-black/60">
                           {section.description}
                         </p>
                       </div>
-                      <span className="text-white/50 group-hover:text-black/60 [&_svg]:size-7">{iconComponents[section.id]}</span>
+                      <span className="text-[#808080] group-hover:text-black/60 [&_svg]:size-7">{iconComponents[section.id]}</span>
                     </div>
-                  </Link>
-                ))}
+                  );
+
+                  if (section.external) {
+                    return (
+                      <a
+                        key={section.id}
+                        href={section.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className={cardClass}
+                        onClick={() => close()}
+                        onMouseEnter={() => iconRefs[section.id]?.current?.startAnimation()}
+                        onMouseLeave={() => iconRefs[section.id]?.current?.stopAnimation()}
+                      >
+                        {cardContent}
+                      </a>
+                    );
+                  }
+
+                  return (
+                    <Link
+                      key={section.id}
+                      href={section.href}
+                      onClick={(e) => {
+                        if (section.id === "portfolio" && !isConnected) {
+                          e.preventDefault();
+                          close();
+                          setTimeout(() => setWalletModalOpen(true), 100);
+                        } else {
+                          navigateWithClose(e, section.href);
+                        }
+                      }}
+                      className={cardClass}
+                      onMouseEnter={() => iconRefs[section.id]?.current?.startAnimation()}
+                      onMouseLeave={() => iconRefs[section.id]?.current?.stopAnimation()}
+                    >
+                      {cardContent}
+                    </Link>
+                  );
+                })}
               </div>
 
             </div>

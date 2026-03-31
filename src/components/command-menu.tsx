@@ -50,15 +50,7 @@ const pages: SearchItem[] = [
     group: "Pages",
     keywords: ["install", "gallery", "agents"],
   },
-  {
-    id: "page-leaderboard",
-    title: "Leaderboard",
-    href: "/leaderboard",
-    breadcrumb: "Pages > Leaderboard",
-    group: "Pages",
-    keywords: ["traders", "rankings", "top"],
-  },
-  {
+{
     id: "page-portfolio",
     title: "Portfolio",
     href: "/portfolio",

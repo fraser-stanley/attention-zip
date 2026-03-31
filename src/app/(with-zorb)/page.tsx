@@ -3,21 +3,21 @@ import { Suspense } from "react";
 import {
   ActivityTickerSkeleton,
 } from "@/components/activity-ticker";
+import { ActivityTickerSection } from "@/components/activity-ticker-section";
 import {
   HomeLiveCards,
   HomeLiveCardsSkeleton,
 } from "@/components/home-live-cards";
 import { HeroSection } from "@/components/hero-section";
-import { getExploreData, getLeaderboardData } from "@/lib/data";
+import { getExploreData } from "@/lib/data";
 import { WorksWithMarquee } from "@/components/works-with-marquee";
-import { ActivityTickerSection } from "@/components/activity-ticker-section";
 
 export const metadata: Metadata = {
   title: {
-    absolute: "attention.zip | Agent skills for the Zora attention market",
+    absolute: "attention.zip | Agent Skills for Zora Attention Markets",
   },
   description:
-    "Agent skills for the Zora attention market. Scan trends, copy trades, and track portfolios. Works with Claude Code, Cursor, Codex, and OpenClaw.",
+    "Install the Zora CLI and six agent skills for the Zora attention market. Scan trends, build briefings, check portfolios, and trade momentum.",
   alternates: { canonical: "/" },
 };
 
@@ -77,18 +77,15 @@ const faqJsonLd = {
 };
 
 async function HomeLiveCardsSection() {
-  const [trending, trends, gainers, volume, traders] = await Promise.all([
+  const [trending, gainers, volume] = await Promise.all([
     getExploreData("trending", 8),
-    getExploreData("trends", 8),
     getExploreData("gainers", 8),
     getExploreData("volume", 8),
-    getLeaderboardData(8),
   ]);
 
   return (
     <HomeLiveCards
-      initialCoins={{ trending, trends, gainers, volume }}
-      initialTraders={traders}
+      initialCoins={{ trending, gainers, volume }}
     />
   );
 }
@@ -100,7 +97,7 @@ export default function Home() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
       />
-      {/* Agent activity */}
+      {/* Agent activity ticker */}
       <section aria-label="Agent activity" className="-mt-20 pt-12 mb-8">
         <div className="overflow-x-clip overflow-y-visible select-none">
           <Suspense fallback={<ActivityTickerSkeleton />}>

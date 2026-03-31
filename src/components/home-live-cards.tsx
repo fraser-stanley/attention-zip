@@ -1,13 +1,13 @@
 "use client";
 
 import type { ComponentType } from "react";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { motion, useReducedMotion } from "motion/react";
 import { HoverMediaOverlay } from "@/components/hover-media-overlay";
+import { useToast } from "@/components/toast";
 
 import { TextMorph } from "@/components/text-morph";
-import { ActivityIcon } from "@/components/ui/activity";
 import { ChartBarIncreasingIcon } from "@/components/ui/chart-bar-increasing";
 import { FlameIcon } from "@/components/ui/flame";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -16,19 +16,18 @@ import { TrendingUpIcon } from "@/components/ui/trending-up";
 import type {
   CoinNode,
   ExploreApiResponse,
-  LeaderboardApiResponse,
-  TraderNode,
 } from "@/lib/zora";
 import { formatCompactCurrency, formatChange, truncateAddress } from "@/lib/zora";
 import { cn } from "@/lib/utils";
 
-type BoardTab = "trending" | "trends" | "gainers" | "volume" | "traders";
+type BoardTab = "trending" | "gainers" | "volume";
 type FlashTone = "green" | "pink" | null;
 
 type CoinBoardRow = {
   id: string;
   kind: "coin";
   name: string;
+  address: string;
   mediaUrl: string | null;
   marketCapValue: number;
   marketCap: string;
@@ -39,15 +38,7 @@ type CoinBoardRow = {
   positive: boolean | null;
 };
 
-type TraderBoardRow = {
-  id: string;
-  kind: "trader";
-  trader: string;
-  volumeValue: number;
-  volume: string;
-};
-
-type BoardRow = CoinBoardRow | TraderBoardRow;
+type BoardRow = CoinBoardRow;
 
 type PreviewFrame = {
   rows: BoardRow[];
@@ -64,12 +55,10 @@ const TAB_DEFS: Array<{
   icon: ComponentType<{ size?: number }>;
 }> = [
   { id: "trending", label: "Trending", icon: FlameIcon },
-  { id: "trends", label: "Trends", icon: TrendingUpIcon },
   { id: "gainers", label: "Gainers", icon: TrendingUpIcon },
   { id: "volume", label: "Volume", icon: ChartBarIncreasingIcon },
-  { id: "traders", label: "Traders", icon: ActivityIcon },
 ];
-const BOARD_SKELETON_TAB_WIDTHS = ["w-20", "w-[4.25rem]", "w-[4.75rem]", "w-[4.25rem]", "w-[4.5rem]"] as const;
+const BOARD_SKELETON_TAB_WIDTHS = ["w-20", "w-[4.75rem]", "w-[4.25rem]"] as const;
 const BOARD_SKELETON_ROWS = [
   { coin: "w-[70%]", marketCap: "w-16", volume: "w-14", change: "w-14" },
   { coin: "w-[62%]", marketCap: "w-14", volume: "w-16", change: "w-12" },
@@ -101,6 +90,7 @@ function createCoinRows(coins: CoinNode[] = []): CoinBoardRow[] {
       id,
       kind: "coin",
       name: coin.name ?? coin.symbol ?? "Unknown",
+      address: coin.address ?? "",
       mediaUrl: coin.mediaContent?.previewImage?.medium ?? null,
       marketCapValue: toNumber(coin.marketCap),
       marketCap: formatCompactCurrency(coin.marketCap),
@@ -113,18 +103,6 @@ function createCoinRows(coins: CoinNode[] = []): CoinBoardRow[] {
   });
 }
 
-function createTraderRows(traders: TraderNode[] = []): TraderBoardRow[] {
-  return traders.map((trader, index) => ({
-    id: trader.address ?? trader.profileId ?? trader.displayName ?? `trader-${index}`,
-    kind: "trader",
-    trader:
-      trader.displayName ??
-      (trader.address ? truncateAddress(trader.address) : "Unknown trader"),
-    volumeValue: toNumber(trader.volume),
-    volume: formatCompactCurrency(trader.volume),
-  }));
-}
-
 function formatPercentValue(value: number | null) {
   if (value === null || !Number.isFinite(value)) return "\u2014";
 
@@ -133,9 +111,7 @@ function formatPercentValue(value: number | null) {
 }
 
 function createPreviewFrame(rows: BoardRow[], tick: number, reduceMotion: boolean): PreviewFrame {
-  const containsOnlyTraders = rows.every((row) => row.kind === "trader");
-
-  if (rows.length === 0 || containsOnlyTraders || reduceMotion || tick === 0) {
+  if (rows.length === 0 || reduceMotion || tick === 0) {
     return {
       rows,
       flashById: {},
@@ -213,8 +189,7 @@ function createPreviewFrame(rows: BoardRow[], tick: number, reduceMotion: boolea
 function rowSummary(row: BoardRow | null, index: number) {
   if (!row) return "";
 
-  const label = row.kind === "coin" ? row.name : row.trader;
-  return `${String(index + 1).padStart(2, "0")} / ${label}`;
+  return `${String(index + 1).padStart(2, "0")} / ${row.name}`;
 }
 
 function changeChipClass(positive: boolean | null, flashTone: FlashTone, isSelected: boolean) {
@@ -237,7 +212,7 @@ export function HomeLiveCardsSkeleton() {
       />
 
       <div className="flex flex-col gap-2 border-b border-border bg-muted p-1 sm:flex-row sm:items-center sm:justify-between">
-        <div className="grid w-full grid-cols-3 gap-1 sm:w-auto sm:grid-cols-5">
+        <div className="grid w-full grid-cols-2 gap-1 sm:w-auto sm:grid-cols-4">
           {TAB_DEFS.map((tab, index) => (
             <div
               key={tab.id}
@@ -280,9 +255,8 @@ export function HomeLiveCardsSkeleton() {
                 key={index}
                 className="terminal-board-cols grid min-h-[44px] w-full items-center border-b border-border/70 px-4 py-2 last:border-b-0"
               >
-                <div className="type-body-sm flex items-center gap-2 font-mono text-muted-foreground/60">
-                  <span className="h-2.5 w-2.5 rounded-full bg-foreground/20" />
-                  <span>{String(index + 1).padStart(2, "0")}</span>
+                <div className="type-body-sm font-mono tabular-nums text-muted-foreground/60">
+                  {String(index + 1).padStart(2, "0")}
                 </div>
                 <Skeleton className={cn("h-3 bg-foreground/10", widths.coin)} />
                 <div className="flex justify-end">
@@ -308,26 +282,25 @@ function TerminalRow({
   index,
   flashTone,
   isSelected,
-  rankDelta,
   onSelect,
   onMediaHover,
+  onClick,
 }: {
   row: BoardRow;
   index: number;
   flashTone: FlashTone;
   isSelected: boolean;
-  rankDelta: number;
   onSelect: (rowId: string) => void;
   onMediaHover: (url: string | null) => void;
+  onClick: (e: React.MouseEvent, row: BoardRow) => void;
 }) {
-  const movementLabel =
-    rankDelta > 0 ? `+${rankDelta}` : rankDelta < 0 ? `${rankDelta}` : null;
   const isFlash = flashTone !== null;
   const mediaUrl = row.kind === "coin" ? row.mediaUrl : null;
 
   return (
     <motion.div
       layout
+      onClick={(e) => onClick(e, row)}
       onMouseEnter={() => {
         onSelect(row.id);
         onMediaHover(mediaUrl);
@@ -344,10 +317,8 @@ function TerminalRow({
         transition: flashTone ? "background-color 0s" : "background-color 200ms cubic-bezier(0.33, 1, 0.68, 1)",
       }}
       className={cn(
-        "group relative min-h-[44px] cursor-default items-center border-b border-border/70 px-4 py-2 last:border-b-0",
-        row.kind === "coin"
-          ? "terminal-board-cols grid min-w-[44rem] w-full gap-4"
-          : "terminal-board-cols-trader grid min-w-[34rem] w-full gap-4",
+        "group relative min-h-[44px] cursor-pointer items-center border-b border-border/70 px-4 py-2 last:border-b-0",
+        "terminal-board-cols grid min-w-[44rem] w-full gap-4",
         isFlash ? "text-black" : "",
         !isFlash && isSelected ? "bg-foreground text-background" : "",
         !isFlash && !isSelected ? "hover:bg-muted/35" : ""
@@ -355,114 +326,78 @@ function TerminalRow({
     >
       <div
         className={cn(
-          "type-body-sm flex items-center gap-2 font-mono",
-          isFlash ? "text-black/72" : isSelected ? "text-background/72" : "text-muted-foreground"
+          "type-body-sm font-mono tabular-nums",
+          isFlash ? "text-black/60" : isSelected ? "text-background/60" : "text-muted-foreground"
         )}
       >
-        <span
-          className={cn(
-            "h-2.5 w-2.5 rounded-full",
-            isFlash ? "bg-black" : isSelected ? "bg-background" : "bg-foreground/25"
-          )}
-        />
-        <span>{String(index + 1).padStart(2, "0")}</span>
-        {movementLabel ? (
-          <span
-            className={cn(
-              "type-caption",
-              isFlash ? "text-black" : rankDelta > 0 ? "text-[#198754]" : "text-[#9f3f84]"
-            )}
-          >
-            {movementLabel}
-          </span>
-        ) : null}
+        {String(index + 1).padStart(2, "0")}
       </div>
 
-      {row.kind === "coin" ? (
-        <>
-          <div
-            className={cn(
-              "type-body-sm truncate font-medium",
-              isFlash ? "text-black" : isSelected ? "text-background" : "text-foreground"
-            )}
-          >
-            {row.name}
-          </div>
-          <div className="text-right">
-            <TextMorph
-              className={cn(
-                "type-body-sm inline-flex rounded-sm px-1.5 py-0.5",
-                isFlash ? "text-black/72" : isSelected ? "text-background/80" : "text-muted-foreground"
-              )}
-            >
-              {row.marketCap}
-            </TextMorph>
-          </div>
-          <div className="text-right">
-            <TextMorph
-              className={cn(
-                "type-body-sm inline-flex rounded-sm px-1.5 py-0.5",
-                isFlash ? "text-black/72" : isSelected ? "text-background/80" : "text-muted-foreground"
-              )}
-            >
-              {row.volume}
-            </TextMorph>
-          </div>
-          <div className="text-right">
-            <TextMorph
-              className={cn(
-                "type-body-sm inline-flex items-center rounded-sm px-1.5 py-0.5 font-mono font-medium",
-                changeChipClass(row.positive, flashTone, isSelected)
-              )}
-            >
-              {row.changeText}
-            </TextMorph>
-          </div>
-        </>
-      ) : (
-        <>
-          <div
-            className={cn(
-              "type-body-sm truncate font-mono",
-              isFlash ? "text-black" : isSelected ? "text-background" : "text-foreground"
-            )}
-          >
-            {row.trader}
-          </div>
-          <div className="text-right">
-            <TextMorph
-              className={cn(
-                "type-body-sm inline-flex rounded-sm px-1.5 py-0.5",
-                isFlash ? "text-black/72" : isSelected ? "text-background/80" : "text-muted-foreground"
-              )}
-            >
-              {row.volume}
-            </TextMorph>
-          </div>
-        </>
-      )}
+      <div
+        className={cn(
+          "type-body-sm truncate font-medium",
+          isFlash ? "text-black" : isSelected ? "text-background" : "text-foreground"
+        )}
+      >
+        {row.name}
+      </div>
+      <div className="text-right">
+        <TextMorph
+          className={cn(
+            "type-body-sm inline-flex rounded-sm px-1.5 py-0.5",
+            isFlash ? "text-black/72" : isSelected ? "text-background/80" : "text-muted-foreground"
+          )}
+        >
+          {row.marketCap}
+        </TextMorph>
+      </div>
+      <div className="text-right">
+        <TextMorph
+          className={cn(
+            "type-body-sm inline-flex rounded-sm px-1.5 py-0.5",
+            isFlash ? "text-black/72" : isSelected ? "text-background/80" : "text-muted-foreground"
+          )}
+        >
+          {row.volume}
+        </TextMorph>
+      </div>
+      <div className="text-right">
+        <TextMorph
+          className={cn(
+            "type-body-sm inline-flex items-center rounded-sm px-1.5 py-0.5 font-mono font-medium",
+            changeChipClass(row.positive, flashTone, isSelected)
+          )}
+        >
+          {row.changeText}
+        </TextMorph>
+      </div>
     </motion.div>
   );
 }
 
 export function HomeLiveCards({
   initialCoins,
-  initialTraders,
 }: {
-  initialCoins?: Partial<Record<"trending" | "trends" | "gainers" | "volume", CoinNode[]>>;
-  initialTraders?: TraderNode[];
+  initialCoins?: Partial<Record<"trending" | "gainers" | "volume", CoinNode[]>>;
 }) {
+  const { toast } = useToast();
   const reduceMotion = useReducedMotion() ?? false;
   const [hoveredMediaUrl, setHoveredMediaUrl] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<BoardTab>("trending");
   const [previewTick, setPreviewTick] = useState(0);
   const [selectedRowIds, setSelectedRowIds] = useState<Record<BoardTab, string | null>>({
     trending: null,
-    trends: null,
     gainers: null,
     volume: null,
-    traders: null,
   });
+  const handleRowClick = useCallback((e: React.MouseEvent, row: BoardRow) => {
+    const address = row.address;
+    if (!address || !address.startsWith("0x")) return;
+    const pos = { x: e.clientX, y: e.clientY };
+    void navigator.clipboard.writeText(address).then(() => {
+      toast(`Copied ${truncateAddress(address)}`, pos);
+    });
+  }, [toast]);
 
   useEffect(() => {
     if (reduceMotion) return;
@@ -483,20 +418,6 @@ export function HomeLiveCards({
     },
     initialData: initialCoins?.trending
       ? { coins: initialCoins.trending, sort: "trending" as const, count: ROW_COUNT }
-      : undefined,
-    initialDataUpdatedAt: undefined,
-    refetchInterval: REFRESH_INTERVAL_MS,
-  });
-
-  const trendsQuery = useQuery({
-    queryKey: ["explore", "trends", ROW_COUNT],
-    queryFn: async () => {
-      const res = await fetch(`/api/explore?sort=trends&count=${ROW_COUNT}`);
-      if (!res.ok) throw new Error("Failed to fetch");
-      return res.json() as Promise<ExploreApiResponse>;
-    },
-    initialData: initialCoins?.trends
-      ? { coins: initialCoins.trends, sort: "trends" as const, count: ROW_COUNT }
       : undefined,
     initialDataUpdatedAt: undefined,
     refetchInterval: REFRESH_INTERVAL_MS,
@@ -530,27 +451,11 @@ export function HomeLiveCards({
     refetchInterval: REFRESH_INTERVAL_MS,
   });
 
-  const tradersQuery = useQuery({
-    queryKey: ["leaderboard", ROW_COUNT],
-    queryFn: async () => {
-      const res = await fetch(`/api/leaderboard?count=${ROW_COUNT}`);
-      if (!res.ok) throw new Error("Failed to fetch");
-      return res.json() as Promise<LeaderboardApiResponse>;
-    },
-    initialData: initialTraders ? { traders: initialTraders, count: ROW_COUNT } : undefined,
-    initialDataUpdatedAt: undefined,
-    refetchInterval: REFRESH_INTERVAL_MS,
-  });
-
   const boardData = useMemo(
     () => ({
       trending: {
         rows: createCoinRows(trendingQuery.data?.coins),
         isLoading: trendingQuery.isLoading,
-      },
-      trends: {
-        rows: createCoinRows(trendsQuery.data?.coins),
-        isLoading: trendsQuery.isLoading,
       },
       gainers: {
         rows: createCoinRows(gainersQuery.data?.coins),
@@ -560,22 +465,14 @@ export function HomeLiveCards({
         rows: createCoinRows(volumeQuery.data?.coins),
         isLoading: volumeQuery.isLoading,
       },
-      traders: {
-        rows: createTraderRows(tradersQuery.data?.traders),
-        isLoading: tradersQuery.isLoading,
-      },
     }),
     [
       trendingQuery.data?.coins,
       trendingQuery.isLoading,
-      trendsQuery.data?.coins,
-      trendsQuery.isLoading,
       gainersQuery.data?.coins,
       gainersQuery.isLoading,
       volumeQuery.data?.coins,
       volumeQuery.isLoading,
-      tradersQuery.data?.traders,
-      tradersQuery.isLoading,
     ]
   );
 
@@ -611,7 +508,7 @@ export function HomeLiveCards({
       <div className="overflow-hidden border border-border bg-card">
         <div className="flex flex-col gap-2 border-b border-border bg-muted p-1 sm:flex-row sm:items-center sm:justify-between">
           <TabsList
-            className="grid w-full grid-cols-3 bg-transparent p-0 sm:w-auto sm:grid-cols-5"
+            className="grid w-full grid-cols-2 bg-transparent p-0 sm:w-auto sm:grid-cols-4"
           >
             {TAB_DEFS.map((tab) => {
               const Icon = tab.icon;
@@ -636,10 +533,8 @@ export function HomeLiveCards({
 
         {TAB_DEFS.map((tab) => {
           const board = boardData[tab.id];
-          const isTraderMode = tab.id === "traders";
           const visibleRows = tab.id === activeTab ? activeRows : board.rows;
           const flashById = tab.id === activeTab ? previewFrame.flashById : {};
-          const rankDeltaById = tab.id === activeTab ? previewFrame.rankDeltaById : {};
           const visibleSelectedRowId = tab.id === activeTab ? selectedRowId : null;
 
           return (
@@ -657,22 +552,14 @@ export function HomeLiveCards({
                   <div
                     className={cn(
                       "type-label border-b border-border/70 px-4 py-3 text-muted-foreground",
-                      isTraderMode
-                        ? "terminal-board-cols-trader grid min-w-[34rem] w-full gap-4"
-                        : "terminal-board-cols grid min-w-[44rem] w-full gap-4"
+                      "terminal-board-cols grid min-w-[44rem] w-full gap-4"
                     )}
                   >
                     <span>Rank</span>
-                    <span>{isTraderMode ? "Trader" : "Coin"}</span>
-                    {isTraderMode ? (
-                      <span className="text-right">Volume</span>
-                    ) : (
-                      <>
-                        <span className="text-right">Mcap</span>
-                        <span className="text-right">24h Vol</span>
-                        <span className="text-right">24h</span>
-                      </>
-                    )}
+                    <span>Coin</span>
+                    <span className="text-right">Mcap</span>
+                    <span className="text-right">24h Vol</span>
+                    <span className="text-right">24h</span>
                   </div>
 
                   <div>
@@ -688,13 +575,13 @@ export function HomeLiveCards({
                           index={index}
                           flashTone={flashById[row.id] ?? null}
                           isSelected={visibleSelectedRowId === row.id}
-                          rankDelta={rankDeltaById[row.id] ?? 0}
                           onSelect={(rowId) => {
                             if (tab.id === activeTab) {
                               updateSelectedRow(tab.id, rowId);
                             }
                           }}
                           onMediaHover={tab.id === activeTab ? setHoveredMediaUrl : () => {}}
+                          onClick={handleRowClick}
                         />
                       ))
                     )}

@@ -7,6 +7,6 @@ const HeroOrbGlass = dynamic(
   { ssr: false }
 );
 
-export function HeroOrbGlassLoader() {
-  return <HeroOrbGlass />;
+export function HeroOrbGlassLoader({ spinSignal = 0 }: { spinSignal?: number }) {
+  return <HeroOrbGlass spinSignal={spinSignal} />;
 }

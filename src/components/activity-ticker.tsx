@@ -47,7 +47,7 @@ function TickerItems({
             aria-hidden="true"
             className="inline-flex h-full w-3 shrink-0 items-center justify-center self-center"
           >
-            <span className="-translate-y-px animate-ticker-cursor block h-3 w-2 bg-foreground/85" />
+            <span className="-translate-y-px animate-ticker-cursor block h-3 w-2 bg-foreground" />
           </span>
         </Fragment>
       ))}
@@ -212,26 +212,15 @@ export function ActivityTicker({
       : 0;
   const repeatCount = Math.max(minimumRepeatCount, measuredRepeatCount);
   const canAnimateTicker = items.length > 0;
-  const statusLabel = isErrorState ? "Unavailable" : "Live";
-  const statusDotClass = isErrorState
-    ? "h-1.5 w-1.5 rounded-full bg-muted-foreground/50"
-    : "h-1.5 w-1.5 rounded-full bg-[#3FFF00] animate-pulse";
 
   return (
     <div
       role="log"
       aria-live="off"
       aria-label="Recent agent activity feed"
-      className="relative flex h-8 items-center overflow-hidden border-y border-border bg-white dark:bg-black"
+      className="relative flex h-8 items-center overflow-hidden border-y border-border bg-white dark:bg-black marquee-fade"
     >
       <div className="mx-auto flex h-full w-full max-w-7xl items-center">
-        <div className="flex h-full shrink-0 items-center gap-1.5 border-r border-border px-4">
-          <span aria-hidden="true" className={statusDotClass} />
-          <span className="type-caption font-mono text-muted-foreground">
-            {statusLabel}
-          </span>
-        </div>
-
         {items.length > 0 ? (
           <div ref={viewportRef} className="flex-1 overflow-hidden">
             <div

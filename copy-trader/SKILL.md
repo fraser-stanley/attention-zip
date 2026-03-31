@@ -23,7 +23,7 @@ Use this skill when the user asks for:
 
 ## Setup
 
-1. Install the Zora CLI and make sure `node` is available.
+1. Install the Zora CLI: `npm install -g @zoralabs/cli` (requires Node.js 20+) and make sure `node` is available.
 2. Use a dedicated wallet. Run `zora setup --create` or set `ZORA_PRIVATE_KEY`.
 3. Run `./scripts/validate.sh`.
 4. Keep `ZORA_COPYTRADE_LIVE=false` until the dry-run output matches the sources you want.

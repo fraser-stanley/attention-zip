@@ -16,37 +16,62 @@ import {
 import { getSiteUrl } from "@/lib/site";
 import { cn } from "@/lib/utils";
 
-function useTypewriter(text: string, active: boolean, speed = 12) {
-  const [count, setCount] = useState(0);
-  const hasPlayedRef = useRef(false);
+const PAUSE_CHAR = "\u200B";
+const PAUSE_MS = 300;
 
-  // Derive displayed/done from count + active without extra state
-  const displayed = active ? text.slice(0, count) : "";
-  const done = active && count >= text.length;
+function useTypewriter(text: string, active: boolean, speed = 12, delay = 900) {
+  const [count, setCount] = useState(0);
+  const [started, setStarted] = useState(false);
+  const hasPlayedRef = useRef(false);
+  const timerRef = useRef<number | null>(null);
+
+  const displayed = active && started
+    ? text.slice(0, count).replaceAll(PAUSE_CHAR, "")
+    : "";
+  const done = active && started && count >= text.length;
 
   useEffect(() => {
     /* eslint-disable react-hooks/set-state-in-effect -- animation effect: typewriter ticks */
     if (!active) {
       setCount(0);
+      setStarted(false);
       return;
     }
     if (hasPlayedRef.current) {
+      setStarted(true);
       setCount(text.length);
       return;
     }
-    hasPlayedRef.current = true;
-    setCount(0);
-    let i = 0;
-    const id = setInterval(() => {
-      i += 1;
-      setCount(i);
-      if (i >= text.length) {
-        clearInterval(id);
+
+    function tick(i: number) {
+      if (i >= text.length) return;
+      const char = text[i];
+      if (char === PAUSE_CHAR) {
+        // Pause marker — wait longer, don't render it
+        timerRef.current = window.setTimeout(() => {
+          setCount(i + 1);
+          tick(i + 1);
+        }, PAUSE_MS);
+      } else {
+        setCount(i + 1);
+        timerRef.current = window.setTimeout(() => tick(i + 1), speed);
       }
-    }, speed);
-    return () => clearInterval(id);
+    }
+
+    // Delay before starting to type (cursor blinks first)
+    const delayTimer = window.setTimeout(() => {
+      hasPlayedRef.current = true;
+      setStarted(true);
+      setCount(0);
+      tick(0);
+    }, delay);
+
+    return () => {
+      window.clearTimeout(delayTimer);
+      if (timerRef.current) window.clearTimeout(timerRef.current);
+    };
     /* eslint-enable react-hooks/set-state-in-effect */
-  }, [active, text, speed]);
+  }, [active, text, speed, delay]);
 
   return { displayed, done };
 }
@@ -79,34 +104,39 @@ function isRuntime(value: string | null): value is Runtime {
 }
 
 const EXAMPLE_BLOCK_CLASS =
-  "h-48 overflow-y-auto border border-border bg-foreground/5 px-4 py-3 font-mono text-[0.8125rem] text-foreground/80 whitespace-pre-wrap break-all";
-const EXAMPLE_PLACEHOLDER_CLASS =
-  "h-48 border border-dashed border-border/80 bg-foreground/[0.02] px-4 py-3";
+  "h-48 overflow-y-auto border border-white/10 bg-black px-4 py-3 font-mono text-[0.8125rem] text-white/80 whitespace-pre-wrap break-words";
 
-function formatBadgeLabel(badge: string) {
-  switch (badge) {
-    case "Creator coins":
-      return "Creator coin";
-    case "No wallet":
-    case "Wallet optional":
-      return "No wallet required";
-    case "Wallet needed":
-      return "Wallet required";
-    default:
-      return badge;
+function formatMonitorSummary(monitors: string[]) {
+  const summary = monitors
+    .slice(0, 3)
+    .map((monitor) => {
+      const trimmed = monitor.trim();
+      return trimmed.charAt(0).toLowerCase() + trimmed.slice(1);
+    });
+
+  if (summary.length === 0) {
+    return "";
   }
+  if (summary.length === 1) {
+    return summary[0];
+  }
+  if (summary.length === 2) {
+    return `${summary[0]} and ${summary[1]}`;
+  }
+
+  return `${summary.slice(0, -1).join(", ")}, and ${summary.at(-1)}`;
 }
 
 function TerminalOutput({
   id,
   displayed,
-  active,
   typingDone,
+  showCursor,
 }: {
   id: string;
   displayed: string;
-  active: boolean;
   typingDone: boolean;
+  showCursor: boolean;
 }) {
   const ref = useRef<HTMLPreElement>(null);
 
@@ -118,8 +148,8 @@ function TerminalOutput({
 
   return (
     <pre ref={ref} id={id} className={EXAMPLE_BLOCK_CLASS}>
-      <HighlightedCodeText text={displayed} variant="output" />
-      {active && !typingDone ? <span className="animate-blink">&#9608;</span> : null}
+      <HighlightedCodeText text={displayed} variant="output" terminal />
+      {showCursor && !typingDone ? <span className="animate-blink">&#9608;</span> : null}
     </pre>
   );
 }
@@ -128,7 +158,6 @@ function SkillRowDetails({
   outputId,
   exampleId,
   displayed,
-  active,
   typingDone,
   exampleExpanded,
   onToggleExample,
@@ -136,20 +165,19 @@ function SkillRowDetails({
   outputId: string;
   exampleId: string;
   displayed: string;
-  active: boolean;
   typingDone: boolean;
   exampleExpanded: boolean;
   onToggleExample: () => void;
 }) {
   return (
-    <div>
+    <div className="flex flex-col justify-end">
       {exampleExpanded ? (
         <div id={exampleId}>
           <TerminalOutput
             id={outputId}
             displayed={displayed}
-            active={active}
             typingDone={typingDone}
+            showCursor={exampleExpanded}
           />
         </div>
       ) : (
@@ -157,8 +185,8 @@ function SkillRowDetails({
           id={exampleId}
           type="button"
           className={cn(
-            EXAMPLE_PLACEHOLDER_CLASS,
-            "flex w-full items-center justify-center overflow-hidden whitespace-normal break-normal text-center transition-[background-color,border-color] duration-150 ease-out hover:bg-foreground/[0.035] hover:border-foreground/20",
+            "h-48 border border-dashed border-border/80 px-4 py-3",
+            "flex w-full items-center justify-center overflow-hidden whitespace-normal break-normal text-center transition-[border-color] duration-150 ease-out hover:border-foreground/20",
           )}
           aria-expanded="false"
           aria-controls={outputId}
@@ -183,13 +211,13 @@ function RuntimeInstallCard({
   command: string;
 }) {
   return (
-    <div className="max-w-2xl">
+    <div>
       <Tabs
         value={runtime}
         onValueChange={(value) => onChange(value as Runtime)}
         className="w-full gap-0"
       >
-        <div className="border border-border border-b-0 bg-muted p-1">
+        <div className="border border-border border-b-0 bg-white p-1">
           <TabsList
             aria-label="Agent runtime"
             className="flex w-full flex-wrap justify-start bg-transparent p-0"
@@ -232,6 +260,7 @@ function SkillRow({
     typeof IntersectionObserver === "undefined",
   );
   const exampleActive = hasEnteredViewport && expandedExample;
+  const monitorSummary = formatMonitorSummary(skill.monitors);
 
   function handleToggleExample() {
     setExpandedExample((current) => !current);
@@ -268,45 +297,36 @@ function SkillRow({
   return (
     <section
       ref={sectionRef}
-      className="scroll-mt-32 py-6 sm:py-8"
+      className="scroll-mt-32 py-8 sm:py-12"
       id={skill.id}
     >
-      {index !== 0 && (
-        <div
-          aria-hidden="true"
-          className="-mt-6 mb-6 w-full border-t border-border/80 sm:-mt-8 sm:mb-8"
-        />
-      )}
-      <div className="grid grid-cols-1 gap-5 lg:grid-cols-2 lg:gap-x-10">
-        <div className="space-y-3">
-          <h2 className="type-title leading-[0.98]">
-            {`${String(index + 1).padStart(2, "0")}. ${skill.name}`}
-          </h2>
-          <p className="type-body-sm text-muted-foreground">
-            {skill.longDescription}
-          </p>
-
-          {skill.badges.length > 0 ? (
-            <p className="font-display text-[0.9rem] leading-[1.1] tracking-[0.04em] text-muted-foreground/78">
-              {skill.badges.map(formatBadgeLabel).join(", ")}
-            </p>
-          ) : null}
-
-          <CopyableCodeBlock
-            command={command}
-            prefix={runtime === "prompt" ? ">" : "$"}
-          />
-
-          <div className="type-caption flex flex-wrap items-center gap-4 font-mono text-muted-foreground">
+      <div className="grid grid-cols-1 gap-5 lg:grid-cols-2 lg:gap-x-10 lg:min-h-[200px]">
+        <div className="flex flex-col gap-3">
+          <div className="flex items-start justify-between gap-4">
+            <h2 className="type-title leading-[0.98]">
+              {`${String(index + 1).padStart(2, "0")}. ${skill.name}`}
+            </h2>
             <a
               href={skill.githubUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1 transition-colors hover:text-foreground"
+              className="type-caption inline-flex shrink-0 items-center gap-1 font-mono text-muted-foreground transition-colors hover:text-foreground"
             >
               Source
               <ArrowUpRightIcon size={12} />
             </a>
+          </div>
+          <p className="type-body-sm text-muted-foreground">
+            {skill.longDescription}
+            {monitorSummary ? ` Checks ${monitorSummary}.` : ""}
+            {` Try: "${skill.samplePrompt}"`}
+          </p>
+
+          <div className="mt-auto">
+            <CopyableCodeBlock
+              command={command}
+              prefix={runtime === "prompt" ? ">" : "$"}
+            />
           </div>
 
         </div>
@@ -315,7 +335,6 @@ function SkillRow({
           outputId={`${detailsId}-desktop-output`}
           exampleId={`${detailsId}-desktop-example`}
           displayed={displayed}
-          active={exampleActive}
           typingDone={typingDone}
           exampleExpanded={expandedExample}
           onToggleExample={handleToggleExample}
@@ -338,30 +357,41 @@ export function SkillsInstallList({
   ];
   const [runtime, setRuntime] = useSessionStorageState<Runtime>({
     key: RUNTIME_STORAGE_KEY,
-    initialValue: "claude",
-    parse: (stored) => (isRuntime(stored) ? stored : "claude"),
+    initialValue: "prompt",
+    parse: (stored) => (isRuntime(stored) ? stored : "prompt"),
     serialize: (value) => value,
   });
 
   return (
     <div className="w-full">
       {/* Hero: heading + unified install card */}
-      <section className="space-y-6 mb-12">
-        <h1 className="type-display max-w-5xl pt-[0.06em] leading-[0.94]">
-          Six skills for the Zora attention market.
-        </h1>
+      <section className="space-y-5 pt-1 pb-20 lg:pb-28 sm:pt-4">
         <div className="grid grid-cols-1 lg:grid-cols-2 lg:gap-x-10">
-          <div className="space-y-3">
-            <p className="type-body-sm text-muted-foreground">
-              Send this to your agent. Installs the Zora CLI and all skills
-              below.
-            </p>
-            <RuntimeInstallCard
-              runtime={runtime}
-              onChange={setRuntime}
-              command={getInstallAllCommands(getSiteUrl())[runtime]}
-            />
+          <div className="space-y-5">
+            <h1 className="type-display">
+              Pick a skill, or grab<br className="hidden lg:inline" />{" "}them all.
+            </h1>
+            <div className="space-y-3">
+              <p className="type-body-sm font-medium text-muted-foreground">
+                Six open-source skills for the{" "}
+                <a
+                  href="https://cli.zora.com/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline transition-colors hover:text-foreground"
+                >
+                  Zora CLI
+                </a>
+                . One command installs them all.
+              </p>
+              <RuntimeInstallCard
+                runtime={runtime}
+                onChange={setRuntime}
+                command={getInstallAllCommands(getSiteUrl())[runtime]}
+              />
+            </div>
           </div>
+          {/* Right column: zorb from layout overlays here */}
         </div>
       </section>
 

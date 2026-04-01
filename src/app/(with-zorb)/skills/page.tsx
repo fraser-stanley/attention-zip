@@ -66,7 +66,7 @@ export default function SkillsPage() {
   });
 
   return (
-    <div className="space-y-12 lg:pt-6">
+    <div className="space-y-12 lg:-mt-20 lg:pt-28">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(skillJsonLd) }}

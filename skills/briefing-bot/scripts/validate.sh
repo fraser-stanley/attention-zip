@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
+cd "$(dirname "$0")/.."
 
 echo "Validating briefing-bot..."
 
@@ -24,4 +25,4 @@ echo "  ok node installed"
 node --check scripts/run.mjs >/dev/null
 echo "  ok entrypoint parses"
 
-echo "PASS: briefing-bot ready"
+echo "PASS: briefing-bot ready (read-only, wallet optional)"

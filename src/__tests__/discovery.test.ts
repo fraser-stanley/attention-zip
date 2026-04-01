@@ -34,6 +34,10 @@ describe("buildLlmsTxt", () => {
     expect(llmsTxt).toContain("Step 1 — Install the Zora CLI");
     expect(llmsTxt).toContain("npm install -g @zoralabs/cli");
     expect(llmsTxt).toContain("Step 2 — Install skills");
+    expect(llmsTxt).toContain("git clone --depth 1");
+    expect(llmsTxt).toContain("~/.config/zora-agent-skills");
+    expect(llmsTxt).toContain("GET https://example.com/api/skills");
+    expect(llmsTxt).toContain("install.sh");
     expect(llmsTxt).toContain("Step 3 — Verify the CLI works");
     expect(llmsTxt).toContain("zora explore --sort trending --limit 3 --json");
     expect(llmsTxt).toContain("Step 4 — Optional wallet setup");

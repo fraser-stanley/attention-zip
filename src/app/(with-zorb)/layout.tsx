@@ -18,7 +18,7 @@ export default function WithZorbLayout({
       {/* Zorb: in-flow on mobile, fixed to hero content area on desktop */}
       <div
         aria-hidden="true"
-        className="flex justify-center py-4 lg:fixed lg:top-32 lg:right-[calc((100vw-80rem)/2+2rem)] lg:w-[calc(min(80rem,100vw-4rem)/2-1.25rem)] lg:justify-center lg:py-0 lg:pointer-events-none lg:z-10"
+        className="flex justify-center py-4 lg:absolute lg:top-32 lg:right-0 lg:w-[calc(min(80rem,100vw-4rem)/2-1.25rem)] lg:justify-center lg:py-0 lg:pointer-events-none lg:z-10"
       >
         <div className="lg:pointer-events-auto">
           <Suspense fallback={null}>

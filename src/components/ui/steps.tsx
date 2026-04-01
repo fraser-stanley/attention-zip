@@ -22,14 +22,14 @@ function Step({
   return (
     <li
       className={cn(
-        "relative pl-14 after:absolute after:bottom-[-1.5rem] after:left-4 after:top-10 after:w-px after:bg-border last:after:hidden last:[&_>div]:border-b-0 last:[&_>div]:pb-0",
+        "relative pl-12 last:[&_>div]:border-b-0 last:[&_>div]:pb-0",
         className
       )}
       {...props}
     >
       <div
         aria-hidden="true"
-        className="absolute left-0 top-0 flex size-8 items-center justify-center rounded-full border border-border bg-muted text-xs font-mono before:[counter-increment:step] before:content-[counter(step)]"
+        className="absolute left-0 top-0 font-display text-2xl font-medium tracking-tight leading-none before:[counter-increment:step] before:content-[counter(step)]"
       />
       <div className="space-y-1.5 border-b border-border/60 pb-6">
         <h3 className="text-sm font-medium">{title}</h3>

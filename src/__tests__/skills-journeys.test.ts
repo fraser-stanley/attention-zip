@@ -9,10 +9,11 @@ import {
 } from "@/lib/skills";
 
 const ROOT = path.resolve(__dirname, "../..");
+const SKILLS_DIR = path.join(ROOT, "skills");
 const TEST_BASE_URL = "https://example.com";
 
 function readSkillMd(skill: string) {
-  return fs.readFileSync(path.join(ROOT, skill, "SKILL.md"), "utf8");
+  return fs.readFileSync(path.join(SKILLS_DIR, skill, "SKILL.md"), "utf8");
 }
 
 function getBody(content: string) {
@@ -176,7 +177,7 @@ describe("configuration consistency", () => {
       const body = getBody(readSkillMd(id));
       const docEnvVars = getConfigEnvVars(body);
       const clawhub = JSON.parse(
-        fs.readFileSync(path.join(ROOT, id, "clawhub.json"), "utf8"),
+        fs.readFileSync(path.join(SKILLS_DIR, id, "clawhub.json"), "utf8"),
       );
       const tunableEnvVars: string[] = clawhub.tunables.map(
         (t: { env: string }) => t.env,

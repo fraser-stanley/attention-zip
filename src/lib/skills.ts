@@ -65,7 +65,7 @@ const REPO_URL = getSiteRepoUrl();
 const REPO_NAME = getSiteRepoName();
 
 function buildSkillGithubUrl(skillId: string) {
-  return `${REPO_URL}/tree/${SITE_REPO_REF}/${skillId}`;
+  return `${REPO_URL}/tree/${SITE_REPO_REF}/skills/${skillId}`;
 }
 
 function buildSkillMdUrl(skillId: string) {
@@ -485,6 +485,6 @@ export function getSkillRuntimeCommands(
 ): SkillRuntimeCommands {
   return {
     ...getSkillQuickInstallCommands(skill, baseUrl),
-    manual: `git clone --depth 1 ${REPO_URL} && cd ${REPO_NAME}/${skill.id}`,
+    manual: `git clone --depth 1 ${REPO_URL} && cd ${REPO_NAME}/skills/${skill.id}`,
   };
 }

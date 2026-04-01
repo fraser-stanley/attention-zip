@@ -38,7 +38,7 @@ export function Screensaver() {
 
   // Portal mount guard
   useEffect(() => {
-    setMounted(true);
+    setMounted(true); // eslint-disable-line react-hooks/set-state-in-effect -- mount guard for portal
   }, []);
 
   // Manual trigger via custom event

@@ -17,6 +17,7 @@ const columns = [
     links: [
       { label: "GitHub", href: SITE_REPO_URL, external: true },
       { label: "Zora CLI Docs", href: "https://cli.zora.com/", external: true },
+      { label: "Add Your Skill", href: `${SITE_REPO_URL}/blob/main/CONTRIBUTING.md`, external: true },
       { label: "API Discovery", href: "/api" },
       { label: "Skill Catalog", href: "/api/skills" },
     ],

@@ -4,6 +4,7 @@ import path from "path";
 import yaml from "yaml";
 
 const ROOT = path.resolve(__dirname, "../..");
+const SKILLS_DIR = path.join(ROOT, "skills");
 const SKILL_DIRS = [
   "trend-scout",
   "creator-pulse",
@@ -34,7 +35,7 @@ type Tunable = {
 };
 
 function readSkillMd(skill: string) {
-  return fs.readFileSync(path.join(ROOT, skill, "SKILL.md"), "utf8");
+  return fs.readFileSync(path.join(SKILLS_DIR, skill, "SKILL.md"), "utf8");
 }
 
 function parseFrontmatter(content: string) {
@@ -214,7 +215,7 @@ describe.each(SKILL_DIRS)("%s/SKILL.md", (skill) => {
 });
 
 describe.each(SKILL_DIRS)("%s/clawhub.json", (skill) => {
-  const filePath = path.join(ROOT, skill, "clawhub.json");
+  const filePath = path.join(SKILLS_DIR, skill, "clawhub.json");
   const content = JSON.parse(fs.readFileSync(filePath, "utf8"));
 
   it("has required fields", () => {
@@ -284,21 +285,21 @@ describe.each(SKILL_DIRS)("%s/clawhub.json", (skill) => {
 describe("env requirements", () => {
   it("trend-scout has no required env vars", () => {
     const content = JSON.parse(
-      fs.readFileSync(path.join(ROOT, "trend-scout", "clawhub.json"), "utf8"),
+      fs.readFileSync(path.join(SKILLS_DIR, "trend-scout", "clawhub.json"), "utf8"),
     );
     expect(content.requires.env).toBeUndefined();
   });
 
   it("creator-pulse has no required env vars", () => {
     const content = JSON.parse(
-      fs.readFileSync(path.join(ROOT, "creator-pulse", "clawhub.json"), "utf8"),
+      fs.readFileSync(path.join(SKILLS_DIR, "creator-pulse", "clawhub.json"), "utf8"),
     );
     expect(content.requires.env).toBeUndefined();
   });
 
   it("briefing-bot has no required env vars", () => {
     const content = JSON.parse(
-      fs.readFileSync(path.join(ROOT, "briefing-bot", "clawhub.json"), "utf8"),
+      fs.readFileSync(path.join(SKILLS_DIR, "briefing-bot", "clawhub.json"), "utf8"),
     );
     expect(content.requires.env).toBeUndefined();
   });
@@ -306,7 +307,7 @@ describe("env requirements", () => {
   it("portfolio-scout requires ZORA_PRIVATE_KEY", () => {
     const content = JSON.parse(
       fs.readFileSync(
-        path.join(ROOT, "portfolio-scout", "clawhub.json"),
+        path.join(SKILLS_DIR, "portfolio-scout", "clawhub.json"),
         "utf8",
       ),
     );
@@ -316,7 +317,7 @@ describe("env requirements", () => {
   it("copy-trader requires ZORA_PRIVATE_KEY", () => {
     const content = JSON.parse(
       fs.readFileSync(
-        path.join(ROOT, "copy-trader", "clawhub.json"),
+        path.join(SKILLS_DIR, "copy-trader", "clawhub.json"),
         "utf8",
       ),
     );
@@ -326,7 +327,7 @@ describe("env requirements", () => {
   it("momentum-trader requires ZORA_PRIVATE_KEY", () => {
     const content = JSON.parse(
       fs.readFileSync(
-        path.join(ROOT, "momentum-trader", "clawhub.json"),
+        path.join(SKILLS_DIR, "momentum-trader", "clawhub.json"),
         "utf8",
       ),
     );
@@ -336,7 +337,7 @@ describe("env requirements", () => {
   it("copy-trader exposes only the primary tunables in clawhub.json", () => {
     const content = JSON.parse(
       fs.readFileSync(
-        path.join(ROOT, "copy-trader", "clawhub.json"),
+        path.join(SKILLS_DIR, "copy-trader", "clawhub.json"),
         "utf8",
       ),
     );
@@ -356,7 +357,7 @@ describe("env requirements", () => {
 
 describe.each(SKILL_DIRS)("%s/scripts/validate.sh", (skill) => {
   const content = fs.readFileSync(
-    path.join(ROOT, skill, "scripts", "validate.sh"),
+    path.join(SKILLS_DIR, skill, "scripts", "validate.sh"),
     "utf8",
   );
 
@@ -376,8 +377,8 @@ describe("wallet-backed setup guidance", () => {
 });
 
 describe.each(SKILL_DIRS)("%s/scripts assets", (skill) => {
-  const validatePath = path.join(ROOT, skill, "scripts", "validate.sh");
-  const entrypointPath = path.join(ROOT, skill, "scripts", "run.mjs");
+  const validatePath = path.join(SKILLS_DIR, skill, "scripts", "validate.sh");
+  const entrypointPath = path.join(SKILLS_DIR, skill, "scripts", "run.mjs");
 
   it("validate.sh exists", () => {
     expect(fs.existsSync(validatePath)).toBe(true);

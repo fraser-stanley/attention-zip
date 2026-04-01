@@ -21,10 +21,10 @@ The site design and UI aren't open for contributions. Bug fixes and skill-servin
 
 ## Skill structure
 
-Each skill lives in its own directory at the project root:
+Each skill lives in its own directory under `skills/`:
 
 ```
-<skill-slug>/
+skills/<skill-slug>/
   SKILL.md          # Agent instructions (AgentSkills/OpenClaw format)
   clawhub.json      # Runtime config
   scripts/run.mjs   # Managed entrypoint

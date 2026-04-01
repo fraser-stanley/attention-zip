@@ -12,6 +12,7 @@ import {
 import { CLI_REFERENCE } from "@/lib/discovery";
 
 const ROOT = path.resolve(__dirname, "../..");
+const SKILLS_DIR = path.join(ROOT, "skills");
 
 describe("skills array", () => {
   it("has exactly 6 skills", () => {
@@ -56,16 +57,16 @@ describe("cross-file sync", () => {
   it.each(skills.map((skill) => skill.id))(
     "%s has a matching skill directory",
     (id) => {
-      expect(fs.existsSync(path.join(ROOT, id))).toBe(true);
-      expect(fs.existsSync(path.join(ROOT, id, "SKILL.md"))).toBe(true);
-      expect(fs.existsSync(path.join(ROOT, id, "clawhub.json"))).toBe(true);
+      expect(fs.existsSync(path.join(SKILLS_DIR, id))).toBe(true);
+      expect(fs.existsSync(path.join(SKILLS_DIR, id, "SKILL.md"))).toBe(true);
+      expect(fs.existsSync(path.join(SKILLS_DIR, id, "clawhub.json"))).toBe(true);
     },
   );
 
   it.each(skills.map((skill) => skill.id))(
     "%s SKILL.md name matches skills.ts id",
     (id) => {
-      const content = fs.readFileSync(path.join(ROOT, id, "SKILL.md"), "utf8");
+      const content = fs.readFileSync(path.join(SKILLS_DIR, id, "SKILL.md"), "utf8");
       const match = content.match(/^---\n([\s\S]*?)\n---/);
       expect(match).toBeTruthy();
       const frontmatter = yaml.parse(match![1]);
@@ -228,7 +229,7 @@ describe("CLI compatibility", () => {
       "%s/scripts/run.mjs only uses valid --sort values for their context",
       (id) => {
         const script = fs.readFileSync(
-          path.join(ROOT, id, "scripts", "run.mjs"),
+          path.join(SKILLS_DIR, id, "scripts", "run.mjs"),
           "utf8",
         );
         // Match array-style CLI args: ["explore", ..., "--sort", "value"]
@@ -252,7 +253,7 @@ describe("CLI compatibility", () => {
       "%s/scripts/run.mjs only uses valid explore --type values",
       (id) => {
         const script = fs.readFileSync(
-          path.join(ROOT, id, "scripts", "run.mjs"),
+          path.join(SKILLS_DIR, id, "scripts", "run.mjs"),
           "utf8",
         );
         const typeMatches = script.matchAll(
@@ -268,7 +269,7 @@ describe("CLI compatibility", () => {
       "%s/scripts/run.mjs only uses valid --to/--token asset values",
       (id) => {
         const script = fs.readFileSync(
-          path.join(ROOT, id, "scripts", "run.mjs"),
+          path.join(SKILLS_DIR, id, "scripts", "run.mjs"),
           "utf8",
         );
         const toMatches = script.matchAll(
@@ -465,7 +466,7 @@ describe("getSkillRuntimeCommands", () => {
 
       expect(commands.openclaw).toBe(quickInstall.openclaw);
       expect(commands.claude).toBe(quickInstall.claude);
-      expect(commands.manual).toContain(`cd attention-zip/${skill.id}`);
+      expect(commands.manual).toContain(`cd attention-zip/skills/${skill.id}`);
     }
   });
 });

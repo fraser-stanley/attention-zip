@@ -14,6 +14,7 @@ import path from "path";
 import { spawn, spawnSync } from "child_process";
 
 const ROOT = path.resolve(__dirname, "../..");
+const SKILLS_DIR = path.join(ROOT, "skills");
 
 type StubScenario = Record<string, unknown>;
 type PublicApiScenario = Record<string, unknown>;
@@ -333,7 +334,7 @@ process.exit(response.exitCode ?? 0);
   chmodSync(stubBinaryPath, 0o755);
 
   function runSkill(skillId: string, env: Record<string, string> = {}) {
-    const scriptPath = path.join(ROOT, skillId, "scripts", "run.mjs");
+    const scriptPath = path.join(SKILLS_DIR, skillId, "scripts", "run.mjs");
     const result = spawnSync(process.execPath, [scriptPath], {
       cwd: ROOT,
       encoding: "utf8",
@@ -347,7 +348,7 @@ process.exit(response.exitCode ?? 0);
   }
 
   function runSkillAsync(skillId: string, env: Record<string, string> = {}) {
-    const scriptPath = path.join(ROOT, skillId, "scripts", "run.mjs");
+    const scriptPath = path.join(SKILLS_DIR, skillId, "scripts", "run.mjs");
 
     return new Promise<SkillRunResult>((resolve, reject) => {
       const child = spawn(process.execPath, [scriptPath], {

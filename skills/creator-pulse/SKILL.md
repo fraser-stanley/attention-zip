@@ -45,14 +45,14 @@ node scripts/run.mjs
 zora explore --sort featured --type creator-coin --limit 8 --json
 zora explore --sort trending --type creator-coin --limit 8 --json
 zora explore --sort volume --type creator-coin --limit 8 --json
-zora get <identifier> --type creator-coin --json
+zora get <identifier> --json
 ```
 
 ## How It Works
 
 Three creator views are pulled through the CLI. The script filters the rows and stores featured creator ids plus watchlist metrics in `~/.config/zora-agent-skills/creator-pulse/state.json`.
 
-With a watchlist set, each identifier gets looked up via `zora get --type creator-coin --json`. Volume moves of 10% or more and holder swings of 25+ trigger alerts. New entries into the featured view between runs are flagged too.
+With a watchlist set, each identifier gets looked up via `zora get <identifier> --json`. Volume moves of 10% or more and holder swings of 25+ trigger alerts. New entries into the featured view between runs are flagged too.
 
 ## Example Output
 

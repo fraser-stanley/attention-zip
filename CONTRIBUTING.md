@@ -1,59 +1,45 @@
 # Contributing
 
-The skills are the product. The site serves them. Contributions that improve skills or make them easier to use are welcome.
+## Add a skill
 
-## What we accept
+Copy `skills/trend-scout/`, rename it, edit the `SKILL.md`. Submit a PR with a clear description of what your skill does.
 
-- New skills or improvements to existing ones
-- Bug fixes
-- Documentation improvements
-- Fixes to skill-serving infrastructure (API routes, discovery docs, install commands)
-
-## What needs discussion first
-
-Open an issue before starting work on:
-
-- A new skill
-- Changes to the skill format (SKILL.md structure, clawhub.json schema)
-- Significant site changes beyond bug fixes
-
-The site design and UI aren't open for contributions. Bug fixes and skill-serving improvements are.
-
-## Skill structure
-
-Each skill lives in its own directory under `skills/`:
-
-```
-skills/<skill-slug>/
-  SKILL.md          # Agent instructions (AgentSkills/OpenClaw format)
-  clawhub.json      # Runtime config
-  scripts/run.mjs   # Managed entrypoint
-  scripts/validate.sh
+```bash
+cp -r skills/trend-scout skills/your-skill
+# edit skills/your-skill/SKILL.md
 ```
 
-The skill format follows the AgentSkills/OpenClaw convention. See any existing skill directory for reference.
+Only `SKILL.md` is required. `clawhub.json` and `scripts/` are optional.
+
+## Skill format
+
+SKILL.md follows the [AgentSkills/OpenClaw](https://github.com/AgentSkills) format. See any existing skill directory for reference.
+
+Recommended frontmatter:
+
+```yaml
+name: your-skill-slug
+description: One sentence, max 1024 characters.
+metadata:
+  author: "Your Name"
+  version: "1.0.0"
+  displayName: "Your Skill Name"
+  difficulty: "beginner"
+```
+
+## Rules
+
+- Skills must use the [Zora CLI](https://cli.zora.com/) and be relevant to Zora attention markets
+- Trading skills must default to dry-run mode
+- No paid features or token mechanics
+- One concern per PR
 
 ## Before submitting
 
 Run the merge gate:
 
 ```bash
-pnpm lint
-pnpm typecheck
-pnpm test
-pnpm build
+pnpm lint && pnpm typecheck && pnpm test && pnpm build
 ```
 
-All four must pass. `pnpm test` validates SKILL.md structure, cross-file sync, and managed entrypoint behavior.
-
-## Pull requests
-
-- One concern per PR
-- Include which skills are affected (if any)
-- Confirm the merge gate passes
-
-## Scope limits
-
-- No third-party skill submissions without prior discussion
-- No paid features or token mechanics
-- Trading skills must default to dry-run mode
+All four must pass.

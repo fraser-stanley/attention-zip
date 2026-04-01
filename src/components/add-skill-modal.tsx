@@ -124,16 +124,16 @@ export function AddSkillModal({ open, onClose }: AddSkillModalProps) {
                       Add Your Skill
                     </h2>
                     <p className="type-body-sm text-white/50">
-                      Extend the{" "}
+                      Build a skill for{" "}
                       <a
                         href="https://cli.zora.com/"
                         target="_blank"
                         rel="noopener noreferrer"
                         className="underline transition-colors hover:text-white"
                       >
-                        Zora CLI
-                      </a>{" "}
-                      with a new capability.
+                        Zora
+                      </a>
+                      .
                     </p>
                   </div>
 
@@ -196,7 +196,7 @@ export function AddSkillModal({ open, onClose }: AddSkillModalProps) {
                   <div className="min-w-0 flex-1 space-y-2 pt-1">
                     <h3 className="text-sm font-medium text-white">Add your skill directory</h3>
                     <p className="text-sm text-white/50">
-                      Drop a <code className="rounded bg-white/10 px-1 py-0.5 text-white/80">SKILL.md</code> in <code className="rounded bg-white/10 px-1 py-0.5 text-white/80">skills/your-skill/</code>.{" "}
+                      Drop a <code className="rounded bg-white/10 px-1 py-0.5 text-white/80">SKILL.md</code> in <code className="rounded bg-white/10 px-1 py-0.5 text-white/80">skills/your-skill/</code>. That&apos;s the only required file.{" "}
                       <a
                         href={CONTRIBUTING_URL}
                         target="_blank"
@@ -217,7 +217,7 @@ export function AddSkillModal({ open, onClose }: AddSkillModalProps) {
                   <span className="font-display text-4xl font-medium tracking-tight leading-none text-white/20">3</span>
                   <div className="min-w-0 flex-1 space-y-2 pt-1">
                     <h3 className="text-sm font-medium text-white">Open a PR</h3>
-                    <p className="text-sm text-white/50">Make sure the merge gate passes.</p>
+                    <p className="text-sm text-white/50">We&apos;ll review your PR. Make sure the merge gate passes.</p>
                     <CopyableCodeBlock
                       command="pnpm lint && pnpm typecheck && pnpm test && pnpm build"
                       className="border-white/10 bg-white/[0.04] hover:border-white/20 hover:bg-white/[0.07] [&_span]:text-white/40"

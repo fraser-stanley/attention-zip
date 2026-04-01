@@ -6,6 +6,10 @@ If you find a security issue, please report it through [GitHub Security Advisori
 
 We will acknowledge reports within 48 hours and provide a timeline for resolution.
 
+## Architecture
+
+The site does not execute trades or hold keys. Skills run locally through the user's agent runtime and Zora CLI. The wallet connect flow is address-only — no signing.
+
 ## What counts as a security issue
 
 - Credential or API key exposure in source code or logs
@@ -13,8 +17,3 @@ We will acknowledge reports within 48 hours and provide a timeline for resolutio
 - Rate limit bypass on mutation endpoints
 - Server-side code execution or injection vulnerabilities
 
-## Architecture context
-
-Trading skills (Copy Trader, Momentum Trader) run locally through the user's agent runtime and Zora CLI. The site does not execute trades, hold keys, or custody funds server-side. Skill guardrails live in the local skill runtime, not on the server.
-
-The wallet connect flow is address-only. The site does not ask browsers to sign messages. Portfolio data is public on-chain data.

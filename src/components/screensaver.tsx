@@ -68,17 +68,21 @@ export function Screensaver() {
     };
   }, [active, resetTimer]);
 
-  // Dismiss on any interaction while active
+  // Dismiss on any interaction while active.
+  // Wait for the entrance animation to finish before attaching dismiss
+  // listeners so the triggering gesture doesn't immediately close it.
   useEffect(() => {
     if (!active) return;
 
     const onDismiss = () => dismiss();
-
-    for (const event of INTERACTION_EVENTS) {
-      window.addEventListener(event, onDismiss, { once: true, passive: true });
-    }
+    const timer = setTimeout(() => {
+      for (const event of INTERACTION_EVENTS) {
+        window.addEventListener(event, onDismiss, { once: true, passive: true });
+      }
+    }, 700);
 
     return () => {
+      clearTimeout(timer);
       for (const event of INTERACTION_EVENTS) {
         window.removeEventListener(event, onDismiss);
       }

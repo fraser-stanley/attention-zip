@@ -1,37 +1,31 @@
 # Contributing
 
-The skills are the product. The site serves them. Contributions that improve skills or make them easier to use are welcome.
+Skills are the product. The site serves them.
 
-## What we accept
+## Add a skill
 
-- New skills or improvements to existing ones
-- Bug fixes
-- Documentation improvements
-- Fixes to skill-serving infrastructure (API routes, discovery docs, install commands)
+The fastest way: copy `skills/trend-scout/`, rename it, edit the `SKILL.md`. Every skill is a remixable template — fork one that's close to what you want and make it yours.
 
-## What needs discussion first
+```bash
+cp -r skills/trend-scout skills/your-skill
+# edit skills/your-skill/SKILL.md
+```
 
-Open an issue before starting work on:
-
-- A new skill
-- Changes to the skill format (SKILL.md structure, clawhub.json schema)
-- Significant site changes beyond bug fixes
-
-The site design and UI aren't open for contributions. Bug fixes and skill-serving improvements are.
+For complex or trading skills, consider opening an issue first to discuss the design.
 
 ## Skill structure
 
-Each skill lives in its own directory under `skills/`:
+Each skill lives under `skills/`:
 
 ```
 skills/<skill-slug>/
-  SKILL.md          # Agent instructions (AgentSkills/OpenClaw format)
-  clawhub.json      # Runtime config
-  scripts/run.mjs   # Managed entrypoint
-  scripts/validate.sh
+  SKILL.md            # Required — agent instructions (AgentSkills/OpenClaw format)
+  clawhub.json        # Optional — runtime config and tunables
+  scripts/run.mjs     # Optional — managed entrypoint for scheduled skills
+  scripts/validate.sh # Optional — dependency check script
 ```
 
-The skill format follows the AgentSkills/OpenClaw convention. See any existing skill directory for reference.
+Only `SKILL.md` is required. The other files are for managed/automated skills that run on a schedule. See any existing skill for reference.
 
 ## Before submitting
 
@@ -44,16 +38,11 @@ pnpm test
 pnpm build
 ```
 
-All four must pass. `pnpm test` validates SKILL.md structure, cross-file sync, and managed entrypoint behavior.
+All four must pass.
 
-## Pull requests
+## Rules
 
-- One concern per PR
-- Include which skills are affected (if any)
-- Confirm the merge gate passes
-
-## Scope limits
-
-- No third-party skill submissions without prior discussion
-- No paid features or token mechanics
+- Skills must use the [Zora CLI](https://cli.zora.com/) and be relevant to Zora attention markets
 - Trading skills must default to dry-run mode
+- No paid features or token mechanics
+- One concern per PR

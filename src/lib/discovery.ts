@@ -204,6 +204,7 @@ ${buildSkillSummaryLines(siteUrl)}
 
 ## Reference
 
+Full reference: ${toAbsoluteUrl("/llms-full.txt", siteUrl)}
 Skill catalog API: ${toAbsoluteUrl("/api/skills", siteUrl)}
 Profile API: ${toAbsoluteUrl("/api/profile", siteUrl)}
 Coin swaps API: ${toAbsoluteUrl("/api/coin-swaps", siteUrl)}

@@ -152,7 +152,7 @@ Signal: \`aliens\` has both price momentum and rising volume. \`hyperpop\` is co
       "zora explore --sort featured --type creator-coin --limit 8 --json",
       "zora explore --sort trending --type creator-coin --limit 8 --json",
       "zora explore --sort volume --type creator-coin --limit 8 --json",
-      "zora get <identifier> --type creator-coin --json",
+      "zora get <identifier> --json",
     ],
     requires: {
       bins: ["zora", "node"],

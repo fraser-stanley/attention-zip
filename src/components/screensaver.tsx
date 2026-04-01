@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 
-const IDLE_TIMEOUT = 10_000;
+const IDLE_TIMEOUT = 30_000;
 
 const INTERACTION_EVENTS = [
   "mousemove",

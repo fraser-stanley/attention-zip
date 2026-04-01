@@ -2,13 +2,4 @@
 
 <!-- Brief description -->
 
-## Skills affected
-
-<!-- List skill directories touched, or "None" -->
-
-## Merge gate
-
-- [ ] `pnpm lint`
-- [ ] `pnpm typecheck`
-- [ ] `pnpm test`
-- [ ] `pnpm build`
+**Skills affected:** <!-- e.g. trend-scout, or none -->

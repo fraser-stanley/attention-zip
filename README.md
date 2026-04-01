@@ -13,7 +13,7 @@ Agent skills for the Zora attention market. Scan trends, copy trades, and track 
 | [copy-trader](skills/copy-trader/) | Mirrors public Zora wallet moves with guardrails. Dry run by default | Execution |
 | [momentum-trader](skills/momentum-trader/) | Quotes and manages momentum trades. Dry run by default | Execution |
 
-Each skill lives under `skills/` with a `SKILL.md` for agent instructions, a `clawhub.json` for runtime config, and a `scripts/` directory.
+Each skill lives under `skills/` with a `SKILL.md` for agent instructions.
 
 ## Quick start
 
@@ -33,8 +33,6 @@ pnpm lint         # eslint
 pnpm test         # vitest
 pnpm build        # production build
 ```
-
-Merge gate: `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm build`.
 
 ## Contributing
 

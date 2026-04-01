@@ -57,15 +57,13 @@ for skill_dir in "$SKILLS_DIR"/*/; do
     continue
   fi
 
-  if bash "$validate" >/dev/null 2>&1; then
+  output=$(bash "$validate" 2>&1) && rc=0 || rc=$?
+  if [ "$rc" -eq 0 ]; then
     PASSED=$((PASSED + 1))
+  elif echo "$output" | grep -q "no wallet configured"; then
+    WALLET_NEEDED=$((WALLET_NEEDED + 1))
   else
-    # Check if it failed only on the wallet gate
-    if bash "$validate" 2>&1 | grep -q "no wallet configured"; then
-      WALLET_NEEDED=$((WALLET_NEEDED + 1))
-    else
-      FAILED=$((FAILED + 1))
-    fi
+    FAILED=$((FAILED + 1))
   fi
 done
 

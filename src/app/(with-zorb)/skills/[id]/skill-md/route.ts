@@ -15,7 +15,7 @@ export async function GET(
     return NextResponse.json({ error: "Skill not found" }, { status: 404 });
   }
 
-  const filePath = join(process.cwd(), id, "SKILL.md");
+  const filePath = join(process.cwd(), "skills", id, "SKILL.md");
 
   try {
     const content = readFileSync(filePath, "utf-8");

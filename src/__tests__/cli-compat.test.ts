@@ -3,6 +3,7 @@ import { readFileSync, readdirSync } from "fs";
 import path from "path";
 
 const ROOT = path.resolve(__dirname, "../..");
+const SKILLS_DIR = path.join(ROOT, "skills");
 
 // Valid sort options per https://cli.zora.com/llms-full.txt
 // Update this set when the Zora CLI adds new sort options.
@@ -14,18 +15,12 @@ const VALID_EXPLORE_SORTS = new Set([
   "featured",
 ]);
 
-const SKILL_DIRS = readdirSync(ROOT, { withFileTypes: true })
-  .filter(
-    (d) =>
-      d.isDirectory() &&
-      !["node_modules", "src", "public", "scripts", ".next", ".git"].includes(
-        d.name,
-      ),
-  )
+const SKILL_DIRS = readdirSync(SKILLS_DIR, { withFileTypes: true })
+  .filter((d) => d.isDirectory())
   .map((d) => d.name)
   .filter((name) => {
     try {
-      readFileSync(path.join(ROOT, name, "scripts", "run.mjs"), "utf8");
+      readFileSync(path.join(SKILLS_DIR, name, "scripts", "run.mjs"), "utf8");
       return true;
     } catch {
       return false;
@@ -49,7 +44,7 @@ function extractExploreSorts(source: string): string[] {
 
 function extractArraySorts(source: string): string[] {
   const values: string[] = [];
-  const arrayMatch = source.match(/(?:SCANS|SORTS)\s*=\s*\[([^\]]+)\]/s);
+  const arrayMatch = source.match(new RegExp("(?:SCANS|SORTS)\\s*=\\s*\\[([^\\]]+)\\]", "s"));
   if (arrayMatch) {
     for (const m of arrayMatch[1].matchAll(/(?:key:\s*)?["']([a-z-]+)["']/g)) {
       values.push(m[1]);
@@ -62,7 +57,7 @@ describe("CLI compatibility", () => {
   for (const skill of SKILL_DIRS) {
     it(`${skill}/scripts/run.mjs uses only valid explore --sort values`, () => {
       const source = readFileSync(
-        path.join(ROOT, skill, "scripts", "run.mjs"),
+        path.join(SKILLS_DIR, skill, "scripts", "run.mjs"),
         "utf8",
       );
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useId, useRef, useState } from "react";
+import { useCallback, useEffect, useId, useRef, useState } from "react";
 
 import { ArrowUpRightIcon } from "@/components/ui/arrow-up-right";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -15,6 +15,9 @@ import {
 } from "@/lib/skills";
 import { getSiteUrl } from "@/lib/site";
 import { cn } from "@/lib/utils";
+import { buttonVariants } from "@/components/ui/button-variants";
+import { AddSkillModal } from "@/components/add-skill-modal";
+import { PlusIcon, type PlusIconHandle } from "@/components/ui/plus";
 
 const PAUSE_CHAR = "\u200B";
 const PAUSE_MS = 300;
@@ -342,6 +345,57 @@ function SkillRow({
   );
 }
 
+function AddSkillCta({ onOpen, skillCount }: { onOpen: () => void; skillCount: number }) {
+  const plusRef = useRef<PlusIconHandle>(null);
+
+  return (
+    <section className="py-8 sm:py-12">
+      <div className="grid grid-cols-1 gap-5 lg:grid-cols-2 lg:gap-x-10 lg:min-h-[200px]">
+        <div className="flex flex-col gap-3">
+          <div className="flex items-start justify-between gap-4">
+            <h2 className="type-title leading-[0.98]">
+              {`${String(skillCount + 1).padStart(2, "0")}. Your Skill`}
+            </h2>
+          </div>
+          <p className="type-body-sm text-muted-foreground">
+            Build a skill that gives agents a new capability on Zora. Read-only scanners, trading strategies, portfolio tools &mdash; if it uses the Zora CLI, it belongs here.
+          </p>
+          <div className="mt-auto">
+            <button
+              type="button"
+              onClick={onOpen}
+              onMouseEnter={() => plusRef.current?.startAnimation()}
+              onMouseLeave={() => plusRef.current?.stopAnimation()}
+              className={cn(
+                "inline-flex w-full items-center justify-center gap-2 border border-border bg-background px-5 py-3 text-sm font-medium text-foreground transition-[background-color,color,border-color] duration-150",
+                "hover:border-foreground hover:bg-foreground hover:text-background",
+              )}
+            >
+              <PlusIcon ref={plusRef} size={14} />
+              Add your skill
+            </button>
+          </div>
+        </div>
+
+        <div className="flex flex-col justify-end">
+          <button
+            type="button"
+            className={cn(
+              "h-48 border border-dashed border-border/80 px-4 py-3",
+              "flex w-full items-center justify-center overflow-hidden whitespace-normal break-normal text-center transition-[border-color] duration-150 ease-out hover:border-foreground/20",
+            )}
+            onClick={onOpen}
+          >
+            <span className="type-label text-muted-foreground transition-colors hover:text-foreground">
+              what will it do?
+            </span>
+          </button>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 export function SkillsInstallList({
   skills,
   children,
@@ -359,6 +413,9 @@ export function SkillsInstallList({
     parse: (stored) => (isRuntime(stored) ? stored : "prompt"),
     serialize: (value) => value,
   });
+  const [addSkillOpen, setAddSkillOpen] = useState(false);
+  const handleOpenAddSkill = useCallback(() => setAddSkillOpen(true), []);
+  const handleCloseAddSkill = useCallback(() => setAddSkillOpen(false), []);
 
   return (
     <div className="w-full">
@@ -388,6 +445,19 @@ export function SkillsInstallList({
                 command={getInstallAllCommands(getSiteUrl())[runtime]}
               />
             </div>
+            <div className="flex items-center gap-3">
+              <button
+                type="button"
+                onClick={handleOpenAddSkill}
+                className={cn(
+                  buttonVariants({ variant: "outline" }),
+                  "w-full gap-2 px-8 sm:w-auto",
+                )}
+              >
+                <PlusIcon size={14} />
+                Add yours
+              </button>
+            </div>
           </div>
           {/* Right column: zorb from layout overlays here */}
         </div>
@@ -406,6 +476,9 @@ export function SkillsInstallList({
           />
         ))}
       </div>
+
+      <AddSkillCta onOpen={handleOpenAddSkill} skillCount={orderedSkills.length} />
+      <AddSkillModal open={addSkillOpen} onClose={handleCloseAddSkill} />
     </div>
   );
 }

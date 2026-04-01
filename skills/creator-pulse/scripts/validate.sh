@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
+cd "$(dirname "$0")/.."
 
 echo "Validating creator-pulse..."
 
@@ -24,4 +25,4 @@ echo "  ok node installed"
 node --check scripts/run.mjs >/dev/null
 echo "  ok entrypoint parses"
 
-echo "PASS: creator-pulse ready"
+echo "PASS: creator-pulse ready (read-only, no wallet needed)"

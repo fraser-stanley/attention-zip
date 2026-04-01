@@ -182,8 +182,20 @@ Step 1 — Install the Zora CLI (skip if \`zora --help\` succeeds):
 
 npm install -g @zoralabs/cli
 
-Step 2 — Install skills (read each SKILL.md and follow its instructions):
+Step 2 — Install skills:
 
+git clone --depth 1 ${getSiteRepoUrl()} /tmp/zora-skills
+mkdir -p ~/.config/zora-agent-skills
+cp -r /tmp/zora-skills/skills/* ~/.config/zora-agent-skills/
+rm -rf /tmp/zora-skills
+
+Or fetch the skill catalog programmatically:
+GET ${toAbsoluteUrl("/api/skills", siteUrl)}
+
+Or curl the bootstrap script:
+curl -sL ${toAbsoluteUrl("/install.sh", siteUrl)} | bash
+
+Individual skill docs:
 ${skillMdUrls}
 
 Step 3 — Verify the CLI works:

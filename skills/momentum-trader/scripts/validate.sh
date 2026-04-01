@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
+cd "$(dirname "$0")/.."
 
 echo "Validating momentum-trader..."
 
@@ -25,12 +26,13 @@ node --check scripts/run.mjs >/dev/null
 echo "  ok entrypoint parses"
 
 if ! zora wallet info >/dev/null 2>&1; then
-  echo "FAIL: no wallet configured. Run 'zora setup --create' or set ZORA_PRIVATE_KEY."
+  echo "FAIL: no wallet configured — this skill requires a wallet. Run 'zora setup --create' or set ZORA_PRIVATE_KEY."
+  echo "  note read-only skills (trend-scout, creator-pulse, briefing-bot) work without a wallet"
   exit 1
 fi
 echo "  ok wallet available"
 
 echo "  note run 'zora wallet export' and save the key securely"
 
-echo "PASS: momentum-trader ready"
+echo "PASS: momentum-trader ready (wallet required)"
 echo "  note live trading stays off until ZORA_MOMENTUM_LIVE=true"

@@ -4,7 +4,7 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 FAILED=0
 
-for skill in trend-scout creator-pulse briefing-bot portfolio-scout momentum-trader; do
+for skill in trend-scout creator-pulse briefing-bot portfolio-scout copy-trader momentum-trader; do
   echo "--- $skill ---"
   if (cd "$SCRIPT_DIR/skills/$skill" && bash scripts/validate.sh); then
     echo ""

@@ -358,11 +358,11 @@ function AddSkillCta({ onOpen, skillCount }: { onOpen: () => void; skillCount: n
         <div className="flex flex-col gap-3">
           <div className="flex items-start justify-between gap-4">
             <h2 className="type-title leading-[0.98]">
-              {`${String(skillCount + 1).padStart(2, "0")}. Your Skill`}
+              {`${String(skillCount + 1).padStart(2, "0")}. Your Skill `}<span role="img" aria-label="pointing at you">🫵</span>
             </h2>
           </div>
           <p className="type-body-sm text-muted-foreground">
-            Ship a skill that helps agents scan, trade, or track the Zora attention market. Open source, one PR to go live.
+            Ship a skill that helps agents scan, trade, or track the Zora attention market.
           </p>
           <div className="mt-auto">
             <button
@@ -371,8 +371,8 @@ function AddSkillCta({ onOpen, skillCount }: { onOpen: () => void; skillCount: n
               onMouseEnter={() => plusRef.current?.startAnimation()}
               onMouseLeave={() => plusRef.current?.stopAnimation()}
               className={cn(
-                "inline-flex w-full items-center justify-center gap-2 border border-border bg-background px-5 py-3 text-sm font-medium text-foreground transition-[background-color,color,border-color] duration-150",
-                "hover:border-foreground hover:bg-foreground hover:text-background",
+                buttonVariants({ variant: "default" }),
+                "w-full gap-2",
               )}
             >
               <PlusIcon ref={plusRef} size={14} />

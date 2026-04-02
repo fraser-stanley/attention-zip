@@ -111,7 +111,7 @@ function filterCoins(coins) {
 async function fetchWatchlist() {
   const results = [];
   for (const entry of WATCHLIST) {
-    const payload = await runZora(["get", entry, "--json"]);
+    const payload = await runZora(["get", "creator-coin", entry, "--json"]);
     if (!payload.error) {
       results.push(payload);
     }

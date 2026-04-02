@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useId, useRef, useState } from "react";
 
-import { ArrowUpRightIcon } from "@/components/ui/arrow-up-right";
+import { AnimatedExternalLink } from "@/components/animated-external-link";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CopyableCodeBlock } from "@/components/copyable-code-block";
 import { HighlightedCodeText } from "@/components/highlighted-code-text";
@@ -308,21 +308,25 @@ function SkillRow({
             <h2 className="type-title leading-[0.98]">
               {`${String(index + 1).padStart(2, "0")}. ${skill.name}`}
             </h2>
-            <a
+            <AnimatedExternalLink
               href={skill.githubUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="type-caption inline-flex shrink-0 items-center gap-1 font-mono text-muted-foreground transition-colors hover:text-foreground"
+              iconSize={12}
+              className="type-caption shrink-0 gap-1 font-mono text-muted-foreground transition-colors hover:text-foreground"
             >
               Source
-              <ArrowUpRightIcon size={12} />
-            </a>
+            </AnimatedExternalLink>
           </div>
-          <p className="type-body-sm text-muted-foreground">
-            {skill.longDescription}
-            {monitorSummary ? ` Checks ${monitorSummary}.` : ""}
-            {` Try: "${skill.samplePrompt}"`}
-          </p>
+          <div className="space-y-2">
+            <p className="type-body-sm text-muted-foreground">
+              {skill.longDescription}
+              {monitorSummary ? ` Checks ${monitorSummary}.` : ""}
+            </p>
+            <p>
+              <span className="inline bg-muted px-1.5 py-0.5 font-mono text-[0.8125rem] text-muted-foreground">
+                Try: &ldquo;{skill.samplePrompt}&rdquo;
+              </span>
+            </p>
+          </div>
 
           <div className="mt-auto">
             <CopyableCodeBlock
@@ -354,11 +358,11 @@ function AddSkillCta({ onOpen, skillCount }: { onOpen: () => void; skillCount: n
         <div className="flex flex-col gap-3">
           <div className="flex items-start justify-between gap-4">
             <h2 className="type-title leading-[0.98]">
-              {`${String(skillCount + 1).padStart(2, "0")}. Your Skill`}
+              {`${String(skillCount + 1).padStart(2, "0")}. Your Skill `}<span role="img" aria-label="pointing at you">🫵</span>
             </h2>
           </div>
           <p className="type-body-sm text-muted-foreground">
-            Build a skill that gives agents a new capability on Zora. Read-only scanners, trading strategies, portfolio tools &mdash; if it uses the Zora CLI, it belongs here.
+            Ship a skill that helps agents scan, trade, or track the Zora attention market.
           </p>
           <div className="mt-auto">
             <button
@@ -367,8 +371,8 @@ function AddSkillCta({ onOpen, skillCount }: { onOpen: () => void; skillCount: n
               onMouseEnter={() => plusRef.current?.startAnimation()}
               onMouseLeave={() => plusRef.current?.stopAnimation()}
               className={cn(
-                "inline-flex w-full items-center justify-center gap-2 border border-border bg-background px-5 py-3 text-sm font-medium text-foreground transition-[background-color,color,border-color] duration-150",
-                "hover:border-foreground hover:bg-foreground hover:text-background",
+                buttonVariants({ variant: "default" }),
+                "w-full gap-2",
               )}
             >
               <PlusIcon ref={plusRef} size={14} />
@@ -416,6 +420,7 @@ export function SkillsInstallList({
   const [addSkillOpen, setAddSkillOpen] = useState(false);
   const handleOpenAddSkill = useCallback(() => setAddSkillOpen(true), []);
   const handleCloseAddSkill = useCallback(() => setAddSkillOpen(false), []);
+  const heroPlusRef = useRef<PlusIconHandle>(null);
 
   return (
     <div className="w-full">
@@ -449,12 +454,14 @@ export function SkillsInstallList({
               <button
                 type="button"
                 onClick={handleOpenAddSkill}
+                onMouseEnter={() => heroPlusRef.current?.startAnimation()}
+                onMouseLeave={() => heroPlusRef.current?.stopAnimation()}
                 className={cn(
                   buttonVariants({ variant: "outline" }),
                   "w-full gap-2 px-8 sm:w-auto",
                 )}
               >
-                <PlusIcon size={14} />
+                <PlusIcon ref={heroPlusRef} size={14} />
                 Add yours
               </button>
             </div>

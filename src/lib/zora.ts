@@ -755,7 +755,7 @@ export function truncateAddress(address: string): string {
 export function coinTypeLabel(coinType: string | undefined): string {
   switch (coinType) {
     case "CONTENT": return "post";
-    case "CREATOR": return "creator-coin";
+    case "CREATOR": return "creator";
     case "TREND": return "trend";
     default: return coinType?.toLowerCase() ?? "unknown";
   }

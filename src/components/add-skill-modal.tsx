@@ -3,9 +3,9 @@
 import { useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
-import { Button } from "@/components/ui/button";
-import { CopyableCodeBlock } from "@/components/copyable-code-block";
-import { ArrowUpRightIcon } from "@/components/ui/arrow-up-right";
+import { Button, buttonVariants } from "@/components/ui/button";
+import { AnimatedExternalLink } from "@/components/animated-external-link";
+import { cn } from "@/lib/utils";
 import { SITE_REPO_URL } from "@/lib/site";
 
 interface AddSkillModalProps {
@@ -68,7 +68,6 @@ function useFocusTrap(
 
 const FORK_URL = `${SITE_REPO_URL}/fork`;
 const CONTRIBUTING_URL = `${SITE_REPO_URL}/blob/main/CONTRIBUTING.md`;
-const TREND_SCOUT_URL = `${SITE_REPO_URL}/tree/main/skills/trend-scout`;
 
 export function AddSkillModal({ open, onClose }: AddSkillModalProps) {
   const dialogRef = useRef<HTMLDivElement>(null);
@@ -115,127 +114,89 @@ export function AddSkillModal({ open, onClose }: AddSkillModalProps) {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: prefersReducedMotion ? 0 : 10 }}
               transition={{ duration }}
-              className="pointer-events-auto flex max-h-[calc(100vh-2rem)] w-full max-w-lg flex-col gap-px overflow-y-auto border border-white/10 bg-white/10 text-white shadow-2xl outline-none"
+              className="pointer-events-auto flex max-h-[calc(100vh-2rem)] w-full max-w-lg flex-col gap-0.5 overflow-y-auto bg-white/20 text-white shadow-2xl outline-none"
             >
-              <div className="bg-[#090909] px-5 py-4">
-                <div className="flex items-start justify-between gap-4">
-                  <div className="space-y-1">
-                    <h2 id="add-skill-title" className="font-display text-2xl tracking-tight sm:text-3xl">
-                      Add Your Skill
-                    </h2>
-                    <p className="type-body-sm text-white/50">
-                      Build a skill for{" "}
-                      <a
-                        href="https://cli.zora.com/"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="underline transition-colors hover:text-white"
-                      >
-                        Zora
-                      </a>
-                      .
-                    </p>
-                  </div>
+              {/* Header */}
+              <div className="flex items-center justify-between gap-4 bg-black px-5 py-4">
+                <h2 id="add-skill-title" className="font-display text-3xl leading-none tracking-tight sm:text-4xl -mb-[0.15em]">
+                  Add your skill
+                </h2>
 
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    onClick={onClose}
-                    aria-label="Close"
-                    className="border-transparent text-white/50 hover:bg-white/[0.06] hover:text-white"
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  onClick={onClose}
+                  aria-label="Close"
+                  className="border-transparent text-white/50 hover:bg-white/[0.06] hover:text-white"
+                >
+                  <svg
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
                   >
-                    <svg
-                      width="14"
-                      height="14"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <path d="M18 6 6 18" />
-                      <path d="m6 6 12 12" />
-                    </svg>
-                  </Button>
-                </div>
+                    <path d="M18 6 6 18" />
+                    <path d="m6 6 12 12" />
+                  </svg>
+                </Button>
               </div>
 
-              {/* Step 1: Fork & clone */}
-              <div className="bg-[#090909] px-5 py-4">
-                <div className="flex items-start gap-4">
-                  <span className="font-display text-4xl font-medium tracking-tight leading-none text-white/20">1</span>
-                  <div className="min-w-0 flex-1 space-y-2 pt-1">
-                    <h3 className="text-sm font-medium text-white">Fork & clone</h3>
-                    <p className="text-sm text-white/50">
-                      Start from{" "}
-                      <a
-                        href={TREND_SCOUT_URL}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1 underline transition-colors hover:text-white"
-                      >
-                        Trend Scout
-                        <ArrowUpRightIcon size={12} />
-                      </a>
-                      {" "}&mdash; the simplest skill.
-                    </p>
-                    <CopyableCodeBlock
-                      command={`git clone ${SITE_REPO_URL}.git`}
-                      className="border-white/10 bg-white/[0.04] hover:border-white/20 hover:bg-white/[0.07] [&_span]:text-white/40"
-                    />
+              {/* Steps */}
+              <div className="bg-black px-5 py-5 space-y-5">
+                <div className="grid grid-cols-[3.5rem_1fr] items-center gap-4">
+                  <span className="font-display text-3xl tracking-tight text-white sm:text-4xl">01.</span>
+                  <div>
+                    <p className="type-label text-white">Fork the repo</p>
+                    <p className="type-caption font-mono text-[#808080] mt-0.5">Use the button below</p>
                   </div>
                 </div>
-              </div>
-
-              {/* Step 2: Add your skill */}
-              <div className="bg-[#090909] px-5 py-4">
-                <div className="flex items-start gap-4">
-                  <span className="font-display text-4xl font-medium tracking-tight leading-none text-white/20">2</span>
-                  <div className="min-w-0 flex-1 space-y-2 pt-1">
-                    <h3 className="text-sm font-medium text-white">Add your skill directory</h3>
-                    <p className="text-sm text-white/50">
-                      Drop a <code className="rounded bg-white/10 px-1 py-0.5 text-white/80">SKILL.md</code> in <code className="rounded bg-white/10 px-1 py-0.5 text-white/80">skills/your-skill/</code>. That&apos;s the only required file.{" "}
-                      <a
+                <div className="grid grid-cols-[3.5rem_1fr] items-center gap-4">
+                  <span className="font-display text-3xl tracking-tight text-white sm:text-4xl">02.</span>
+                  <div>
+                    <p className="type-label text-white">Add your skill</p>
+                    <p className="type-caption font-mono text-[#808080] mt-0.5">
+                      Drop a{" "}
+                      <code className="bg-white/[0.08] px-1 py-0.5 text-white/80">SKILL.md</code>
+                      {" "}in{" "}
+                      <code className="bg-white/[0.08] px-1 py-0.5 text-white/80">skills/your-skill/</code>
+                      {" "}
+                      <AnimatedExternalLink
                         href={CONTRIBUTING_URL}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1 underline transition-colors hover:text-white"
+                        iconSize={10}
+                        className="gap-0.5 text-white underline transition-colors hover:text-white/70"
                       >
-                        See the spec
-                        <ArrowUpRightIcon size={12} />
-                      </a>
+                        Spec
+                      </AnimatedExternalLink>
                     </p>
                   </div>
                 </div>
-              </div>
-
-              {/* Step 3: Open a PR */}
-              <div className="bg-[#090909] px-5 py-4">
-                <div className="flex items-start gap-4">
-                  <span className="font-display text-4xl font-medium tracking-tight leading-none text-white/20">3</span>
-                  <div className="min-w-0 flex-1 space-y-2 pt-1">
-                    <h3 className="text-sm font-medium text-white">Open a PR</h3>
-                    <p className="text-sm text-white/50">We&apos;ll review your PR. Make sure the merge gate passes.</p>
-                    <CopyableCodeBlock
-                      command="pnpm lint && pnpm typecheck && pnpm test && pnpm build"
-                      className="border-white/10 bg-white/[0.04] hover:border-white/20 hover:bg-white/[0.07] [&_span]:text-white/40"
-                    />
+                <div className="grid grid-cols-[3.5rem_1fr] items-center gap-4">
+                  <span className="font-display text-3xl tracking-tight text-white sm:text-4xl">03.</span>
+                  <div>
+                    <p className="type-label text-white">Submit a pull request</p>
+                    <p className="type-caption font-mono text-[#808080] mt-0.5">We&apos;ll review and add it if it meets our standards</p>
                   </div>
                 </div>
               </div>
 
-              {/* Fork CTA */}
+              {/* CTA */}
               <a
                 href={FORK_URL}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center justify-center gap-2 bg-white py-3.5 text-sm font-medium text-black transition-colors hover:bg-white/85"
+                className={cn(
+                  buttonVariants({ variant: "default", size: "lg" }),
+                  "w-full rounded-none border-0 bg-white text-black hover:bg-white/85 hover:text-black",
+                )}
               >
                 <svg
-                  width="16"
-                  height="16"
+                  width="14"
+                  height="14"
                   viewBox="0 0 24 24"
                   fill="currentColor"
                   aria-hidden="true"

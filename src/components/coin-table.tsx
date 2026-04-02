@@ -243,8 +243,8 @@ export function CoinTable({
       {/* Header */}
       <div
         className={cn(
-          "type-label border-b border-border/70 px-4 py-3 font-mono text-muted-foreground",
-          gridCols, "grid w-full gap-4", minWidth
+          "type-label border-b border-border/70 px-4 py-2 font-mono text-muted-foreground",
+          gridCols, "grid w-full gap-3", minWidth
         )}
       >
         <span>Rank</span>
@@ -279,7 +279,7 @@ export function CoinTable({
             }}
             className={cn(
               "group relative min-h-[44px] cursor-pointer items-center border-b border-border/70 px-4 py-2 last:border-b-0",
-              gridCols, "grid w-full gap-4", minWidth,
+              gridCols, "grid w-full gap-3", minWidth,
               isFlash ? "text-black" : "",
               !isFlash && isSelected ? "bg-foreground text-background" : "",
               !isFlash && !isSelected ? "hover:bg-muted/35" : ""
@@ -319,12 +319,15 @@ export function CoinTable({
 
             {/* Type (dashboard only) */}
             {!compact && (
-              <div
-                className={cn(
-                  isFlash ? "text-black/60" : isSelected ? "text-background/60" : "text-muted-foreground"
-                )}
-              >
-                {coinTypeLabel(coin.coinType)}
+              <div>
+                <span
+                  className={cn(
+                    "inline-flex items-center truncate px-1.5 py-0.5",
+                    isFlash ? "text-black/60" : isSelected ? "text-background/60" : "bg-muted text-muted-foreground"
+                  )}
+                >
+                  {coinTypeLabel(coin.coinType)}
+                </span>
               </div>
             )}
 
@@ -332,7 +335,7 @@ export function CoinTable({
             <div className="text-right">
               <TextMorph
                 className={cn(
-                  "inline-flex px-1.5 py-0.5",
+                  "inline-flex tabular-nums",
                   isFlash ? "text-black/72" : isSelected ? "text-background/80" : "text-muted-foreground"
                 )}
               >
@@ -344,7 +347,7 @@ export function CoinTable({
             <div className="text-right">
               <TextMorph
                 className={cn(
-                  "inline-flex px-1.5 py-0.5",
+                  "inline-flex tabular-nums",
                   isFlash ? "text-black/72" : isSelected ? "text-background/80" : "text-muted-foreground"
                 )}
               >

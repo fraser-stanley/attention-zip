@@ -52,9 +52,9 @@ export function DashboardTabs({
   return (
     <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as SortOption)} className="gap-0">
       <div className="overflow-hidden border border-border bg-card">
-        <div className="border-b border-border bg-muted p-1">
+        <div className="flex flex-col gap-2 border-b border-border bg-muted p-1 sm:flex-row sm:items-center sm:justify-between">
           <TabsList
-            className="grid w-full grid-cols-4 bg-transparent p-0 sm:w-auto sm:grid-cols-7"
+            className="grid w-full grid-cols-2 bg-transparent p-0 sm:w-auto sm:grid-cols-7"
           >
             {TAB_DEFS.map((tab) => {
               const Icon = ICON_COMPONENTS[tab.value];

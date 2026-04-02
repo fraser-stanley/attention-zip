@@ -328,7 +328,7 @@
 }
 
 @utility terminal-board-cols {
-  grid-template-columns: 4rem minmax(0, 1.5fr) 1fr 1fr 0.9fr;
+  grid-template-columns: 3rem minmax(0, 1.8fr) 1fr 1fr 1fr;
 }
 
 @utility terminal-board-cols-trader {
@@ -336,7 +336,7 @@
 }
 
 @utility terminal-board-cols-dashboard {
-  grid-template-columns: 3rem minmax(0, 1.5fr) minmax(0, 1fr) 5rem 1fr 1fr 0.9fr;
+  grid-template-columns: 3rem minmax(10rem, 1.8fr) minmax(0, 0.7fr) minmax(0, 0.5fr) 1fr 1fr 1fr;
 }
 
 @utility terminal-board-cols-positions {

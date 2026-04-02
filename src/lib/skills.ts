@@ -302,7 +302,7 @@ Action: Rebalance \`jacob\` to reduce single-asset exposure. Portfolio is ETH-he
     description:
       "Follows public wallets and mirrors their trades. Dry run by default.",
     longDescription:
-      "Follow wallets you choose, or import top traders from the Zora leaderboard. Mirrors buys, trims, and exits with spend caps and freshness checks.",
+      "Follow wallets you choose, or import top traders from the Zora leaderboard. Mirrors buys, partial sells, and full exits with spend caps and freshness checks.",
     category: "trading",
     difficulty: "advanced",
     risk: "medium",
@@ -315,12 +315,12 @@ Action: Rebalance \`jacob\` to reduce single-asset exposure. Portfolio is ETH-he
       "risk-controls",
     ],
     monitors: [
-      "Source wallet moves",
-      "Stale copy skips",
-      "Price-drift checks",
+      "Source wallet trades",
+      "Stale trade skips",
+      "Price drift checks",
       "Position concentration",
-      "Duplicate suppression",
-      "State reconciliation",
+      "Duplicate trade prevention",
+      "Portfolio reconciliation",
     ],
     commands: [
       "node scripts/run.mjs",

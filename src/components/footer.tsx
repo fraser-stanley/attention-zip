@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { SITE_REPO_URL } from "@/lib/site";
-import { ArrowUpRightIcon } from "@/components/ui/arrow-up-right";
+import { AnimatedExternalLink } from "@/components/animated-external-link";
 import { FooterLogoButton } from "@/components/footer-logo-button";
 
 const columns = [
@@ -38,16 +38,14 @@ export function Footer() {
                 {col.links.map((link) => (
                   <li key={link.label}>
                     {"external" in link && link.external ? (
-                      <a
+                      <AnimatedExternalLink
                         href={link.href}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="type-caption inline-flex items-center gap-1 font-mono text-background/70 transition-colors duration-150 hover:text-background"
+                        iconSize={12}
+                        srLabel="(opens in new tab)"
+                        className="type-caption gap-1 font-mono text-background/70 transition-colors duration-150 hover:text-background"
                       >
                         {link.label}
-                        <ArrowUpRightIcon aria-hidden="true" size={12} />
-                        <span className="sr-only">(opens in new tab)</span>
-                      </a>
+                      </AnimatedExternalLink>
                     ) : (
                       <Link
                         href={link.href}

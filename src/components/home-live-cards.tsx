@@ -241,7 +241,7 @@ export function HomeLiveCardsSkeleton() {
 
       <div className="overflow-x-auto">
         <div className="min-w-[44rem] px-4 py-3">
-          <div className="terminal-board-cols type-label mb-3 grid w-full gap-4 text-muted-foreground/70">
+          <div className="terminal-board-cols type-label mb-3 grid w-full gap-3 text-muted-foreground/70">
             <span>Rank</span>
             <span>Coin</span>
             <span className="text-right">Mcap</span>
@@ -318,7 +318,7 @@ function TerminalRow({
       }}
       className={cn(
         "group relative min-h-[44px] cursor-pointer items-center border-b border-border/70 px-4 py-2 last:border-b-0",
-        "terminal-board-cols grid min-w-[44rem] w-full gap-4",
+        "terminal-board-cols grid min-w-[44rem] w-full gap-3",
         isFlash ? "text-black" : "",
         !isFlash && isSelected ? "bg-foreground text-background" : "",
         !isFlash && !isSelected ? "hover:bg-muted/35" : ""
@@ -344,7 +344,7 @@ function TerminalRow({
       <div className="text-right">
         <TextMorph
           className={cn(
-            "type-body-sm inline-flex rounded-sm px-1.5 py-0.5",
+            "type-body-sm inline-flex tabular-nums",
             isFlash ? "text-black/72" : isSelected ? "text-background/80" : "text-muted-foreground"
           )}
         >
@@ -354,7 +354,7 @@ function TerminalRow({
       <div className="text-right">
         <TextMorph
           className={cn(
-            "type-body-sm inline-flex rounded-sm px-1.5 py-0.5",
+            "type-body-sm inline-flex tabular-nums",
             isFlash ? "text-black/72" : isSelected ? "text-background/80" : "text-muted-foreground"
           )}
         >
@@ -551,8 +551,8 @@ export function HomeLiveCards({
                   )}
                   <div
                     className={cn(
-                      "type-label border-b border-border/70 px-4 py-3 text-muted-foreground",
-                      "terminal-board-cols grid min-w-[44rem] w-full gap-4"
+                      "type-label border-b border-border/70 px-4 py-2 text-muted-foreground",
+                      "terminal-board-cols grid min-w-[44rem] w-full gap-3"
                     )}
                   >
                     <span>Rank</span>

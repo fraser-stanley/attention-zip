@@ -700,7 +700,7 @@ describe("managed skill entrypoints", { timeout: 30_000 }, () => {
         "8",
         "--json",
       ])]: [{ coins: [jacob] }, { coins: [jacob] }],
-      [keyOf(["get", "jacob", "--json"])]: [
+      [keyOf(["get", "creator-coin", "jacob", "--json"])]: [
         {
           ...jacob,
           volume24h: "100000",

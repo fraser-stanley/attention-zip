@@ -40,9 +40,9 @@ The default schedule is `0 9,21 * * *`. Adjust it if your agent already has anot
 
 ```bash
 node scripts/run.mjs
-zora explore --sort trending --limit 5 --json
-zora explore --sort volume --limit 5 --json
-zora explore --sort new --limit 5 --json
+zora explore --sort trending --type all --limit 5 --json
+zora explore --sort volume --type all --limit 5 --json
+zora explore --sort new --type all --limit 5 --json
 zora balance --json
 zora price-history <identifier> --interval 1w --json
 ```

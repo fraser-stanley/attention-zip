@@ -53,8 +53,8 @@ Schedule: every 10 minutes. Keep `autostart` off until dry-run output is correct
 
 ```bash
 node scripts/run.mjs
-zora explore --sort volume --limit 12 --json
-zora explore --sort trending --limit 12 --json
+zora explore --sort volume --type all --limit 12 --json
+zora explore --sort trending --type all --limit 12 --json
 zora get <identifier> --json
 zora balance coins --sort usd-value --limit 20 --json
 zora buy <identifier> --eth <amount> --quote --json
@@ -65,9 +65,9 @@ zora price-history <identifier> --interval 24h --json
 
 ## How It Works
 
-Loads state, refreshes positions, runs exits first (stop-loss, take-profit, trailing stop). Every exit logs to `journal.jsonl`.
+Loads state, refreshes positions, runs exits first (stop-loss, take-profit, trailing stop). Exits log to `journal.jsonl`.
 
-New entries run after cooldown, position, and daily cap checks. Pulls volume and trending, filters by gain and volume, drops flip-flop blocked coins, resolves addresses, quotes up to 5 candidates. Dry run stops at the quote. Live mode enters the top pick.
+After cooldown/position/cap checks, pulls volume and trending, filters by gain and volume, drops flip-flop coins, quotes up to 5 candidates. Dry run stops at the quote. Live mode enters the top pick.
 
 ### Decision Rules
 
@@ -81,6 +81,7 @@ New entries run after cooldown, position, and daily cap checks. Pulls volume and
 | Daily ETH cap reached | Block new entries |
 | Candidate in flip-flop cooldown | Skip candidate |
 | Quote slippage > threshold | Skip candidate |
+| Coin is platform-blocked | Skip candidate, log "blocked" |
 
 ## Example Output
 
@@ -114,13 +115,13 @@ Candidates (3 evaluated, 1 filtered by slippage):
 
 ### Mandates
 
-- NEVER enable live mode without reviewing dry-run output first, unless the user explicitly asks to skip dry-run.
+- NEVER enable live mode without reviewing dry-run output first, unless the user explicitly asks.
 - NEVER raise daily cap beyond the user's stated risk tolerance.
-- ALWAYS run exits before scanning for new entries. Quote before executing.
+- ALWAYS run exits before new entries. Quote before executing.
 - Use a dedicated wallet.
-- ALWAYS use the Zora CLI for market data. Do not scrape zora.co or call Zora APIs directly.
+- Use the Zora CLI for all market data.
 
-The user has final say. If they explicitly override a mandate, respect their decision.
+The user has final say on overrides.
 
 ### Anti-Patterns
 
@@ -130,3 +131,4 @@ The user has final say. If they explicitly override a mandate, respect their dec
 | Raising daily cap to chase momentum | Amplifies losses on reversal |
 | Skipping exits to hold longer | Defeats the stop-loss safety model |
 | Re-entering a flip-flop blocked coin | Churn erodes balance to fees |
+| Buying platform-blocked coins | Trade will fail; sell/send still works for exiting |

@@ -72,6 +72,7 @@ The script loads the last source snapshot, looks up source wallets, optionally p
 | Daily spend cap reached | Block all entries |
 | Position count at max | Block new entries |
 | Reconciliation mismatch detected | Halt entries, log safety event |
+| Target coin is platform-blocked | Skip entry, log "blocked" (sell/send still works for exits) |
 
 ## Example Output
 
@@ -121,3 +122,4 @@ The user has final say. If they explicitly override a mandate, respect their dec
 | Raising daily cap to chase a run | Amplifies losses on reversal |
 | Ignoring reconciliation mismatches | Trades against stale state |
 | Copying without confirming source swap | Follows phantom deltas |
+| Copying buys into blocked coins | Buy will fail; only sell/send allowed for exiting positions |

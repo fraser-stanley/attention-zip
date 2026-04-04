@@ -286,6 +286,22 @@ describe("CLI compatibility", () => {
         }
       },
     );
+
+    it.each(SKILL_DIRS)(
+      "%s/scripts/run.mjs passes --json on all zora CLI calls",
+      (id) => {
+        const script = fs.readFileSync(
+          path.join(SKILLS_DIR, id, "scripts", "run.mjs"),
+          "utf8",
+        );
+        const zoraCallBlocks = script.matchAll(
+          /runZora\(\[[\s\S]*?\]\)/g,
+        );
+        for (const match of zoraCallBlocks) {
+          expect(match[0]).toContain('"--json"');
+        }
+      },
+    );
   });
 });
 

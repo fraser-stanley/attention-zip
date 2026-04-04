@@ -33,6 +33,7 @@ Use this skill when the user asks for:
 | --------------------------------- | ------- | ---------------------------------- |
 | `ZORA_BRIEFING_LIMIT`             | `5`     | Rows fetched per market scan       |
 | `ZORA_BRIEFING_INCLUDE_PORTFOLIO` | `true`  | Toggles the wallet overlap section |
+| `ZORA_BRIEFING_HISTORY_INTERVAL`  | `1w`    | Price history interval for trend annotation (1h, 24h, 1w, 1m) |
 
 The default schedule is `0 9,21 * * *`. Adjust it if your agent already has another cadence.
 
@@ -51,6 +52,8 @@ zora price-history <identifier> --interval 1w --json
 
 Three market scans run through the CLI. The ids from each table go into `~/.config/zora-agent-skills/briefing-bot/state.json`. Next run, the `new` table is compared against the previous snapshot so the briefing can say what launched since last time.
 
+After the scans, the script runs `zora price-history <address> --interval 1w --json` on each coin that appears in the trending or volume tables. The JSON `change` field (fractional, e.g. 0.15 = +15%) is used to annotate each coin with a direction and weekly change percentage so the briefing shows whether momentum is sustained or fading.
+
 When `ZORA_BRIEFING_INCLUDE_PORTFOLIO=true`, the script also runs `zora balance --json`. No wallet configured? The briefing still runs and notes the overlap check was skipped.
 
 ## Example Output
@@ -59,14 +62,19 @@ When `ZORA_BRIEFING_INCLUDE_PORTFOLIO=true`, the script also runs `zora balance 
 Zora Briefing
 Run at 2026-03-23T09:00:00Z
 
-Trending: looksmaxxing leads at $2.3M, +12.3%.
-Volume: frog market leads at $3.1M volume.
+Trending:
+- looksmaxxing, $2.3M mcap, +12.3% 24h, 1w trend: +38.2%
+- hyperpop, $890K mcap, +8.1% 24h, 1w trend: -14.5%
+
+Volume:
+- frog market, $3.1M volume, 1w trend: +22.0%
+
 New: 3 fresh launches since the last run, largest is $45K.
 
 Portfolio overlap:
-- looksmaxxing is both held and active in the market scans
+- looksmaxxing is both held and trending (1w: +38.2%)
 
-Assessment: Active tape. Momentum is broad enough to watch closely.
+Assessment: Active tape. looksmaxxing momentum is sustained; hyperpop trending but declining — watch for reversal.
 ```
 
 ## Troubleshooting

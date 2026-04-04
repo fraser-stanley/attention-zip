@@ -211,6 +211,37 @@ describe.each(SKILL_DIRS)("%s/SKILL.md", (skill) => {
         expect(line).toContain("--json");
       }
     });
+
+    it("price-history --interval values are valid", () => {
+      const VALID_INTERVALS = ["1h", "24h", "1w", "1m", "ALL"];
+      const lines = codeContent
+        .split("\n")
+        .filter((line) => line.includes("zora price-history") && line.includes("--interval"));
+      for (const line of lines) {
+        const match = line.match(/--interval\s+(\S+)/);
+        if (match && !match[1].startsWith("<")) {
+          expect(VALID_INTERVALS).toContain(match[1]);
+        }
+      }
+    });
+
+    it("profile commands use --json", () => {
+      const lines = codeContent
+        .split("\n")
+        .filter((line) => line.includes("zora profile"));
+      for (const line of lines) {
+        expect(line).toContain("--json");
+      }
+    });
+
+    it("price-history commands use --json", () => {
+      const lines = codeContent
+        .split("\n")
+        .filter((line) => line.includes("zora price-history"));
+      for (const line of lines) {
+        expect(line).toContain("--json");
+      }
+    });
   });
 });
 

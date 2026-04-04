@@ -165,6 +165,24 @@ describe("troubleshooting addresses real user problems", () => {
     const troubleshooting = getSection(body, "## Troubleshooting");
     expect(troubleshooting).toMatch(/[Ww]rong wallet/);
   });
+
+  it.each(["momentum-trader", "copy-trader"])(
+    "%s troubleshooting covers CLI revert error 'Price moved too much'",
+    (id) => {
+      const body = getBody(readSkillMd(id));
+      const troubleshooting = getSection(body, "## Troubleshooting");
+      expect(troubleshooting).toMatch(/[Pp]rice moved too much/);
+    },
+  );
+
+  it.each(["momentum-trader", "copy-trader"])(
+    "%s troubleshooting covers CLI revert error 'Not enough liquidity'",
+    (id) => {
+      const body = getBody(readSkillMd(id));
+      const troubleshooting = getSection(body, "## Troubleshooting");
+      expect(troubleshooting).toMatch(/[Nn]ot enough liquidity/);
+    },
+  );
 });
 
 // ---------------------------------------------------------------------------

@@ -2020,7 +2020,7 @@ describe("managed skill entrypoints", { timeout: 30_000 }, () => {
       copiedPositions: {},
       processedActions: {
         [`${txHash}:${sourceWallet.toLowerCase()}:${coinAddress.toLowerCase()}:BUY`]: {
-          seenAt: "2026-03-27T12:10:00.000Z",
+          seenAt: new Date(Date.now() - 60 * 60 * 1000).toISOString(),
           txHash,
           sourceWallet,
           coinAddress,

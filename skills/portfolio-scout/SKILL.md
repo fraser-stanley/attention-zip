@@ -35,6 +35,7 @@ Use this skill when the user asks for:
 | `ZORA_PORTFOLIO_LIMIT`                   | `20`    | Max tracked coin positions                         |
 | `ZORA_PORTFOLIO_CONCENTRATION_ALERT_PCT` | `35`    | Alert when one position exceeds this share         |
 | `ZORA_PORTFOLIO_DRAWNDOWN_ALERT_PCT`     | `15`    | Alert on run-to-run value drops above this percent |
+| `ZORA_PORTFOLIO_TREND_INTERVAL`          | `1w`    | Price history interval for trend analysis (1h, 24h, 1w, 1m) |
 
 The schedule is every 4 hours. Keep it on a dedicated wallet for the cleanest history.
 
@@ -46,13 +47,14 @@ zora balance --json
 zora balance spendable --json
 zora balance coins --sort usd-value --limit 20 --json
 zora balance coins --sort price-change --limit 20 --json
+zora price-history <identifier> --interval 1w --json
 ```
 
 ## How It Works
 
 `zora balance --json` returns spendable balances and coin positions. The script stores tracked positions and total value in `~/.config/zora-agent-skills/portfolio-scout/state.json`.
 
-Next run, it diffs the current snapshot against saved state: new positions, closed positions, concentration risk, run-to-run drawdowns. All local, no external service.
+Next run, it diffs the current snapshot against saved state: new positions, closed positions, concentration risk, run-to-run drawdowns. For the top positions by USD value, it also runs `zora price-history <address> --interval 1w --json`. If a position's weekly `change` is negative and exceeds the drawdown alert threshold, it is flagged as a sustained decline — distinct from a single-run dip. When history is unavailable (e.g. the coin is too new), the alert falls back to run-to-run comparison. All local, no external service.
 
 ## Example Output
 
@@ -65,11 +67,12 @@ Spendable:
 - 183.20 USDC
 
 Coin positions:
-1. jacob, $4,120.00, 68.1% of tracked coin value
-2. looksmaxxing, $1,150.00, 19.0% of tracked coin value
+1. jacob, $4,120.00, 68.1% of tracked coin value, 1w: +12.3%
+2. looksmaxxing, $1,150.00, 19.0% of tracked coin value, 1w: -22.8%
 
 Alerts:
 - Concentration warning: jacob is above the 35% threshold
+- Sustained decline: looksmaxxing down 22.8% over 1w (exceeds 15% drawdown threshold)
 - based penguin is no longer held
 ```
 
@@ -82,6 +85,8 @@ Concentration warning too sensitive? Raise `ZORA_PORTFOLIO_CONCENTRATION_ALERT_P
 Positions vanishing? Make sure the wallet is the one you expect. Portfolio Scout reports what the CLI sees for the active wallet source.
 
 Want to check someone else's wallet? Use the API or SDK. `zora balance` reads only the local wallet.
+
+Trend data missing for some coins? The coin may be too new for the selected interval. The alert falls back to run-to-run comparison when history is unavailable.
 
 ## Important Notes
 

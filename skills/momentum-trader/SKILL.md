@@ -18,8 +18,8 @@ Use this skill when the user asks for:
 
 - Recurring momentum scans and entries
 - Dry-run candidate scans before going live
-- Stop-loss, take-profit, or trailing-stop management
-- A flip-flop guard blocking re-entry into recently exited coins
+- Stop-loss, take-profit, or trailing-stop exits
+- Flip-flop guard blocking re-entry into exited coins
 
 ## Setup
 
@@ -47,7 +47,7 @@ Use this skill when the user asks for:
 | `ZORA_MOMENTUM_FLIPFLOP_RUNS`        | `3`     | Re-entry block duration (runs)           |
 | `ZORA_MOMENTUM_MAX_QUOTE_SLIPPAGE_PCT` | `5`  | Skip above this slippage                 |
 
-Schedule: every 10 minutes. Keep `autostart` off until dry-run output is correct.
+Schedule: every 10 minutes. Keep `autostart` off until dry-run looks right.
 
 ## Commands
 
@@ -61,27 +61,28 @@ zora buy <identifier> --eth <amount> --quote --json
 zora buy <identifier> --eth <amount> --slippage <pct> --json --yes
 zora sell <identifier> --percent 100 --to eth --slippage <pct> --json --yes
 zora price-history <identifier> --interval 24h --json
+zora profile <identifier> --json
 ```
 
 ## How It Works
 
-Loads state, refreshes positions, runs exits first (stop-loss, take-profit, trailing stop). Exits log to `journal.jsonl`.
+Loads state, refreshes positions, runs exits first. Exits log to `journal.jsonl`.
 
-After cooldown/position/cap checks, pulls volume and trending, filters by gain and volume, drops flip-flop coins, quotes up to 5 candidates. Dry run stops at the quote. Live mode enters the top pick.
+After cooldown/position/cap checks, pulls volume and trending, filters by gain and volume, drops flip-flop coins, quotes up to 5. `zora profile` can check creator history to deprioritize unproven creators. Dry run stops at the quote. Live enters the top pick.
 
 ### Decision Rules
 
 | Condition | Action |
 | --- | --- |
-| Price below stop-loss from entry | Exit immediately, log reason |
-| Price above take-profit from entry | Exit immediately, log reason |
-| Price below trailing stop from peak | Exit immediately, log reason |
-| Cooldown timer not elapsed | Block new entries |
+| Price below stop-loss | Exit, log reason |
+| Price above take-profit | Exit, log reason |
+| Price below trailing stop | Exit, log reason |
+| Cooldown not elapsed | Block new entries |
 | Position count at max | Block new entries |
 | Daily ETH cap reached | Block new entries |
-| Candidate in flip-flop cooldown | Skip candidate |
+| Flip-flop cooldown active | Skip candidate |
 | Quote slippage > threshold | Skip candidate |
-| Coin is platform-blocked | Skip candidate, log "blocked" |
+| Coin is platform-blocked | Skip candidate |
 
 ## Example Output
 
@@ -90,36 +91,38 @@ Momentum Trader
 Run at 2026-03-23T13:40:00Z
 Mode: dry-run
 
-Open positions tracked: 1
-- looksmaxxing, entry $0.000210, peak $0.000240, current $0.000170
-  Stop-loss fired: price $0.000170 is 19.0% below entry $0.000210
+Positions: 1
+- looksmaxxing, entry $0.000210, peak $0.000240, now $0.000170
+  Stop-loss fired: -19.0% below entry
 
-Candidates (3 evaluated, 1 filtered by slippage):
-- Skipped FROGCOIN: exited recently (flip-flop guard)
+Candidates (3 evaluated, 1 filtered):
+- Skipped FROGCOIN: flip-flop guard
 1. hyperpop, +28.3%, $210K volume, slippage 1.2%
    Quote: 0.01 ETH -> 263 HYPERPOP
-   Action: dry-run only, no order sent
+   Action: dry-run, no order sent
 ```
 
 ## Troubleshooting
 
 | Symptom | Cause | Fix |
 | --- | --- | --- |
-| No candidates showing | Filters too tight | Lower `MIN_GAIN_PCT` or `MIN_VOLUME_USD` |
-| "Invalid address" on buy/sell | Name not resolved | Run `zora get <name> --json` first |
-| Quotes failing | Size too large for liquidity | Reduce `MAX_ETH` before loosening slippage |
-| Wrong wallet in live mode | Env misconfiguration | Unset `ZORA_MOMENTUM_LIVE` immediately, rerun dry |
-| Coin keeps getting skipped | Flip-flop cooldown active | Lower `FLIPFLOP_RUNS` or wait it out |
+| No candidates | Filters too tight | Lower `MIN_GAIN_PCT` or `MIN_VOLUME_USD` |
+| "Invalid address" | Name not resolved | Run `zora get <name> --json` first |
+| Quotes failing | Low liquidity | Reduce `MAX_ETH` |
+| Wrong wallet in live mode | Env misconfiguration | Unset `ZORA_MOMENTUM_LIVE`, rerun dry |
+| Coin keeps getting skipped | Flip-flop cooldown | Lower `FLIPFLOP_RUNS` or wait |
+| "Price moved too much" on buy | Slippage exceeded | Bump `MAX_SLIPPAGE_PCT` by 1-2%, or reduce `MAX_ETH` |
+| "Not enough liquidity" on buy | Pool too shallow | Reduce `MAX_ETH`; do not loosen slippage |
+| "Not enough funds" on buy | Cap or wallet depleted | Check `zora balance spendable`; wait for next window |
 
 ## Important Notes
 
 ### Mandates
 
-- NEVER enable live mode without reviewing dry-run output first, unless the user explicitly asks.
-- NEVER raise daily cap beyond the user's stated risk tolerance.
-- ALWAYS run exits before new entries. Quote before executing.
+- NEVER enable live mode without reviewing dry-run first, unless the user asks.
+- NEVER raise daily cap beyond stated risk tolerance.
+- ALWAYS run exits before entries. Quote before executing.
 - Use a dedicated wallet.
-- Use the Zora CLI for all market data.
 
 The user has final say on overrides.
 
@@ -129,6 +132,6 @@ The user has final say on overrides.
 | --- | --- |
 | Loosening slippage to force fills | Overpays on illiquid coins |
 | Raising daily cap to chase momentum | Amplifies losses on reversal |
-| Skipping exits to hold longer | Defeats the stop-loss safety model |
-| Re-entering a flip-flop blocked coin | Churn erodes balance to fees |
-| Buying platform-blocked coins | Trade will fail; sell/send still works for exiting |
+| Skipping exits to hold longer | Defeats stop-loss model |
+| Re-entering flip-flop blocked coin | Churn erodes balance |
+| Buying platform-blocked coins | Trade will fail |

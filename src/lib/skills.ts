@@ -262,6 +262,7 @@ Assessment: Active tape. Momentum is broad enough to watch closely.`,
       "zora balance spendable --json",
       "zora balance coins --sort usd-value --limit 20 --json",
       "zora balance coins --sort price-change --limit 20 --json",
+      "zora price-history <identifier> --interval 1w --json",
     ],
     requires: {
       bins: ["zora", "node"],
@@ -330,6 +331,7 @@ Action: Rebalance \`jacob\` to reduce single-asset exposure. Portfolio is ETH-he
       "zora sell <address> --percent <pct> --to <asset> --slippage <pct> --json --yes",
       "zora balance --json",
       "zora balance coins --sort usd-value --limit 20 --json",
+      "zora price-history <identifier> --interval 1h --json",
     ],
     requires: {
       bins: ["zora", "node"],
@@ -392,6 +394,7 @@ Next: Set ZORA_COPYTRADE_LIVE=true to execute.`,
       "zora buy <identifier> --eth <amount> --slippage <pct> --json --yes",
       "zora sell <identifier> --percent 100 --to eth --slippage <pct> --json --yes",
       "zora price-history <identifier> --interval 24h --json",
+      "zora profile <identifier> --json",
     ],
     requires: {
       bins: ["zora", "node"],

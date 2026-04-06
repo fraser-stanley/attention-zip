@@ -60,7 +60,6 @@ When `ZORA_BRIEFING_INCLUDE_PORTFOLIO=true`, the script also runs `zora balance 
 
 ```text
 Zora Briefing
-Run at 2026-03-23T09:00:00Z
 
 Trending:
 - looksmaxxing, $2.3M mcap, +12.3% 24h, 1w trend: +38.2%

@@ -349,52 +349,31 @@ function SkillRow({
   );
 }
 
-function AddSkillCta({ onOpen, skillCount }: { onOpen: () => void; skillCount: number }) {
+function AddSkillCta({ onOpen }: { onOpen: () => void }) {
   const plusRef = useRef<PlusIconHandle>(null);
 
   return (
     <section className="py-8 sm:py-12">
-      <div className="grid grid-cols-1 gap-5 lg:grid-cols-2 lg:gap-x-10 lg:min-h-[200px]">
-        <div className="flex flex-col gap-3">
-          <div className="flex items-start justify-between gap-4">
-            <h2 className="type-title leading-[0.98]">
-              {`${String(skillCount + 1).padStart(2, "0")}. Your Skill `}<span role="img" aria-label="pointing at you">🫵</span>
-            </h2>
-          </div>
-          <p className="type-body-sm text-muted-foreground">
-            Ship a skill that helps agents scan, trade, or track the Zora attention market.
-          </p>
-          <div className="mt-auto">
-            <button
-              type="button"
-              onClick={onOpen}
-              onMouseEnter={() => plusRef.current?.startAnimation()}
-              onMouseLeave={() => plusRef.current?.stopAnimation()}
-              className={cn(
-                buttonVariants({ variant: "default" }),
-                "w-full gap-2",
-              )}
-            >
-              <PlusIcon ref={plusRef} size={14} />
-              Add your skill
-            </button>
-          </div>
-        </div>
-
-        <div className="flex flex-col justify-end">
-          <button
-            type="button"
-            className={cn(
-              "h-48 border border-dashed border-border/80 px-4 py-3",
-              "flex w-full items-center justify-center overflow-hidden whitespace-normal break-normal text-center transition-[border-color] duration-150 ease-out hover:border-foreground/20",
-            )}
-            onClick={onOpen}
-          >
-            <span className="type-label text-muted-foreground transition-colors hover:text-foreground">
-              what will it do?
-            </span>
-          </button>
-        </div>
+      <div className="mx-auto flex max-w-md flex-col items-center gap-3 text-center">
+        <h2 className="type-title leading-[0.98]">
+          Add your skill
+        </h2>
+        <p className="type-body-sm text-muted-foreground">
+          Ship a skill that helps agents scan, trade, or track the Zora attention market.
+        </p>
+        <button
+          type="button"
+          onClick={onOpen}
+          onMouseEnter={() => plusRef.current?.startAnimation()}
+          onMouseLeave={() => plusRef.current?.stopAnimation()}
+          className={cn(
+            buttonVariants({ variant: "default" }),
+            "mt-2 w-full gap-2",
+          )}
+        >
+          <PlusIcon ref={plusRef} size={14} />
+          Add your skill
+        </button>
       </div>
     </section>
   );
@@ -484,7 +463,7 @@ export function SkillsInstallList({
         ))}
       </div>
 
-      <AddSkillCta onOpen={handleOpenAddSkill} skillCount={orderedSkills.length} />
+      <AddSkillCta onOpen={handleOpenAddSkill} />
       <AddSkillModal open={addSkillOpen} onClose={handleCloseAddSkill} />
     </div>
   );

@@ -82,7 +82,6 @@ Before copying, `zora price-history` checks whether price reversed since the sou
 
 ```text
 Copy Trader
-Run at 2026-03-27T13:40:00Z
 Mode: dry-run
 Health: healthy
 

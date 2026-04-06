@@ -59,7 +59,6 @@ To drill into a specific coin, run `zora get <name> --type trend --json` for hol
 
 ```text
 Trend Scout
-Run at 2026-03-23T13:30:00Z
 
 Trending leaders:
 1. looksmaxxing, $2.3M, +12.3%, $450.2K volume

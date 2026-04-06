@@ -60,7 +60,6 @@ Next run, it diffs the current snapshot against saved state: new positions, clos
 
 ```text
 Portfolio Scout
-Run at 2026-03-23T12:00:00Z
 
 Spendable:
 - 0.42 ETH

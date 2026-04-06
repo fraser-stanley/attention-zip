@@ -88,7 +88,6 @@ After cooldown/position/cap checks, pulls volume and trending, filters by gain a
 
 ```text
 Momentum Trader
-Run at 2026-03-23T13:40:00Z
 Mode: dry-run
 
 Positions: 1

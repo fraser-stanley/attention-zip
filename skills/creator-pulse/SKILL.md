@@ -58,7 +58,6 @@ With a watchlist set, each identifier gets looked up via `zora get <identifier> 
 
 ```text
 Creator Pulse
-Run at 2026-03-23T13:30:00Z
 
 Featured creators:
 1. jacob, $8.1M, $1.2M volume, 2,341 holders
